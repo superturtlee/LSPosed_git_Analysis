@@ -1,0 +1,210 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][admin][admin@0x.mk]package de.robv.android.xposed;
+[external][admin][admin@0x.mk]
+[external][shana][shana@zju.edu.cn]import java.lang.reflect.Executable;
+[external][admin][admin@0x.mk]import java.lang.reflect.Member;
+[external][shana][shana@zju.edu.cn]import java.util.HashMap;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]import de.robv.android.xposed.callbacks.IXUnhook;
+[external][admin][admin@0x.mk]import de.robv.android.xposed.callbacks.XCallback;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]/**
+[external][admin][admin@0x.mk] * Callback class for method hooks.
+[external][admin][admin@0x.mk] *
+[external][admin][admin@0x.mk] * <p>Usually, anonymous subclasses of this class are created which override
+[external][admin][admin@0x.mk] * {@link #beforeHookedMethod} and/or {@link #afterHookedMethod}.
+[external][admin][admin@0x.mk] */
+[external][admin][admin@0x.mk]public abstract class XC_MethodHook extends XCallback {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Creates a new callback with default priority.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @SuppressWarnings("deprecation")
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public XC_MethodHook() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        super();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Creates a new callback with a specific priority.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * <p class="note">Note that {@link #afterHookedMethod} will be called in reversed order, i.e.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * the callback with the highest priority will be called last. This way, the callback has the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * final control over the return value. {@link #beforeHookedMethod} is called as usual, i.e.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * highest priority first.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param priority See {@link XCallback#priority}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public XC_MethodHook(int priority) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        super(priority);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Called before the invocation of the method.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * <p>You can use {@link MethodHookParam#setResult} and {@link MethodHookParam#setThrowable}
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * to prevent the original method from being called.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * <p>Note that implementations shouldn't call {@code super(param)}, it's not necessary.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param param Information about the method call.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @throws Throwable Everything the callback throws is caught and logged.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][shana][shana@zju.edu.cn]    protected void beforeHookedMethod(MethodHookParam<?> param) throws Throwable {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    public void callBeforeHookedMethod(MethodHookParam<?> param) throws Throwable {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        beforeHookedMethod(param);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Called after the invocation of the method.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * <p>You can use {@link MethodHookParam#setResult} and {@link MethodHookParam#setThrowable}
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * to modify the return value of the original method.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * <p>Note that implementations shouldn't call {@code super(param)}, it's not necessary.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param param Information about the method call.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @throws Throwable Everything the callback throws is caught and logged.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][shana][shana@zju.edu.cn]    protected void afterHookedMethod(MethodHookParam<?> param) throws Throwable {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    public void callAfterHookedMethod(MethodHookParam<?> param) throws Throwable {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        afterHookedMethod(param);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Wraps information about the method call and allows to influence it.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][noreply][noreply@nullptr.icu]    public static final class MethodHookParam<T extends Executable> extends XCallback.Param {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         * @hide
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        @SuppressWarnings("deprecation")
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public MethodHookParam() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            super();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         * The hooked method/constructor.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         */
+[external][shana][shana@zju.edu.cn]        public Member method;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         * The {@code this} reference for an instance method, or {@code null} for static methods.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public Object thisObject;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         * Arguments to the method call.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public Object[] args;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][noreply][noreply@nullptr.icu]        public Object result = null;
+[external][noreply][noreply@nullptr.icu]        public Throwable throwable = null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public boolean returnEarly = false;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]        private final HashMap<String, Object> extras = new HashMap<>();
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         * Returns the result of the method call.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public Object getResult() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return result;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         * Modify the result of the method call.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         * <p>If called from {@link #beforeHookedMethod}, it prevents the call to the original method.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public void setResult(Object result) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            this.result = result;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            this.throwable = null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            this.returnEarly = true;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         * Returns the {@link Throwable} thrown by the method, or {@code null}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public Throwable getThrowable() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return throwable;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         * Returns true if an exception was thrown by the method.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public boolean hasThrowable() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return throwable != null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         * Modify the exception thrown of the method call.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         * <p>If called from {@link #beforeHookedMethod}, it prevents the call to the original method.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public void setThrowable(Throwable throwable) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            this.throwable = throwable;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            this.result = null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            this.returnEarly = true;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         * Returns the result of the method call, or throws the Throwable caused by it.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public Object getResultOrThrowable() throws Throwable {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (throwable != null)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                throw throwable;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return result;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * An object with which the method/constructor can be unhooked.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public class Unhook implements IXUnhook<XC_MethodHook> {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        private final Member hookMethod;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        /*package*/ Unhook(Member hookMethod) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            this.hookMethod = hookMethod;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         * Returns the method/constructor that has been hooked.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public Member getHookedMethod() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return hookMethod;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public XC_MethodHook getCallback() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return XC_MethodHook.this;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        @SuppressWarnings("deprecation")
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public void unhook() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.unhookMethod(hookMethod, XC_MethodHook.this);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][admin][admin@0x.mk]}

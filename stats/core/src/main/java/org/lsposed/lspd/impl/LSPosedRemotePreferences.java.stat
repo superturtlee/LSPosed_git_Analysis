@@ -1,0 +1,129 @@
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]package org.lsposed.lspd.impl;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import android.content.SharedPreferences;
+[external][shana][shana@zju.edu.cn]import android.os.Bundle;
+[external][shana][shana@zju.edu.cn]import android.os.RemoteException;
+[external][shana][shana@zju.edu.cn]import android.util.ArraySet;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import androidx.annotation.Nullable;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import org.lsposed.lspd.service.ILSPInjectedModuleService;
+[external][shana][shana@zju.edu.cn]import org.lsposed.lspd.service.IRemotePreferenceCallback;
+[external][shana][shana@zju.edu.cn]
+[external][noreply][noreply@nullptr.icu]import java.util.HashSet;
+[external][shana][shana@zju.edu.cn]import java.util.Map;
+[external][shana][shana@zju.edu.cn]import java.util.Set;
+[external][shana][shana@zju.edu.cn]import java.util.TreeMap;
+[external][shana][shana@zju.edu.cn]import java.util.concurrent.ConcurrentHashMap;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]@SuppressWarnings("unchecked")
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]public class LSPosedRemotePreferences implements SharedPreferences {
+[external][shana][shana@zju.edu.cn]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    private final Map<String, Object> mMap = new ConcurrentHashMap<>();
+[external][shana][shana@zju.edu.cn]
+[external][noreply][noreply@nullptr.icu]    final HashSet<OnSharedPreferenceChangeListener> mListeners = new HashSet<>();
+[external][shana][shana@zju.edu.cn]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    IRemotePreferenceCallback callback = new IRemotePreferenceCallback.Stub() {
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        synchronized public void onUpdate(Bundle bundle) {
+[external][shana][shana@zju.edu.cn]            Set<String> changes = new ArraySet<>();
+[external][shana][shana@zju.edu.cn]            if (bundle.containsKey("delete")) {
+[external][noreply][noreply@nullptr.icu]                var deletes = (Set<String>) bundle.getSerializable("delete");
+[external][shana][shana@zju.edu.cn]                changes.addAll(deletes);
+[external][shana][shana@zju.edu.cn]                for (var key : deletes) {
+[external][shana][shana@zju.edu.cn]                    mMap.remove(key);
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            if (bundle.containsKey("put")) {
+[external][shana][shana@zju.edu.cn]                var puts = (Map<String, Object>) bundle.getSerializable("put");
+[external][shana][shana@zju.edu.cn]                mMap.putAll(puts);
+[external][shana][shana@zju.edu.cn]                changes.addAll(puts.keySet());
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            synchronized (mListeners) {
+[external][shana][shana@zju.edu.cn]                for (var key : changes) {
+[external][noreply][noreply@nullptr.icu]                    mListeners.forEach(listener -> listener.onSharedPreferenceChanged(LSPosedRemotePreferences.this, key));
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    };
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public LSPosedRemotePreferences(ILSPInjectedModuleService service, String group) throws RemoteException {
+[external][shana][shana@zju.edu.cn]        Bundle output = service.requestRemotePreferences(group, callback);
+[external][shana][shana@zju.edu.cn]        if (output.containsKey("map")) {
+[external][shana][shana@zju.edu.cn]            mMap.putAll((Map<String, Object>) output.getSerializable("map"));
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public Map<String, ?> getAll() {
+[external][shana][shana@zju.edu.cn]        return new TreeMap<>(mMap);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Nullable
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public String getString(String key, @Nullable String defValue) {
+[external][shana][shana@zju.edu.cn]        var v = (String) mMap.getOrDefault(key, defValue);
+[external][shana][shana@zju.edu.cn]        if (v != null) return v;
+[external][shana][shana@zju.edu.cn]        return defValue;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Nullable
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public Set<String> getStringSet(String key, @Nullable Set<String> defValues) {
+[external][shana][shana@zju.edu.cn]        var v = (Set<String>) mMap.getOrDefault(key, defValues);
+[external][shana][shana@zju.edu.cn]        if (v != null) return v;
+[external][shana][shana@zju.edu.cn]        return defValues;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public int getInt(String key, int defValue) {
+[external][shana][shana@zju.edu.cn]        var v = (Integer) mMap.getOrDefault(key, defValue);
+[external][shana][shana@zju.edu.cn]        if (v != null) return v;
+[external][shana][shana@zju.edu.cn]        return defValue;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public long getLong(String key, long defValue) {
+[external][shana][shana@zju.edu.cn]        var v = (Long) mMap.getOrDefault(key, defValue);
+[external][shana][shana@zju.edu.cn]        if (v != null) return v;
+[external][shana][shana@zju.edu.cn]        return defValue;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public float getFloat(String key, float defValue) {
+[external][shana][shana@zju.edu.cn]        var v = (Float) mMap.getOrDefault(key, defValue);
+[external][shana][shana@zju.edu.cn]        if (v != null) return v;
+[external][shana][shana@zju.edu.cn]        return defValue;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public boolean getBoolean(String key, boolean defValue) {
+[external][shana][shana@zju.edu.cn]        var v = (Boolean) mMap.getOrDefault(key, defValue);
+[external][shana][shana@zju.edu.cn]        if (v != null) return v;
+[external][shana][shana@zju.edu.cn]        return defValue;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public boolean contains(String key) {
+[external][shana][shana@zju.edu.cn]        return mMap.containsKey(key);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public Editor edit() {
+[external][shana][shana@zju.edu.cn]        throw new UnsupportedOperationException("Read only implementation");
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public void registerOnSharedPreferenceChangeListener(OnSharedPreferenceChangeListener listener) {
+[external][shana][shana@zju.edu.cn]        synchronized (mListeners) {
+[external][noreply][noreply@nullptr.icu]            mListeners.add(listener);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public void unregisterOnSharedPreferenceChangeListener(OnSharedPreferenceChangeListener listener) {
+[external][shana][shana@zju.edu.cn]        synchronized (mListeners) {
+[external][shana][shana@zju.edu.cn]            mListeners.remove(listener);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

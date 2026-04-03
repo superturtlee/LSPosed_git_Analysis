@@ -1,0 +1,81 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]<?xml version="1.0" encoding="utf-8"?><!--
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  -->
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="PrivateResource,UnusedResources">
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    <!-- Add android:colorControlNormal -->
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    <style name="Base.ThemeOverlay.AppCompat.ActionBar" tools:override="true">
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <item name="android:colorControlNormal">?android:attr/textColorPrimary</item>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <item name="colorControlNormal">?android:attr/textColorPrimary</item>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <item name="searchViewStyle">@style/Widget.AppCompat.SearchView.ActionBar</item>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    </style>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    <style name="Base.ThemeOverlay.AppCompat.Dark.ActionBar" tools:override="true">
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <item name="android:colorControlNormal">?android:attr/textColorPrimary</item>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <item name="colorControlNormal">?android:attr/textColorPrimary</item>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <item name="searchViewStyle">@style/Widget.AppCompat.SearchView.ActionBar</item>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    </style>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    <style name="Widget.MaterialComponents.CompoundButton.CheckBox" parent="Widget.AppCompat.CompoundButton.CheckBox" tools:override="true">
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <item name="enforceMaterialTheme">true</item>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <item name="useMaterialThemeColors">true</item>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    </style>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    <style name="Widget.MaterialComponents.CompoundButton.RadioButton" parent="Widget.AppCompat.CompoundButton.RadioButton" tools:override="true">
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <item name="enforceMaterialTheme">true</item>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <item name="useMaterialThemeColors">true</item>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    </style>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    <style name="ThemeOverlay.Material.Dialog.ColorPicker" parent="@style/ThemeOverlay.Material3.MaterialAlertDialog.Centered" tools:override="true" />
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    <!-- Base themes -->
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    <style name="Base.Light" parent="Theme.Material3.Light" tools:override="true">
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <item name="android:statusBarColor">?android:colorBackground</item>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <item name="android:ambientShadowAlpha">@dimen/ambient_shadow_alpha</item>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <item name="android:spotShadowAlpha">@dimen/spot_shadow_alpha</item>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <item name="colorPrimary">@color/primary_light</item>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <item name="colorPrimaryVariant">@color/primary_dark_light</item>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <item name="swipeRefreshLayoutProgressSpinnerBackgroundColor">?cardBackground</item>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <item name="colorAlert">@color/material_red_A200</item>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <item name="colorSafe">@color/material_green_600</item>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <item name="colorWarning">@color/material_orange_700</item>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <item name="colorInactive" tools:ignore="PrivateResource">@color/material_grey_600</item>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]        <item name="navigationBarDividerColor">@android:color/transparent</item>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    </style>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    <style name="Base" parent="Theme.Material3.Dark" tools:override="true">
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <item name="android:statusBarColor">?android:colorBackground</item>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <item name="android:ambientShadowAlpha">@dimen/ambient_shadow_alpha</item>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <item name="android:spotShadowAlpha">@dimen/spot_shadow_alpha</item>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <item name="colorPrimary">@color/primary_dark</item>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <item name="colorPrimaryVariant">@color/primary_dark_dark</item>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <item name="swipeRefreshLayoutProgressSpinnerBackgroundColor">?cardBackground</item>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <item name="colorAlert">@color/material_red_A100</item>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <item name="colorSafe">@color/material_green_A100</item>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <item name="colorWarning">@color/material_orange_A100</item>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]        <item name="navigationBarDividerColor">@android:color/transparent</item>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    </style>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]</resources>

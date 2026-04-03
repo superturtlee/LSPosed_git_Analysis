@@ -1,0 +1,43 @@
+[external][shana][shana@zju.edu.cn]<?xml version="1.0" encoding="utf-8"?><!--
+[external][shana][shana@zju.edu.cn]  ~ This file is part of LSPosed.
+[external][shana][shana@zju.edu.cn]  ~
+[external][shana][shana@zju.edu.cn]  ~ LSPosed is free software: you can redistribute it and/or modify
+[external][shana][shana@zju.edu.cn]  ~ it under the terms of the GNU General Public License as published by
+[external][shana][shana@zju.edu.cn]  ~ the Free Software Foundation, either version 3 of the License, or
+[external][shana][shana@zju.edu.cn]  ~ (at your option) any later version.
+[external][shana][shana@zju.edu.cn]  ~
+[external][shana][shana@zju.edu.cn]  ~ LSPosed is distributed in the hope that it will be useful,
+[external][shana][shana@zju.edu.cn]  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][shana][shana@zju.edu.cn]  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][shana][shana@zju.edu.cn]  ~ GNU General Public License for more details.
+[external][shana][shana@zju.edu.cn]  ~
+[external][shana][shana@zju.edu.cn]  ~ You should have received a copy of the GNU General Public License
+[external][shana][shana@zju.edu.cn]  ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][shana][shana@zju.edu.cn]  ~
+[external][shana][shana@zju.edu.cn]  ~ Copyright (C) 2021 LSPosed Contributors
+[external][shana][shana@zju.edu.cn]  -->
+[external][shana][shana@zju.edu.cn]<menu xmlns:android="http://schemas.android.com/apk/res/android">
+[external][shana][shana@zju.edu.cn]    <item
+[external][shana][shana@zju.edu.cn]        android:id="@+id/main_fragment"
+[external][shana][shana@zju.edu.cn]        android:icon="@drawable/ic_home_checkable"
+[external][shana][shana@zju.edu.cn]        android:title="@string/overview" />
+[external][shana][shana@zju.edu.cn]    <item
+[external][shana][shana@zju.edu.cn]        android:id="@+id/modules_nav"
+[external][shana][shana@zju.edu.cn]        android:icon="@drawable/ic_extension_checkable"
+[external][shana][shana@zju.edu.cn]        android:title="@string/Modules" />
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    <item
+[external][shana][shana@zju.edu.cn]        android:id="@+id/repo_nav"
+[external][shana][shana@zju.edu.cn]        android:icon="@drawable/ic_get_app_checkable"
+[external][shana][shana@zju.edu.cn]        android:title="@string/module_repo" />
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    <item
+[external][shana][shana@zju.edu.cn]        android:id="@+id/logs_fragment"
+[external][shana][shana@zju.edu.cn]        android:icon="@drawable/ic_assignment_checkable"
+[external][shana][shana@zju.edu.cn]        android:title="@string/Logs" />
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    <item
+[external][shana][shana@zju.edu.cn]        android:id="@+id/settings_fragment"
+[external][shana][shana@zju.edu.cn]        android:icon="@drawable/ic_settings_checkable"
+[external][shana][shana@zju.edu.cn]        android:title="@string/Settings" />
+[external][shana][shana@zju.edu.cn]</menu>

@@ -1,0 +1,242 @@
+[bot][lsposed][lsposed@lsposed.org]<?xml version="1.0" encoding="utf-8"?>
+[bot][lsposed][lsposed@lsposed.org]<!--
+[bot][lsposed][lsposed@lsposed.org]  ~ This file is part of LSPosed.
+[bot][lsposed][lsposed@lsposed.org]  ~
+[bot][lsposed][lsposed@lsposed.org]  ~ LSPosed is free software: you can redistribute it and/or modify
+[bot][lsposed][lsposed@lsposed.org]  ~ it under the terms of the GNU General Public License as published by
+[bot][lsposed][lsposed@lsposed.org]  ~ the Free Software Foundation, either version 3 of the License, or
+[bot][lsposed][lsposed@lsposed.org]  ~ (at your option) any later version.
+[bot][lsposed][lsposed@lsposed.org]  ~
+[bot][lsposed][lsposed@lsposed.org]  ~ LSPosed is distributed in the hope that it will be useful,
+[bot][lsposed][lsposed@lsposed.org]  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+[bot][lsposed][lsposed@lsposed.org]  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[bot][lsposed][lsposed@lsposed.org]  ~ GNU General Public License for more details.
+[bot][lsposed][lsposed@lsposed.org]  ~
+[bot][lsposed][lsposed@lsposed.org]  ~ You should have received a copy of the GNU General Public License
+[bot][lsposed][lsposed@lsposed.org]  ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[bot][lsposed][lsposed@lsposed.org]  ~
+[bot][lsposed][lsposed@lsposed.org]  ~ Copyright (C) 2021 LSPosed Contributors
+[bot][lsposed][lsposed@lsposed.org]  -->
+[bot][lsposed][lsposed@lsposed.org]<resources xmlns:tools="http://schemas.android.com/tools" tools:keep="@string/xposed_module_updated_notification_*,@string/module_is_not_activated_*">
+[bot][lsposed][lsposed@lsposed.org]    <!-- MainActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="overview">Oversikt</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="Modules">Moduler</string>
+[bot][lsposed][lsposed@lsposed.org]    <plurals name="modules_enabled_count">
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="one">%d modul aktivert</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="other">%d moduler aktivert</item>
+[bot][lsposed][lsposed@lsposed.org]    </plurals>
+[bot][lsposed][lsposed@lsposed.org]    <string name="Logs">Logger</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="Settings">Innstillinger</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="feedback_or_suggestion">Tilbakemelding eller forslag</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="About">Om</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="report_issue">Rapporter en feil</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo">Kodelager</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo_up_to_date">Alle moduler oppdatert</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo_published_time">Publisert på %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo_updated_time">Oppdatert kl %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <plurals name="module_repo_upgradable">
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="one">%d modul kan oppgraderes</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="other">%d moduler kan oppgraderes</item>
+[bot][lsposed][lsposed@lsposed.org]    </plurals>
+[bot][lsposed][lsposed@lsposed.org]    <string name="about_view_source_code"><![CDATA[Vis kildekode på %1$s<br/>Bli med i vår %2$s -kanal]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="translators" comment="Dear translators, please add your home page here following the format. There can be more than one translator. So feel free to append yourself.">null</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install">Installer</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install_summary">Trykk for å installere LSPosed</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="not_installed">Ikke installert</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="not_install_summary">LSPC er ikke installert</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="activated">Aktivert</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="partial_activated">Delvis aktivert</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="selinux_policy_not_loaded_summary">SEPolicy er ikke lastet riktig</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="selinux_policy_not_loaded"><![CDATA[Noen funksjoner vil ikke fungere.<br/>Vennligst rapporter dette til <a href="https://github.com/topjohnwu/Magisk/issues"><b>Magisk</b></a> utvikler.]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_inject_fail_summary">Systemets ramme-injeksjon mislyktes</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_inject_fail"><![CDATA[Dette er sjeldent og kan forårsakes av <b>Magisk</b> eller noen lavkvalitets magnetiske moduler.<br/>Prøv å deaktivere andre Magiske moduler enn Riru og LSPosed eller sende full logg til utviklere.]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_prop_incorrect_summary">Feil i systemprop</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_prop_incorrect"><![CDATA[Noen nødvendige systemegenskaper kan slettes eller endres.<br/>Moduler kan godkjennes av og til.]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="need_update">Må oppdatere</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="please_update_summary">Vennligst installer den nyeste versjonen av LSPosed</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_api_version">API versjon</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_framework_version">Rammeverk versjon</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_manager_package_name">Lederpakkenavn (Automatic Translation)</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_system_version">System versjon</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_device">Enhet</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_system_abi">System ABI</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_dex2oat_wrapper">Dex Optimizer Wrapper</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enabled">Aktivert</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="not_enabled">Ikke aktivert</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="supported">Støttes</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="unsupported">Ustøttet</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="android_version_unsatisfied">Android-versjonen er ikke fornøyd</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="crashed">Krasjet</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="mount_failed">Montering mislyktes</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="selinux_permissive">SELinux er tillatt</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sepolicy_incorrect">SELinux policy er feil</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_lsposed">Oppdateringen LSPosed</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_lsposed_msg">Bekreft oppdatering av LSPosed? Denne enheten vil starte på nytt etter fullført oppdatering</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_copied">Kopiert til utklippstavlen</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- WelcomeDialog -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="parasitic_welcome">Velkommen til LSPosed</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="parasitic_welcome_summary">Du bruker den parasittiske manageren, som kan opprette snarvei eller fortsatt åpne fra varsling.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="parasitic_welcome_summary_no_shortcut_support">Du bruker parasittbehandleren, som kan åpnes fra varsling.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="create_shortcut">Opprett snarvei</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="never_show">Vis aldri</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_welcome">Parasittisk leder anbefales</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_welcome_summary">LSPosed støtter nå systemparasittering for å unngå deteksjon, du kan åpne parasitic manager fra varsling. Det anbefales å avinstallere gjeldende applikasjon.</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- LogsActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="menuSaveToSd">Lagre</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="nav_item_logs_verbose">Detaljert logg</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="nav_item_logs_module">Modullogger</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_saving">Lagrer loggen, vennligst vent</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_saved">Logger lagret</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_save_failed2">Kunne ikke lagre:\n%s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menuClearLog">Tøm logg nå</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_cleared">Logg fjernet.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="scroll_top">Rull til toppen</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="loading">Laster…</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="scroll_bottom">Rull til bunnen</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menuReload">Reload</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_clear_failed_2">Kunne ikke tømme loggen</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_enable_word_wrap">Ordfarget farget farget</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enabled_verbose_log">Detaljert logg aktivert</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="disabled_verbose_log">Detaljert logg deaktivert</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- ModulesActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_empty_description">(ingen beskrivelse er gitt)</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_xposed_min_version">Denne modulen krever en nyere Xposed versjon (%d) og kan dermed ikke aktiveres</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_target_version_higher">Denne modulen er designet for en nyere Xposed-versjon (%d), og derfor kan det hende at enkelte funksjoner ikke fungerer</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="no_min_version_specified">Denne modulen spesifiserer ikke hvilken versjon av Xposed den trenger.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_min_version_too_low">Denne modulen var laget for Xposed versjon %1$d, men grunnet inkompatible endringer i versjon %2$der den blitt deaktivert</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_installed_on_external_storage">Denne modulen kan ikke lastes fordi den er installert på SD-kortet, vennligst flytt den til intern lagring</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstall">Avinstaller</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_settings">Modul innstillinger</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="view_in_repo">Vis i Repo</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstall_message">Vil du avinstallere denne modulen?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstalled">Avinstallert %1$s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstall_failed">Avinstalleringen mislyktes</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="add_module_to_user">Legg til modul i brukeren</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_installed">La til %1$s som bruker %2$s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_install_failed">Legge til modul mislyktes</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install_to_user">Installer til bruker %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install_to_user_message">Ønsker du installere %1$s til brukeren %2$s? Det anbefales å installere manuelt, tvinge installasjonen via LSPosed kan forårsake problemer.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="expand">utvid</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="collapse">skjul</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- AppListActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_speed">Gjenoptimaliser</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_speed_msg">Optimaliserer…</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_done">Optimalisering fullført</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_launch">Start det</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_failed">Optimalisering mislyktes: returverdien er tom</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_failed_with_info">Optimalisering mislyktes: </string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_by_name">Navn på applikasjon</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_by_package_name">Navn på pakke</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_by_install_time">Installere tid</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_by_update_time">Oppdaterings tid</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_reverse">Revers</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_system_apps">System apper</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_sort">Sortering</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enable_module">Aktiver modul</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="no_scope_selected">Du valgte ingen app. Fortsette?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_games">Spill</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_modules">Moduler</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_denylist">Denylist</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="failed_to_save_scope_list">Kan ikke lagre områdeliste</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_version">Versjon: %1$s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="use_recommended">Anbefalt</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="no_scope_selected_has_recommended">Du valgte ingen applikasjoner. Velg anbefalte apper?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="use_recommended_message">Velg anbefalte apper?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_is_not_activated_yet">Xposed modul er ikke aktivert enda</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="requested_by_module">Anbefalt</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_available">Oppdatering tilgjengelig: %1$s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_disabled_no_selection">Modul %s er deaktivert siden ingen app valgt.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="android_framework">Systemets rammeverk</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_backup_and_restore">Sikkerhetskopi</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_backup">Sikkerhetskopi</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_restore">Gjenopprett</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="force_stop">Tving avslutning</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="force_stop_dlg_title">Tving stopp?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="force_stop_dlg_text">Hvis du tvangsstopper en app, kan den oppføre seg uventet.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="reboot_required">Omstart kreves for at denne endringen skal gjelde</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="reboot">Reboot</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_hide">Skjul</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="deny_list">%s er på denylist. Det kan ikke tre i kraft.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="deny_list_info">På denylist</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- ModulesActivity and AppListActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="modules_other_app">Se i andre app</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_app_info">Info om app</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="list_empty">########\\\\_(∙)_\/ ″\nIngenting her</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- SettingsActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_group_framework">Framework</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_disable_verbose_log">Deaktiver detaljerte logger</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_disable_verbose_log_summary">Rapporter problemer forespørsel om å inkludere detaljerte logger</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="pure_black_dark_theme">Svart mørkt tema</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="pure_black_dark_theme_summary">Bruk det svarte temaet hvis mørkt tema er aktivert</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_group_theme">Tema</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup_and_restore">Sikkerhetskopiering og gjenoppretting</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup_summery">Sikkerhetskopier modulliste og omfangslister.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_restore_summery">Gjenopprett modulliste og omfangslister.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup">Sikkerhetskopi</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup_failed2">Klarte ikke å sikkerhetskopiere:\n%s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enable_documentui">Aktiver DocumentUI</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_restore">Gjenopprett</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_restore_failed2">Kunne ikke gjenopprette:\n%s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="group_network">Nettverk</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="dns_over_http">DNS over HTTPS</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="dns_over_http_summary">Workaround DNS-forgiftning i noen nasjoner</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="theme_color">Tema farge</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="theme_color_system">System temafarge</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_show_hidden_icon_apps_enabled">Tving apper til å vise programvelgerikoner</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_show_hidden_icon_apps_enabled_summary">Etter Android 10 er apper ikke tillatt å skjule programikonene sine. Slå av for å deaktivere denne systemfunksjonen.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_group_system">Systemadministrasjon</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_language">Språk</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_translation_contributors">Oversettelse bidragsytere</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_translation">Delta i oversettelse</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_translation_summary">Hjelp oss med å oversette %s til ditt språk</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_create_shortcut_summary">Lag en snarvei som kan åpne parasitic manager</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_shortcut_pinned_hint">Snarvei festet</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_unsupported_pin_shortcut_summary">Den gjeldende standardstarteren støtter ikke pin-snarveier</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_enable_status_notification">Statusvarsel</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_enable_status_notification_summary">Vis et varsel som kan åpne parasitic manager</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="disable_status_notification_error">Ingen snarvei, kan ikke deaktivere varsling</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_update_channel">Oppdater kanal</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_channel_stable">Stabil</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_channel_bate">beta</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_channel_nightly">Nattlig bygg</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_xposed_api_call_protection">Xposed API-anropsbeskyttelse</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_xposed_api_call_protection_summary">Blokker dynamisk lastet modulkode for å bruke Xposed API, dette kan ødelegge noen moduler, men gi fordeler for sikkerheten</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- Module Repo -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_readme">Lesmeg</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_releases">Utgivelser</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_information">Informasjon</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_information_homepage">Hjemmeside</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_information_source_url">Kildekode</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_information_collaborators">Samarbeidspartnere</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_release_view_assets">Eiendeler</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_open_in_browser">Åpne i nettleser</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_release_load_more">Vis eldre versjoner</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_release_no_more">Ingen flere utgivelse</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="repo_load_failed">Kunne ikke laste modulrepo: %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_upgradable_first">Oppgraderbar først</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="installed">Installert</string>
+[bot][lsposed][lsposed@lsposed.org]    <plurals name="module_release_assets_download_count">
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="one">%d nedlasting</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="other">%d nedlastinger</item>
+[bot][lsposed][lsposed@lsposed.org]    </plurals>
+[bot][lsposed][lsposed@lsposed.org]    <!-- Colors -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_sakura">Sakura</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_red">Rød</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_pink">Rosa</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_purple">Lilla</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_deep_purple">Dyp lilla</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_indigo">Indigo</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_blue">Blå</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_light_blue">Lys blå</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_cyan">Turkis</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_teal">Blågrønn</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_green">Grønn</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_light_green">Lys grønn</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_lime">Limegrønn</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_yellow">Gul</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_amber">Rav</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_orange">Oransje</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_deep_orange">Dyp oransje</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_brown">Brun</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_blue_grey">Blå grå</string>
+[bot][lsposed][lsposed@lsposed.org]</resources>

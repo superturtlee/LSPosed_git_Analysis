@@ -1,0 +1,15 @@
+[external][shana][shana@zju.edu.cn]package android.content;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import android.os.Handler;
+[external][shana][shana@zju.edu.cn]import android.os.IBinder;
+[external][shana][shana@zju.edu.cn]import android.os.UserHandle;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public class Context {
+[external][shana][shana@zju.edu.cn]    public IBinder getActivityToken() {
+[external][shana][shana@zju.edu.cn]        throw new UnsupportedOperationException("STUB");
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]    public Intent registerReceiverAsUser(BroadcastReceiver receiver, UserHandle user,
+[external][shana][shana@zju.edu.cn]                                         IntentFilter filter, String broadcastPermission, Handler scheduler) {
+[external][shana][shana@zju.edu.cn]        throw new UnsupportedOperationException("STUB");
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

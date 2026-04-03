@@ -1,0 +1,71 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]<!--
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  -->
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    <shortcut
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        android:enabled="true"
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        android:icon="@drawable/shortcut_ic_modules"
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        android:shortcutId="modules"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        android:shortcutLongLabel="@string/Modules"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        android:shortcutShortLabel="@string/Modules">
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        <intent
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]            android:action="android.intent.action.MAIN"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            android:data="modules"
+[external][shana][shana@zju.edu.cn]            android:targetClass="org.lsposed.manager.ui.activity.MainActivity"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            android:targetPackage="org.lsposed.manager" />
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    </shortcut>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    <shortcut
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        android:enabled="true"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        android:icon="@drawable/shortcut_ic_logs"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        android:shortcutId="logs"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        android:shortcutLongLabel="@string/Logs"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        android:shortcutShortLabel="@string/Logs">
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <intent
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            android:action="android.intent.action.MAIN"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            android:data="logs"
+[external][shana][shana@zju.edu.cn]            android:targetClass="org.lsposed.manager.ui.activity.MainActivity"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            android:targetPackage="org.lsposed.manager" />
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    </shortcut>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    <shortcut
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        android:enabled="true"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        android:icon="@drawable/shortcut_ic_repo"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        android:shortcutId="repo"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        android:shortcutLongLabel="@string/module_repo"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        android:shortcutShortLabel="@string/module_repo">
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <intent
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            android:action="android.intent.action.MAIN"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            android:data="repo"
+[external][shana][shana@zju.edu.cn]            android:targetClass="org.lsposed.manager.ui.activity.MainActivity"
+[external][shana][shana@zju.edu.cn]            android:targetPackage="org.lsposed.manager" />
+[external][shana][shana@zju.edu.cn]    </shortcut>
+[external][shana][shana@zju.edu.cn]    <shortcut
+[external][shana][shana@zju.edu.cn]        android:enabled="true"
+[external][shana][shana@zju.edu.cn]        android:icon="@drawable/shortcut_ic_settings"
+[external][shana][shana@zju.edu.cn]        android:shortcutId="settings"
+[external][shana][shana@zju.edu.cn]        android:shortcutLongLabel="@string/Settings"
+[external][shana][shana@zju.edu.cn]        android:shortcutShortLabel="@string/Settings">
+[external][shana][shana@zju.edu.cn]        <intent
+[external][shana][shana@zju.edu.cn]            android:action="android.intent.action.MAIN"
+[external][shana][shana@zju.edu.cn]            android:data="settings"
+[external][shana][shana@zju.edu.cn]            android:targetClass="org.lsposed.manager.ui.activity.MainActivity"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            android:targetPackage="org.lsposed.manager" />
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    </shortcut>
+[internal][vvb2060][vvb2060@gmail.com]</shortcuts>

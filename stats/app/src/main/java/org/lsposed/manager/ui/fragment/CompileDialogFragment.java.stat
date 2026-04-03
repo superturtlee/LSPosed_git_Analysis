@@ -1,0 +1,123 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.manager.ui.fragment;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]import android.app.Dialog;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]import android.content.Context;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]import android.content.pm.ApplicationInfo;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]import android.content.pm.PackageManager;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]import android.os.AsyncTask;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]import android.os.Bundle;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]import android.view.LayoutInflater;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]import androidx.annotation.NonNull;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]import androidx.appcompat.app.AppCompatDialogFragment;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import androidx.fragment.app.FragmentManager;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.App;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.R;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.databinding.FragmentCompileDialogBinding;
+[external][shana][shana@zju.edu.cn]import org.lsposed.manager.receivers.LSPManagerServiceHolder;
+[external][shana][shana@zju.edu.cn]import org.lsposed.manager.ui.dialog.BlurBehindDialogBuilder;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.lang.ref.WeakReference;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]@SuppressWarnings("deprecation")
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]public class CompileDialogFragment extends AppCompatDialogFragment {
+[external][shana][shana@zju.edu.cn]    public static void speed(FragmentManager fragmentManager, ApplicationInfo info) {
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        CompileDialogFragment fragment = new CompileDialogFragment();
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        fragment.setCancelable(false);
+[external][shana][shana@zju.edu.cn]        var bundle = new Bundle();
+[external][shana][shana@zju.edu.cn]        bundle.putParcelable("appInfo", info);
+[external][shana][shana@zju.edu.cn]        fragment.setArguments(bundle);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        fragment.show(fragmentManager, "compile_dialog");
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    @Override
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    @NonNull
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    public Dialog onCreateDialog(Bundle savedInstanceState) {
+[external][shana][shana@zju.edu.cn]        var arguments = getArguments();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        ApplicationInfo appInfo = arguments != null ? arguments.getParcelable("appInfo") : null;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        if (appInfo == null) {
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]            throw new IllegalStateException("appInfo should not be null.");
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        FragmentCompileDialogBinding binding = FragmentCompileDialogBinding.inflate(LayoutInflater.from(requireActivity()), null, false);
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        final PackageManager pm = requireContext().getPackageManager();
+[external][shana][shana@zju.edu.cn]        var builder = new BlurBehindDialogBuilder(requireActivity())
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                .setIcon(appInfo.loadIcon(pm))
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]                .setTitle(appInfo.loadLabel(pm))
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                .setView(binding.getRoot());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        var alertDialog = builder.create();
+[external][shana][shana@zju.edu.cn]        new CompileTask(this).executeOnExecutor(App.getExecutorService(), appInfo.packageName);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        return alertDialog;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    private static class CompileTask extends AsyncTask<String, Void, Throwable> {
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        WeakReference<CompileDialogFragment> outerRef;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        CompileTask(CompileDialogFragment fragment) {
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]            outerRef = new WeakReference<>(fragment);
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        @Override
+[external][shana][shana@zju.edu.cn]        protected Throwable doInBackground(String... commands) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            try {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                LSPManagerServiceHolder.getService().clearApplicationProfileData(commands[0]);
+[external][shana][shana@zju.edu.cn]                if (LSPManagerServiceHolder.getService().performDexOptMode(commands[0])) {
+[external][shana][shana@zju.edu.cn]                    return null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                } else {
+[external][shana][shana@zju.edu.cn]                    return new UnknownError();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                }
+[external][shana][shana@zju.edu.cn]            } catch (Throwable e) {
+[external][shana][shana@zju.edu.cn]                return e;
+[external][admin][admin@0x.mk]            }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        @Override
+[external][shana][shana@zju.edu.cn]        protected void onPostExecute(Throwable result) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Context context = App.getInstance();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            String text;
+[external][shana][shana@zju.edu.cn]            if (result != null) {
+[external][shana][shana@zju.edu.cn]                if (result instanceof UnknownError) {
+[external][shana][shana@zju.edu.cn]                    text = context.getString(R.string.compile_failed);
+[external][shana][shana@zju.edu.cn]                } else {
+[external][shana][shana@zju.edu.cn]                    text = context.getString(R.string.compile_failed_with_info) + result;
+[external][shana][shana@zju.edu.cn]                }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]            } else {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                text = context.getString(R.string.compile_done);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][shana][shana@zju.edu.cn]            try {
+[external][shana][shana@zju.edu.cn]                CompileDialogFragment fragment = outerRef.get();
+[external][shana][shana@zju.edu.cn]                if (fragment != null) {
+[external][shana][shana@zju.edu.cn]                    fragment.dismissAllowingStateLoss();
+[external][shana][shana@zju.edu.cn]                    var parent = fragment.getParentFragment();
+[external][shana][shana@zju.edu.cn]                    if (parent instanceof BaseFragment) {
+[external][shana][shana@zju.edu.cn]                        ((BaseFragment) parent).showHint(text, true);
+[external][shana][shana@zju.edu.cn]                    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                }
+[external][shana][shana@zju.edu.cn]            } catch (IllegalStateException ignored) {
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]            }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]}

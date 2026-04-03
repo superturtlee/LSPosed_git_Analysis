@@ -1,0 +1,39 @@
+[external][shana][shana@zju.edu.cn]<?xml version="1.0" encoding="utf-8"?><!--
+[external][shana][shana@zju.edu.cn]  ~ This file is part of LSPosed.
+[external][shana][shana@zju.edu.cn]  ~
+[external][shana][shana@zju.edu.cn]  ~ LSPosed is free software: you can redistribute it and/or modify
+[external][shana][shana@zju.edu.cn]  ~ it under the terms of the GNU General Public License as published by
+[external][shana][shana@zju.edu.cn]  ~ the Free Software Foundation, either version 3 of the License, or
+[external][shana][shana@zju.edu.cn]  ~ (at your option) any later version.
+[external][shana][shana@zju.edu.cn]  ~
+[external][shana][shana@zju.edu.cn]  ~ LSPosed is distributed in the hope that it will be useful,
+[external][shana][shana@zju.edu.cn]  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][shana][shana@zju.edu.cn]  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][shana][shana@zju.edu.cn]  ~ GNU General Public License for more details.
+[external][shana][shana@zju.edu.cn]  ~
+[external][shana][shana@zju.edu.cn]  ~ You should have received a copy of the GNU General Public License
+[external][shana][shana@zju.edu.cn]  ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][shana][shana@zju.edu.cn]  ~
+[external][shana][shana@zju.edu.cn]  ~ Copyright (C) 2021 LSPosed Contributors
+[external][shana][shana@zju.edu.cn]  -->
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+[external][shana][shana@zju.edu.cn]    xmlns:app="http://schemas.android.com/apk/res-auto"
+[external][shana][shana@zju.edu.cn]    android:id="@+id/nav_graph"
+[external][shana][shana@zju.edu.cn]    app:startDestination="@id/main_fragment">
+[external][shana][shana@zju.edu.cn]    <fragment
+[external][shana][shana@zju.edu.cn]        android:id="@+id/main_fragment"
+[external][shana][shana@zju.edu.cn]        android:name="org.lsposed.manager.ui.fragment.HomeFragment"
+[external][shana][shana@zju.edu.cn]        android:label="main" />
+[external][shana][shana@zju.edu.cn]    <fragment
+[external][shana][shana@zju.edu.cn]        android:id="@+id/logs_fragment"
+[external][shana][shana@zju.edu.cn]        android:name="org.lsposed.manager.ui.fragment.LogsFragment"
+[external][shana][shana@zju.edu.cn]        android:label="logs" />
+[external][shana][shana@zju.edu.cn]    <fragment
+[external][shana][shana@zju.edu.cn]        android:id="@+id/settings_fragment"
+[external][shana][shana@zju.edu.cn]        android:name="org.lsposed.manager.ui.fragment.SettingsFragment"
+[external][shana][shana@zju.edu.cn]        android:label="settings" />
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    <include app:graph="@navigation/modules_nav" />
+[external][shana][shana@zju.edu.cn]    <include app:graph="@navigation/repo_nav" />
+[external][shana][shana@zju.edu.cn]</navigation>

@@ -1,0 +1,45 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][admin][admin@0x.mk]package de.robv.android.xposed.callbacks;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]import de.robv.android.xposed.IXposedHookZygoteInit;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]/**
+[external][admin][admin@0x.mk] * Interface for objects that can be used to remove callbacks.
+[external][admin][admin@0x.mk] *
+[external][admin][admin@0x.mk] * <p class="warning">Just like hooking methods etc., unhooking applies only to the current process.
+[external][admin][admin@0x.mk] * In other process (or when the app is removed from memory and then restarted), the hook will still
+[external][admin][admin@0x.mk] * be active. The Zygote process (see {@link IXposedHookZygoteInit}) is an exception, the hook won't
+[external][admin][admin@0x.mk] * be inherited by any future processes forked from it in the future.
+[external][admin][admin@0x.mk] *
+[external][admin][admin@0x.mk] * @param <T> The class of the callback.
+[external][admin][admin@0x.mk] */
+[external][admin][admin@0x.mk]public interface IXUnhook<T> {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Returns the callback that has been registered.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    T getCallback();
+[external][admin][admin@0x.mk]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Removes the callback.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    void unhook();
+[external][admin][admin@0x.mk]}

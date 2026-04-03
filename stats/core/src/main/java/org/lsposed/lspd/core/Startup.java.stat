@@ -1,0 +1,86 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * Copyright (C) 2021 - 2022 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.lspd.core;
+[external][hsushulong][hsushulong@gmail.com]
+[external][shana][shana@zju.edu.cn]import android.app.ActivityThread;
+[external][shana][shana@zju.edu.cn]import android.app.LoadedApk;
+[external][shana][shana@zju.edu.cn]import android.content.pm.ApplicationInfo;
+[external][shana][shana@zju.edu.cn]import android.content.res.CompatibilityInfo;
+[external][hsushulong][hsushulong@gmail.com]
+[external][shana][shana@zju.edu.cn]import com.android.internal.os.ZygoteInit;
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.lspd.deopt.PrebuiltMethodsDeopter;
+[external][shana][shana@zju.edu.cn]import org.lsposed.lspd.hooker.AttachHooker;
+[external][shana][shana@zju.edu.cn]import org.lsposed.lspd.hooker.CrashDumpHooker;
+[external][shana][shana@zju.edu.cn]import org.lsposed.lspd.hooker.HandleSystemServerProcessHooker;
+[external][shana][shana@zju.edu.cn]import org.lsposed.lspd.hooker.LoadedApkCtorHooker;
+[external][shana][shana@zju.edu.cn]import org.lsposed.lspd.hooker.LoadedApkCreateCLHooker;
+[external][shana][shana@zju.edu.cn]import org.lsposed.lspd.hooker.OpenDexFileHooker;
+[external][shana][shana@zju.edu.cn]import org.lsposed.lspd.impl.LSPosedContext;
+[external][noreply][noreply@nullptr.icu]import org.lsposed.lspd.impl.LSPosedHelper;
+[external][shana][shana@zju.edu.cn]import org.lsposed.lspd.service.ILSPApplicationService;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.lspd.util.Utils;
+[external][hsushulong][hsushulong@gmail.com]
+[external][shana][shana@zju.edu.cn]import java.util.List;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import dalvik.system.DexFile;
+[external][416810799][416810799@qq.com]import de.robv.android.xposed.XposedBridge;
+[external][416810799][416810799@qq.com]import de.robv.android.xposed.XposedInit;
+[external][shana][shana@zju.edu.cn]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]public class Startup {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    private static void startBootstrapHook(boolean isSystem) {
+[external][shana][shana@zju.edu.cn]        Utils.logD("startBootstrapHook starts: isSystem = " + isSystem);
+[external][noreply][noreply@nullptr.icu]        LSPosedHelper.hookMethod(CrashDumpHooker.class, Thread.class, "dispatchUncaughtException", Throwable.class);
+[external][shana][shana@zju.edu.cn]        if (isSystem) {
+[external][noreply][noreply@nullptr.icu]            LSPosedHelper.hookAllMethods(HandleSystemServerProcessHooker.class, ZygoteInit.class, "handleSystemServerProcess");
+[external][shana][shana@zju.edu.cn]        } else {
+[external][noreply][noreply@nullptr.icu]            LSPosedHelper.hookAllMethods(OpenDexFileHooker.class, DexFile.class, "openDexFile");
+[external][noreply][noreply@nullptr.icu]            LSPosedHelper.hookAllMethods(OpenDexFileHooker.class, DexFile.class, "openInMemoryDexFile");
+[external][noreply][noreply@nullptr.icu]            LSPosedHelper.hookAllMethods(OpenDexFileHooker.class, DexFile.class, "openInMemoryDexFiles");
+[external][hsushulong][hsushulong@gmail.com]        }
+[external][noreply][noreply@nullptr.icu]        LSPosedHelper.hookConstructor(LoadedApkCtorHooker.class, LoadedApk.class,
+[external][shana][shana@zju.edu.cn]                ActivityThread.class, ApplicationInfo.class, CompatibilityInfo.class,
+[external][noreply][noreply@nullptr.icu]                ClassLoader.class, boolean.class, boolean.class, boolean.class);
+[external][shana][shana@zju.edu.cn]        LSPosedHelper.hookMethod(LoadedApkCreateCLHooker.class, LoadedApk.class, "createOrUpdateClassLoaderLocked", List.class);
+[external][noreply][noreply@nullptr.icu]        LSPosedHelper.hookAllMethods(AttachHooker.class, ActivityThread.class, "attach");
+[external][hsushulong][hsushulong@gmail.com]    }
+[external][hsushulong][hsushulong@gmail.com]
+[external][shana][shana@zju.edu.cn]    public static void bootstrapXposed() {
+[external][shana][shana@zju.edu.cn]        // Initialize the Xposed framework
+[external][shana][shana@zju.edu.cn]        try {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            startBootstrapHook(XposedInit.startsSystemServer);
+[external][shana][shana@zju.edu.cn]            XposedInit.loadLegacyModules();
+[external][shana][shana@zju.edu.cn]        } catch (Throwable t) {
+[external][shana][shana@zju.edu.cn]            Utils.logE("error during Xposed initialization", t);
+[external][hsushulong][hsushulong@gmail.com]        }
+[external][hsushulong][hsushulong@gmail.com]    }
+[external][hsushulong][hsushulong@gmail.com]
+[external][shana][shana@zju.edu.cn]    public static void initXposed(boolean isSystem, String processName, String appDir, ILSPApplicationService service) {
+[external][shana][shana@zju.edu.cn]        // init logger
+[external][shana][shana@zju.edu.cn]        ApplicationServiceClient.Init(service, processName);
+[external][shana][shana@zju.edu.cn]        XposedBridge.initXResources();
+[external][shana][shana@zju.edu.cn]        XposedInit.startsSystemServer = isSystem;
+[external][shana][shana@zju.edu.cn]        LSPosedContext.isSystemServer = isSystem;
+[external][shana][shana@zju.edu.cn]        LSPosedContext.appDir = appDir;
+[external][shana][shana@zju.edu.cn]        LSPosedContext.processName = processName;
+[external][shana][shana@zju.edu.cn]        PrebuiltMethodsDeopter.deoptBootMethods(); // do it once for secondary zygote
+[external][7741672-nekoinverter][7741672-NekoInverter@users.noreply.gitlab.com]    }
+[external][hsushulong][hsushulong@gmail.com]}

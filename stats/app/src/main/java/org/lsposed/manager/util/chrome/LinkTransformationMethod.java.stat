@@ -1,0 +1,65 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.manager.util.chrome;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.app.Activity;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.graphics.Rect;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.text.Spannable;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.text.Spanned;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.text.method.TransformationMethod;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.text.style.URLSpan;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.view.View;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.widget.TextView;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]public class LinkTransformationMethod implements TransformationMethod {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private final Activity activity;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public LinkTransformationMethod(Activity activity) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        this.activity = activity;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public CharSequence getTransformation(CharSequence source, View view) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (view instanceof TextView) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            TextView textView = (TextView) view;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (textView.getText() == null || !(textView.getText() instanceof Spannable)) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                return source;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Spannable text = (Spannable) textView.getText();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            URLSpan[] spans = text.getSpans(0, textView.length(), URLSpan.class);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            for (int i = spans.length - 1; i >= 0; i--) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                URLSpan oldSpan = spans[i];
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                int start = text.getSpanStart(oldSpan);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                int end = text.getSpanEnd(oldSpan);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                String url = oldSpan.getURL();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                text.removeSpan(oldSpan);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                text.setSpan(new CustomTabsURLSpan(activity, url), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return text;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return source;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public void onFocusChanged(View view, CharSequence sourceText, boolean focused, int direction, Rect previouslyFocusedRect) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[internal][vvb2060][vvb2060@gmail.com]}

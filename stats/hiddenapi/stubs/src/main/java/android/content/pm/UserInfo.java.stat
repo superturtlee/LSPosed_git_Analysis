@@ -1,0 +1,6 @@
+[external][shana][shana@zju.edu.cn]package android.content.pm;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public class UserInfo {
+[external][shana][shana@zju.edu.cn]    public int id;
+[external][shana][shana@zju.edu.cn]    public String name;
+[external][shana][shana@zju.edu.cn]}

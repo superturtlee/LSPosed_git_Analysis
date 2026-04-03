@@ -1,0 +1,38 @@
+[external][shana][shana@zju.edu.cn]enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]pluginManagement {
+[external][shana][shana@zju.edu.cn]    repositories {
+[external][shana][shana@zju.edu.cn]        gradlePluginPortal()
+[external][shana][shana@zju.edu.cn]        google()
+[external][shana][shana@zju.edu.cn]        mavenCentral()
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]dependencyResolutionManagement {
+[external][shana][shana@zju.edu.cn]    repositoriesMode = RepositoriesMode.FAIL_ON_PROJECT_REPOS
+[internal][vvb2060][vvb2060@gmail.com]    repositories {
+[internal][vvb2060][vvb2060@gmail.com]        google()
+[internal][vvb2060][vvb2060@gmail.com]        mavenCentral()
+[external][shana][shana@zju.edu.cn]        mavenLocal {
+[external][shana][shana@zju.edu.cn]            content {
+[external][shana][shana@zju.edu.cn]                includeGroup("io.github.libxposed")
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]    versionCatalogs {
+[external][shana][shana@zju.edu.cn]        create("libs")
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]rootProject.name = "LSPosed"
+[external][shana][shana@zju.edu.cn]include(
+[external][shana][shana@zju.edu.cn]    ":app",
+[external][shana][shana@zju.edu.cn]    ":core",
+[external][shana][shana@zju.edu.cn]    ":daemon",
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    ":dex2oat",
+[external][shana][shana@zju.edu.cn]    ":hiddenapi:stubs",
+[external][shana][shana@zju.edu.cn]    ":hiddenapi:bridge",
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    ":magisk-loader",
+[external][shana][shana@zju.edu.cn]    ":services:manager-service",
+[external][shana][shana@zju.edu.cn]    ":services:daemon-service",
+[external][shana][shana@zju.edu.cn])

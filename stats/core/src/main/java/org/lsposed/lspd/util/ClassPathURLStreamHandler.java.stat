@@ -1,0 +1,120 @@
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.lspd.util;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import java.io.File;
+[internal][vvb2060][vvb2060@gmail.com]import java.io.FileNotFoundException;
+[internal][vvb2060][vvb2060@gmail.com]import java.io.FilterInputStream;
+[internal][vvb2060][vvb2060@gmail.com]import java.io.IOException;
+[internal][vvb2060][vvb2060@gmail.com]import java.io.InputStream;
+[internal][vvb2060][vvb2060@gmail.com]import java.net.JarURLConnection;
+[internal][vvb2060][vvb2060@gmail.com]import java.net.MalformedURLException;
+[internal][vvb2060][vvb2060@gmail.com]import java.net.URL;
+[internal][vvb2060][vvb2060@gmail.com]import java.net.URLConnection;
+[internal][vvb2060][vvb2060@gmail.com]import java.util.jar.JarFile;
+[internal][vvb2060][vvb2060@gmail.com]import java.util.zip.ZipEntry;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import sun.net.www.ParseUtil;
+[internal][vvb2060][vvb2060@gmail.com]import sun.net.www.protocol.jar.Handler;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]final class ClassPathURLStreamHandler extends Handler {
+[internal][vvb2060][vvb2060@gmail.com]    private final String fileUri;
+[internal][vvb2060][vvb2060@gmail.com]    private final JarFile jarFile;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    ClassPathURLStreamHandler(String jarFileName) throws IOException {
+[internal][vvb2060][vvb2060@gmail.com]        jarFile = new JarFile(jarFileName);
+[internal][vvb2060][vvb2060@gmail.com]        fileUri = new File(jarFileName).toURI().toString();
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    URL getEntryUrlOrNull(String entryName) {
+[internal][vvb2060][vvb2060@gmail.com]        if (jarFile.getEntry(entryName) != null) {
+[internal][vvb2060][vvb2060@gmail.com]            try {
+[internal][vvb2060][vvb2060@gmail.com]                String encodedName = ParseUtil.encodePath(entryName, false);
+[internal][vvb2060][vvb2060@gmail.com]                return new URL("jar", null, -1, fileUri + "!/" + encodedName, this);
+[internal][vvb2060][vvb2060@gmail.com]            } catch (MalformedURLException e) {
+[internal][vvb2060][vvb2060@gmail.com]                throw new RuntimeException("Invalid entry name", e);
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]        return null;
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    @Override
+[internal][vvb2060][vvb2060@gmail.com]    protected URLConnection openConnection(URL url) throws IOException {
+[internal][vvb2060][vvb2060@gmail.com]        return new ClassPathURLConnection(url);
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    @Override
+[internal][vvb2060][vvb2060@gmail.com]    protected void finalize() throws IOException {
+[internal][vvb2060][vvb2060@gmail.com]        jarFile.close();
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    private final class ClassPathURLConnection extends JarURLConnection {
+[internal][vvb2060][vvb2060@gmail.com]        private JarFile connectionJarFile = null;
+[internal][vvb2060][vvb2060@gmail.com]        private ZipEntry jarEntry = null;
+[internal][vvb2060][vvb2060@gmail.com]        private InputStream jarInput = null;
+[internal][vvb2060][vvb2060@gmail.com]        private boolean closed = false;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]        private ClassPathURLConnection(URL url) throws MalformedURLException {
+[internal][vvb2060][vvb2060@gmail.com]            super(url);
+[internal][vvb2060][vvb2060@gmail.com]            setUseCaches(false);
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]        @Override
+[internal][vvb2060][vvb2060@gmail.com]        public void setUseCaches(boolean usecaches) {
+[internal][vvb2060][vvb2060@gmail.com]            super.setUseCaches(false);
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]        @Override
+[internal][vvb2060][vvb2060@gmail.com]        public void connect() throws IOException {
+[internal][vvb2060][vvb2060@gmail.com]            if (closed) {
+[internal][vvb2060][vvb2060@gmail.com]                throw new IllegalStateException("JarURLConnection has been closed");
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]            if (!connected) {
+[internal][vvb2060][vvb2060@gmail.com]                jarEntry = jarFile.getEntry(getEntryName());
+[internal][vvb2060][vvb2060@gmail.com]                if (jarEntry == null) {
+[internal][vvb2060][vvb2060@gmail.com]                    throw new FileNotFoundException("URL=" + url + ", zipfile=" + jarFile.getName());
+[internal][vvb2060][vvb2060@gmail.com]                }
+[internal][vvb2060][vvb2060@gmail.com]                connected = true;
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]        @Override
+[internal][vvb2060][vvb2060@gmail.com]        public JarFile getJarFile() throws IOException {
+[internal][vvb2060][vvb2060@gmail.com]            connect();
+[internal][vvb2060][vvb2060@gmail.com]            if (connectionJarFile != null) return connectionJarFile;
+[internal][vvb2060][vvb2060@gmail.com]            return connectionJarFile = new JarFile(jarFile.getName());
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]        @Override
+[internal][vvb2060][vvb2060@gmail.com]        public InputStream getInputStream() throws IOException {
+[internal][vvb2060][vvb2060@gmail.com]            connect();
+[internal][vvb2060][vvb2060@gmail.com]            if (jarInput != null) return jarInput;
+[internal][vvb2060][vvb2060@gmail.com]            return jarInput = new FilterInputStream(jarFile.getInputStream(jarEntry)) {
+[internal][vvb2060][vvb2060@gmail.com]                @Override
+[internal][vvb2060][vvb2060@gmail.com]                public void close() throws IOException {
+[internal][vvb2060][vvb2060@gmail.com]                    super.close();
+[internal][vvb2060][vvb2060@gmail.com]                    closed = true;
+[internal][vvb2060][vvb2060@gmail.com]                    jarFile.close();
+[internal][vvb2060][vvb2060@gmail.com]                    if (connectionJarFile != null) connectionJarFile.close();
+[internal][vvb2060][vvb2060@gmail.com]                }
+[internal][vvb2060][vvb2060@gmail.com]            };
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]        @Override
+[internal][vvb2060][vvb2060@gmail.com]        public String getContentType() {
+[internal][vvb2060][vvb2060@gmail.com]            String cType = guessContentTypeFromName(getEntryName());
+[internal][vvb2060][vvb2060@gmail.com]            if (cType == null) {
+[internal][vvb2060][vvb2060@gmail.com]                cType = "content/unknown";
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]            return cType;
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]        @Override
+[internal][vvb2060][vvb2060@gmail.com]        public int getContentLength() {
+[internal][vvb2060][vvb2060@gmail.com]            try {
+[internal][vvb2060][vvb2060@gmail.com]                connect();
+[internal][vvb2060][vvb2060@gmail.com]                return (int) getJarEntry().getSize();
+[internal][vvb2060][vvb2060@gmail.com]            } catch (IOException ignored) {
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]            return -1;
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]}

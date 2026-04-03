@@ -1,0 +1,147 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * <!--This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors-->
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]package org.lsposed.manager.ui.fragment;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.view.View;
+[external][shana][shana@zju.edu.cn]import android.widget.Toast;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]import androidx.annotation.IdRes;
+[external][shana][shana@zju.edu.cn]import androidx.annotation.StringRes;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import androidx.appcompat.widget.Toolbar;
+[external][shana][shana@zju.edu.cn]import androidx.core.view.MenuProvider;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import androidx.fragment.app.Fragment;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import androidx.navigation.NavController;
+[external][shana][shana@zju.edu.cn]import androidx.navigation.NavDirections;
+[external][shana][shana@zju.edu.cn]import androidx.navigation.fragment.NavHostFragment;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]import com.google.android.material.floatingactionbutton.FloatingActionButton;
+[external][shana][shana@zju.edu.cn]import com.google.android.material.snackbar.Snackbar;
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import org.lsposed.manager.App;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.manager.R;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]import java.util.concurrent.Callable;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import java.util.concurrent.Future;
+[external][shana][shana@zju.edu.cn]import java.util.concurrent.FutureTask;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]public abstract class BaseFragment extends Fragment {
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public void navigateUp() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        getNavController().navigateUp();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public NavController getNavController() {
+[external][shana][shana@zju.edu.cn]        return NavHostFragment.findNavController(this);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    public boolean safeNavigate(@IdRes int resId) {
+[external][shana][shana@zju.edu.cn]        try {
+[external][shana][shana@zju.edu.cn]            getNavController().navigate(resId);
+[external][shana][shana@zju.edu.cn]            return true;
+[external][shana][shana@zju.edu.cn]        } catch (IllegalArgumentException ignored) {
+[external][shana][shana@zju.edu.cn]            return false;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public boolean safeNavigate(NavDirections direction) {
+[external][shana][shana@zju.edu.cn]        try {
+[external][shana][shana@zju.edu.cn]            getNavController().navigate(direction);
+[external][shana][shana@zju.edu.cn]            return true;
+[external][shana][shana@zju.edu.cn]        } catch (IllegalArgumentException ignored) {
+[external][shana][shana@zju.edu.cn]            return false;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void setupToolbar(Toolbar toolbar, View tipsView, int title) {
+[external][shana][shana@zju.edu.cn]        setupToolbar(toolbar, tipsView, getString(title), -1);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    public void setupToolbar(Toolbar toolbar, View tipsView, int title, int menu) {
+[external][shana][shana@zju.edu.cn]        setupToolbar(toolbar, tipsView, getString(title), menu, null);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    public void setupToolbar(Toolbar toolbar, View tipsView, String title, int menu) {
+[external][shana][shana@zju.edu.cn]        setupToolbar(toolbar, tipsView, title, menu, null);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    public void setupToolbar(Toolbar toolbar, View tipsView, String title, int menu, View.OnClickListener navigationOnClickListener) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        toolbar.setNavigationOnClickListener(navigationOnClickListener == null ? (v -> navigateUp()) : navigationOnClickListener);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        toolbar.setTitle(title);
+[external][shana][shana@zju.edu.cn]        toolbar.setTooltipText(title);
+[external][shana][shana@zju.edu.cn]        if (tipsView != null) tipsView.setTooltipText(title);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (menu != -1) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            toolbar.inflateMenu(menu);
+[external][howardwu20][HowardWu20@outlook.com]            if (this instanceof MenuProvider self) {
+[external][shana][shana@zju.edu.cn]                toolbar.setOnMenuItemClickListener(self::onMenuItemSelected);
+[external][shana][shana@zju.edu.cn]                self.onPrepareMenu(toolbar.getMenu());
+[external][shana][shana@zju.edu.cn]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    public void runAsync(Runnable runnable) {
+[external][shana][shana@zju.edu.cn]        App.getExecutorService().submit(runnable);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public <T> Future<T> runAsync(Callable<T> callable) {
+[external][shana][shana@zju.edu.cn]        return App.getExecutorService().submit(callable);
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    public void runOnUiThread(Runnable runnable) {
+[external][howardwu20][HowardWu20@outlook.com]        App.getMainHandler().post(runnable);
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public <T> Future<T> runOnUiThread(Callable<T> callable) {
+[external][shana][shana@zju.edu.cn]        var task = new FutureTask<>(callable);
+[external][shana][shana@zju.edu.cn]        runOnUiThread(task);
+[external][shana][shana@zju.edu.cn]        return task;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void showHint(@StringRes int res, boolean lengthShort, @StringRes int actionRes, View.OnClickListener action) {
+[external][shana][shana@zju.edu.cn]        showHint(App.getInstance().getString(res), lengthShort, App.getInstance().getString(actionRes), action);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void showHint(@StringRes int res, boolean lengthShort) {
+[external][shana][shana@zju.edu.cn]        showHint(App.getInstance().getString(res), lengthShort, null, null);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void showHint(CharSequence str, boolean lengthShort) {
+[external][shana][shana@zju.edu.cn]        showHint(str, lengthShort, null, null);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void showHint(CharSequence str, boolean lengthShort, CharSequence actionStr, View.OnClickListener action) {
+[external][howardwu20][HowardWu20@outlook.com]        var container = getView();
+[external][howardwu20][HowardWu20@outlook.com]        if (isResumed() && container != null) {
+[external][howardwu20][HowardWu20@outlook.com]            var snackbar = Snackbar.make(container, str, lengthShort ? Snackbar.LENGTH_SHORT : Snackbar.LENGTH_LONG);
+[external][howardwu20][HowardWu20@outlook.com]            var fab = container.findViewById(R.id.fab);
+[external][howardwu20][HowardWu20@outlook.com]            if (fab instanceof FloatingActionButton && ((FloatingActionButton) fab).isOrWillBeShown())
+[external][howardwu20][HowardWu20@outlook.com]                snackbar.setAnchorView(fab);
+[external][howardwu20][HowardWu20@outlook.com]            if (actionStr != null && action != null) snackbar.setAction(actionStr, action);
+[external][howardwu20][HowardWu20@outlook.com]            snackbar.show();
+[external][howardwu20][HowardWu20@outlook.com]            return;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        runOnUiThread(() -> {
+[external][shana][shana@zju.edu.cn]            try {
+[external][shana][shana@zju.edu.cn]                Toast.makeText(App.getInstance(), str, lengthShort ? Toast.LENGTH_SHORT : Toast.LENGTH_LONG).show();
+[external][shana][shana@zju.edu.cn]            } catch (Throwable ignored) {
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        });
+[external][shana][shana@zju.edu.cn]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]}

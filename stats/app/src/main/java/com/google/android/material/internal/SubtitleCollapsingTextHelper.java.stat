@@ -1,0 +1,1255 @@
+[external][shana][shana@zju.edu.cn]package com.google.android.material.internal;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import android.animation.TimeInterpolator;
+[external][shana][shana@zju.edu.cn]import android.content.res.ColorStateList;
+[external][shana][shana@zju.edu.cn]import android.graphics.Bitmap;
+[external][shana][shana@zju.edu.cn]import android.graphics.Canvas;
+[external][shana][shana@zju.edu.cn]import android.graphics.Color;
+[external][shana][shana@zju.edu.cn]import android.graphics.Paint;
+[external][shana][shana@zju.edu.cn]import android.graphics.Rect;
+[external][shana][shana@zju.edu.cn]import android.graphics.RectF;
+[external][shana][shana@zju.edu.cn]import android.graphics.Typeface;
+[external][shana][shana@zju.edu.cn]import android.os.Build;
+[external][shana][shana@zju.edu.cn]import android.text.TextPaint;
+[external][shana][shana@zju.edu.cn]import android.text.TextUtils;
+[external][shana][shana@zju.edu.cn]import android.view.Gravity;
+[external][shana][shana@zju.edu.cn]import android.view.View;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import androidx.annotation.ColorInt;
+[external][shana][shana@zju.edu.cn]import androidx.annotation.NonNull;
+[external][shana][shana@zju.edu.cn]import androidx.annotation.Nullable;
+[external][shana][shana@zju.edu.cn]import androidx.core.math.MathUtils;
+[external][shana][shana@zju.edu.cn]import androidx.core.text.TextDirectionHeuristicsCompat;
+[external][shana][shana@zju.edu.cn]import androidx.core.view.GravityCompat;
+[external][shana][shana@zju.edu.cn]import androidx.core.view.ViewCompat;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import com.google.android.material.animation.AnimationUtils;
+[external][shana][shana@zju.edu.cn]import com.google.android.material.resources.CancelableFontCallback;
+[external][shana][shana@zju.edu.cn]import com.google.android.material.resources.TextAppearance;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]/**
+[external][shana][shana@zju.edu.cn] * Helper class for {@link com.google.android.material.appbar.SubtitleCollapsingToolbarLayout}.
+[external][shana][shana@zju.edu.cn] *
+[external][shana][shana@zju.edu.cn] * @see CollapsingTextHelper
+[external][shana][shana@zju.edu.cn] */
+[external][shana][shana@zju.edu.cn]public final class SubtitleCollapsingTextHelper {
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    // Pre-JB-MR2 doesn't support HW accelerated canvas scaled title so we will workaround it
+[external][shana][shana@zju.edu.cn]    // by using our own texture
+[external][shana][shana@zju.edu.cn]    private static final boolean USE_SCALING_TEXTURE = Build.VERSION.SDK_INT < 18;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private static final boolean DEBUG_DRAW = false;
+[external][shana][shana@zju.edu.cn]    @NonNull
+[external][shana][shana@zju.edu.cn]    private static final Paint DEBUG_DRAW_PAINT;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    static {
+[external][shana][shana@zju.edu.cn]        DEBUG_DRAW_PAINT = DEBUG_DRAW ? new Paint() : null;
+[external][shana][shana@zju.edu.cn]        if (DEBUG_DRAW_PAINT != null) {
+[external][shana][shana@zju.edu.cn]            DEBUG_DRAW_PAINT.setAntiAlias(true);
+[external][shana][shana@zju.edu.cn]            DEBUG_DRAW_PAINT.setColor(Color.MAGENTA);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private final View view;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private boolean drawTitle;
+[external][shana][shana@zju.edu.cn]    private float expandedFraction;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @NonNull
+[external][shana][shana@zju.edu.cn]    private final Rect expandedBounds;
+[external][shana][shana@zju.edu.cn]    @NonNull
+[external][shana][shana@zju.edu.cn]    private final Rect collapsedBounds;
+[external][shana][shana@zju.edu.cn]    @NonNull
+[external][shana][shana@zju.edu.cn]    private final RectF currentBounds;
+[external][shana][shana@zju.edu.cn]    private int expandedTextGravity = Gravity.CENTER_VERTICAL;
+[external][shana][shana@zju.edu.cn]    private int collapsedTextGravity = Gravity.CENTER_VERTICAL;
+[external][shana][shana@zju.edu.cn]    private float expandedTitleTextSize, expandedSubtitleTextSize = 15;
+[external][shana][shana@zju.edu.cn]    private float collapsedTitleTextSize, collapsedSubtitleTextSize = 15;
+[external][shana][shana@zju.edu.cn]    private ColorStateList expandedTitleTextColor, expandedSubtitleTextColor;
+[external][shana][shana@zju.edu.cn]    private ColorStateList collapsedTitleTextColor, collapsedSubtitleTextColor;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private float expandedTitleDrawY, expandedSubtitleDrawY;
+[external][shana][shana@zju.edu.cn]    private float collapsedTitleDrawY, collapsedSubtitleDrawY;
+[external][shana][shana@zju.edu.cn]    private float expandedTitleDrawX, expandedSubtitleDrawX;
+[external][shana][shana@zju.edu.cn]    private float collapsedTitleDrawX, collapsedSubtitleDrawX;
+[external][shana][shana@zju.edu.cn]    private float currentTitleDrawX, currentSubtitleDrawX;
+[external][shana][shana@zju.edu.cn]    private float currentTitleDrawY, currentSubtitleDrawY;
+[external][shana][shana@zju.edu.cn]    private Typeface collapsedTitleTypeface, collapsedSubtitleTypeface;
+[external][shana][shana@zju.edu.cn]    private Typeface expandedTitleTypeface, expandedSubtitleTypeface;
+[external][shana][shana@zju.edu.cn]    private Typeface currentTitleTypeface, currentSubtitleTypeface;
+[external][shana][shana@zju.edu.cn]    private CancelableFontCallback expandedTitleFontCallback, expandedSubtitleFontCallback;
+[external][shana][shana@zju.edu.cn]    private CancelableFontCallback collapsedTitleFontCallback, collapsedSubtitleFontCallback;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Nullable
+[external][shana][shana@zju.edu.cn]    private CharSequence title, subtitle;
+[external][shana][shana@zju.edu.cn]    @Nullable
+[external][shana][shana@zju.edu.cn]    private CharSequence titleToDraw, subtitleToDraw;
+[external][shana][shana@zju.edu.cn]    private boolean isRtl;
+[external][shana][shana@zju.edu.cn]    private boolean isRtlTextDirectionHeuristicsEnabled = true;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private boolean useTexture;
+[external][shana][shana@zju.edu.cn]    @Nullable
+[external][shana][shana@zju.edu.cn]    private Bitmap expandedTitleTexture, expandedSubtitleTexture;
+[external][shana][shana@zju.edu.cn]    private Paint titleTexturePaint, subtitleTexturePaint;
+[external][shana][shana@zju.edu.cn]    private float titleTextureAscent, subtitleTextureAscent;
+[external][shana][shana@zju.edu.cn]    private float titleTextureDescent, subtitleTextureDescent;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private float titleScale, subtitleScale;
+[external][shana][shana@zju.edu.cn]    private float currentTitleTextSize, currentSubtitleTextSize;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private int[] state;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private boolean boundsChanged;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @NonNull
+[external][shana][shana@zju.edu.cn]    private final TextPaint titleTextPaint, subtitleTextPaint;
+[external][shana][shana@zju.edu.cn]    @NonNull
+[external][shana][shana@zju.edu.cn]    private final TextPaint titleTmpPaint, subtitleTmpPaint;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private TimeInterpolator positionInterpolator;
+[external][shana][shana@zju.edu.cn]    private TimeInterpolator textSizeInterpolator;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private float collapsedTitleShadowRadius, collapsedSubtitleShadowRadius;
+[external][shana][shana@zju.edu.cn]    private float collapsedTitleShadowDx, collapsedSubtitleShadowDx;
+[external][shana][shana@zju.edu.cn]    private float collapsedTitleShadowDy, collapsedSubtitleShadowDy;
+[external][shana][shana@zju.edu.cn]    private ColorStateList collapsedTitleShadowColor, collapsedSubtitleShadowColor;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private float expandedTitleShadowRadius, expandedSubtitleShadowRadius;
+[external][shana][shana@zju.edu.cn]    private float expandedTitleShadowDx, expandedSubtitleShadowDx;
+[external][shana][shana@zju.edu.cn]    private float expandedTitleShadowDy, expandedSubtitleShadowDy;
+[external][shana][shana@zju.edu.cn]    private ColorStateList expandedTitleShadowColor, expandedSubtitleShadowColor;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public SubtitleCollapsingTextHelper(View view) {
+[external][shana][shana@zju.edu.cn]        this.view = view;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        titleTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG | Paint.SUBPIXEL_TEXT_FLAG);
+[external][shana][shana@zju.edu.cn]        titleTmpPaint = new TextPaint(titleTextPaint);
+[external][shana][shana@zju.edu.cn]        subtitleTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG | Paint.SUBPIXEL_TEXT_FLAG);
+[external][shana][shana@zju.edu.cn]        subtitleTmpPaint = new TextPaint(subtitleTextPaint);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        collapsedBounds = new Rect();
+[external][shana][shana@zju.edu.cn]        expandedBounds = new Rect();
+[external][shana][shana@zju.edu.cn]        currentBounds = new RectF();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void setTextSizeInterpolator(TimeInterpolator interpolator) {
+[external][shana][shana@zju.edu.cn]        textSizeInterpolator = interpolator;
+[external][shana][shana@zju.edu.cn]        recalculate();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void setPositionInterpolator(TimeInterpolator interpolator) {
+[external][shana][shana@zju.edu.cn]        positionInterpolator = interpolator;
+[external][shana][shana@zju.edu.cn]        recalculate();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void setExpandedTitleTextSize(float textSize) {
+[external][shana][shana@zju.edu.cn]        if (expandedTitleTextSize != textSize) {
+[external][shana][shana@zju.edu.cn]            expandedTitleTextSize = textSize;
+[external][shana][shana@zju.edu.cn]            recalculate();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void setCollapsedTitleTextSize(float textSize) {
+[external][shana][shana@zju.edu.cn]        if (collapsedTitleTextSize != textSize) {
+[external][shana][shana@zju.edu.cn]            collapsedTitleTextSize = textSize;
+[external][shana][shana@zju.edu.cn]            recalculate();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void setExpandedSubtitleTextSize(float textSize) {
+[external][shana][shana@zju.edu.cn]        if (expandedSubtitleTextSize != textSize) {
+[external][shana][shana@zju.edu.cn]            expandedSubtitleTextSize = textSize;
+[external][shana][shana@zju.edu.cn]            recalculate();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void setCollapsedSubtitleTextSize(float textSize) {
+[external][shana][shana@zju.edu.cn]        if (collapsedSubtitleTextSize != textSize) {
+[external][shana][shana@zju.edu.cn]            collapsedSubtitleTextSize = textSize;
+[external][shana][shana@zju.edu.cn]            recalculate();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void setCollapsedTitleTextColor(ColorStateList textColor) {
+[external][shana][shana@zju.edu.cn]        if (collapsedTitleTextColor != textColor) {
+[external][shana][shana@zju.edu.cn]            collapsedTitleTextColor = textColor;
+[external][shana][shana@zju.edu.cn]            recalculate();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void setExpandedTitleTextColor(ColorStateList textColor) {
+[external][shana][shana@zju.edu.cn]        if (expandedTitleTextColor != textColor) {
+[external][shana][shana@zju.edu.cn]            expandedTitleTextColor = textColor;
+[external][shana][shana@zju.edu.cn]            recalculate();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void setCollapsedSubtitleTextColor(ColorStateList textColor) {
+[external][shana][shana@zju.edu.cn]        if (collapsedSubtitleTextColor != textColor) {
+[external][shana][shana@zju.edu.cn]            collapsedSubtitleTextColor = textColor;
+[external][shana][shana@zju.edu.cn]            recalculate();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void setExpandedSubtitleTextColor(ColorStateList textColor) {
+[external][shana][shana@zju.edu.cn]        if (expandedSubtitleTextColor != textColor) {
+[external][shana][shana@zju.edu.cn]            expandedSubtitleTextColor = textColor;
+[external][shana][shana@zju.edu.cn]            recalculate();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void setExpandedBounds(int left, int top, int right, int bottom) {
+[external][shana][shana@zju.edu.cn]        if (!rectEquals(expandedBounds, left, top, right, bottom)) {
+[external][shana][shana@zju.edu.cn]            expandedBounds.set(left, top, right, bottom);
+[external][shana][shana@zju.edu.cn]            boundsChanged = true;
+[external][shana][shana@zju.edu.cn]            onBoundsChanged();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void setExpandedBounds(@NonNull Rect bounds) {
+[external][shana][shana@zju.edu.cn]        setExpandedBounds(bounds.left, bounds.top, bounds.right, bounds.bottom);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void setCollapsedBounds(int left, int top, int right, int bottom) {
+[external][shana][shana@zju.edu.cn]        if (!rectEquals(collapsedBounds, left, top, right, bottom)) {
+[external][shana][shana@zju.edu.cn]            collapsedBounds.set(left, top, right, bottom);
+[external][shana][shana@zju.edu.cn]            boundsChanged = true;
+[external][shana][shana@zju.edu.cn]            onBoundsChanged();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void setCollapsedBounds(@NonNull Rect bounds) {
+[external][shana][shana@zju.edu.cn]        setCollapsedBounds(bounds.left, bounds.top, bounds.right, bounds.bottom);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void getCollapsedTitleTextActualBounds(@NonNull RectF bounds) {
+[external][shana][shana@zju.edu.cn]        boolean isRtl = calculateIsRtl(title);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        bounds.left = !isRtl ? collapsedBounds.left : collapsedBounds.right - calculateCollapsedTitleTextWidth();
+[external][shana][shana@zju.edu.cn]        bounds.top = collapsedBounds.top;
+[external][shana][shana@zju.edu.cn]        bounds.right = !isRtl ? bounds.left + calculateCollapsedTitleTextWidth() : collapsedBounds.right;
+[external][shana][shana@zju.edu.cn]        bounds.bottom = collapsedBounds.top + getCollapsedTitleTextHeight();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public float calculateCollapsedTitleTextWidth() {
+[external][shana][shana@zju.edu.cn]        if (title == null) {
+[external][shana][shana@zju.edu.cn]            return 0;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        getTitleTextPaintCollapsed(titleTmpPaint);
+[external][shana][shana@zju.edu.cn]        return titleTmpPaint.measureText(title, 0, title.length());
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void getCollapsedSubtitleTextActualBounds(@NonNull RectF bounds) {
+[external][shana][shana@zju.edu.cn]        boolean isRtl = calculateIsRtl(subtitle);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        bounds.left = !isRtl ? collapsedBounds.left : collapsedBounds.right - calculateCollapsedSubtitleTextWidth();
+[external][shana][shana@zju.edu.cn]        bounds.top = collapsedBounds.top;
+[external][shana][shana@zju.edu.cn]        bounds.right = !isRtl ? bounds.left + calculateCollapsedSubtitleTextWidth() : collapsedBounds.right;
+[external][shana][shana@zju.edu.cn]        bounds.bottom = collapsedBounds.top + getCollapsedSubtitleTextHeight();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public float calculateCollapsedSubtitleTextWidth() {
+[external][shana][shana@zju.edu.cn]        if (subtitle == null) {
+[external][shana][shana@zju.edu.cn]            return 0;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        getSubtitleTextPaintCollapsed(subtitleTmpPaint);
+[external][shana][shana@zju.edu.cn]        return subtitleTmpPaint.measureText(subtitle, 0, subtitle.length());
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public float getExpandedTitleTextHeight() {
+[external][shana][shana@zju.edu.cn]        getTitleTextPaintExpanded(titleTmpPaint);
+[external][shana][shana@zju.edu.cn]        // Return expanded height measured from the baseline.
+[external][shana][shana@zju.edu.cn]        return -titleTmpPaint.ascent();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public float getCollapsedTitleTextHeight() {
+[external][shana][shana@zju.edu.cn]        getTitleTextPaintCollapsed(titleTmpPaint);
+[external][shana][shana@zju.edu.cn]        // Return collapsed height measured from the baseline.
+[external][shana][shana@zju.edu.cn]        return -titleTmpPaint.ascent();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public float getExpandedSubtitleTextHeight() {
+[external][shana][shana@zju.edu.cn]        getSubtitleTextPaintExpanded(subtitleTmpPaint);
+[external][shana][shana@zju.edu.cn]        // Return expanded height measured from the baseline.
+[external][shana][shana@zju.edu.cn]        return -subtitleTmpPaint.ascent();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public float getCollapsedSubtitleTextHeight() {
+[external][shana][shana@zju.edu.cn]        getSubtitleTextPaintCollapsed(subtitleTmpPaint);
+[external][shana][shana@zju.edu.cn]        // Return collapsed height measured from the baseline.
+[external][shana][shana@zju.edu.cn]        return -subtitleTmpPaint.ascent();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private void getTitleTextPaintExpanded(@NonNull TextPaint textPaint) {
+[external][shana][shana@zju.edu.cn]        textPaint.setTextSize(expandedTitleTextSize);
+[external][shana][shana@zju.edu.cn]        textPaint.setTypeface(expandedTitleTypeface);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private void getTitleTextPaintCollapsed(@NonNull TextPaint textPaint) {
+[external][shana][shana@zju.edu.cn]        textPaint.setTextSize(collapsedTitleTextSize);
+[external][shana][shana@zju.edu.cn]        textPaint.setTypeface(collapsedTitleTypeface);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private void getSubtitleTextPaintExpanded(@NonNull TextPaint textPaint) {
+[external][shana][shana@zju.edu.cn]        textPaint.setTextSize(expandedSubtitleTextSize);
+[external][shana][shana@zju.edu.cn]        textPaint.setTypeface(expandedSubtitleTypeface);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private void getSubtitleTextPaintCollapsed(@NonNull TextPaint textPaint) {
+[external][shana][shana@zju.edu.cn]        textPaint.setTextSize(collapsedSubtitleTextSize);
+[external][shana][shana@zju.edu.cn]        textPaint.setTypeface(collapsedSubtitleTypeface);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    void onBoundsChanged() {
+[external][shana][shana@zju.edu.cn]        drawTitle = collapsedBounds.width() > 0
+[external][shana][shana@zju.edu.cn]                && collapsedBounds.height() > 0
+[external][shana][shana@zju.edu.cn]                && expandedBounds.width() > 0
+[external][shana][shana@zju.edu.cn]                && expandedBounds.height() > 0;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void setExpandedTextGravity(int gravity) {
+[external][shana][shana@zju.edu.cn]        if (expandedTextGravity != gravity) {
+[external][shana][shana@zju.edu.cn]            expandedTextGravity = gravity;
+[external][shana][shana@zju.edu.cn]            recalculate();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public int getExpandedTextGravity() {
+[external][shana][shana@zju.edu.cn]        return expandedTextGravity;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void setCollapsedTextGravity(int gravity) {
+[external][shana][shana@zju.edu.cn]        if (collapsedTextGravity != gravity) {
+[external][shana][shana@zju.edu.cn]            collapsedTextGravity = gravity;
+[external][shana][shana@zju.edu.cn]            recalculate();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public int getCollapsedTextGravity() {
+[external][shana][shana@zju.edu.cn]        return collapsedTextGravity;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void setCollapsedTitleTextAppearance(int resId) {
+[external][shana][shana@zju.edu.cn]        TextAppearance textAppearance = new TextAppearance(view.getContext(), resId);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        if (textAppearance.getTextColor() != null) {
+[external][shana][shana@zju.edu.cn]            collapsedTitleTextColor = textAppearance.getTextColor();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        if (textAppearance.getTextSize() != 0) {
+[external][shana][shana@zju.edu.cn]            collapsedTitleTextSize = textAppearance.getTextSize();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        if (textAppearance.shadowColor != null) {
+[external][shana][shana@zju.edu.cn]            collapsedTitleShadowColor = textAppearance.shadowColor;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        collapsedTitleShadowDx = textAppearance.shadowDx;
+[external][shana][shana@zju.edu.cn]        collapsedTitleShadowDy = textAppearance.shadowDy;
+[external][shana][shana@zju.edu.cn]        collapsedTitleShadowRadius = textAppearance.shadowRadius;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // Cancel pending async fetch, if any, and replace with a new one.
+[external][shana][shana@zju.edu.cn]        if (collapsedTitleFontCallback != null) {
+[external][shana][shana@zju.edu.cn]            collapsedTitleFontCallback.cancel();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        collapsedTitleFontCallback = new CancelableFontCallback(new CancelableFontCallback.ApplyFont() {
+[external][shana][shana@zju.edu.cn]            @Override
+[external][shana][shana@zju.edu.cn]            public void apply(Typeface font) {
+[external][shana][shana@zju.edu.cn]                setCollapsedTitleTypeface(font);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }, textAppearance.getFallbackFont());
+[external][shana][shana@zju.edu.cn]        textAppearance.getFontAsync(view.getContext(), collapsedTitleFontCallback);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        recalculate();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void setExpandedTitleTextAppearance(int resId) {
+[external][shana][shana@zju.edu.cn]        TextAppearance textAppearance = new TextAppearance(view.getContext(), resId);
+[external][shana][shana@zju.edu.cn]        if (textAppearance.getTextColor() != null) {
+[external][shana][shana@zju.edu.cn]            expandedTitleTextColor = textAppearance.getTextColor();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        if (textAppearance.getTextSize() != 0) {
+[external][shana][shana@zju.edu.cn]            expandedTitleTextSize = textAppearance.getTextSize();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        if (textAppearance.shadowColor != null) {
+[external][shana][shana@zju.edu.cn]            expandedTitleShadowColor = textAppearance.shadowColor;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        expandedTitleShadowDx = textAppearance.shadowDx;
+[external][shana][shana@zju.edu.cn]        expandedTitleShadowDy = textAppearance.shadowDy;
+[external][shana][shana@zju.edu.cn]        expandedTitleShadowRadius = textAppearance.shadowRadius;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // Cancel pending async fetch, if any, and replace with a new one.
+[external][shana][shana@zju.edu.cn]        if (expandedTitleFontCallback != null) {
+[external][shana][shana@zju.edu.cn]            expandedTitleFontCallback.cancel();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        expandedTitleFontCallback = new CancelableFontCallback(new CancelableFontCallback.ApplyFont() {
+[external][shana][shana@zju.edu.cn]            @Override
+[external][shana][shana@zju.edu.cn]            public void apply(Typeface font) {
+[external][shana][shana@zju.edu.cn]                setExpandedTitleTypeface(font);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }, textAppearance.getFallbackFont());
+[external][shana][shana@zju.edu.cn]        textAppearance.getFontAsync(view.getContext(), expandedTitleFontCallback);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        recalculate();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void setCollapsedSubtitleTextAppearance(int resId) {
+[external][shana][shana@zju.edu.cn]        TextAppearance textAppearance = new TextAppearance(view.getContext(), resId);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        if (textAppearance.getTextColor() != null) {
+[external][shana][shana@zju.edu.cn]            collapsedSubtitleTextColor = textAppearance.getTextColor();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        if (textAppearance.getTextSize() != 0) {
+[external][shana][shana@zju.edu.cn]            collapsedSubtitleTextSize = textAppearance.getTextSize();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        if (textAppearance.shadowColor != null) {
+[external][shana][shana@zju.edu.cn]            collapsedSubtitleShadowColor = textAppearance.shadowColor;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        collapsedSubtitleShadowDx = textAppearance.shadowDx;
+[external][shana][shana@zju.edu.cn]        collapsedSubtitleShadowDy = textAppearance.shadowDy;
+[external][shana][shana@zju.edu.cn]        collapsedSubtitleShadowRadius = textAppearance.shadowRadius;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // Cancel pending async fetch, if any, and replace with a new one.
+[external][shana][shana@zju.edu.cn]        if (collapsedSubtitleFontCallback != null) {
+[external][shana][shana@zju.edu.cn]            collapsedSubtitleFontCallback.cancel();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        collapsedSubtitleFontCallback = new CancelableFontCallback(new CancelableFontCallback.ApplyFont() {
+[external][shana][shana@zju.edu.cn]            @Override
+[external][shana][shana@zju.edu.cn]            public void apply(Typeface font) {
+[external][shana][shana@zju.edu.cn]                setCollapsedSubtitleTypeface(font);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }, textAppearance.getFallbackFont());
+[external][shana][shana@zju.edu.cn]        textAppearance.getFontAsync(view.getContext(), collapsedSubtitleFontCallback);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        recalculate();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void setExpandedSubtitleTextAppearance(int resId) {
+[external][shana][shana@zju.edu.cn]        TextAppearance textAppearance = new TextAppearance(view.getContext(), resId);
+[external][shana][shana@zju.edu.cn]        if (textAppearance.getTextColor() != null) {
+[external][shana][shana@zju.edu.cn]            expandedSubtitleTextColor = textAppearance.getTextColor();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        if (textAppearance.getTextSize() != 0) {
+[external][shana][shana@zju.edu.cn]            expandedSubtitleTextSize = textAppearance.getTextSize();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        if (textAppearance.shadowColor != null) {
+[external][shana][shana@zju.edu.cn]            expandedSubtitleShadowColor = textAppearance.shadowColor;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        expandedSubtitleShadowDx = textAppearance.shadowDx;
+[external][shana][shana@zju.edu.cn]        expandedSubtitleShadowDy = textAppearance.shadowDy;
+[external][shana][shana@zju.edu.cn]        expandedSubtitleShadowRadius = textAppearance.shadowRadius;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // Cancel pending async fetch, if any, and replace with a new one.
+[external][shana][shana@zju.edu.cn]        if (expandedSubtitleFontCallback != null) {
+[external][shana][shana@zju.edu.cn]            expandedSubtitleFontCallback.cancel();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        expandedSubtitleFontCallback = new CancelableFontCallback(new CancelableFontCallback.ApplyFont() {
+[external][shana][shana@zju.edu.cn]            @Override
+[external][shana][shana@zju.edu.cn]            public void apply(Typeface font) {
+[external][shana][shana@zju.edu.cn]                if (font != null) setExpandedSubtitleTypeface(font);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }, null);
+[external][shana][shana@zju.edu.cn]        textAppearance.getFontAsync(view.getContext(), expandedSubtitleFontCallback);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        recalculate();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void setCollapsedTitleTypeface(Typeface typeface) {
+[external][shana][shana@zju.edu.cn]        if (setCollapsedTitleTypefaceInternal(typeface)) {
+[external][shana][shana@zju.edu.cn]            recalculate();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void setExpandedTitleTypeface(Typeface typeface) {
+[external][shana][shana@zju.edu.cn]        if (setExpandedTitleTypefaceInternal(typeface)) {
+[external][shana][shana@zju.edu.cn]            recalculate();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void setCollapsedSubtitleTypeface(Typeface typeface) {
+[external][shana][shana@zju.edu.cn]        if (setCollapsedSubtitleTypefaceInternal(typeface)) {
+[external][shana][shana@zju.edu.cn]            recalculate();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void setExpandedSubtitleTypeface(Typeface typeface) {
+[external][shana][shana@zju.edu.cn]        if (setExpandedSubtitleTypefaceInternal(typeface)) {
+[external][shana][shana@zju.edu.cn]            recalculate();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void setTitleTypefaces(Typeface typeface) {
+[external][shana][shana@zju.edu.cn]        boolean collapsedFontChanged = setCollapsedTitleTypefaceInternal(typeface);
+[external][shana][shana@zju.edu.cn]        boolean expandedFontChanged = setExpandedTitleTypefaceInternal(typeface);
+[external][shana][shana@zju.edu.cn]        if (collapsedFontChanged || expandedFontChanged) {
+[external][shana][shana@zju.edu.cn]            recalculate();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void setSubtitleTypefaces(Typeface typeface) {
+[external][shana][shana@zju.edu.cn]        boolean collapsedFontChanged = setCollapsedSubtitleTypefaceInternal(typeface);
+[external][shana][shana@zju.edu.cn]        boolean expandedFontChanged = setExpandedSubtitleTypefaceInternal(typeface);
+[external][shana][shana@zju.edu.cn]        if (collapsedFontChanged || expandedFontChanged) {
+[external][shana][shana@zju.edu.cn]            recalculate();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @SuppressWarnings("ReferenceEquality") // Matches the Typeface comparison in TextView
+[external][shana][shana@zju.edu.cn]    private boolean setCollapsedTitleTypefaceInternal(Typeface typeface) {
+[external][shana][shana@zju.edu.cn]        // Explicit Typeface setting cancels pending async fetch, if any, to avoid old font overriding
+[external][shana][shana@zju.edu.cn]        // already updated one when async op comes back after a while.
+[external][shana][shana@zju.edu.cn]        if (collapsedTitleFontCallback != null) {
+[external][shana][shana@zju.edu.cn]            collapsedTitleFontCallback.cancel();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        if (collapsedTitleTypeface != typeface) {
+[external][shana][shana@zju.edu.cn]            collapsedTitleTypeface = typeface;
+[external][shana][shana@zju.edu.cn]            return true;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return false;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @SuppressWarnings("ReferenceEquality") // Matches the Typeface comparison in TextView
+[external][shana][shana@zju.edu.cn]    private boolean setExpandedTitleTypefaceInternal(Typeface typeface) {
+[external][shana][shana@zju.edu.cn]        // Explicit Typeface setting cancels pending async fetch, if any, to avoid old font overriding
+[external][shana][shana@zju.edu.cn]        // already updated one when async op comes back after a while.
+[external][shana][shana@zju.edu.cn]        if (expandedTitleFontCallback != null) {
+[external][shana][shana@zju.edu.cn]            expandedTitleFontCallback.cancel();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        if (expandedTitleTypeface != typeface) {
+[external][shana][shana@zju.edu.cn]            expandedTitleTypeface = typeface;
+[external][shana][shana@zju.edu.cn]            return true;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return false;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @SuppressWarnings("ReferenceEquality") // Matches the Typeface comparison in TextView
+[external][shana][shana@zju.edu.cn]    private boolean setCollapsedSubtitleTypefaceInternal(Typeface typeface) {
+[external][shana][shana@zju.edu.cn]        // Explicit Typeface setting cancels pending async fetch, if any, to avoid old font overriding
+[external][shana][shana@zju.edu.cn]        // already updated one when async op comes back after a while.
+[external][shana][shana@zju.edu.cn]        if (collapsedSubtitleFontCallback != null) {
+[external][shana][shana@zju.edu.cn]            collapsedSubtitleFontCallback.cancel();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        if (collapsedSubtitleTypeface != typeface) {
+[external][shana][shana@zju.edu.cn]            collapsedSubtitleTypeface = typeface;
+[external][shana][shana@zju.edu.cn]            return true;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return false;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @SuppressWarnings("ReferenceEquality") // Matches the Typeface comparison in TextView
+[external][shana][shana@zju.edu.cn]    private boolean setExpandedSubtitleTypefaceInternal(Typeface typeface) {
+[external][shana][shana@zju.edu.cn]        // Explicit Typeface setting cancels pending async fetch, if any, to avoid old font overriding
+[external][shana][shana@zju.edu.cn]        // already updated one when async op comes back after a while.
+[external][shana][shana@zju.edu.cn]        if (expandedSubtitleFontCallback != null) {
+[external][shana][shana@zju.edu.cn]            expandedSubtitleFontCallback.cancel();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        if (expandedSubtitleTypeface != typeface) {
+[external][shana][shana@zju.edu.cn]            expandedSubtitleTypeface = typeface;
+[external][shana][shana@zju.edu.cn]            return true;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return false;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public Typeface getCollapsedTitleTypeface() {
+[external][shana][shana@zju.edu.cn]        return collapsedTitleTypeface != null ? collapsedTitleTypeface : Typeface.DEFAULT;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public Typeface getExpandedTitleTypeface() {
+[external][shana][shana@zju.edu.cn]        return expandedTitleTypeface != null ? expandedTitleTypeface : Typeface.DEFAULT;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public Typeface getCollapsedSubtitleTypeface() {
+[external][shana][shana@zju.edu.cn]        return collapsedSubtitleTypeface != null ? collapsedSubtitleTypeface : Typeface.DEFAULT;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public Typeface getExpandedSubtitleTypeface() {
+[external][shana][shana@zju.edu.cn]        return expandedSubtitleTypeface != null ? expandedSubtitleTypeface : Typeface.DEFAULT;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Set the value indicating the current scroll value. This decides how much of the background will
+[external][shana][shana@zju.edu.cn]     * be displayed, as well as the title metrics/positioning.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * <p>A value of {@code 0.0} indicates that the layout is fully expanded. A value of {@code 1.0}
+[external][shana][shana@zju.edu.cn]     * indicates that the layout is fully collapsed.
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public void setExpansionFraction(float fraction) {
+[external][shana][shana@zju.edu.cn]        fraction = MathUtils.clamp(fraction, 0f, 1f);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        if (fraction != expandedFraction) {
+[external][shana][shana@zju.edu.cn]            expandedFraction = fraction;
+[external][shana][shana@zju.edu.cn]            calculateCurrentOffsets();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public final boolean setState(final int[] state) {
+[external][shana][shana@zju.edu.cn]        this.state = state;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        if (isStateful()) {
+[external][shana][shana@zju.edu.cn]            recalculate();
+[external][shana][shana@zju.edu.cn]            return true;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        return false;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public final boolean isStateful() {
+[external][shana][shana@zju.edu.cn]        return (collapsedTitleTextColor != null && collapsedTitleTextColor.isStateful())
+[external][shana][shana@zju.edu.cn]                || (expandedTitleTextColor != null && expandedTitleTextColor.isStateful());
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public float getExpansionFraction() {
+[external][shana][shana@zju.edu.cn]        return expandedFraction;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public float getCollapsedTitleTextSize() {
+[external][shana][shana@zju.edu.cn]        return collapsedTitleTextSize;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public float getExpandedTitleTextSize() {
+[external][shana][shana@zju.edu.cn]        return expandedTitleTextSize;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public float getCollapsedSubtitleTextSize() {
+[external][shana][shana@zju.edu.cn]        return collapsedSubtitleTextSize;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public float getExpandedSubtitleTextSize() {
+[external][shana][shana@zju.edu.cn]        return expandedSubtitleTextSize;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void setRtlTextDirectionHeuristicsEnabled(boolean rtlTextDirectionHeuristicsEnabled) {
+[external][shana][shana@zju.edu.cn]        isRtlTextDirectionHeuristicsEnabled = rtlTextDirectionHeuristicsEnabled;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public boolean isRtlTextDirectionHeuristicsEnabled() {
+[external][shana][shana@zju.edu.cn]        return isRtlTextDirectionHeuristicsEnabled;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private void calculateCurrentOffsets() {
+[external][shana][shana@zju.edu.cn]        calculateOffsets(expandedFraction);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private void calculateOffsets(final float fraction) {
+[external][shana][shana@zju.edu.cn]        interpolateBounds(fraction);
+[external][shana][shana@zju.edu.cn]        currentTitleDrawX = lerp(expandedTitleDrawX, collapsedTitleDrawX, fraction, positionInterpolator);
+[external][shana][shana@zju.edu.cn]        currentTitleDrawY = lerp(expandedTitleDrawY, collapsedTitleDrawY, fraction, positionInterpolator);
+[external][shana][shana@zju.edu.cn]        currentSubtitleDrawX = lerp(expandedSubtitleDrawX, collapsedSubtitleDrawX, fraction, positionInterpolator);
+[external][shana][shana@zju.edu.cn]        currentSubtitleDrawY = lerp(expandedSubtitleDrawY, collapsedSubtitleDrawY, fraction, positionInterpolator);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        setInterpolatedTitleTextSize(lerp(expandedTitleTextSize, collapsedTitleTextSize, fraction, textSizeInterpolator));
+[external][shana][shana@zju.edu.cn]        setInterpolatedSubtitleTextSize(lerp(expandedSubtitleTextSize, collapsedSubtitleTextSize, fraction, textSizeInterpolator));
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        if (collapsedTitleTextColor != expandedTitleTextColor) {
+[external][shana][shana@zju.edu.cn]            // If the collapsed and expanded title colors are different, blend them based on the
+[external][shana][shana@zju.edu.cn]            // fraction
+[external][shana][shana@zju.edu.cn]            titleTextPaint.setColor(blendColors(getCurrentExpandedTitleTextColor(), getCurrentCollapsedTitleTextColor(), fraction));
+[external][shana][shana@zju.edu.cn]        } else {
+[external][shana][shana@zju.edu.cn]            titleTextPaint.setColor(getCurrentCollapsedTitleTextColor());
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        titleTextPaint.setShadowLayer(
+[external][shana][shana@zju.edu.cn]                lerp(expandedTitleShadowRadius, collapsedTitleShadowRadius, fraction, null),
+[external][shana][shana@zju.edu.cn]                lerp(expandedTitleShadowDx, collapsedTitleShadowDx, fraction, null),
+[external][shana][shana@zju.edu.cn]                lerp(expandedTitleShadowDy, collapsedTitleShadowDy, fraction, null),
+[external][shana][shana@zju.edu.cn]                blendColors(getCurrentColor(expandedTitleShadowColor), getCurrentColor(collapsedTitleShadowColor), fraction));
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        if (collapsedSubtitleTextColor != expandedSubtitleTextColor) {
+[external][shana][shana@zju.edu.cn]            // If the collapsed and expanded title colors are different, blend them based on the
+[external][shana][shana@zju.edu.cn]            // fraction
+[external][shana][shana@zju.edu.cn]            subtitleTextPaint.setColor(blendColors(getCurrentExpandedSubtitleTextColor(), getCurrentCollapsedSubtitleTextColor(), fraction));
+[external][shana][shana@zju.edu.cn]        } else {
+[external][shana][shana@zju.edu.cn]            subtitleTextPaint.setColor(getCurrentCollapsedSubtitleTextColor());
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        subtitleTextPaint.setShadowLayer(
+[external][shana][shana@zju.edu.cn]                lerp(expandedSubtitleShadowRadius, collapsedSubtitleShadowRadius, fraction, null),
+[external][shana][shana@zju.edu.cn]                lerp(expandedSubtitleShadowDx, collapsedSubtitleShadowDx, fraction, null),
+[external][shana][shana@zju.edu.cn]                lerp(expandedSubtitleShadowDy, collapsedSubtitleShadowDy, fraction, null),
+[external][shana][shana@zju.edu.cn]                blendColors(getCurrentColor(expandedSubtitleShadowColor), getCurrentColor(collapsedSubtitleShadowColor), fraction));
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        ViewCompat.postInvalidateOnAnimation(view);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @ColorInt
+[external][shana][shana@zju.edu.cn]    private int getCurrentExpandedTitleTextColor() {
+[external][shana][shana@zju.edu.cn]        return getCurrentColor(expandedTitleTextColor);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @ColorInt
+[external][shana][shana@zju.edu.cn]    private int getCurrentExpandedSubtitleTextColor() {
+[external][shana][shana@zju.edu.cn]        return getCurrentColor(expandedSubtitleTextColor);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @ColorInt
+[external][shana][shana@zju.edu.cn]    public int getCurrentCollapsedTitleTextColor() {
+[external][shana][shana@zju.edu.cn]        return getCurrentColor(collapsedTitleTextColor);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @ColorInt
+[external][shana][shana@zju.edu.cn]    public int getCurrentCollapsedSubtitleTextColor() {
+[external][shana][shana@zju.edu.cn]        return getCurrentColor(collapsedSubtitleTextColor);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @ColorInt
+[external][shana][shana@zju.edu.cn]    private int getCurrentColor(@Nullable ColorStateList colorStateList) {
+[external][shana][shana@zju.edu.cn]        if (colorStateList == null) {
+[external][shana][shana@zju.edu.cn]            return 0;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        if (state != null) {
+[external][shana][shana@zju.edu.cn]            return colorStateList.getColorForState(state, 0);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return colorStateList.getDefaultColor();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private void calculateBaseOffsets() {
+[external][shana][shana@zju.edu.cn]        final float currentTitleSize = this.currentTitleTextSize;
+[external][shana][shana@zju.edu.cn]        final float currentSubtitleSize = this.currentSubtitleTextSize;
+[external][shana][shana@zju.edu.cn]        final boolean isTitleOnly = TextUtils.isEmpty(subtitle);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // We then calculate the collapsed title size, using the same logic
+[external][shana][shana@zju.edu.cn]        calculateUsingTitleTextSize(collapsedTitleTextSize);
+[external][shana][shana@zju.edu.cn]        calculateUsingSubtitleTextSize(collapsedSubtitleTextSize);
+[external][shana][shana@zju.edu.cn]        float titleWidth = titleToDraw != null ? titleTextPaint.measureText(titleToDraw, 0, titleToDraw.length()) : 0;
+[external][shana][shana@zju.edu.cn]        float subtitleWidth = subtitleToDraw != null ? subtitleTextPaint.measureText(subtitleToDraw, 0, subtitleToDraw.length()) : 0;
+[external][shana][shana@zju.edu.cn]        final int collapsedAbsGravity =
+[external][shana][shana@zju.edu.cn]                GravityCompat.getAbsoluteGravity(
+[external][shana][shana@zju.edu.cn]                        collapsedTextGravity,
+[external][shana][shana@zju.edu.cn]                        isRtl ? ViewCompat.LAYOUT_DIRECTION_RTL : ViewCompat.LAYOUT_DIRECTION_LTR);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // reusable dimension
+[external][shana][shana@zju.edu.cn]        float titleHeight = titleTextPaint.descent() - titleTextPaint.ascent();
+[external][shana][shana@zju.edu.cn]        float titleOffset = titleHeight / 2 - titleTextPaint.descent();
+[external][shana][shana@zju.edu.cn]        float subtitleHeight = subtitleTextPaint.descent() - subtitleTextPaint.ascent();
+[external][shana][shana@zju.edu.cn]        float subtitleOffset = subtitleHeight / 2 - subtitleTextPaint.descent();
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        if (isTitleOnly) {
+[external][shana][shana@zju.edu.cn]            switch (collapsedAbsGravity & Gravity.VERTICAL_GRAVITY_MASK) {
+[external][shana][shana@zju.edu.cn]                case Gravity.BOTTOM:
+[external][shana][shana@zju.edu.cn]                    collapsedTitleDrawY = collapsedBounds.bottom;
+[external][shana][shana@zju.edu.cn]                    break;
+[external][shana][shana@zju.edu.cn]                case Gravity.TOP:
+[external][shana][shana@zju.edu.cn]                    collapsedTitleDrawY = collapsedBounds.top - titleTextPaint.ascent();
+[external][shana][shana@zju.edu.cn]                    break;
+[external][shana][shana@zju.edu.cn]                case Gravity.CENTER_VERTICAL:
+[external][shana][shana@zju.edu.cn]                default:
+[external][shana][shana@zju.edu.cn]                    float textHeight = titleTextPaint.descent() - titleTextPaint.ascent();
+[external][shana][shana@zju.edu.cn]                    float textOffset = (textHeight / 2) - titleTextPaint.descent();
+[external][shana][shana@zju.edu.cn]                    collapsedTitleDrawY = collapsedBounds.centerY() + textOffset;
+[external][shana][shana@zju.edu.cn]                    break;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        } else {
+[external][shana][shana@zju.edu.cn]            final float offset = (collapsedBounds.height() - (titleHeight + subtitleHeight)) / 3;
+[external][shana][shana@zju.edu.cn]            collapsedTitleDrawY = collapsedBounds.top + offset - titleTextPaint.ascent();
+[external][shana][shana@zju.edu.cn]            collapsedSubtitleDrawY = collapsedBounds.top + offset * 2 + titleHeight - subtitleTextPaint.ascent();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        switch (collapsedAbsGravity & GravityCompat.RELATIVE_HORIZONTAL_GRAVITY_MASK) {
+[external][shana][shana@zju.edu.cn]            case Gravity.CENTER_HORIZONTAL:
+[external][shana][shana@zju.edu.cn]                collapsedTitleDrawX = collapsedBounds.centerX() - (titleWidth / 2);
+[external][shana][shana@zju.edu.cn]                collapsedSubtitleDrawX = collapsedBounds.centerX() - (subtitleWidth / 2);
+[external][shana][shana@zju.edu.cn]                break;
+[external][shana][shana@zju.edu.cn]            case Gravity.RIGHT:
+[external][shana][shana@zju.edu.cn]                collapsedTitleDrawX = collapsedBounds.right - titleWidth;
+[external][shana][shana@zju.edu.cn]                collapsedSubtitleDrawX = collapsedBounds.right - subtitleWidth;
+[external][shana][shana@zju.edu.cn]                break;
+[external][shana][shana@zju.edu.cn]            case Gravity.LEFT:
+[external][shana][shana@zju.edu.cn]            default:
+[external][shana][shana@zju.edu.cn]                collapsedTitleDrawX = collapsedBounds.left;
+[external][shana][shana@zju.edu.cn]                collapsedSubtitleDrawX = collapsedBounds.left;
+[external][shana][shana@zju.edu.cn]                break;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        calculateUsingTitleTextSize(expandedTitleTextSize);
+[external][shana][shana@zju.edu.cn]        calculateUsingSubtitleTextSize(expandedSubtitleTextSize);
+[external][shana][shana@zju.edu.cn]        titleWidth = titleToDraw != null ? titleTextPaint.measureText(titleToDraw, 0, titleToDraw.length()) : 0;
+[external][shana][shana@zju.edu.cn]        subtitleWidth = subtitleToDraw != null ? subtitleTextPaint.measureText(subtitleToDraw, 0, subtitleToDraw.length()) : 0;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // dimension modification
+[external][shana][shana@zju.edu.cn]        titleHeight = titleTextPaint.descent() - titleTextPaint.ascent();
+[external][shana][shana@zju.edu.cn]        titleOffset = titleHeight / 2 - titleTextPaint.descent();
+[external][shana][shana@zju.edu.cn]        subtitleHeight = subtitleTextPaint.descent() - subtitleTextPaint.ascent();
+[external][shana][shana@zju.edu.cn]        subtitleOffset = subtitleHeight / 2 - subtitleTextPaint.descent();
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        final int expandedAbsGravity = GravityCompat.getAbsoluteGravity(
+[external][shana][shana@zju.edu.cn]                expandedTextGravity,
+[external][shana][shana@zju.edu.cn]                isRtl ? ViewCompat.LAYOUT_DIRECTION_RTL : ViewCompat.LAYOUT_DIRECTION_LTR
+[external][shana][shana@zju.edu.cn]        );
+[external][shana][shana@zju.edu.cn]        if (isTitleOnly) {
+[external][shana][shana@zju.edu.cn]            switch (expandedAbsGravity & Gravity.VERTICAL_GRAVITY_MASK) {
+[external][shana][shana@zju.edu.cn]                case Gravity.BOTTOM:
+[external][shana][shana@zju.edu.cn]                    expandedTitleDrawY = expandedBounds.bottom;
+[external][shana][shana@zju.edu.cn]                    break;
+[external][shana][shana@zju.edu.cn]                case Gravity.TOP:
+[external][shana][shana@zju.edu.cn]                    expandedTitleDrawY = expandedBounds.top - titleTextPaint.ascent();
+[external][shana][shana@zju.edu.cn]                    break;
+[external][shana][shana@zju.edu.cn]                case Gravity.CENTER_VERTICAL:
+[external][shana][shana@zju.edu.cn]                default:
+[external][shana][shana@zju.edu.cn]                    float textHeight = titleTextPaint.descent() - titleTextPaint.ascent();
+[external][shana][shana@zju.edu.cn]                    float textOffset = (textHeight / 2) - titleTextPaint.descent();
+[external][shana][shana@zju.edu.cn]                    expandedTitleDrawY = expandedBounds.centerY() + textOffset;
+[external][shana][shana@zju.edu.cn]                    break;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        } else {
+[external][shana][shana@zju.edu.cn]            switch (expandedAbsGravity & Gravity.VERTICAL_GRAVITY_MASK) {
+[external][shana][shana@zju.edu.cn]                case Gravity.BOTTOM:
+[external][shana][shana@zju.edu.cn]                    expandedTitleDrawY = expandedBounds.bottom - subtitleHeight - titleOffset;
+[external][shana][shana@zju.edu.cn]                    expandedSubtitleDrawY = expandedBounds.bottom;
+[external][shana][shana@zju.edu.cn]                    break;
+[external][shana][shana@zju.edu.cn]                case Gravity.TOP:
+[external][shana][shana@zju.edu.cn]                    expandedTitleDrawY = expandedBounds.top - titleTextPaint.ascent();
+[external][shana][shana@zju.edu.cn]                    expandedSubtitleDrawY = expandedTitleDrawY + subtitleHeight + titleOffset;
+[external][shana][shana@zju.edu.cn]                    break;
+[external][shana][shana@zju.edu.cn]                case Gravity.CENTER_VERTICAL:
+[external][shana][shana@zju.edu.cn]                default:
+[external][shana][shana@zju.edu.cn]                    expandedTitleDrawY = expandedBounds.centerY() + titleOffset;
+[external][shana][shana@zju.edu.cn]                    expandedSubtitleDrawY = expandedTitleDrawY + subtitleHeight + titleOffset;
+[external][shana][shana@zju.edu.cn]                    break;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        switch (expandedAbsGravity & GravityCompat.RELATIVE_HORIZONTAL_GRAVITY_MASK) {
+[external][shana][shana@zju.edu.cn]            case Gravity.CENTER_HORIZONTAL:
+[external][shana][shana@zju.edu.cn]                expandedTitleDrawX = expandedBounds.centerX() - (titleWidth / 2);
+[external][shana][shana@zju.edu.cn]                expandedSubtitleDrawX = expandedBounds.centerX() - (subtitleWidth / 2);
+[external][shana][shana@zju.edu.cn]                break;
+[external][shana][shana@zju.edu.cn]            case Gravity.RIGHT:
+[external][shana][shana@zju.edu.cn]                expandedTitleDrawX = expandedBounds.right - titleWidth;
+[external][shana][shana@zju.edu.cn]                expandedSubtitleDrawX = expandedBounds.right - subtitleWidth;
+[external][shana][shana@zju.edu.cn]                break;
+[external][shana][shana@zju.edu.cn]            case Gravity.LEFT:
+[external][shana][shana@zju.edu.cn]            default:
+[external][shana][shana@zju.edu.cn]                expandedTitleDrawX = expandedBounds.left;
+[external][shana][shana@zju.edu.cn]                expandedSubtitleDrawX = expandedBounds.left;
+[external][shana][shana@zju.edu.cn]                break;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // The bounds have changed so we need to clear the texture
+[external][shana][shana@zju.edu.cn]        clearTexture();
+[external][shana][shana@zju.edu.cn]        // Now reset the title size back to the original
+[external][shana][shana@zju.edu.cn]        setInterpolatedTitleTextSize(currentTitleSize);
+[external][shana][shana@zju.edu.cn]        setInterpolatedSubtitleTextSize(currentSubtitleSize);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private void interpolateBounds(float fraction) {
+[external][shana][shana@zju.edu.cn]        currentBounds.left = lerp(expandedBounds.left, collapsedBounds.left, fraction, positionInterpolator);
+[external][shana][shana@zju.edu.cn]        currentBounds.top = lerp(expandedTitleDrawY, collapsedTitleDrawY, fraction, positionInterpolator);
+[external][shana][shana@zju.edu.cn]        currentBounds.right = lerp(expandedBounds.right, collapsedBounds.right, fraction, positionInterpolator);
+[external][shana][shana@zju.edu.cn]        currentBounds.bottom = lerp(expandedBounds.bottom, collapsedBounds.bottom, fraction, positionInterpolator);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void draw(@NonNull Canvas canvas) {
+[external][shana][shana@zju.edu.cn]        final int saveCount = canvas.save();
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        if (drawTitle && titleToDraw != null) {
+[external][shana][shana@zju.edu.cn]            float titleX = currentTitleDrawX;
+[external][shana][shana@zju.edu.cn]            float titleY = currentTitleDrawY;
+[external][shana][shana@zju.edu.cn]            float subtitleX = currentSubtitleDrawX;
+[external][shana][shana@zju.edu.cn]            float subtitleY = currentSubtitleDrawY;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            final boolean drawTitleTexture = useTexture && expandedTitleTexture != null;
+[external][shana][shana@zju.edu.cn]            final boolean drawSubtitleTexture = useTexture && expandedSubtitleTexture != null;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            final float titleAscent;
+[external][shana][shana@zju.edu.cn]            final float titleDescent;
+[external][shana][shana@zju.edu.cn]            if (drawTitleTexture) {
+[external][shana][shana@zju.edu.cn]                titleAscent = titleTextureAscent * titleScale;
+[external][shana][shana@zju.edu.cn]                titleDescent = titleTextureDescent * titleScale;
+[external][shana][shana@zju.edu.cn]            } else {
+[external][shana][shana@zju.edu.cn]                titleAscent = titleTextPaint.ascent() * titleScale;
+[external][shana][shana@zju.edu.cn]                titleDescent = titleTextPaint.descent() * titleScale;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            if (DEBUG_DRAW) {
+[external][shana][shana@zju.edu.cn]                // Just a debug tool, which drawn a magenta rect in the text bounds
+[external][shana][shana@zju.edu.cn]                canvas.drawRect(currentBounds.left, titleY + titleAscent, currentBounds.right, titleY + titleDescent, DEBUG_DRAW_PAINT);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            if (drawTitleTexture) {
+[external][shana][shana@zju.edu.cn]                titleY += titleAscent;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            // additional canvas save for subtitle
+[external][shana][shana@zju.edu.cn]            if (subtitleToDraw != null) {
+[external][shana][shana@zju.edu.cn]                final int subtitleSaveCount = canvas.save();
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]                if (subtitleScale != 1f) {
+[external][shana][shana@zju.edu.cn]                    canvas.scale(subtitleScale, subtitleScale, subtitleX, subtitleY);
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]                if (drawSubtitleTexture) {
+[external][shana][shana@zju.edu.cn]                    // If we should use a texture, draw it instead of title
+[external][shana][shana@zju.edu.cn]                    canvas.drawBitmap(expandedSubtitleTexture, subtitleX, subtitleY, subtitleTexturePaint);
+[external][shana][shana@zju.edu.cn]                } else {
+[external][shana][shana@zju.edu.cn]                    canvas.drawText(subtitleToDraw, 0, subtitleToDraw.length(), subtitleX, subtitleY, subtitleTextPaint);
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]                canvas.restoreToCount(subtitleSaveCount);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            if (titleScale != 1f) {
+[external][shana][shana@zju.edu.cn]                canvas.scale(titleScale, titleScale, titleX, titleY);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            if (drawTitleTexture) {
+[external][shana][shana@zju.edu.cn]                // If we should use a texture, draw it instead of text
+[external][shana][shana@zju.edu.cn]                canvas.drawBitmap(expandedTitleTexture, titleX, titleY, titleTexturePaint);
+[external][shana][shana@zju.edu.cn]            } else {
+[external][shana][shana@zju.edu.cn]                canvas.drawText(titleToDraw, 0, titleToDraw.length(), titleX, titleY, titleTextPaint);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        canvas.restoreToCount(saveCount);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private boolean calculateIsRtl(@NonNull CharSequence text) {
+[external][shana][shana@zju.edu.cn]        final boolean defaultIsRtl = isDefaultIsRtl();
+[external][shana][shana@zju.edu.cn]        return isRtlTextDirectionHeuristicsEnabled
+[external][shana][shana@zju.edu.cn]                ? isTextDirectionHeuristicsIsRtl(text, defaultIsRtl)
+[external][shana][shana@zju.edu.cn]                : defaultIsRtl;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private boolean isDefaultIsRtl() {
+[external][shana][shana@zju.edu.cn]        return ViewCompat.getLayoutDirection(view) == ViewCompat.LAYOUT_DIRECTION_RTL;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private boolean isTextDirectionHeuristicsIsRtl(@NonNull CharSequence text, boolean defaultIsRtl) {
+[external][shana][shana@zju.edu.cn]        return (defaultIsRtl
+[external][shana][shana@zju.edu.cn]                ? TextDirectionHeuristicsCompat.FIRSTSTRONG_RTL
+[external][shana][shana@zju.edu.cn]                : TextDirectionHeuristicsCompat.FIRSTSTRONG_LTR)
+[external][shana][shana@zju.edu.cn]                .isRtl(text, 0, text.length());
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private void setInterpolatedTitleTextSize(float textSize) {
+[external][shana][shana@zju.edu.cn]        calculateUsingTitleTextSize(textSize);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // Use our texture if the scale isn't 1.0
+[external][shana][shana@zju.edu.cn]        useTexture = USE_SCALING_TEXTURE && titleScale != 1f;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        if (useTexture) {
+[external][shana][shana@zju.edu.cn]            // Make sure we have an expanded texture if needed
+[external][shana][shana@zju.edu.cn]            ensureExpandedTitleTexture();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        ViewCompat.postInvalidateOnAnimation(view);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private void setInterpolatedSubtitleTextSize(float textSize) {
+[external][shana][shana@zju.edu.cn]        calculateUsingSubtitleTextSize(textSize);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // Use our texture if the scale isn't 1.0
+[external][shana][shana@zju.edu.cn]        useTexture = USE_SCALING_TEXTURE && subtitleScale != 1f;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        if (useTexture) {
+[external][shana][shana@zju.edu.cn]            // Make sure we have an expanded texture if needed
+[external][shana][shana@zju.edu.cn]            ensureExpandedSubtitleTexture();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        ViewCompat.postInvalidateOnAnimation(view);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @SuppressWarnings("ReferenceEquality") // Matches the Typeface comparison in TextView
+[external][shana][shana@zju.edu.cn]    private void calculateUsingTitleTextSize(final float size) {
+[external][shana][shana@zju.edu.cn]        if (title == null) {
+[external][shana][shana@zju.edu.cn]            return;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        final float collapsedWidth = collapsedBounds.width();
+[external][shana][shana@zju.edu.cn]        final float expandedWidth = expandedBounds.width();
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        final float availableWidth;
+[external][shana][shana@zju.edu.cn]        final float newTextSize;
+[external][shana][shana@zju.edu.cn]        boolean updateDrawText = false;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        if (isClose(size, collapsedTitleTextSize)) {
+[external][shana][shana@zju.edu.cn]            newTextSize = collapsedTitleTextSize;
+[external][shana][shana@zju.edu.cn]            titleScale = 1f;
+[external][shana][shana@zju.edu.cn]            if (currentTitleTypeface != collapsedTitleTypeface) {
+[external][shana][shana@zju.edu.cn]                currentTitleTypeface = collapsedTitleTypeface;
+[external][shana][shana@zju.edu.cn]                updateDrawText = true;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            availableWidth = collapsedWidth;
+[external][shana][shana@zju.edu.cn]        } else {
+[external][shana][shana@zju.edu.cn]            newTextSize = expandedTitleTextSize;
+[external][shana][shana@zju.edu.cn]            if (currentTitleTypeface != expandedTitleTypeface) {
+[external][shana][shana@zju.edu.cn]                currentTitleTypeface = expandedTitleTypeface;
+[external][shana][shana@zju.edu.cn]                updateDrawText = true;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            if (isClose(size, expandedTitleTextSize)) {
+[external][shana][shana@zju.edu.cn]                // If we're close to the expanded title size, snap to it and use a scale of 1
+[external][shana][shana@zju.edu.cn]                titleScale = 1f;
+[external][shana][shana@zju.edu.cn]            } else {
+[external][shana][shana@zju.edu.cn]                // Else, we'll scale down from the expanded title size
+[external][shana][shana@zju.edu.cn]                titleScale = size / expandedTitleTextSize;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            final float textSizeRatio = collapsedTitleTextSize / expandedTitleTextSize;
+[external][shana][shana@zju.edu.cn]            // This is the size of the expanded bounds when it is scaled to match the
+[external][shana][shana@zju.edu.cn]            // collapsed title size
+[external][shana][shana@zju.edu.cn]            final float scaledDownWidth = expandedWidth * textSizeRatio;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            if (scaledDownWidth > collapsedWidth) {
+[external][shana][shana@zju.edu.cn]                // If the scaled down size is larger than the actual collapsed width, we need to
+[external][shana][shana@zju.edu.cn]                // cap the available width so that when the expanded title scales down, it matches
+[external][shana][shana@zju.edu.cn]                // the collapsed width
+[external][shana][shana@zju.edu.cn]                availableWidth = Math.min(collapsedWidth / textSizeRatio, expandedWidth);
+[external][shana][shana@zju.edu.cn]            } else {
+[external][shana][shana@zju.edu.cn]                // Otherwise we'll just use the expanded width
+[external][shana][shana@zju.edu.cn]                availableWidth = expandedWidth;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        if (availableWidth > 0) {
+[external][shana][shana@zju.edu.cn]            updateDrawText = (currentTitleTextSize != newTextSize) || boundsChanged || updateDrawText;
+[external][shana][shana@zju.edu.cn]            currentTitleTextSize = newTextSize;
+[external][shana][shana@zju.edu.cn]            boundsChanged = false;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        if (titleToDraw == null || updateDrawText) {
+[external][shana][shana@zju.edu.cn]            titleTextPaint.setTextSize(currentTitleTextSize);
+[external][shana][shana@zju.edu.cn]            titleTextPaint.setTypeface(currentTitleTypeface);
+[external][shana][shana@zju.edu.cn]            // Use linear title scaling if we're scaling the canvas
+[external][shana][shana@zju.edu.cn]            titleTextPaint.setLinearText(titleScale != 1f);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            // If we don't currently have title to draw, or the title size has changed, ellipsize...
+[external][shana][shana@zju.edu.cn]            final CharSequence text =
+[external][shana][shana@zju.edu.cn]                    TextUtils
+[external][shana][shana@zju.edu.cn]                            .ellipsize(this.title, titleTextPaint, availableWidth, TextUtils.TruncateAt.END);
+[external][shana][shana@zju.edu.cn]            if (!TextUtils.equals(text, titleToDraw)) {
+[external][shana][shana@zju.edu.cn]                titleToDraw = text;
+[external][shana][shana@zju.edu.cn]                isRtl = calculateIsRtl(titleToDraw);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @SuppressWarnings("ReferenceEquality") // Matches the Typeface comparison in TextView
+[external][shana][shana@zju.edu.cn]    private void calculateUsingSubtitleTextSize(final float size) {
+[external][shana][shana@zju.edu.cn]        if (subtitle == null) {
+[external][shana][shana@zju.edu.cn]            return;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        final float collapsedWidth = collapsedBounds.width();
+[external][shana][shana@zju.edu.cn]        final float expandedWidth = expandedBounds.width();
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        final float availableWidth;
+[external][shana][shana@zju.edu.cn]        final float newTextSize;
+[external][shana][shana@zju.edu.cn]        boolean updateDrawText = false;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        if (isClose(size, collapsedSubtitleTextSize)) {
+[external][shana][shana@zju.edu.cn]            newTextSize = collapsedSubtitleTextSize;
+[external][shana][shana@zju.edu.cn]            subtitleScale = 1f;
+[external][shana][shana@zju.edu.cn]            if (currentSubtitleTypeface != collapsedSubtitleTypeface) {
+[external][shana][shana@zju.edu.cn]                currentSubtitleTypeface = collapsedSubtitleTypeface;
+[external][shana][shana@zju.edu.cn]                updateDrawText = true;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            availableWidth = collapsedWidth;
+[external][shana][shana@zju.edu.cn]        } else {
+[external][shana][shana@zju.edu.cn]            newTextSize = expandedSubtitleTextSize;
+[external][shana][shana@zju.edu.cn]            if (currentSubtitleTypeface != expandedSubtitleTypeface) {
+[external][shana][shana@zju.edu.cn]                currentSubtitleTypeface = expandedSubtitleTypeface;
+[external][shana][shana@zju.edu.cn]                updateDrawText = true;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            if (isClose(size, expandedSubtitleTextSize)) {
+[external][shana][shana@zju.edu.cn]                // If we're close to the expanded title size, snap to it and use a scale of 1
+[external][shana][shana@zju.edu.cn]                subtitleScale = 1f;
+[external][shana][shana@zju.edu.cn]            } else {
+[external][shana][shana@zju.edu.cn]                // Else, we'll scale down from the expanded title size
+[external][shana][shana@zju.edu.cn]                subtitleScale = size / expandedSubtitleTextSize;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            final float textSizeRatio = collapsedSubtitleTextSize / expandedSubtitleTextSize;
+[external][shana][shana@zju.edu.cn]            // This is the size of the expanded bounds when it is scaled to match the
+[external][shana][shana@zju.edu.cn]            // collapsed title size
+[external][shana][shana@zju.edu.cn]            final float scaledDownWidth = expandedWidth * textSizeRatio;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            if (scaledDownWidth > collapsedWidth) {
+[external][shana][shana@zju.edu.cn]                // If the scaled down size is larger than the actual collapsed width, we need to
+[external][shana][shana@zju.edu.cn]                // cap the available width so that when the expanded title scales down, it matches
+[external][shana][shana@zju.edu.cn]                // the collapsed width
+[external][shana][shana@zju.edu.cn]                availableWidth = Math.min(collapsedWidth / textSizeRatio, expandedWidth);
+[external][shana][shana@zju.edu.cn]            } else {
+[external][shana][shana@zju.edu.cn]                // Otherwise we'll just use the expanded width
+[external][shana][shana@zju.edu.cn]                availableWidth = expandedWidth;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        if (availableWidth > 0) {
+[external][shana][shana@zju.edu.cn]            updateDrawText = (currentSubtitleTextSize != newTextSize) || boundsChanged || updateDrawText;
+[external][shana][shana@zju.edu.cn]            currentSubtitleTextSize = newTextSize;
+[external][shana][shana@zju.edu.cn]            boundsChanged = false;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        if (subtitleToDraw == null || updateDrawText) {
+[external][shana][shana@zju.edu.cn]            subtitleTextPaint.setTextSize(currentSubtitleTextSize);
+[external][shana][shana@zju.edu.cn]            subtitleTextPaint.setTypeface(currentSubtitleTypeface);
+[external][shana][shana@zju.edu.cn]            // Use linear title scaling if we're scaling the canvas
+[external][shana][shana@zju.edu.cn]            subtitleTextPaint.setLinearText(subtitleScale != 1f);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            // If we don't currently have title to draw, or the title size has changed, ellipsize...
+[external][shana][shana@zju.edu.cn]            final CharSequence text =
+[external][shana][shana@zju.edu.cn]                    TextUtils.ellipsize(this.subtitle, subtitleTextPaint, availableWidth, TextUtils.TruncateAt.END);
+[external][shana][shana@zju.edu.cn]            if (!TextUtils.equals(text, subtitleToDraw)) {
+[external][shana][shana@zju.edu.cn]                subtitleToDraw = text;
+[external][shana][shana@zju.edu.cn]                isRtl = calculateIsRtl(subtitleToDraw);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private void ensureExpandedTitleTexture() {
+[external][shana][shana@zju.edu.cn]        if (expandedTitleTexture != null || expandedBounds.isEmpty() || TextUtils.isEmpty(titleToDraw)) {
+[external][shana][shana@zju.edu.cn]            return;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        calculateOffsets(0f);
+[external][shana][shana@zju.edu.cn]        titleTextureAscent = titleTextPaint.ascent();
+[external][shana][shana@zju.edu.cn]        titleTextureDescent = titleTextPaint.descent();
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        final int w = Math.round(titleTextPaint.measureText(titleToDraw, 0, titleToDraw.length()));
+[external][shana][shana@zju.edu.cn]        final int h = Math.round(titleTextureDescent - titleTextureAscent);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        if (w <= 0 || h <= 0) {
+[external][shana][shana@zju.edu.cn]            return; // If the width or height are 0, return
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        expandedTitleTexture = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        Canvas c = new Canvas(expandedTitleTexture);
+[external][shana][shana@zju.edu.cn]        c.drawText(titleToDraw, 0, titleToDraw.length(), 0, h - titleTextPaint.descent(), titleTextPaint);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        if (titleTexturePaint == null) {
+[external][shana][shana@zju.edu.cn]            // Make sure we have a paint
+[external][shana][shana@zju.edu.cn]            titleTexturePaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private void ensureExpandedSubtitleTexture() {
+[external][shana][shana@zju.edu.cn]        if (expandedSubtitleTexture != null || expandedBounds.isEmpty() || TextUtils.isEmpty(subtitleToDraw)) {
+[external][shana][shana@zju.edu.cn]            return;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        calculateOffsets(0f);
+[external][shana][shana@zju.edu.cn]        subtitleTextureAscent = subtitleTextPaint.ascent();
+[external][shana][shana@zju.edu.cn]        subtitleTextureDescent = subtitleTextPaint.descent();
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        final int w = Math.round(subtitleTextPaint.measureText(subtitleToDraw, 0, subtitleToDraw.length()));
+[external][shana][shana@zju.edu.cn]        final int h = Math.round(subtitleTextureDescent - subtitleTextureAscent);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        if (w <= 0 || h <= 0) {
+[external][shana][shana@zju.edu.cn]            return; // If the width or height are 0, return
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        expandedSubtitleTexture = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        Canvas c = new Canvas(expandedSubtitleTexture);
+[external][shana][shana@zju.edu.cn]        c.drawText(subtitleToDraw, 0, subtitleToDraw.length(), 0, h - subtitleTextPaint.descent(), subtitleTextPaint);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        if (subtitleTexturePaint == null) {
+[external][shana][shana@zju.edu.cn]            // Make sure we have a paint
+[external][shana][shana@zju.edu.cn]            subtitleTexturePaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void recalculate() {
+[external][shana][shana@zju.edu.cn]        if (view.getHeight() > 0 && view.getWidth() > 0) {
+[external][shana][shana@zju.edu.cn]            // If we've already been laid out, calculate everything now otherwise we'll wait
+[external][shana][shana@zju.edu.cn]            // until a layout
+[external][shana][shana@zju.edu.cn]            calculateBaseOffsets();
+[external][shana][shana@zju.edu.cn]            calculateCurrentOffsets();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Set the title to display
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @param title
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public void setTitle(@Nullable CharSequence title) {
+[external][shana][shana@zju.edu.cn]        if (title == null || !title.equals(this.title)) {
+[external][shana][shana@zju.edu.cn]            this.title = title;
+[external][shana][shana@zju.edu.cn]            titleToDraw = null;
+[external][shana][shana@zju.edu.cn]            clearTexture();
+[external][shana][shana@zju.edu.cn]            recalculate();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Nullable
+[external][shana][shana@zju.edu.cn]    public CharSequence getTitle() {
+[external][shana][shana@zju.edu.cn]        return title;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Set the subtitle to display
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @param subtitle
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public void setSubtitle(@Nullable CharSequence subtitle) {
+[external][shana][shana@zju.edu.cn]        if (subtitle == null || !subtitle.equals(this.subtitle)) {
+[external][shana][shana@zju.edu.cn]            this.subtitle = subtitle;
+[external][shana][shana@zju.edu.cn]            subtitleToDraw = null;
+[external][shana][shana@zju.edu.cn]            clearTexture();
+[external][shana][shana@zju.edu.cn]            recalculate();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Nullable
+[external][shana][shana@zju.edu.cn]    public CharSequence getSubtitle() {
+[external][shana][shana@zju.edu.cn]        return subtitle;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private void clearTexture() {
+[external][shana][shana@zju.edu.cn]        if (expandedTitleTexture != null) {
+[external][shana][shana@zju.edu.cn]            expandedTitleTexture.recycle();
+[external][shana][shana@zju.edu.cn]            expandedTitleTexture = null;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        if (expandedSubtitleTexture != null) {
+[external][shana][shana@zju.edu.cn]            expandedSubtitleTexture.recycle();
+[external][shana][shana@zju.edu.cn]            expandedSubtitleTexture = null;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Returns true if {@code value} is 'close' to it's closest decimal value. Close is currently
+[external][shana][shana@zju.edu.cn]     * defined as it's difference being < 0.001.
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    private static boolean isClose(float value, float targetValue) {
+[external][shana][shana@zju.edu.cn]        return Math.abs(value - targetValue) < 0.001f;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public ColorStateList getExpandedTitleTextColor() {
+[external][shana][shana@zju.edu.cn]        return expandedTitleTextColor;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public ColorStateList getExpandedSubtitleTextColor() {
+[external][shana][shana@zju.edu.cn]        return expandedSubtitleTextColor;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public ColorStateList getCollapsedTitleTextColor() {
+[external][shana][shana@zju.edu.cn]        return collapsedTitleTextColor;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public ColorStateList getCollapsedSubtitleTextColor() {
+[external][shana][shana@zju.edu.cn]        return collapsedSubtitleTextColor;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Blend {@code color1} and {@code color2} using the given ratio.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @param ratio of which to blend. 0.0 will return {@code color1}, 0.5 will give an even blend,
+[external][shana][shana@zju.edu.cn]     *              1.0 will return {@code color2}.
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    private static int blendColors(int color1, int color2, float ratio) {
+[external][shana][shana@zju.edu.cn]        final float inverseRatio = 1f - ratio;
+[external][shana][shana@zju.edu.cn]        float a = (Color.alpha(color1) * inverseRatio) + (Color.alpha(color2) * ratio);
+[external][shana][shana@zju.edu.cn]        float r = (Color.red(color1) * inverseRatio) + (Color.red(color2) * ratio);
+[external][shana][shana@zju.edu.cn]        float g = (Color.green(color1) * inverseRatio) + (Color.green(color2) * ratio);
+[external][shana][shana@zju.edu.cn]        float b = (Color.blue(color1) * inverseRatio) + (Color.blue(color2) * ratio);
+[external][shana][shana@zju.edu.cn]        return Color.argb((int) a, (int) r, (int) g, (int) b);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private static float lerp(
+[external][shana][shana@zju.edu.cn]            float startValue, float endValue, float fraction, @Nullable TimeInterpolator interpolator) {
+[external][shana][shana@zju.edu.cn]        if (interpolator != null) {
+[external][shana][shana@zju.edu.cn]            fraction = interpolator.getInterpolation(fraction);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return AnimationUtils.lerp(startValue, endValue, fraction);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private static boolean rectEquals(@NonNull Rect r, int left, int top, int right, int bottom) {
+[external][shana][shana@zju.edu.cn]        return !(r.left != left || r.top != top || r.right != right || r.bottom != bottom);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

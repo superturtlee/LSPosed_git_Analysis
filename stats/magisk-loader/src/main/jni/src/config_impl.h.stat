@@ -1,0 +1,40 @@
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]/*
+[internal][kotori2][17663689+kotori2@users.noreply.github.com] * This file is part of LSPosed.
+[internal][kotori2][17663689+kotori2@users.noreply.github.com] *
+[internal][kotori2][17663689+kotori2@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[internal][kotori2][17663689+kotori2@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[internal][kotori2][17663689+kotori2@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[internal][kotori2][17663689+kotori2@users.noreply.github.com] * (at your option) any later version.
+[internal][kotori2][17663689+kotori2@users.noreply.github.com] *
+[internal][kotori2][17663689+kotori2@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[internal][kotori2][17663689+kotori2@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[internal][kotori2][17663689+kotori2@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[internal][kotori2][17663689+kotori2@users.noreply.github.com] * GNU General Public License for more details.
+[internal][kotori2][17663689+kotori2@users.noreply.github.com] *
+[internal][kotori2][17663689+kotori2@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[internal][kotori2][17663689+kotori2@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[internal][kotori2][17663689+kotori2@users.noreply.github.com] *
+[internal][kotori2][17663689+kotori2@users.noreply.github.com] * Copyright (C) 2022 LSPosed Contributors
+[internal][kotori2][17663689+kotori2@users.noreply.github.com] */
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]#pragma once
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]#include "config_bridge.h"
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]#include "service.h"
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]namespace lspd {
+[external][shana][shana@zju.edu.cn]    class ConfigImpl : public ConfigBridge {
+[external][shana][shana@zju.edu.cn]    public:
+[external][shana][shana@zju.edu.cn]        inline static void Init() {
+[external][shana][shana@zju.edu.cn]            instance_ = std::make_unique<ConfigImpl>();
+[external][shana][shana@zju.edu.cn]        }
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]        virtual obfuscation_map_t &obfuscation_map() override { return obfuscation_map_; }
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]        virtual void
+[external][shana][shana@zju.edu.cn]        obfuscation_map(obfuscation_map_t m) override { obfuscation_map_ = std::move(m); }
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    private:
+[external][shana][shana@zju.edu.cn]        inline static std::map<std::string, std::string> obfuscation_map_;
+[external][shana][shana@zju.edu.cn]    };
+[external][shana][shana@zju.edu.cn]}

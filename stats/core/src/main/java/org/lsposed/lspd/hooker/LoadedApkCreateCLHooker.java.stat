@@ -1,0 +1,208 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.lspd.hooker;
+[external][hsushulong][hsushulong@gmail.com]
+[external][shana][shana@zju.edu.cn]import static org.lsposed.lspd.core.ApplicationServiceClient.serviceClient;
+[external][416810799][416810799@qq.com]
+[external][shana][shana@zju.edu.cn]import android.annotation.SuppressLint;
+[external][shana][shana@zju.edu.cn]import android.app.ActivityThread;
+[external][hsushulong][hsushulong@gmail.com]import android.app.LoadedApk;
+[external][shana][shana@zju.edu.cn]import android.content.pm.ApplicationInfo;
+[external][shana][shana@zju.edu.cn]import android.os.Build;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import androidx.annotation.NonNull;
+[external][hsushulong][hsushulong@gmail.com]
+[external][shana][shana@zju.edu.cn]import org.lsposed.lspd.impl.LSPosedContext;
+[external][416810799][416810799@qq.com]import org.lsposed.lspd.util.Hookers;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.lspd.util.MetaDataReader;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.lspd.util.Utils;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.io.File;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.io.IOException;
+[external][shana][shana@zju.edu.cn]import java.lang.reflect.Field;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.util.Map;
+[external][shana][shana@zju.edu.cn]import java.util.Optional;
+[external][noreply][noreply@nullptr.icu]import java.util.Set;
+[external][noreply][noreply@nullptr.icu]import java.util.concurrent.ConcurrentHashMap;
+[external][416810799][416810799@qq.com]
+[external][hsushulong][hsushulong@gmail.com]import de.robv.android.xposed.XC_MethodHook;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import de.robv.android.xposed.XC_MethodReplacement;
+[external][hsushulong][hsushulong@gmail.com]import de.robv.android.xposed.XposedBridge;
+[external][hsushulong][hsushulong@gmail.com]import de.robv.android.xposed.XposedHelpers;
+[external][shana][shana@zju.edu.cn]import de.robv.android.xposed.XposedInit;
+[external][hsushulong][hsushulong@gmail.com]import de.robv.android.xposed.callbacks.XC_LoadPackage;
+[external][noreply][noreply@nullptr.icu]import io.github.libxposed.api.XposedInterface;
+[external][noreply][noreply@nullptr.icu]import io.github.libxposed.api.XposedModuleInterface;
+[external][noreply][noreply@nullptr.icu]import io.github.libxposed.api.annotations.AfterInvocation;
+[external][noreply][noreply@nullptr.icu]import io.github.libxposed.api.annotations.XposedHooker;
+[external][hsushulong][hsushulong@gmail.com]
+[external][shana][shana@zju.edu.cn]@SuppressLint("BlockedPrivateApi")
+[external][noreply][noreply@nullptr.icu]@XposedHooker
+[external][shana][shana@zju.edu.cn]public class LoadedApkCreateCLHooker implements XposedInterface.Hooker {
+[external][shana][shana@zju.edu.cn]    private final static Field defaultClassLoaderField;
+[external][shana][shana@zju.edu.cn]
+[external][noreply][noreply@nullptr.icu]    private final static Set<LoadedApk> loadedApks = ConcurrentHashMap.newKeySet();
+[external][noreply][noreply@nullptr.icu]
+[external][shana][shana@zju.edu.cn]    static {
+[external][shana][shana@zju.edu.cn]        Field field = null;
+[external][shana][shana@zju.edu.cn]        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+[external][shana][shana@zju.edu.cn]            try {
+[external][shana][shana@zju.edu.cn]                field = LoadedApk.class.getDeclaredField("mDefaultClassLoader");
+[external][shana][shana@zju.edu.cn]                field.setAccessible(true);
+[external][shana][shana@zju.edu.cn]            } catch (Throwable ignored) {
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        defaultClassLoaderField = field;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][noreply][noreply@nullptr.icu]    static void addLoadedApk(LoadedApk loadedApk) {
+[external][noreply][noreply@nullptr.icu]        loadedApks.add(loadedApk);
+[external][hsushulong][hsushulong@gmail.com]    }
+[external][hsushulong][hsushulong@gmail.com]
+[external][noreply][noreply@nullptr.icu]    @AfterInvocation
+[external][noreply][noreply@nullptr.icu]    public static void afterHookedMethod(XposedInterface.AfterHookCallback callback) {
+[external][noreply][noreply@nullptr.icu]        LoadedApk loadedApk = (LoadedApk) callback.getThisObject();
+[external][hsushulong][hsushulong@gmail.com]
+[external][shana][shana@zju.edu.cn]        if (callback.getArgs()[0] != null || !loadedApks.contains(loadedApk)) {
+[external][shana][shana@zju.edu.cn]            return;
+[external][shana][shana@zju.edu.cn]        }
+[external][hsushulong][hsushulong@gmail.com]
+[external][shana][shana@zju.edu.cn]        try {
+[external][shana][shana@zju.edu.cn]            Hookers.logD("LoadedApk#createClassLoader starts");
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            String packageName = ActivityThread.currentPackageName();
+[external][shana][shana@zju.edu.cn]            String processName = ActivityThread.currentProcessName();
+[external][shana][shana@zju.edu.cn]            boolean isFirstPackage = packageName != null && processName != null && packageName.equals(loadedApk.getPackageName());
+[external][shana][shana@zju.edu.cn]            if (!isFirstPackage) {
+[external][shana][shana@zju.edu.cn]                packageName = loadedApk.getPackageName();
+[external][shana][shana@zju.edu.cn]                processName = ActivityThread.currentPackageName();
+[external][shana][shana@zju.edu.cn]            } else if (packageName.equals("android")) {
+[external][shana][shana@zju.edu.cn]                packageName = "system";
+[external][shana][shana@zju.edu.cn]            }
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]            Object mAppDir = XposedHelpers.getObjectField(loadedApk, "mAppDir");
+[external][shana][shana@zju.edu.cn]            ClassLoader classLoader = (ClassLoader) XposedHelpers.getObjectField(loadedApk, "mClassLoader");
+[external][shana][shana@zju.edu.cn]            Hookers.logD("LoadedApk#createClassLoader ends: " + mAppDir + " -> " + classLoader);
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]            if (classLoader == null) {
+[external][hsushulong][hsushulong@gmail.com]                return;
+[external][hsushulong][hsushulong@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]            if (!isFirstPackage && !XposedHelpers.getBooleanField(loadedApk, "mIncludeCode")) {
+[internal][vvb2060][vvb2060@gmail.com]                Hookers.logD("LoadedApk#<init> mIncludeCode == false: " + mAppDir);
+[internal][vvb2060][vvb2060@gmail.com]                return;
+[internal][vvb2060][vvb2060@gmail.com]            }
+[external][hsushulong][hsushulong@gmail.com]
+[external][shana][shana@zju.edu.cn]            if (!isFirstPackage && !XposedInit.getLoadedModules().getOrDefault(packageName, Optional.of("")).isPresent()) {
+[external][shana][shana@zju.edu.cn]                return;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]
+[external][hsushulong][hsushulong@gmail.com]            XC_LoadPackage.LoadPackageParam lpparam = new XC_LoadPackage.LoadPackageParam(
+[external][hsushulong][hsushulong@gmail.com]                    XposedBridge.sLoadedPackageCallbacks);
+[external][shana][shana@zju.edu.cn]            lpparam.packageName = packageName;
+[external][shana][shana@zju.edu.cn]            lpparam.processName = processName;
+[external][hsushulong][hsushulong@gmail.com]            lpparam.classLoader = classLoader;
+[external][hsushulong][hsushulong@gmail.com]            lpparam.appInfo = loadedApk.getApplicationInfo();
+[external][noreply][noreply@nullptr.icu]            lpparam.isFirstApplication = isFirstPackage;
+[external][hsushulong][hsushulong@gmail.com]
+[external][shana][shana@zju.edu.cn]            if (isFirstPackage && XposedInit.getLoadedModules().getOrDefault(packageName, Optional.empty()).isPresent()) {
+[external][shana][shana@zju.edu.cn]                hookNewXSP(lpparam);
+[external][shana][shana@zju.edu.cn]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][noreply][noreply@nullptr.icu]            Hookers.logD("Call handleLoadedPackage: packageName=" + lpparam.packageName + " processName=" + lpparam.processName + " isFirstPackage=" + isFirstPackage + " classLoader=" + lpparam.classLoader + " appInfo=" + lpparam.appInfo);
+[external][shana][shana@zju.edu.cn]            XC_LoadPackage.callAll(lpparam);
+[external][hsushulong][hsushulong@gmail.com]
+[external][shana][shana@zju.edu.cn]            LSPosedContext.callOnPackageLoaded(new XposedModuleInterface.PackageLoadedParam() {
+[external][shana][shana@zju.edu.cn]                @NonNull
+[external][shana][shana@zju.edu.cn]                @Override
+[external][shana][shana@zju.edu.cn]                public String getPackageName() {
+[external][shana][shana@zju.edu.cn]                    return loadedApk.getPackageName();
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]                @NonNull
+[external][shana][shana@zju.edu.cn]                @Override
+[external][noreply][noreply@nullptr.icu]                public ApplicationInfo getApplicationInfo() {
+[external][shana][shana@zju.edu.cn]                    return loadedApk.getApplicationInfo();
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]                @NonNull
+[external][shana][shana@zju.edu.cn]                @Override
+[external][shana][shana@zju.edu.cn]                public ClassLoader getDefaultClassLoader() {
+[external][shana][shana@zju.edu.cn]                    try {
+[external][shana][shana@zju.edu.cn]                        return (ClassLoader) defaultClassLoaderField.get(loadedApk);
+[external][shana][shana@zju.edu.cn]                    } catch (Throwable t) {
+[external][shana][shana@zju.edu.cn]                        throw new IllegalStateException(t);
+[external][shana][shana@zju.edu.cn]                    }
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]                @NonNull
+[external][shana][shana@zju.edu.cn]                @Override
+[external][shana][shana@zju.edu.cn]                public ClassLoader getClassLoader() {
+[external][shana][shana@zju.edu.cn]                    return classLoader;
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]                @Override
+[external][noreply][noreply@nullptr.icu]                public boolean isFirstPackage() {
+[external][noreply][noreply@nullptr.icu]                    return isFirstPackage;
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            });
+[external][hsushulong][hsushulong@gmail.com]        } catch (Throwable t) {
+[external][shana][shana@zju.edu.cn]            Hookers.logE("error when hooking LoadedApk#createClassLoader", t);
+[external][hsushulong][hsushulong@gmail.com]        } finally {
+[external][noreply][noreply@nullptr.icu]            loadedApks.remove(loadedApk);
+[external][hsushulong][hsushulong@gmail.com]        }
+[external][hsushulong][hsushulong@gmail.com]    }
+[external][hsushulong][hsushulong@gmail.com]
+[external][noreply][noreply@nullptr.icu]    private static void hookNewXSP(XC_LoadPackage.LoadPackageParam lpparam) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        int xposedminversion = -1;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        boolean xposedsharedprefs = false;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Map<String, Object> metaData = MetaDataReader.getMetaData(new File(lpparam.appInfo.sourceDir));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Object minVersionRaw = metaData.get("xposedminversion");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (minVersionRaw instanceof Integer) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                xposedminversion = (Integer) minVersionRaw;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            } else if (minVersionRaw instanceof String) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                xposedminversion = MetaDataReader.extractIntPart((String) minVersionRaw);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            xposedsharedprefs = metaData.containsKey("xposedsharedprefs");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (NumberFormatException | IOException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Hookers.logE("ApkParser fails", e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (xposedminversion > 92 || xposedsharedprefs) {
+[external][shana][shana@zju.edu.cn]            Utils.logI("New modules detected, hook preferences");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedHelpers.findAndHookMethod("android.app.ContextImpl", lpparam.classLoader, "checkMode", int.class, new XC_MethodHook() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                protected void afterHookedMethod(MethodHookParam param) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    if (((int) param.args[0] & 1/*Context.MODE_WORLD_READABLE*/) != 0) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        param.setThrowable(null);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            });
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedHelpers.findAndHookMethod("android.app.ContextImpl", lpparam.classLoader, "getPreferencesDir", new XC_MethodReplacement() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                protected Object replaceHookedMethod(MethodHookParam param) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    return new File(serviceClient.getPrefsPath(lpparam.packageName));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            });
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][hsushulong][hsushulong@gmail.com]    }
+[external][hsushulong][hsushulong@gmail.com]}

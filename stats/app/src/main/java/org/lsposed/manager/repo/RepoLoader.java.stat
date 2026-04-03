@@ -1,0 +1,323 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.manager.repo;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import android.content.res.Resources;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.util.Log;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import androidx.annotation.NonNull;
+[external][shana][shana@zju.edu.cn]import androidx.annotation.Nullable;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import com.google.gson.Gson;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.manager.App;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import org.lsposed.manager.R;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.manager.repo.model.OnlineModule;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import org.lsposed.manager.repo.model.Release;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.io.IOException;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.nio.charset.StandardCharsets;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.nio.file.Files;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.nio.file.Path;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.nio.file.Paths;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import java.util.ArrayList;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.util.Arrays;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.util.Collection;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.util.HashMap;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import java.util.List;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.util.Map;
+[external][shana][shana@zju.edu.cn]import java.util.Set;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import java.util.concurrent.ConcurrentHashMap;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import okhttp3.Call;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import okhttp3.Callback;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import okhttp3.Request;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import okhttp3.Response;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import okhttp3.ResponseBody;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]public class RepoLoader {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private static RepoLoader instance = null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private Map<String, OnlineModule> onlineModules = new HashMap<>();
+[external][shana][shana@zju.edu.cn]    private Map<String, ModuleVersion> latestVersion = new ConcurrentHashMap<>();
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static class ModuleVersion {
+[external][shana][shana@zju.edu.cn]        public String versionName;
+[external][shana][shana@zju.edu.cn]        public long versionCode;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        private ModuleVersion(long versionCode, String versionName) {
+[external][shana][shana@zju.edu.cn]            this.versionName = versionName;
+[external][shana][shana@zju.edu.cn]            this.versionCode = versionCode;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        public boolean upgradable(long versionCode, String versionName) {
+[external][shana][shana@zju.edu.cn]            return this.versionCode > versionCode || (this.versionCode == versionCode && !versionName.replace(' ', '_').equals(this.versionName));
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private final Path repoFile = Paths.get(App.getInstance().getFilesDir().getAbsolutePath(), "repo.json");
+[external][shana][shana@zju.edu.cn]    private final Set<RepoListener> listeners = ConcurrentHashMap.newKeySet();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private boolean repoLoaded = false;
+[external][shana][shana@zju.edu.cn]    private static final String originRepoUrl = "https://modules.lsposed.org/";
+[external][shana][shana@zju.edu.cn]    private static final String backupRepoUrl = "https://modules-blogcdn.lsposed.org/";
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private static final String secondBackupRepoUrl = "https://modules-cloudflare.lsposed.org/";
+[external][shana][shana@zju.edu.cn]    private static String repoUrl = originRepoUrl;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    private final Resources resources = App.getInstance().getResources();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    private final String[] channels = resources.getStringArray(R.array.update_channel_values);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public boolean isRepoLoaded() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return repoLoaded;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static synchronized RepoLoader getInstance() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (instance == null) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            instance = new RepoLoader();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            App.getExecutorService().submit(() -> instance.loadLocalData(true));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return instance;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    synchronized public void loadRemoteData() {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        repoLoaded = false;
+[external][shana][shana@zju.edu.cn]        try {
+[external][howardwu20][HowardWu20@outlook.com]            try (var response = App.getOkHttpClient().newCall(new Request.Builder().url(repoUrl + "modules.json").build()).execute()) {
+[external][howardwu20][HowardWu20@outlook.com]
+[external][howardwu20][HowardWu20@outlook.com]                if (response.isSuccessful()) {
+[external][howardwu20][HowardWu20@outlook.com]                    ResponseBody body = response.body();
+[external][howardwu20][HowardWu20@outlook.com]                    if (body != null) {
+[external][howardwu20][HowardWu20@outlook.com]                        try {
+[external][howardwu20][HowardWu20@outlook.com]                            String bodyString = body.string();
+[external][howardwu20][HowardWu20@outlook.com]                            Files.write(repoFile, bodyString.getBytes(StandardCharsets.UTF_8));
+[external][howardwu20][HowardWu20@outlook.com]                            loadLocalData(false);
+[external][howardwu20][HowardWu20@outlook.com]                        } catch (Throwable t) {
+[external][howardwu20][HowardWu20@outlook.com]                            Log.e(App.TAG, Log.getStackTraceString(t));
+[external][howardwu20][HowardWu20@outlook.com]                            for (RepoListener listener : listeners) {
+[external][howardwu20][HowardWu20@outlook.com]                                listener.onThrowable(t);
+[external][howardwu20][HowardWu20@outlook.com]                            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        }
+[external][shana][shana@zju.edu.cn]                    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][shana][shana@zju.edu.cn]        } catch (Throwable e) {
+[external][shana][shana@zju.edu.cn]            Log.e(App.TAG, "load remote data", e);
+[external][shana][shana@zju.edu.cn]            for (RepoListener listener : listeners) {
+[external][shana][shana@zju.edu.cn]                listener.onThrowable(e);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            if (repoUrl.equals(originRepoUrl)) {
+[external][shana][shana@zju.edu.cn]                repoUrl = backupRepoUrl;
+[external][shana][shana@zju.edu.cn]                loadRemoteData();
+[external][shana][shana@zju.edu.cn]            } else if (repoUrl.equals(backupRepoUrl)) {
+[external][shana][shana@zju.edu.cn]                repoUrl = secondBackupRepoUrl;
+[external][shana][shana@zju.edu.cn]                loadRemoteData();
+[external][shana][shana@zju.edu.cn]            }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    synchronized public void loadLocalData(boolean updateRemoteRepo) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        repoLoaded = false;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        try {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            if (Files.notExists(repoFile)) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                loadRemoteData();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                updateRemoteRepo = false;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            byte[] encoded = Files.readAllBytes(repoFile);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            String bodyString = new String(encoded, StandardCharsets.UTF_8);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            Gson gson = new Gson();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            Map<String, OnlineModule> modules = new HashMap<>();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            OnlineModule[] repoModules = gson.fromJson(bodyString, OnlineModule[].class);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            Arrays.stream(repoModules).forEach(onlineModule -> modules.put(onlineModule.getName(), onlineModule));
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            var channel = App.getPreferences().getString("update_channel", channels[0]);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            updateLatestVersion(repoModules, channel);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            onlineModules = modules;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        } catch (Throwable t) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            Log.e(App.TAG, Log.getStackTraceString(t));
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            for (RepoListener listener : listeners) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                listener.onThrowable(t);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            }
+[external][shana][shana@zju.edu.cn]        } finally {
+[external][shana][shana@zju.edu.cn]            repoLoaded = true;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            for (RepoListener listener : listeners) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                listener.onRepoLoaded();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            if (updateRemoteRepo) loadRemoteData();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    synchronized private void updateLatestVersion(OnlineModule[] onlineModules, String channel) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        repoLoaded = false;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        Map<String, ModuleVersion> versions = new ConcurrentHashMap<>();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        for (var module : onlineModules) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            String release = module.getLatestRelease();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            if (channel.equals(channels[1]) && module.getLatestBetaRelease() != null && !module.getLatestBetaRelease().isEmpty()) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                release = module.getLatestBetaRelease();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            } else if (channel.equals(channels[2])) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                if (module.getLatestSnapshotRelease() != null && !module.getLatestSnapshotRelease().isEmpty())
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    release = module.getLatestSnapshotRelease();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                else if (module.getLatestBetaRelease() != null && !module.getLatestBetaRelease().isEmpty())
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    release = module.getLatestBetaRelease();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            if (release == null || release.isEmpty()) continue;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            var splits = release.split("-", 2);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            if (splits.length < 2) continue;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            long verCode;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            String verName;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            try {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                verCode = Long.parseLong(splits[0]);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                verName = splits[1];
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            } catch (NumberFormatException ignored) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                continue;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            String pkgName = module.getName();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            versions.put(pkgName, new ModuleVersion(verCode, verName));
+[external][shana][shana@zju.edu.cn]        }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        latestVersion = versions;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        repoLoaded = true;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        for (RepoListener listener : listeners) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            listener.onRepoLoaded();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    public void updateLatestVersion(String channel) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        if (repoLoaded)
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            updateLatestVersion(onlineModules.keySet().parallelStream().map(onlineModules::get).toArray(OnlineModule[]::new), channel);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    @Nullable
+[external][shana][shana@zju.edu.cn]    public ModuleVersion getModuleLatestVersion(String packageName) {
+[external][shana][shana@zju.edu.cn]        return repoLoaded ? latestVersion.getOrDefault(packageName, null) : null;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    @Nullable
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    public List<Release> getReleases(String packageName) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        var channel = App.getPreferences().getString("update_channel", channels[0]);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        List<Release> releases = new ArrayList<>();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        if (repoLoaded) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            var module = onlineModules.get(packageName);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            if (module != null) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                releases = module.getReleases();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                if (!module.releasesLoaded) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    if (channel.equals(channels[1]) && !(module.getBetaReleases() != null && module.getBetaReleases().isEmpty())) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        releases = module.getBetaReleases();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    } else if (channel.equals(channels[2]))
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        if (!(module.getSnapshotReleases() != null && module.getSnapshotReleases().isEmpty()))
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                            releases = module.getSnapshotReleases();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        else if (!(module.getBetaReleases() != null && module.getBetaReleases().isEmpty()))
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                            releases = module.getBetaReleases();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        return releases;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    @Nullable
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    public String getLatestReleaseTime(String packageName, String channel) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        String releaseTime = null;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        if (repoLoaded) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            var module = onlineModules.get(packageName);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            if (module != null) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                releaseTime = module.getLatestReleaseTime();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                if (channel.equals(channels[1]) && module.getLatestBetaReleaseTime() != null) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    releaseTime = module.getLatestBetaReleaseTime();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                } else if (channel.equals(channels[2]))
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    if (module.getLatestSnapshotReleaseTime() != null)
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        releaseTime = module.getLatestSnapshotReleaseTime();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    else if (module.getLatestBetaReleaseTime() != null)
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        releaseTime = module.getLatestBetaReleaseTime();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        return releaseTime;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public void loadRemoteReleases(String packageName) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        App.getOkHttpClient().newCall(new Request.Builder().url(String.format(repoUrl + "module/%s.json", packageName)).build()).enqueue(new Callback() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+[internal][vvb2060][vvb2060@gmail.com]                Log.e(App.TAG, call.request().url() + e.getMessage());
+[external][shana][shana@zju.edu.cn]                if (repoUrl.equals(originRepoUrl)) {
+[external][shana][shana@zju.edu.cn]                    repoUrl = backupRepoUrl;
+[external][shana][shana@zju.edu.cn]                    loadRemoteReleases(packageName);
+[external][shana][shana@zju.edu.cn]                } else if (repoUrl.equals(backupRepoUrl)) {
+[external][shana][shana@zju.edu.cn]                    repoUrl = secondBackupRepoUrl;
+[external][shana][shana@zju.edu.cn]                    loadRemoteReleases(packageName);
+[external][shana][shana@zju.edu.cn]                } else {
+[external][shana][shana@zju.edu.cn]                    for (RepoListener listener : listeners) {
+[external][shana][shana@zju.edu.cn]                        listener.onThrowable(e);
+[external][shana][shana@zju.edu.cn]                    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            public void onResponse(@NonNull Call call, @NonNull Response response) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                if (response.isSuccessful()) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    ResponseBody body = response.body();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    if (body != null) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                            String bodyString = body.string();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                            Gson gson = new Gson();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                            OnlineModule module = gson.fromJson(bodyString, OnlineModule.class);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                            module.releasesLoaded = true;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                            onlineModules.replace(packageName, module);
+[external][shana][shana@zju.edu.cn]                            for (RepoListener listener : listeners) {
+[external][shana][shana@zju.edu.cn]                                listener.onModuleReleasesLoaded(module);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        } catch (Throwable t) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                            Log.e(App.TAG, Log.getStackTraceString(t));
+[external][shana][shana@zju.edu.cn]                            for (RepoListener listener : listeners) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                                listener.onThrowable(t);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        });
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    public void addListener(RepoListener listener) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        listeners.add(listener);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    public void removeListener(RepoListener listener) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        listeners.remove(listener);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    @Nullable
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public OnlineModule getOnlineModule(String packageName) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        return repoLoaded && packageName != null ? onlineModules.get(packageName) : null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    @Nullable
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public Collection<OnlineModule> getOnlineModules() {
+[external][shana][shana@zju.edu.cn]        return repoLoaded ? onlineModules.values() : null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    public interface RepoListener {
+[external][shana][shana@zju.edu.cn]        default void onRepoLoaded() {
+[internal][vvb2060][vvb2060@gmail.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]        default void onModuleReleasesLoaded(OnlineModule module) {
+[internal][vvb2060][vvb2060@gmail.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]        default void onThrowable(Throwable t) {
+[external][shana][shana@zju.edu.cn]            Log.e(App.TAG, "load repo failed", t);
+[external][shana][shana@zju.edu.cn]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]}

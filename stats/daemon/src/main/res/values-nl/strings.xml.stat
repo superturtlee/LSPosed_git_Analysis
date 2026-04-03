@@ -1,0 +1,21 @@
+[bot][lsposed][lsposed@lsposed.org]<?xml version="1.0" encoding="utf-8"?>
+[bot][lsposed][lsposed@lsposed.org]<resources>
+[bot][lsposed][lsposed@lsposed.org]    <!-- Notification -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_is_not_activated_yet">LSPosed module is nog niet geactiveerd</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_is_not_activated_yet_main_user_detailed">%1$s is geïnstalleerd, maar nog niet geactiveerd</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_is_not_activated_yet_multi_user_detailed">%1$s is geïnstalleerd bij gebruiker %2$s, maar is nog niet geactiveerd</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="xposed_module_updated_notification_title">LSPosed module bijgewerkt</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="xposed_module_updated_notification_content">%1$s is geupdate</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="xposed_module_updated_notification_title_system">Xposed-module bijgewerkt, systeem opnieuw opstarten vereist</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="xposed_module_updated_notification_content_system">%s is bijgewerkt, omdat het bereik een systeemkader bevat, moet je opnieuw opstarten om wijzigingen toe te passen</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_updated_channel_name">Module update voltooid</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="status_channel_name">LSPosed status</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="lsposed_running_notification_title">LSPosed geladen</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="lsposed_running_notification_content">Tik op de melding om manager te openen</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="xposed_module_request_scope_title">Scope verzoek</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="xposed_module_request_scope_content">%1$s op gebruiker %2$s verzoeken om %3$s toe te voegen aan het toepassingsgebied.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="scope_channel_name">Scope verzoek</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="scope_approve">Goedkeuren</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="scope_deny">Weiger</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="nerver_ask_again">Nooit vragen</string>
+[bot][lsposed][lsposed@lsposed.org]</resources>

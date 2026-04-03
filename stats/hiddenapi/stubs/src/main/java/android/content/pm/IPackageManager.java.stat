@@ -1,0 +1,104 @@
+[external][shana][shana@zju.edu.cn]package android.content.pm;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import android.content.Intent;
+[external][shana][shana@zju.edu.cn]import android.os.Binder;
+[external][shana][shana@zju.edu.cn]import android.os.IBinder;
+[external][shana][shana@zju.edu.cn]import android.os.IInterface;
+[external][shana][shana@zju.edu.cn]import android.os.RemoteException;
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]import androidx.annotation.RequiresApi;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import java.util.List;
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]public interface IPackageManager extends IInterface {
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    boolean isPackageAvailable(String packageName, int userId) throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    boolean getApplicationHiddenSettingAsUser(String packageName, int userId) throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    ApplicationInfo getApplicationInfo(String packageName, int flags, int userId)
+[external][shana][shana@zju.edu.cn]            throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @RequiresApi(33)
+[external][shana][shana@zju.edu.cn]    ApplicationInfo getApplicationInfo(String packageName, long flags, int userId)
+[external][shana][shana@zju.edu.cn]            throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    PackageInfo getPackageInfo(String packageName, int flags, int userId)
+[external][shana][shana@zju.edu.cn]            throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @RequiresApi(33)
+[external][shana][shana@zju.edu.cn]    PackageInfo getPackageInfo(String packageName, long flags, int userId)
+[external][shana][shana@zju.edu.cn]            throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    int getPackageUid(String packageName, int flags, int userId) throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @RequiresApi(33)
+[external][shana][shana@zju.edu.cn]    int getPackageUid(String packageName, long flags, int userId) throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    String[] getPackagesForUid(int uid)
+[external][shana][shana@zju.edu.cn]            throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    ParceledListSlice<PackageInfo> getInstalledPackages(int flags, int userId)
+[external][shana][shana@zju.edu.cn]            throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @RequiresApi(33)
+[external][shana][shana@zju.edu.cn]    ParceledListSlice<PackageInfo> getInstalledPackages(long flags, int userId)
+[external][shana][shana@zju.edu.cn]            throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    ParceledListSlice<ApplicationInfo> getInstalledApplications(int flags, int userId)
+[external][shana][shana@zju.edu.cn]            throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @RequiresApi(33)
+[external][shana][shana@zju.edu.cn]    ParceledListSlice<ApplicationInfo> getInstalledApplications(long flags, int userId)
+[external][shana][shana@zju.edu.cn]            throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    int getUidForSharedUser(String sharedUserName)
+[external][shana][shana@zju.edu.cn]            throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    void grantRuntimePermission(String packageName, String permissionName, int userId)
+[external][shana][shana@zju.edu.cn]            throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    void revokeRuntimePermission(String packageName, String permissionName, int userId)
+[external][shana][shana@zju.edu.cn]            throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    int getPermissionFlags(String permissionName, String packageName, int userId)
+[external][shana][shana@zju.edu.cn]            throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    void updatePermissionFlags(String permissionName, String packageName, int flagMask, int flagValues, int userId)
+[external][shana][shana@zju.edu.cn]            throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    int checkPermission(String permName, String pkgName, int userId)
+[external][shana][shana@zju.edu.cn]            throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    int checkUidPermission(String permName, int uid)
+[external][shana][shana@zju.edu.cn]            throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    IPackageInstaller getPackageInstaller() throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]    int installExistingPackageAsUser(String packageName, int userId, int installFlags,
+[external][shana][shana@zju.edu.cn]                                     int installReason) throws RemoteException;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    @RequiresApi(29)
+[internal][vvb2060][vvb2060@gmail.com]    int installExistingPackageAsUser(String packageName, int userId, int installFlags,
+[external][shana][shana@zju.edu.cn]                                     int installReason, List<String> whiteListedPermissions) throws RemoteException;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    ParceledListSlice<ResolveInfo> queryIntentActivities(Intent intent,
+[external][shana][shana@zju.edu.cn]                                                         String resolvedType, int flags, int userId) throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @RequiresApi(33)
+[external][shana][shana@zju.edu.cn]    ParceledListSlice<ResolveInfo> queryIntentActivities(Intent intent,
+[external][shana][shana@zju.edu.cn]                                            String resolvedType, long flags, int userId) throws RemoteException;
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]    boolean performDexOptMode(String packageName, boolean checkProfiles,
+[external][shana][shana@zju.edu.cn]                              String targetCompilerFilter, boolean force, boolean bootComplete, String splitName)
+[external][shana][shana@zju.edu.cn]            throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    void clearApplicationProfileData(String packageName) throws RemoteException;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    abstract class Stub extends Binder implements IPackageManager {
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        public static IPackageManager asInterface(IBinder obj) {
+[external][shana][shana@zju.edu.cn]            throw new UnsupportedOperationException();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

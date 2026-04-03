@@ -1,0 +1,76 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][admin][admin@0x.mk]package de.robv.android.xposed;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]import de.robv.android.xposed.services.BaseService;
+[external][admin][admin@0x.mk]import de.robv.android.xposed.services.DirectAccessService;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]/**
+[external][admin][admin@0x.mk] * A helper to work with (or without) SELinux, abstracting much of its big complexity.
+[external][admin][admin@0x.mk] */
+[external][admin][admin@0x.mk]public final class SELinuxHelper {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private SELinuxHelper() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][admin][admin@0x.mk]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Determines whether SELinux is disabled or enabled.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @return A boolean indicating whether SELinux is enabled.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static boolean isSELinuxEnabled() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        // lsp: always enabled
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return true;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][admin][admin@0x.mk]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Determines whether SELinux is permissive or enforcing.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @return A boolean indicating whether SELinux is enforcing.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static boolean isSELinuxEnforced() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        // lsp: always enforcing
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return true;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][admin][admin@0x.mk]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Gets the security context of the current process.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @return A String representing the security context of the current process.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static String getContext() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][admin][admin@0x.mk]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Retrieve the service to be used when accessing files in {@code /data/data/*}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * <p class="caution"><strong>IMPORTANT:</strong> If you call this from the Zygote process,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * don't re-use the result in different process!
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @return An instance of the service.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static BaseService getAppDataFileService() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return sServiceAppDataFile;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][admin][admin@0x.mk]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private static final BaseService sServiceAppDataFile = new DirectAccessService(); // ed: initialized directly
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]}

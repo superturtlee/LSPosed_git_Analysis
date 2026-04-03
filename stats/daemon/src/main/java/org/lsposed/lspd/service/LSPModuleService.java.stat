@@ -1,0 +1,268 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.lspd.service;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import static org.lsposed.lspd.service.PackageService.PER_USER_RANGE;
+[external][shana][shana@zju.edu.cn]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import android.content.AttributionSource;
+[external][shana][shana@zju.edu.cn]import android.os.Binder;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import android.os.Build;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import android.os.Bundle;
+[external][shana][shana@zju.edu.cn]import android.os.ParcelFileDescriptor;
+[external][shana][shana@zju.edu.cn]import android.os.RemoteException;
+[external][shana][shana@zju.edu.cn]import android.util.ArrayMap;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import android.util.Log;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import androidx.annotation.NonNull;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import org.lsposed.daemon.BuildConfig;
+[external][shana][shana@zju.edu.cn]import org.lsposed.lspd.models.Module;
+[external][shana][shana@zju.edu.cn]
+[external][noreply][noreply@nullptr.icu]import java.io.IOException;
+[external][shana][shana@zju.edu.cn]import java.util.ArrayList;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import java.util.Collections;
+[external][shana][shana@zju.edu.cn]import java.util.List;
+[external][shana][shana@zju.edu.cn]import java.util.Map;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import java.util.Set;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import java.util.WeakHashMap;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import java.util.concurrent.ConcurrentHashMap;
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[external][shana][shana@zju.edu.cn]import io.github.libxposed.service.IXposedScopeCallback;
+[external][shana][shana@zju.edu.cn]import io.github.libxposed.service.IXposedService;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public class LSPModuleService extends IXposedService.Stub {
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private final static String TAG = "LSPosedModuleService";
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private final static Set<Integer> uidSet = ConcurrentHashMap.newKeySet();
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    private final static Map<Module, LSPModuleService> serviceMap = Collections.synchronizedMap(new WeakHashMap<>());
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    public final static String FILES_DIR = "files";
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private final @NonNull
+[external][shana][shana@zju.edu.cn]    Module loadedModule;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    static void uidClear() {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        uidSet.clear();
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    static void uidStarts(int uid) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        if (!uidSet.contains(uid)) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            uidSet.add(uid);
+[external][shana][shana@zju.edu.cn]            var module = ConfigManager.getInstance().getModule(uid);
+[external][shana][shana@zju.edu.cn]            if (module != null && module.file != null && !module.file.legacy) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                var service = serviceMap.computeIfAbsent(module, LSPModuleService::new);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                service.sendBinder(uid);
+[external][shana][shana@zju.edu.cn]            }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    static void uidGone(int uid) {
+[external][shana][shana@zju.edu.cn]        uidSet.remove(uid);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private void sendBinder(int uid) {
+[external][shana][shana@zju.edu.cn]        var name = loadedModule.packageName;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        try {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            int userId = uid / PackageService.PER_USER_RANGE;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            var authority = name + AUTHORITY_SUFFIX;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            var provider = ActivityManagerService.getContentProvider(authority, userId);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            if (provider == null) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                Log.d(TAG, "no service provider for " + name);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                return;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            var extra = new Bundle();
+[external][shana][shana@zju.edu.cn]            extra.putBinder("binder", asBinder());
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            Bundle reply = null;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+[external][shana][shana@zju.edu.cn]                reply = provider.call(new AttributionSource.Builder(1000).setPackageName("android").build(), authority, SEND_BINDER, null, extra);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            } else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                reply = provider.call("android", null, authority, SEND_BINDER, null, extra);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            } else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                reply = provider.call("android", authority, SEND_BINDER, null, extra);
+[external][howardwu20][HowardWu20@outlook.com]            } else {
+[external][howardwu20][HowardWu20@outlook.com]                reply = provider.call("android", SEND_BINDER, null, extra);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            if (reply != null) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                Log.d(TAG, "sent module binder to " + name);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            } else {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                Log.w(TAG, "failed to send module binder to " + name);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            }
+[external][shana][shana@zju.edu.cn]        } catch (Throwable e) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            Log.w(TAG, "failed to send module binder for uid " + uid, e);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    LSPModuleService(@NonNull Module module) {
+[external][shana][shana@zju.edu.cn]        loadedModule = module;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private int ensureModule() throws RemoteException {
+[external][shana][shana@zju.edu.cn]        var appId = Binder.getCallingUid() % PER_USER_RANGE;
+[external][shana][shana@zju.edu.cn]        if (loadedModule.appId != appId) {
+[external][shana][shana@zju.edu.cn]            throw new RemoteException("Module " + loadedModule.packageName + " is not for uid " + Binder.getCallingUid());
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return Binder.getCallingUid() / PER_USER_RANGE;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public int getAPIVersion() throws RemoteException {
+[external][shana][shana@zju.edu.cn]        ensureModule();
+[external][shana][shana@zju.edu.cn]        return API;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public String getFrameworkName() throws RemoteException {
+[external][shana][shana@zju.edu.cn]        ensureModule();
+[external][shana][shana@zju.edu.cn]        return "LSPosed";
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public String getFrameworkVersion() throws RemoteException {
+[external][shana][shana@zju.edu.cn]        ensureModule();
+[external][shana][shana@zju.edu.cn]        return BuildConfig.VERSION_NAME;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public long getFrameworkVersionCode() throws RemoteException {
+[external][shana][shana@zju.edu.cn]        ensureModule();
+[external][shana][shana@zju.edu.cn]        return BuildConfig.VERSION_CODE;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    @Override
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    public int getFrameworkPrivilege() throws RemoteException {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        ensureModule();
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        return IXposedService.FRAMEWORK_PRIVILEGE_ROOT;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public List<String> getScope() throws RemoteException {
+[external][shana][shana@zju.edu.cn]        ensureModule();
+[external][shana][shana@zju.edu.cn]        ArrayList<String> res = new ArrayList<>();
+[external][shana][shana@zju.edu.cn]        var scope = ConfigManager.getInstance().getModuleScope(loadedModule.packageName);
+[external][shana][shana@zju.edu.cn]        if (scope == null) return res;
+[external][shana][shana@zju.edu.cn]        for (var s : scope) {
+[external][shana][shana@zju.edu.cn]            res.add(s.packageName);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return res;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public void requestScope(String packageName, IXposedScopeCallback callback) throws RemoteException {
+[external][shana][shana@zju.edu.cn]        var userId = ensureModule();
+[external][noreply][noreply@nullptr.icu]        if (ConfigManager.getInstance().scopeRequestBlocked(loadedModule.packageName)) {
+[external][noreply][noreply@nullptr.icu]            callback.onScopeRequestDenied(packageName);
+[external][noreply][noreply@nullptr.icu]        } else {
+[external][noreply][noreply@nullptr.icu]            LSPNotificationManager.requestModuleScope(loadedModule.packageName, userId, packageName, callback);
+[external][noreply][noreply@nullptr.icu]            callback.onScopeRequestPrompted(packageName);
+[external][noreply][noreply@nullptr.icu]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public String removeScope(String packageName) throws RemoteException {
+[external][shana][shana@zju.edu.cn]        var userId = ensureModule();
+[external][shana][shana@zju.edu.cn]        try {
+[external][shana][shana@zju.edu.cn]            if (!ConfigManager.getInstance().removeModuleScope(loadedModule.packageName, packageName, userId)) {
+[external][shana][shana@zju.edu.cn]                return "Invalid request";
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            return null;
+[external][shana][shana@zju.edu.cn]        } catch (Throwable e) {
+[external][shana][shana@zju.edu.cn]            return e.getMessage();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public Bundle requestRemotePreferences(String group) throws RemoteException {
+[external][shana][shana@zju.edu.cn]        var userId = ensureModule();
+[external][shana][shana@zju.edu.cn]        var bundle = new Bundle();
+[external][shana][shana@zju.edu.cn]        bundle.putSerializable("map", ConfigManager.getInstance().getModulePrefs(loadedModule.packageName, userId, group));
+[external][shana][shana@zju.edu.cn]        return bundle;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public void updateRemotePreferences(String group, Bundle diff) throws RemoteException {
+[external][shana][shana@zju.edu.cn]        var userId = ensureModule();
+[external][shana][shana@zju.edu.cn]        Map<String, Object> values = new ArrayMap<>();
+[external][shana][shana@zju.edu.cn]        if (diff.containsKey("delete")) {
+[internal][5ec1cff][56485584+5ec1cff@users.noreply.github.com]            var deletes = (Set<?>) diff.getSerializable("delete");
+[external][shana][shana@zju.edu.cn]            for (var key : deletes) {
+[internal][5ec1cff][56485584+5ec1cff@users.noreply.github.com]                values.put((String) key, null);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        if (diff.containsKey("put")) {
+[external][shana][shana@zju.edu.cn]            try {
+[external][shana][shana@zju.edu.cn]                var puts = (Map<?, ?>) diff.getSerializable("put");
+[external][shana][shana@zju.edu.cn]                for (var entry : puts.entrySet()) {
+[external][shana][shana@zju.edu.cn]                    values.put((String) entry.getKey(), entry.getValue());
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            } catch (Throwable e) {
+[external][shana][shana@zju.edu.cn]                Log.e(TAG, "updateRemotePreferences: ", e);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        try {
+[external][shana][shana@zju.edu.cn]            ConfigManager.getInstance().updateModulePrefs(loadedModule.packageName, userId, group, values);
+[external][shana][shana@zju.edu.cn]            ((LSPInjectedModuleService) loadedModule.service).onUpdateRemotePreferences(group, diff);
+[external][shana][shana@zju.edu.cn]        } catch (Throwable e) {
+[external][shana][shana@zju.edu.cn]            throw new RemoteException(e.getMessage());
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public void deleteRemotePreferences(String group) throws RemoteException {
+[external][shana][shana@zju.edu.cn]        var userId = ensureModule();
+[external][shana][shana@zju.edu.cn]        ConfigManager.getInstance().deleteModulePrefs(loadedModule.packageName, userId, group);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][noreply][noreply@nullptr.icu]    public String[] listRemoteFiles() throws RemoteException {
+[external][shana][shana@zju.edu.cn]        var userId = ensureModule();
+[external][shana][shana@zju.edu.cn]        try {
+[external][shana][shana@zju.edu.cn]            var dir = ConfigFileManager.resolveModuleDir(loadedModule.packageName, FILES_DIR, userId, Binder.getCallingUid());
+[external][noreply][noreply@nullptr.icu]            var files = dir.toFile().list();
+[external][noreply][noreply@nullptr.icu]            return files == null ? new String[0] : files;
+[external][noreply][noreply@nullptr.icu]        } catch (IOException e) {
+[external][shana][shana@zju.edu.cn]            throw new RemoteException(e.getMessage());
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][noreply][noreply@nullptr.icu]    public ParcelFileDescriptor openRemoteFile(String path) throws RemoteException {
+[external][shana][shana@zju.edu.cn]        var userId = ensureModule();
+[external][shana][shana@zju.edu.cn]        ConfigFileManager.ensureModuleFilePath(path);
+[external][shana][shana@zju.edu.cn]        try {
+[external][shana][shana@zju.edu.cn]            var dir = ConfigFileManager.resolveModuleDir(loadedModule.packageName, FILES_DIR, userId, Binder.getCallingUid());
+[external][noreply][noreply@nullptr.icu]            return ParcelFileDescriptor.open(dir.resolve(path).toFile(), ParcelFileDescriptor.MODE_CREATE | ParcelFileDescriptor.MODE_READ_WRITE);
+[external][noreply][noreply@nullptr.icu]        } catch (IOException e) {
+[external][shana][shana@zju.edu.cn]            throw new RemoteException(e.getMessage());
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][noreply][noreply@nullptr.icu]    public boolean deleteRemoteFile(String path) throws RemoteException {
+[external][shana][shana@zju.edu.cn]        var userId = ensureModule();
+[external][noreply][noreply@nullptr.icu]        ConfigFileManager.ensureModuleFilePath(path);
+[external][shana][shana@zju.edu.cn]        try {
+[external][shana][shana@zju.edu.cn]            var dir = ConfigFileManager.resolveModuleDir(loadedModule.packageName, FILES_DIR, userId, Binder.getCallingUid());
+[external][noreply][noreply@nullptr.icu]            return dir.resolve(path).toFile().delete();
+[external][noreply][noreply@nullptr.icu]        } catch (IOException e) {
+[external][shana][shana@zju.edu.cn]            throw new RemoteException(e.getMessage());
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

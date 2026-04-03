@@ -1,0 +1,220 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.lspd.service;
+[external][shana][shana@zju.edu.cn]
+[external][416810799][416810799@qq.com]import static hidden.HiddenApiBridge.Binder_allowBlocking;
+[external][416810799][416810799@qq.com]import static hidden.HiddenApiBridge.Context_getActivityToken;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import android.app.ActivityThread;
+[external][shana][shana@zju.edu.cn]import android.app.IApplicationThread;
+[external][shana][shana@zju.edu.cn]import android.content.Context;
+[external][shana][shana@zju.edu.cn]import android.os.Binder;
+[external][shana][shana@zju.edu.cn]import android.os.IBinder;
+[external][shana][shana@zju.edu.cn]import android.os.Parcel;
+[external][shana][shana@zju.edu.cn]import android.os.RemoteException;
+[external][shana][shana@zju.edu.cn]import android.util.Log;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import androidx.annotation.NonNull;
+[external][shana][shana@zju.edu.cn]import androidx.annotation.Nullable;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import org.lsposed.lspd.BuildConfig;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public class BridgeService {
+[external][shana][shana@zju.edu.cn]    private static final int TRANSACTION_CODE = ('_' << 24) | ('L' << 16) | ('S' << 8) | 'P';
+[external][shana][shana@zju.edu.cn]    private static final String DESCRIPTOR = "LSPosed";
+[internal][dr-tsng][tsng.nullptr@outlook.com]    protected static final String TAG = "LSPosed Bridge";
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    enum ACTION {
+[external][shana][shana@zju.edu.cn]        ACTION_UNKNOWN,
+[external][shana][shana@zju.edu.cn]        ACTION_SEND_BINDER,
+[external][shana][shana@zju.edu.cn]        ACTION_GET_BINDER,
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    // for client
+[external][shana][shana@zju.edu.cn]    private static IBinder serviceBinder = null;
+[external][shana][shana@zju.edu.cn]    private static ILSPosedService service = null;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    // for client
+[external][shana][shana@zju.edu.cn]    private static final IBinder.DeathRecipient serviceRecipient = new IBinder.DeathRecipient() {
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public void binderDied() {
+[external][shana][shana@zju.edu.cn]            serviceBinder.unlinkToDeath(this, 0);
+[external][shana][shana@zju.edu.cn]            serviceBinder = null;
+[external][shana][shana@zju.edu.cn]            service = null;
+[external][shana][shana@zju.edu.cn]            Log.e(TAG, "service is dead");
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    };
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    // For client
+[external][shana][shana@zju.edu.cn]    private static void receiveFromBridge(IBinder binder) {
+[external][shana][shana@zju.edu.cn]        if (binder == null) {
+[external][shana][shana@zju.edu.cn]            Log.e(TAG, "received empty binder");
+[external][shana][shana@zju.edu.cn]            return;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        var token = Binder.clearCallingIdentity();
+[external][shana][shana@zju.edu.cn]        if (serviceBinder != null) {
+[external][shana][shana@zju.edu.cn]            serviceBinder.unlinkToDeath(serviceRecipient, 0);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        Binder.restoreCallingIdentity(token);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        serviceBinder = Binder_allowBlocking(binder);
+[external][shana][shana@zju.edu.cn]        service = ILSPosedService.Stub.asInterface(serviceBinder);
+[external][shana][shana@zju.edu.cn]        try {
+[external][shana][shana@zju.edu.cn]            serviceBinder.linkToDeath(serviceRecipient, 0);
+[external][shana][shana@zju.edu.cn]        } catch (Throwable e) {
+[external][shana][shana@zju.edu.cn]            Log.e(TAG, "service link to death: ", e);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        try {
+[external][shana][shana@zju.edu.cn]            IApplicationThread at = ActivityThread.currentActivityThread().getApplicationThread();
+[external][shana][shana@zju.edu.cn]            Context ctx = ActivityThread.currentActivityThread().getSystemContext();
+[internal][vvb2060][vvb2060@gmail.com]            service.dispatchSystemServerContext(at.asBinder(), Context_getActivityToken(ctx), BuildConfig.FLAVOR);
+[external][shana][shana@zju.edu.cn]        } catch (Throwable e) {
+[external][shana][shana@zju.edu.cn]            Log.e(TAG, "dispatch context: ", e);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        Log.i(TAG, "binder received");
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static ILSPosedService getService() {
+[external][shana][shana@zju.edu.cn]        return service;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @SuppressWarnings({"unused", "RedundantSuppression"})
+[external][shana][shana@zju.edu.cn]    public static boolean onTransact(@NonNull Parcel data, @Nullable Parcel reply, int flags) {
+[external][shana][shana@zju.edu.cn]        if (!ParcelUtils.safeEnforceInterface(data, DESCRIPTOR)) return false;
+[external][shana][shana@zju.edu.cn]
+[external][noreply][noreply@nullptr.icu]        try {
+[external][noreply][noreply@nullptr.icu]            ACTION action = ACTION.values()[data.readInt()];
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]            Log.d(TAG, "onTransact: action=" + action + ", callingUid=" + Binder.getCallingUid() + ", callingPid=" + Binder.getCallingPid());
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]            switch (action) {
+[external][noreply][noreply@nullptr.icu]                case ACTION_SEND_BINDER: {
+[external][noreply][noreply@nullptr.icu]                    if (Binder.getCallingUid() == 0) {
+[external][noreply][noreply@nullptr.icu]                        receiveFromBridge(data.readStrongBinder());
+[external][noreply][noreply@nullptr.icu]                        if (reply != null) {
+[external][noreply][noreply@nullptr.icu]                            reply.writeNoException();
+[external][noreply][noreply@nullptr.icu]                        }
+[external][noreply][noreply@nullptr.icu]                        return true;
+[external][shana][shana@zju.edu.cn]                    }
+[external][noreply][noreply@nullptr.icu]                    break;
+[external][shana][shana@zju.edu.cn]                }
+[external][noreply][noreply@nullptr.icu]                case ACTION_GET_BINDER: {
+[external][noreply][noreply@nullptr.icu]                    IBinder binder = null;
+[external][noreply][noreply@nullptr.icu]                    try {
+[external][noreply][noreply@nullptr.icu]                        String processName = data.readString();
+[external][noreply][noreply@nullptr.icu]                        IBinder heartBeat = data.readStrongBinder();
+[external][noreply][noreply@nullptr.icu]                        var applicationService = service == null ? null : service.requestApplicationService(Binder.getCallingUid(), Binder.getCallingPid(), processName, heartBeat);
+[external][noreply][noreply@nullptr.icu]                        if (applicationService != null) binder = applicationService.asBinder();
+[external][noreply][noreply@nullptr.icu]                    } catch (RemoteException e) {
+[external][noreply][noreply@nullptr.icu]                        Log.e(TAG, Log.getStackTraceString(e));
+[external][noreply][noreply@nullptr.icu]                    }
+[external][noreply][noreply@nullptr.icu]                    if (binder != null && reply != null) {
+[external][noreply][noreply@nullptr.icu]                        reply.writeNoException();
+[external][noreply][noreply@nullptr.icu]                        Log.d(TAG, "got binder is " + binder);
+[external][noreply][noreply@nullptr.icu]                        reply.writeStrongBinder(binder);
+[external][noreply][noreply@nullptr.icu]                        return true;
+[external][noreply][noreply@nullptr.icu]                    }
+[external][noreply][noreply@nullptr.icu]                    return false;
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            }
+[external][noreply][noreply@nullptr.icu]        } catch (Throwable e) {
+[external][noreply][noreply@nullptr.icu]            Log.e(TAG, "onTransact", e);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return false;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @SuppressWarnings("unused")
+[external][shana][shana@zju.edu.cn]    public static boolean replaceShellCommand(IBinder obj, int code, long dataObj, long replyObj, int flags) {
+[external][shana][shana@zju.edu.cn]        Parcel data = ParcelUtils.fromNativePointer(dataObj);
+[external][shana][shana@zju.edu.cn]        Parcel reply = ParcelUtils.fromNativePointer(replyObj);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        if (data == null || reply == null) {
+[external][shana][shana@zju.edu.cn]            Log.w(TAG, "Got transaction with null data or reply");
+[external][shana][shana@zju.edu.cn]            return false;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        try {
+[external][shana][shana@zju.edu.cn]            String descriptor = obj.getInterfaceDescriptor();
+[external][shana][shana@zju.edu.cn]            if (!"android.app.IActivityManager".equals(descriptor) &&
+[external][shana][shana@zju.edu.cn]                    !"com.sonymobile.hookservice.HookActivityService".equals(descriptor)) {
+[external][shana][shana@zju.edu.cn]                return false;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            return ActivityController.replaceShellCommand(obj, data, reply);
+[external][shana][shana@zju.edu.cn]        } catch (Throwable e) {
+[external][shana][shana@zju.edu.cn]            Log.e(TAG, "replace shell command", e);
+[external][shana][shana@zju.edu.cn]            return false;
+[external][shana][shana@zju.edu.cn]        } finally {
+[external][shana][shana@zju.edu.cn]            data.setDataPosition(0);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @SuppressWarnings("unused")
+[external][shana][shana@zju.edu.cn]    public static boolean replaceActivityController(IBinder obj, int code, long dataObj, long replyObj, int flags) {
+[external][shana][shana@zju.edu.cn]        Parcel data = ParcelUtils.fromNativePointer(dataObj);
+[external][shana][shana@zju.edu.cn]        Parcel reply = ParcelUtils.fromNativePointer(replyObj);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        if (data == null || reply == null) {
+[external][shana][shana@zju.edu.cn]            Log.w(TAG, "Got transaction with null data or reply");
+[external][shana][shana@zju.edu.cn]            return false;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        try {
+[external][shana][shana@zju.edu.cn]            if (!ParcelUtils.safeEnforceInterface(data, "android.app.IActivityManager") &&
+[external][shana][shana@zju.edu.cn]                    !ParcelUtils.safeEnforceInterface(data, "com.sonymobile.hookservice.HookActivityService")) {
+[external][shana][shana@zju.edu.cn]                return false;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            return ActivityController.replaceActivityController(data);
+[external][shana][shana@zju.edu.cn]        } finally {
+[external][shana][shana@zju.edu.cn]            data.setDataPosition(0);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @SuppressWarnings("unused")
+[external][shana][shana@zju.edu.cn]    public static boolean execTransact(IBinder obj, int code, long dataObj, long replyObj, int flags) {
+[external][shana][shana@zju.edu.cn]        if (code != TRANSACTION_CODE) return false;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        Parcel data = ParcelUtils.fromNativePointer(dataObj);
+[external][shana][shana@zju.edu.cn]        Parcel reply = ParcelUtils.fromNativePointer(replyObj);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        if (data == null || reply == null) {
+[external][shana][shana@zju.edu.cn]            Log.w(TAG, "Got transaction with null data or reply");
+[external][shana][shana@zju.edu.cn]            return false;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        try {
+[external][shana][shana@zju.edu.cn]            try {
+[external][shana][shana@zju.edu.cn]                return onTransact(data, reply, flags);
+[external][shana][shana@zju.edu.cn]            } catch (Exception e) {
+[external][shana][shana@zju.edu.cn]                if ((flags & IBinder.FLAG_ONEWAY) != 0) {
+[external][shana][shana@zju.edu.cn]                    Log.w(TAG, "Caught a Exception from the binder stub implementation. ", e);
+[external][shana][shana@zju.edu.cn]                } else {
+[external][shana][shana@zju.edu.cn]                    reply.setDataPosition(0);
+[external][shana][shana@zju.edu.cn]                    reply.writeException(e);
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]                Log.w(TAG, "on transact", e);
+[external][shana][shana@zju.edu.cn]                return true;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        } finally {
+[external][shana][shana@zju.edu.cn]            data.recycle();
+[external][shana][shana@zju.edu.cn]            reply.recycle();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

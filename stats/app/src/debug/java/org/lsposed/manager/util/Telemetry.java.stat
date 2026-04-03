@@ -1,0 +1,86 @@
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]/*
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * This file is part of LSPosed.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] *
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * (at your option) any later version.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] *
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * GNU General Public License for more details.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] *
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] *
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * Copyright (C) 2022 LSPosed Contributors
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] */
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]package org.lsposed.manager.util;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import android.app.Application;
+[external][shana][shana@zju.edu.cn]import android.os.Handler;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import androidx.annotation.NonNull;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import com.microsoft.appcenter.AppCenter;
+[internal][vvb2060][vvb2060@gmail.com]import com.microsoft.appcenter.analytics.Analytics;
+[external][shana][shana@zju.edu.cn]import com.microsoft.appcenter.channel.AbstractChannelListener;
+[external][shana][shana@zju.edu.cn]import com.microsoft.appcenter.channel.Channel;
+[external][shana][shana@zju.edu.cn]import com.microsoft.appcenter.crashes.Crashes;
+[internal][vvb2060][vvb2060@gmail.com]import com.microsoft.appcenter.ingestion.models.Log;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import org.lsposed.manager.App;
+[external][shana][shana@zju.edu.cn]import org.lsposed.manager.BuildConfig;
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]import java.util.Map;
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]public class Telemetry {
+[internal][vvb2060][vvb2060@gmail.com]    private static final Channel.Listener patchDeviceListener = new AbstractChannelListener() {
+[external][shana][shana@zju.edu.cn]        @Override
+[internal][vvb2060][vvb2060@gmail.com]        public void onPreparedLog(@NonNull Log log, @NonNull String groupName, int flags) {
+[internal][vvb2060][vvb2060@gmail.com]            var device = log.getDevice();
+[internal][vvb2060][vvb2060@gmail.com]            device.setAppVersion(BuildConfig.VERSION_NAME);
+[internal][vvb2060][vvb2060@gmail.com]            device.setAppBuild(String.valueOf(BuildConfig.VERSION_CODE));
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    };
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]    private static void addPatchDeviceListener() {
+[external][shana][shana@zju.edu.cn]        try {
+[internal][vvb2060][vvb2060@gmail.com]            var channelField = AppCenter.class.getDeclaredField("mChannel");
+[internal][vvb2060][vvb2060@gmail.com]            channelField.setAccessible(true);
+[internal][vvb2060][vvb2060@gmail.com]            var channel = (Channel) channelField.get(AppCenter.getInstance());
+[internal][vvb2060][vvb2060@gmail.com]            assert channel != null;
+[internal][vvb2060][vvb2060@gmail.com]            channel.addListener(patchDeviceListener);
+[internal][vvb2060][vvb2060@gmail.com]        } catch (ReflectiveOperationException e) {
+[internal][vvb2060][vvb2060@gmail.com]            android.util.Log.e(App.TAG, "add listener", e);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]    private static void patchDevice() {
+[internal][vvb2060][vvb2060@gmail.com]        try {
+[internal][vvb2060][vvb2060@gmail.com]            var handlerField = AppCenter.class.getDeclaredField("mHandler");
+[internal][vvb2060][vvb2060@gmail.com]            handlerField.setAccessible(true);
+[internal][vvb2060][vvb2060@gmail.com]            var handler = ((Handler) handlerField.get(AppCenter.getInstance()));
+[internal][vvb2060][vvb2060@gmail.com]            assert handler != null;
+[internal][vvb2060][vvb2060@gmail.com]            handler.post(Telemetry::addPatchDeviceListener);
+[internal][vvb2060][vvb2060@gmail.com]        } catch (ReflectiveOperationException e) {
+[internal][vvb2060][vvb2060@gmail.com]            android.util.Log.e(App.TAG, "patch device", e);
+[internal][vvb2060][vvb2060@gmail.com]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static void start(Application app) {
+[internal][vvb2060][vvb2060@gmail.com]        AppCenter.start(app, "eb3c4175-e879-4312-a72e-b0e64bca142c",
+[internal][vvb2060][vvb2060@gmail.com]                Analytics.class, Crashes.class);
+[internal][vvb2060][vvb2060@gmail.com]        patchDevice();
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    public static void trackEvent(String name, Map<String, String> properties) {
+[internal][vvb2060][vvb2060@gmail.com]        Analytics.trackEvent(name, properties);
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    public static void trackError(Throwable throwable, Map<String, String> properties) {
+[internal][vvb2060][vvb2060@gmail.com]        Crashes.trackError(throwable, properties, null);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

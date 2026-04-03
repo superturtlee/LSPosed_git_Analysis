@@ -1,0 +1,102 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]<?xml version="1.0" encoding="utf-8"?><!--
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][shana][shana@zju.edu.cn]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  -->
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    xmlns:app="http://schemas.android.com/apk/res-auto"
+[external][shana][shana@zju.edu.cn]    android:id="@+id/fragment_container"
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    android:layout_width="match_parent"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    android:layout_height="match_parent"
+[external][shana][shana@zju.edu.cn]    app:consumeSystemWindowsInsets="@integer/internal_fragment_insets"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    app:edgeToEdge="true"
+[external][shana][shana@zju.edu.cn]    app:fitsSystemWindowsInsets="@integer/internal_fragment_insets">
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    <com.google.android.material.appbar.AppBarLayout
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        android:id="@+id/app_bar"
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        android:layout_width="match_parent"
+[external][shana][shana@zju.edu.cn]        android:layout_height="wrap_content"
+[external][shana][shana@zju.edu.cn]        android:fitsSystemWindows="false"
+[external][shana][shana@zju.edu.cn]        app:fitsSystemWindowsInsets="@integer/internal_fragment_top_insets">
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]        <com.google.android.material.appbar.SubtitleCollapsingToolbarLayout
+[external][shana][shana@zju.edu.cn]            android:id="@+id/toolbar_layout"
+[external][shana][shana@zju.edu.cn]            style="?attr/collapsingToolbarLayoutLargeStyle"
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]            android:layout_width="match_parent"
+[external][shana][shana@zju.edu.cn]            android:layout_height="?attr/collapsingToolbarLayoutLargeSize"
+[external][shana][shana@zju.edu.cn]            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+[external][shana][shana@zju.edu.cn]            app:titleCollapseMode="scale">
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            <View
+[external][shana][shana@zju.edu.cn]                android:id="@+id/click_view"
+[external][shana][shana@zju.edu.cn]                android:layout_width="match_parent"
+[external][shana][shana@zju.edu.cn]                android:layout_height="match_parent" />
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            <com.google.android.material.appbar.MaterialToolbar
+[external][shana][shana@zju.edu.cn]                android:id="@+id/toolbar"
+[external][shana][shana@zju.edu.cn]                android:layout_width="match_parent"
+[external][shana][shana@zju.edu.cn]                android:layout_height="?attr/actionBarSize"
+[external][shana][shana@zju.edu.cn]                android:elevation="0dp"
+[external][shana][shana@zju.edu.cn]                android:theme="@style/ThemeOverlay.MaterialComponents.ActionBar"
+[external][shana][shana@zju.edu.cn]                app:layout_collapseMode="pin" />
+[external][shana][shana@zju.edu.cn]        </com.google.android.material.appbar.SubtitleCollapsingToolbarLayout>
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][chsqwyx][chsqwyx@gmail.com]    </com.google.android.material.appbar.AppBarLayout>
+[external][chsqwyx][chsqwyx@gmail.com]
+[external][shana][shana@zju.edu.cn]    <com.google.android.material.floatingactionbutton.FloatingActionButton
+[external][shana][shana@zju.edu.cn]        android:id="@+id/fab"
+[external][shana][shana@zju.edu.cn]        android:layout_width="wrap_content"
+[external][shana][shana@zju.edu.cn]        android:layout_height="wrap_content"
+[external][shana][shana@zju.edu.cn]        android:layout_gravity="end|bottom"
+[external][shana][shana@zju.edu.cn]        android:layout_margin="?attr/dialogPreferredPadding"
+[external][shana][shana@zju.edu.cn]        android:contentDescription="@string/module_settings"
+[external][shana][shana@zju.edu.cn]        android:src="@drawable/ic_round_settings_24"
+[external][shana][shana@zju.edu.cn]        android:tooltipText="@string/module_settings"
+[external][shana][shana@zju.edu.cn]        android:visibility="gone"
+[external][shana][shana@zju.edu.cn]        app:backgroundTint="?attr/colorPrimary"
+[external][shana][shana@zju.edu.cn]        app:layout_behavior="@string/hide_bottom_view_on_scroll_behavior"
+[external][shana][shana@zju.edu.cn]        app:layout_fitsSystemWindowsInsets="@integer/internal_fragment_bottom_insets"
+[external][shana][shana@zju.edu.cn]        app:tint="?attr/colorOnPrimary" />
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    <LinearLayout
+[external][chsqwyx][chsqwyx@gmail.com]        android:layout_width="match_parent"
+[external][chsqwyx][chsqwyx@gmail.com]        android:layout_height="match_parent"
+[external][shana][shana@zju.edu.cn]        android:orientation="vertical"
+[external][shana][shana@zju.edu.cn]        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+[external][chsqwyx][chsqwyx@gmail.com]
+[external][shana][shana@zju.edu.cn]        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+[external][shana][shana@zju.edu.cn]            android:id="@+id/swipe_refresh_layout"
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]            android:layout_width="match_parent"
+[external][shana][shana@zju.edu.cn]            android:layout_height="match_parent">
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]            <org.lsposed.manager.ui.widget.EmptyStateRecyclerView
+[external][shana][shana@zju.edu.cn]                android:id="@+id/recycler_view"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                android:layout_width="match_parent"
+[external][shana][shana@zju.edu.cn]                android:layout_height="wrap_content"
+[external][shana][shana@zju.edu.cn]                android:clipToPadding="false"
+[external][shana][shana@zju.edu.cn]                android:fadeScrollbars="true"
+[external][shana][shana@zju.edu.cn]                android:scrollbarStyle="insideOverlay"
+[external][shana][shana@zju.edu.cn]                android:scrollbars="vertical"
+[external][shana][shana@zju.edu.cn]                app:borderBottomVisibility="never"
+[external][shana][shana@zju.edu.cn]                app:borderTopDrawable="@null"
+[external][shana][shana@zju.edu.cn]                app:borderTopVisibility="whenTop"
+[external][shana][shana@zju.edu.cn]                app:fitsSystemWindowsInsets="@integer/internal_fragment_bottom_insets" />
+[external][shana][shana@zju.edu.cn]        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+[external][shana][shana@zju.edu.cn]    </LinearLayout>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]</androidx.coordinatorlayout.widget.CoordinatorLayout>

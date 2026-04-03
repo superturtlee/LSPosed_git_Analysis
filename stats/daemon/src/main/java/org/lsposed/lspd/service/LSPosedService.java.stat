@@ -1,0 +1,470 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.lspd.service;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import static android.content.Intent.EXTRA_UID;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import static org.lsposed.lspd.service.LSPNotificationManager.SCOPE_CHANNEL_ID;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import static org.lsposed.lspd.service.LSPNotificationManager.UPDATED_CHANNEL_ID;
+[external][shana][shana@zju.edu.cn]import static org.lsposed.lspd.service.PackageService.PER_USER_RANGE;
+[external][416810799][416810799@qq.com]import static org.lsposed.lspd.service.ServiceManager.TAG;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import static org.lsposed.lspd.service.ServiceManager.getExecutorService;
+[external][416810799][416810799@qq.com]
+[external][shana][shana@zju.edu.cn]import android.app.IApplicationThread;
+[external][shana][shana@zju.edu.cn]import android.app.IUidObserver;
+[external][shana][shana@zju.edu.cn]import android.content.Context;
+[external][shana][shana@zju.edu.cn]import android.content.IIntentReceiver;
+[external][shana][shana@zju.edu.cn]import android.content.Intent;
+[external][shana][shana@zju.edu.cn]import android.content.IntentFilter;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.content.pm.ApplicationInfo;
+[external][shana][shana@zju.edu.cn]import android.content.pm.PackageManager;
+[external][shana][shana@zju.edu.cn]import android.net.Uri;
+[external][shana][shana@zju.edu.cn]import android.os.Binder;
+[internal][vvb2060][vvb2060@gmail.com]import android.os.Build;
+[external][shana][shana@zju.edu.cn]import android.os.Bundle;
+[external][shana][shana@zju.edu.cn]import android.os.IBinder;
+[internal][vvb2060][vvb2060@gmail.com]import android.os.RemoteException;
+[internal][vvb2060][vvb2060@gmail.com]import android.provider.Telephony;
+[internal][vvb2060][vvb2060@gmail.com]import android.telephony.TelephonyManager;
+[external][shana][shana@zju.edu.cn]import android.util.Log;
+[external][shana][shana@zju.edu.cn]
+[internal][dr-tsng][tsng.nullptr@outlook.com]import org.lsposed.daemon.BuildConfig;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import java.io.IOException;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.util.Arrays;
+[internal][vvb2060][vvb2060@gmail.com]import java.util.List;
+[external][howardwu20][HowardWu20@outlook.com]import java.util.Objects;
+[internal][vvb2060][vvb2060@gmail.com]import java.util.function.Consumer;
+[external][shana][shana@zju.edu.cn]import java.util.zip.ZipFile;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]import hidden.HiddenApiBridge;
+[external][shana][shana@zju.edu.cn]import io.github.libxposed.service.IXposedScopeCallback;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public class LSPosedService extends ILSPosedService.Stub {
+[external][shana][shana@zju.edu.cn]    private static final int AID_NOBODY = 9999;
+[external][shana][shana@zju.edu.cn]    private static final int USER_NULL = -10000;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    private static final String ACTION_USER_ADDED = "android.intent.action.USER_ADDED";
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    public static final String ACTION_USER_REMOVED = "android.intent.action.USER_REMOVED";
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    private static final String EXTRA_USER_HANDLE = "android.intent.extra.user_handle";
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    private static final String EXTRA_REMOVED_FOR_ALL_USERS = "android.intent.extra.REMOVED_FOR_ALL_USERS";
+[external][howardwu20][HowardWu20@outlook.com]    private static boolean bootCompleted = false;
+[external][howardwu20][HowardWu20@outlook.com]    private IBinder appThread = null;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private static boolean isModernModules(ApplicationInfo info) {
+[external][shana][shana@zju.edu.cn]        String[] apks;
+[external][shana][shana@zju.edu.cn]        if (info.splitSourceDirs != null) {
+[external][shana][shana@zju.edu.cn]            apks = Arrays.copyOf(info.splitSourceDirs, info.splitSourceDirs.length + 1);
+[external][shana][shana@zju.edu.cn]            apks[info.splitSourceDirs.length] = info.sourceDir;
+[external][shana][shana@zju.edu.cn]        } else apks = new String[]{info.sourceDir};
+[external][shana][shana@zju.edu.cn]        for (var apk : apks) {
+[external][shana][shana@zju.edu.cn]            try (var zip = new ZipFile(apk)) {
+[external][shana][shana@zju.edu.cn]                if (zip.getEntry("META-INF/xposed/java_init.list") != null) {
+[external][shana][shana@zju.edu.cn]                    return true;
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            } catch (IOException ignored) {
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return false;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public ILSPApplicationService requestApplicationService(int uid, int pid, String processName, IBinder heartBeat) {
+[external][shana][shana@zju.edu.cn]        if (Binder.getCallingUid() != 1000) {
+[external][shana][shana@zju.edu.cn]            Log.w(TAG, "Someone else got my binder!?");
+[external][shana][shana@zju.edu.cn]            return null;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        if (ServiceManager.getApplicationService().hasRegister(uid, pid)) {
+[external][shana][shana@zju.edu.cn]            Log.d(TAG, "Skipped duplicated request for uid " + uid + " pid " + pid);
+[external][shana][shana@zju.edu.cn]            return null;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        if (!ServiceManager.getManagerService().shouldStartManager(pid, uid, processName) && ConfigManager.getInstance().shouldSkipProcess(new ConfigManager.ProcessScope(processName, uid))) {
+[external][shana][shana@zju.edu.cn]            Log.d(TAG, "Skipped " + processName + "/" + uid);
+[external][shana][shana@zju.edu.cn]            return null;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        Log.d(TAG, "returned service");
+[external][shana][shana@zju.edu.cn]        return ServiceManager.requestApplicationService(uid, pid, processName, heartBeat);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * This part is quite complex.
+[external][shana][shana@zju.edu.cn]     * For modules, we never care about its user id, we only care about its apk path.
+[external][shana][shana@zju.edu.cn]     * So we will only process module's removal when it's removed from all users.
+[external][shana][shana@zju.edu.cn]     * And FULLY_REMOVE is exactly the one.
+[external][shana][shana@zju.edu.cn]     * <p>
+[external][shana][shana@zju.edu.cn]     * For applications, we care about its user id.
+[external][shana][shana@zju.edu.cn]     * So we will process application's removal when it's removed from every single user.
+[external][shana][shana@zju.edu.cn]     * However, PACKAGE_REMOVED will be triggered by `pm hide`, so we use UID_REMOVED instead.
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]    private void dispatchPackageChanged(Intent intent) {
+[external][shana][shana@zju.edu.cn]        if (intent == null) return;
+[external][shana][shana@zju.edu.cn]        int uid = intent.getIntExtra(EXTRA_UID, AID_NOBODY);
+[external][shana][shana@zju.edu.cn]        if (uid == AID_NOBODY || uid <= 0) return;
+[external][shana][shana@zju.edu.cn]        int userId = intent.getIntExtra("android.intent.extra.user_handle", USER_NULL);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        var intentAction = intent.getAction();
+[internal][vvb2060][vvb2060@gmail.com]        if (intentAction == null) return;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        var allUsers = intent.getBooleanExtra(EXTRA_REMOVED_FOR_ALL_USERS, false);
+[external][shana][shana@zju.edu.cn]        if (userId == USER_NULL) userId = uid % PER_USER_RANGE;
+[external][shana][shana@zju.edu.cn]        Uri uri = intent.getData();
+[external][wanghan1995315][wanghan1995315@gmail.com]        var module = ConfigManager.getInstance().getModule(uid);
+[external][wanghan1995315][wanghan1995315@gmail.com]        String moduleName = (uri != null) ? uri.getSchemeSpecificPart() : (module != null) ? module.packageName : null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]        ApplicationInfo applicationInfo = null;
+[external][shana][shana@zju.edu.cn]        if (moduleName != null) {
+[external][shana][shana@zju.edu.cn]            try {
+[external][shana][shana@zju.edu.cn]                applicationInfo = PackageService.getApplicationInfo(moduleName, PackageManager.GET_META_DATA | PackageService.MATCH_ALL_FLAGS, 0);
+[external][shana][shana@zju.edu.cn]            } catch (Throwable ignored) {
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][android][android@robv.de]
+[external][shana][shana@zju.edu.cn]        boolean isXposedModule = applicationInfo != null && ((applicationInfo.metaData != null && applicationInfo.metaData.containsKey("xposedminversion")) || isModernModules(applicationInfo));
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        switch (intentAction) {
+[internal][vvb2060][vvb2060@gmail.com]            case Intent.ACTION_PACKAGE_FULLY_REMOVED -> {
+[external][shana][shana@zju.edu.cn]                // for module, remove module
+[external][shana][shana@zju.edu.cn]                // because we only care about when the apk is gone
+[internal][vvb2060][vvb2060@gmail.com]                if (moduleName != null) {
+[internal][vvb2060][vvb2060@gmail.com]                    if (allUsers && ConfigManager.getInstance().removeModule(moduleName)) {
+[external][shana][shana@zju.edu.cn]                        isXposedModule = true;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        broadcastAndShowNotification(moduleName, userId, intent, true);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                    LSPNotificationManager.cancelNotification(UPDATED_CHANNEL_ID, moduleName, userId);
+[internal][vvb2060][vvb2060@gmail.com]                }
+[external][shana][shana@zju.edu.cn]            }
+[internal][vvb2060][vvb2060@gmail.com]            case Intent.ACTION_PACKAGE_REMOVED -> {
+[internal][vvb2060][vvb2060@gmail.com]                if (moduleName != null) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                    LSPNotificationManager.cancelNotification(UPDATED_CHANNEL_ID, moduleName, userId);
+[internal][vvb2060][vvb2060@gmail.com]                }
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]            case Intent.ACTION_PACKAGE_ADDED, Intent.ACTION_PACKAGE_CHANGED -> {
+[external][shana][shana@zju.edu.cn]                // make sure that the change is for the complete package, not only a
+[external][shana][shana@zju.edu.cn]                // component
+[external][shana][shana@zju.edu.cn]                String[] components = intent.getStringArrayExtra(Intent.EXTRA_CHANGED_COMPONENT_NAME_LIST);
+[external][shana][shana@zju.edu.cn]                if (components != null && !Arrays.stream(components).reduce(false, (p, c) -> p || c.equals(moduleName), Boolean::logicalOr)) {
+[external][shana][shana@zju.edu.cn]                    return;
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]                if (isXposedModule) {
+[external][shana][shana@zju.edu.cn]                    // When installing a new Xposed module, we update the apk path to mark it as a
+[external][shana][shana@zju.edu.cn]                    // module to send a broadcast when modules that have not been activated are
+[external][shana][shana@zju.edu.cn]                    // uninstalled.
+[external][shana][shana@zju.edu.cn]                    // If cache not updated, assume it's not xposed module
+[external][shana][shana@zju.edu.cn]                    isXposedModule = ConfigManager.getInstance().updateModuleApkPath(moduleName, ConfigManager.getInstance().getModuleApkPath(applicationInfo), false);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                } else if (ConfigManager.getInstance().isUidHooked(uid)) {
+[internal][vvb2060][vvb2060@gmail.com]                    // it will auto update obsolete scope from database
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    ConfigManager.getInstance().updateAppCache();
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]                broadcastAndShowNotification(moduleName, userId, intent, isXposedModule);
+[external][shana][shana@zju.edu.cn]            }
+[internal][vvb2060][vvb2060@gmail.com]            case Intent.ACTION_UID_REMOVED -> {
+[external][shana][shana@zju.edu.cn]                // when a package is removed (rather than hide) for a single user
+[external][shana][shana@zju.edu.cn]                // (apk may still be there because of multi-user)
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                broadcastAndShowNotification(moduleName, userId, intent, isXposedModule);
+[external][shana][shana@zju.edu.cn]                if (isXposedModule) {
+[internal][vvb2060][vvb2060@gmail.com]                    // it will auto remove obsolete app and scope from database
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    ConfigManager.getInstance().updateCache();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                } else if (ConfigManager.getInstance().isUidHooked(uid)) {
+[internal][vvb2060][vvb2060@gmail.com]                    // it will auto remove obsolete scope from database
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    ConfigManager.getInstance().updateAppCache();
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        boolean removed = Intent.ACTION_PACKAGE_FULLY_REMOVED.equals(intentAction) || Intent.ACTION_UID_REMOVED.equals(intentAction);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        Log.d(TAG, "Package changed: uid=" + uid + " userId=" + userId + " action=" + intentAction + " isXposedModule=" + isXposedModule + " isAllUsers=" + allUsers);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]        if (BuildConfig.DEFAULT_MANAGER_PACKAGE_NAME.equals(moduleName) && userId == 0) {
+[external][shana][shana@zju.edu.cn]            Log.d(TAG, "Manager updated");
+[internal][vvb2060][vvb2060@gmail.com]            ConfigManager.getInstance().updateManager(removed);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    private void broadcastAndShowNotification(String packageName, int userId, Intent intent, boolean isXposedModule) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        Log.d(TAG, "package " + packageName + " changed, dispatching to manager");
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        var action = intent.getAction();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        var allUsers = intent.getBooleanExtra(EXTRA_REMOVED_FOR_ALL_USERS, false);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        intent.putExtra("android.intent.extra.PACKAGES", packageName);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        intent.putExtra(Intent.EXTRA_USER, userId);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        intent.putExtra("isXposedModule", isXposedModule);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        LSPManagerService.broadcastIntent(intent);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        if (isXposedModule) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            var enabledModules = ConfigManager.getInstance().enabledModules();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            var scope = ConfigManager.getInstance().getModuleScope(packageName);
+[external][shana][shana@zju.edu.cn]            boolean systemModule = scope != null && scope.parallelStream().anyMatch(app -> app.packageName.equals("system"));
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            boolean enabled = Arrays.asList(enabledModules).contains(packageName);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            if (!(Intent.ACTION_UID_REMOVED.equals(action) || Intent.ACTION_PACKAGE_FULLY_REMOVED.equals(action) || allUsers))
+[internal][vvb2060][vvb2060@gmail.com]                LSPNotificationManager.notifyModuleUpdated(packageName, userId, enabled, systemModule);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]    private void dispatchUserChanged(Intent intent) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        if (intent == null) return;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        int uid = intent.getIntExtra(EXTRA_USER_HANDLE, AID_NOBODY);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        if (uid == AID_NOBODY || uid <= 0) return;
+[internal][vvb2060][vvb2060@gmail.com]        LSPManagerService.broadcastIntent(intent);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]    private void dispatchBootCompleted(Intent intent) {
+[external][howardwu20][HowardWu20@outlook.com]        bootCompleted = true;
+[external][shana][shana@zju.edu.cn]        try {
+[internal][vvb2060][vvb2060@gmail.com]            var am = ActivityManagerService.getActivityManager();
+[internal][vvb2060][vvb2060@gmail.com]            if (am != null) am.setActivityController(null, false);
+[internal][vvb2060][vvb2060@gmail.com]        } catch (RemoteException e) {
+[internal][vvb2060][vvb2060@gmail.com]            Log.e(TAG, "setActivityController", e);
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]        var configManager = ConfigManager.getInstance();
+[internal][vvb2060][vvb2060@gmail.com]        if (configManager.enableStatusNotification()) {
+[internal][vvb2060][vvb2060@gmail.com]            LSPNotificationManager.notifyStatusNotification();
+[internal][vvb2060][vvb2060@gmail.com]        } else {
+[internal][vvb2060][vvb2060@gmail.com]            LSPNotificationManager.cancelStatusNotification();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]    private void dispatchConfigurationChanged(Intent intent) {
+[external][howardwu20][HowardWu20@outlook.com]        if (!bootCompleted) return;
+[internal][vvb2060][vvb2060@gmail.com]        ConfigFileManager.reloadConfiguration();
+[internal][vvb2060][vvb2060@gmail.com]        var configManager = ConfigManager.getInstance();
+[internal][vvb2060][vvb2060@gmail.com]        if (configManager.enableStatusNotification()) {
+[internal][vvb2060][vvb2060@gmail.com]            LSPNotificationManager.notifyStatusNotification();
+[internal][vvb2060][vvb2060@gmail.com]        } else {
+[internal][vvb2060][vvb2060@gmail.com]            LSPNotificationManager.cancelStatusNotification();
+[internal][vvb2060][vvb2060@gmail.com]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]    private void dispatchSecretCodeReceive(Intent i) {
+[internal][vvb2060][vvb2060@gmail.com]        LSPManagerService.openManager(null);
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    private void dispatchOpenManager(Intent intent) {
+[internal][vvb2060][vvb2060@gmail.com]        LSPManagerService.openManager(intent.getData());
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]    private void dispatchModuleScope(Intent intent) {
+[external][shana][shana@zju.edu.cn]        Log.d(TAG, "dispatchModuleScope: " + intent);
+[external][shana][shana@zju.edu.cn]        var data = intent.getData();
+[external][shana][shana@zju.edu.cn]        var extras = intent.getExtras();
+[external][shana][shana@zju.edu.cn]        if (extras == null || data == null) return;
+[external][shana][shana@zju.edu.cn]        var callback = extras.getBinder("callback");
+[internal][vvb2060][vvb2060@gmail.com]        if (callback == null || !callback.isBinderAlive()) return;
+[internal][vvb2060][vvb2060@gmail.com]        var authority = data.getEncodedAuthority();
+[internal][vvb2060][vvb2060@gmail.com]        if (authority == null) return;
+[internal][vvb2060][vvb2060@gmail.com]        var s = authority.split(":", 2);
+[external][shana][shana@zju.edu.cn]        if (s.length != 2) return;
+[external][shana][shana@zju.edu.cn]        var packageName = s[0];
+[external][shana][shana@zju.edu.cn]        int userId;
+[external][shana][shana@zju.edu.cn]        try {
+[external][shana][shana@zju.edu.cn]            userId = Integer.parseInt(s[1]);
+[external][shana][shana@zju.edu.cn]        } catch (NumberFormatException e) {
+[external][shana][shana@zju.edu.cn]            return;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        var scopePackageName = data.getPath();
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        if (scopePackageName == null) return;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        scopePackageName = scopePackageName.substring(1);
+[external][shana][shana@zju.edu.cn]        var action = data.getQueryParameter("action");
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        if (action == null) return;
+[external][shana][shana@zju.edu.cn]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        var iCallback = IXposedScopeCallback.Stub.asInterface(callback);
+[external][shana][shana@zju.edu.cn]        try {
+[internal][vvb2060][vvb2060@gmail.com]            var applicationInfo = PackageService.getApplicationInfo(scopePackageName, 0, userId);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            if (applicationInfo == null) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                iCallback.onScopeRequestFailed(scopePackageName, "Package not found");
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                return;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]            switch (action) {
+[internal][vvb2060][vvb2060@gmail.com]                case "approve" -> {
+[external][shana][shana@zju.edu.cn]                    ConfigManager.getInstance().setModuleScope(packageName, scopePackageName, userId);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                    iCallback.onScopeRequestApproved(scopePackageName);
+[internal][vvb2060][vvb2060@gmail.com]                }
+[internal][vvb2060][vvb2060@gmail.com]                case "deny" -> iCallback.onScopeRequestDenied(scopePackageName);
+[internal][vvb2060][vvb2060@gmail.com]                case "delete" -> iCallback.onScopeRequestTimeout(scopePackageName);
+[internal][vvb2060][vvb2060@gmail.com]                case "block" -> {
+[external][noreply][noreply@nullptr.icu]                    ConfigManager.getInstance().blockScopeRequest(packageName);
+[external][noreply][noreply@nullptr.icu]                    iCallback.onScopeRequestDenied(scopePackageName);
+[internal][vvb2060][vvb2060@gmail.com]                }
+[external][shana][shana@zju.edu.cn]            }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            Log.i(TAG, action + " scope " + scopePackageName + " for " + packageName + " in user " + userId);
+[internal][vvb2060][vvb2060@gmail.com]        } catch (RemoteException e) {
+[external][shana][shana@zju.edu.cn]            try {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                iCallback.onScopeRequestFailed(scopePackageName, e.getMessage());
+[internal][vvb2060][vvb2060@gmail.com]            } catch (RemoteException ignored) {
+[external][shana][shana@zju.edu.cn]                // callback died
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        LSPNotificationManager.cancelNotification(SCOPE_CHANNEL_ID, packageName, userId);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][naicfeng][18218380+naicfeng@users.noreply.github.com]    private void registerReceiver(List<IntentFilter> filters, String requiredPermission, int userId, Consumer<Intent> task, int flag) {
+[internal][vvb2060][vvb2060@gmail.com]        var receiver = new IIntentReceiver.Stub() {
+[internal][vvb2060][vvb2060@gmail.com]            @Override
+[internal][vvb2060][vvb2060@gmail.com]            public void performReceive(Intent intent, int resultCode, String data, Bundle extras, boolean ordered, boolean sticky, int sendingUser) {
+[internal][vvb2060][vvb2060@gmail.com]                getExecutorService().submit(() -> {
+[internal][vvb2060][vvb2060@gmail.com]                    try {
+[internal][vvb2060][vvb2060@gmail.com]                        task.accept(intent);
+[internal][vvb2060][vvb2060@gmail.com]                    } catch (Throwable t) {
+[internal][vvb2060][vvb2060@gmail.com]                        Log.e(TAG, "performReceive: ", t);
+[internal][vvb2060][vvb2060@gmail.com]                    }
+[internal][vvb2060][vvb2060@gmail.com]                });
+[external][howardwu20][HowardWu20@outlook.com]                if (!ordered && !Objects.equals(intent.getAction(), Intent.ACTION_LOCKED_BOOT_COMPLETED))
+[external][howardwu20][HowardWu20@outlook.com]                    return;
+[internal][vvb2060][vvb2060@gmail.com]                try {
+[external][howardwu20][HowardWu20@outlook.com]                    ActivityManagerService.finishReceiver(this, appThread, resultCode, data, extras, false, intent.getFlags());
+[internal][vvb2060][vvb2060@gmail.com]                } catch (RemoteException e) {
+[internal][vvb2060][vvb2060@gmail.com]                    Log.e(TAG, "finish receiver", e);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            }
+[internal][vvb2060][vvb2060@gmail.com]        };
+[internal][vvb2060][vvb2060@gmail.com]        try {
+[internal][vvb2060][vvb2060@gmail.com]            for (var filter : filters) {
+[external][naicfeng][18218380+naicfeng@users.noreply.github.com]                ActivityManagerService.registerReceiver("android", null, receiver, filter, requiredPermission, userId, flag);
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]        } catch (RemoteException e) {
+[internal][vvb2060][vvb2060@gmail.com]            Log.e(TAG, "register receiver", e);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]    private void registerReceiver(List<IntentFilter> filters, int userId, Consumer<Intent> task) {
+[internal][vvb2060][vvb2060@gmail.com]        //noinspection InlinedApi
+[internal][vvb2060][vvb2060@gmail.com]        registerReceiver(filters, "android.permission.BRICK", userId, task, Context.RECEIVER_NOT_EXPORTED);
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]    private void registerPackageReceiver() {
+[internal][vvb2060][vvb2060@gmail.com]        var packageFilter = new IntentFilter();
+[internal][vvb2060][vvb2060@gmail.com]        packageFilter.addAction(Intent.ACTION_PACKAGE_ADDED);
+[internal][vvb2060][vvb2060@gmail.com]        packageFilter.addAction(Intent.ACTION_PACKAGE_CHANGED);
+[internal][vvb2060][vvb2060@gmail.com]        packageFilter.addAction(Intent.ACTION_PACKAGE_FULLY_REMOVED);
+[internal][vvb2060][vvb2060@gmail.com]        packageFilter.addDataScheme("package");
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]        var uidFilter = new IntentFilter(Intent.ACTION_UID_REMOVED);
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]        registerReceiver(List.of(packageFilter, uidFilter), -1, this::dispatchPackageChanged);
+[internal][vvb2060][vvb2060@gmail.com]        Log.d(TAG, "registered package receiver");
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private void registerConfigurationReceiver() {
+[internal][vvb2060][vvb2060@gmail.com]        var intentFilter = new IntentFilter(Intent.ACTION_CONFIGURATION_CHANGED);
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]        registerReceiver(List.of(intentFilter), 0, this::dispatchConfigurationChanged);
+[external][shana][shana@zju.edu.cn]        Log.d(TAG, "registered configuration receiver");
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    private void registerSecretCodeReceiver() {
+[internal][vvb2060][vvb2060@gmail.com]        IntentFilter intentFilter = new IntentFilter();
+[internal][vvb2060][vvb2060@gmail.com]        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+[internal][vvb2060][vvb2060@gmail.com]            intentFilter.addAction(TelephonyManager.ACTION_SECRET_CODE);
+[internal][vvb2060][vvb2060@gmail.com]        } else {
+[internal][vvb2060][vvb2060@gmail.com]            // noinspection InlinedApi
+[internal][vvb2060][vvb2060@gmail.com]            intentFilter.addAction(Telephony.Sms.Intents.SECRET_CODE_ACTION);
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]        intentFilter.addDataAuthority("5776733", null);
+[internal][vvb2060][vvb2060@gmail.com]        intentFilter.addDataScheme("android_secret_code");
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]        //noinspection InlinedApi
+[internal][vvb2060][vvb2060@gmail.com]        registerReceiver(List.of(intentFilter), "android.permission.CONTROL_INCALL_EXPERIENCE",
+[internal][vvb2060][vvb2060@gmail.com]                0, this::dispatchSecretCodeReceive, Context.RECEIVER_EXPORTED);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        Log.d(TAG, "registered secret code receiver");
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    private void registerBootCompleteReceiver() {
+[internal][vvb2060][vvb2060@gmail.com]        var intentFilter = new IntentFilter(Intent.ACTION_LOCKED_BOOT_COMPLETED);
+[external][howardwu20][HowardWu20@outlook.com]        intentFilter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
+[internal][vvb2060][vvb2060@gmail.com]        registerReceiver(List.of(intentFilter), 0, this::dispatchBootCompleted);
+[external][shana][shana@zju.edu.cn]        Log.d(TAG, "registered boot receiver");
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    private void registerUserChangeReceiver() {
+[internal][vvb2060][vvb2060@gmail.com]        var userFilter = new IntentFilter();
+[internal][vvb2060][vvb2060@gmail.com]        userFilter.addAction(ACTION_USER_ADDED);
+[internal][vvb2060][vvb2060@gmail.com]        userFilter.addAction(ACTION_USER_REMOVED);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]        registerReceiver(List.of(userFilter), -1, this::dispatchUserChanged);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        Log.d(TAG, "registered user info change receiver");
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]    private void registerOpenManagerReceiver() {
+[internal][vvb2060][vvb2060@gmail.com]        var intentFilter = new IntentFilter(LSPNotificationManager.openManagerAction);
+[internal][vvb2060][vvb2060@gmail.com]        var moduleFilter = new IntentFilter(intentFilter);
+[internal][vvb2060][vvb2060@gmail.com]        moduleFilter.addDataScheme("module");
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]        registerReceiver(List.of(intentFilter, moduleFilter), 0, this::dispatchOpenManager);
+[internal][vvb2060][vvb2060@gmail.com]        Log.d(TAG, "registered open manager receiver");
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]    private void registerModuleScopeReceiver() {
+[external][shana][shana@zju.edu.cn]        var intentFilter = new IntentFilter(LSPNotificationManager.moduleScope);
+[external][shana][shana@zju.edu.cn]        intentFilter.addDataScheme("module");
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]        registerReceiver(List.of(intentFilter), 0, this::dispatchModuleScope);
+[external][shana][shana@zju.edu.cn]        Log.d(TAG, "registered module scope receiver");
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private void registerUidObserver() {
+[external][shana][shana@zju.edu.cn]        try {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            var which = HiddenApiBridge.ActivityManager_UID_OBSERVER_ACTIVE()
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                    | HiddenApiBridge.ActivityManager_UID_OBSERVER_GONE()
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                    | HiddenApiBridge.ActivityManager_UID_OBSERVER_IDLE()
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                    | HiddenApiBridge.ActivityManager_UID_OBSERVER_CACHED();
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            LSPModuleService.uidClear();
+[external][shana][shana@zju.edu.cn]            ActivityManagerService.registerUidObserver(new IUidObserver.Stub() {
+[external][shana][shana@zju.edu.cn]                @Override
+[external][shana][shana@zju.edu.cn]                public void onUidActive(int uid) {
+[external][shana][shana@zju.edu.cn]                    LSPModuleService.uidStarts(uid);
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]                @Override
+[external][shana][shana@zju.edu.cn]                public void onUidCachedChanged(int uid, boolean cached) {
+[external][shana][shana@zju.edu.cn]                    if (!cached) LSPModuleService.uidStarts(uid);
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]                @Override
+[external][shana][shana@zju.edu.cn]                public void onUidIdle(int uid, boolean disabled) {
+[external][shana][shana@zju.edu.cn]                    LSPModuleService.uidStarts(uid);
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]                @Override
+[external][shana][shana@zju.edu.cn]                public void onUidGone(int uid, boolean disabled) {
+[external][shana][shana@zju.edu.cn]                    LSPModuleService.uidGone(uid);
+[external][shana][shana@zju.edu.cn]                }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            }, which, HiddenApiBridge.ActivityManager_PROCESS_STATE_UNKNOWN(), null);
+[external][shana][shana@zju.edu.cn]        } catch (RemoteException e) {
+[external][shana][shana@zju.edu.cn]            Log.e(TAG, "registerUidObserver", e);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][howardwu20][HowardWu20@outlook.com]    public void dispatchSystemServerContext(IBinder appThread, IBinder activityToken, String api) {
+[external][shana][shana@zju.edu.cn]        Log.d(TAG, "received system context");
+[external][howardwu20][HowardWu20@outlook.com]        this.appThread = appThread;
+[external][shana][shana@zju.edu.cn]        ConfigManager.getInstance().setApi(api);
+[external][howardwu20][HowardWu20@outlook.com]        ActivityManagerService.onSystemServerContext(IApplicationThread.Stub.asInterface(appThread), activityToken);
+[external][howardwu20][HowardWu20@outlook.com]        registerBootCompleteReceiver();
+[external][shana][shana@zju.edu.cn]        registerPackageReceiver();
+[external][shana][shana@zju.edu.cn]        registerConfigurationReceiver();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        registerSecretCodeReceiver();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        registerUserChangeReceiver();
+[internal][vvb2060][vvb2060@gmail.com]        registerOpenManagerReceiver();
+[external][shana][shana@zju.edu.cn]        registerModuleScopeReceiver();
+[external][shana][shana@zju.edu.cn]        registerUidObserver();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public boolean preStartManager(String pkgName, Intent intent) {
+[external][shana][shana@zju.edu.cn]        Log.d(TAG, "checking manager intent");
+[external][shana][shana@zju.edu.cn]        return ServiceManager.getManagerService().preStartManager(pkgName, intent, false);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

@@ -1,0 +1,209 @@
+[external][admin][admin@0x.mk]/*
+[external][admin][admin@0x.mk] * This file is part of LSPosed.
+[external][admin][admin@0x.mk] *
+[external][admin][admin@0x.mk] * LSPosed is free software: you can redistribute it and/or modify
+[external][admin][admin@0x.mk] * it under the terms of the GNU General Public License as published by
+[external][admin][admin@0x.mk] * the Free Software Foundation, either version 3 of the License, or
+[external][admin][admin@0x.mk] * (at your option) any later version.
+[external][admin][admin@0x.mk] *
+[external][admin][admin@0x.mk] * LSPosed is distributed in the hope that it will be useful,
+[external][admin][admin@0x.mk] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][admin][admin@0x.mk] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][admin][admin@0x.mk] * GNU General Public License for more details.
+[external][admin][admin@0x.mk] *
+[external][admin][admin@0x.mk] * You should have received a copy of the GNU General Public License
+[external][admin][admin@0x.mk] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][admin][admin@0x.mk] *
+[external][admin][admin@0x.mk] * Copyright (C) 2022 LSPosed Contributors
+[external][admin][admin@0x.mk] */
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]//
+[external][admin][admin@0x.mk]// Created by Kotori2 on 2021/12/1.
+[external][admin][admin@0x.mk]//
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]#include <jni.h>
+[external][admin][admin@0x.mk]#include <unistd.h>
+[external][admin][admin@0x.mk]#include <algorithm>
+[external][admin][admin@0x.mk]#include <random>
+[external][admin][admin@0x.mk]#include <unordered_map>
+[external][admin][admin@0x.mk]#include <sys/mman.h>
+[external][admin][admin@0x.mk]#include <android/sharedmem.h>
+[external][admin][admin@0x.mk]#include <android/sharedmem_jni.h>
+[external][admin][admin@0x.mk]#include <slicer/dex_utf8.h>
+[external][admin][admin@0x.mk]#include <fcntl.h>
+[external][admin][admin@0x.mk]#include "slicer/reader.h"
+[external][admin][admin@0x.mk]#include "slicer/writer.h"
+[external][admin][admin@0x.mk]#include "obfuscation.h"
+[external][shana][shana@zju.edu.cn]#include "logging.h"
+[external][admin][admin@0x.mk]
+[external][shana][shana@zju.edu.cn]using namespace lsplant;
+[external][shana][shana@zju.edu.cn]namespace {
+[external][shana][shana@zju.edu.cn]std::mutex init_lock{};
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]std::map<const std::string, std::string> signatures = {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        {"Lde/robv/android/xposed/", ""},
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        { "Landroid/app/AndroidApp", ""},
+[external][keta1][41381927+keta1@users.noreply.github.com]        { "Landroid/content/res/XRes", ""},
+[external][keta1][41381927+keta1@users.noreply.github.com]        { "Landroid/content/res/XModule", ""},
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        { "Lorg/lsposed/lspd/core/", ""},
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        { "Lorg/lsposed/lspd/nativebridge/", ""},
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        { "Lorg/lsposed/lspd/service/", ""},
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]};
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]jclass class_file_descriptor;
+[external][shana][shana@zju.edu.cn]jmethodID method_file_descriptor_ctor;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]jclass class_shared_memory;
+[external][shana][shana@zju.edu.cn]jmethodID method_shared_memory_ctor;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]bool inited = false;
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]static std::string to_java(const std::string &signature) {
+[internal][vvb2060][vvb2060@gmail.com]    std::string java(signature, 1);
+[internal][vvb2060][vvb2060@gmail.com]    replace(java.begin(), java.end(), '/', '.');
+[internal][vvb2060][vvb2060@gmail.com]    return java;
+[internal][vvb2060][vvb2060@gmail.com]}
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]void maybeInit(JNIEnv *env) {
+[external][shana][shana@zju.edu.cn]    if (inited) [[likely]] return;
+[external][shana][shana@zju.edu.cn]    std::lock_guard l(init_lock);
+[external][admin][admin@0x.mk]    LOGD("ObfuscationManager.init");
+[external][admin][admin@0x.mk]    if (auto file_descriptor = JNI_FindClass(env, "java/io/FileDescriptor")) {
+[external][admin][admin@0x.mk]        class_file_descriptor = JNI_NewGlobalRef(env, file_descriptor);
+[external][admin][admin@0x.mk]    } else return;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    method_file_descriptor_ctor = JNI_GetMethodID(env, class_file_descriptor, "<init>", "(I)V");
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    if (auto shared_memory = JNI_FindClass(env, "android/os/SharedMemory")) {
+[external][admin][admin@0x.mk]        class_shared_memory = JNI_NewGlobalRef(env, shared_memory);
+[external][admin][admin@0x.mk]    } else return;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    method_shared_memory_ctor = JNI_GetMethodID(env, class_shared_memory, "<init>", "(Ljava/io/FileDescriptor;)V");
+[external][admin][admin@0x.mk]
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    auto regen = [](std::string_view original_signature) {
+[external][admin][admin@0x.mk]        static auto& chrs = "abcdefghijklmnopqrstuvwxyz"
+[external][admin][admin@0x.mk]                            "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]        thread_local static std::mt19937 rg{std::random_device{}()};
+[external][admin][admin@0x.mk]        thread_local static std::uniform_int_distribution<std::string::size_type> pick(0, sizeof(chrs) - 2);
+[external][admin][admin@0x.mk]        thread_local static std::uniform_int_distribution<std::string::size_type> choose_slash(0, 10);
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]        std::string out;
+[internal][vvb2060][vvb2060@gmail.com]        size_t length = original_signature.size();
+[external][admin][admin@0x.mk]        out.reserve(length);
+[external][admin][admin@0x.mk]        out += "L";
+[external][admin][admin@0x.mk]
+[internal][vvb2060][vvb2060@gmail.com]        for (size_t i = 1; i < length - 1; i++) {
+[external][admin][admin@0x.mk]            if (choose_slash(rg) > 8 &&                         // 80% alphabet + 20% slashes
+[external][admin][admin@0x.mk]                out[i - 1] != '/' &&                                // slashes could not stick together
+[external][admin][admin@0x.mk]                i != 1 &&                                           // the first character should not be slash
+[internal][vvb2060][vvb2060@gmail.com]                i != length - 2) {                                  // and the last character
+[external][admin][admin@0x.mk]                out += "/";
+[external][admin][admin@0x.mk]            } else {
+[external][admin][admin@0x.mk]                out += chrs[pick(rg)];
+[external][admin][admin@0x.mk]            }
+[external][admin][admin@0x.mk]        }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]        out += "/";
+[external][admin][admin@0x.mk]        return out;
+[external][admin][admin@0x.mk]    };
+[external][admin][admin@0x.mk]
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    for (auto &i: signatures) {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        i.second = regen(i.first);
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        LOGD("%s => %s", i.first.c_str(), i.second.c_str());
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    }
+[external][admin][admin@0x.mk]
+[external][shana][shana@zju.edu.cn]    LOGD("ObfuscationManager init successfully");
+[external][shana][shana@zju.edu.cn]    inited = true;
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]// https://stackoverflow.com/questions/4844022/jni-create-hashmap with modifications
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]jobject stringMapToJavaHashMap(JNIEnv *env, const decltype(signatures)& map) {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    jclass mapClass = env->FindClass("java/util/HashMap");
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    if(mapClass == nullptr)
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        return nullptr;
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    jmethodID init = env->GetMethodID(mapClass, "<init>", "()V");
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    jobject hashMap = env->NewObject(mapClass, init);
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    jmethodID put = env->GetMethodID(mapClass, "put", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    auto citr = map.begin();
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    for( ; citr != map.end(); ++citr) {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        jstring keyJava = env->NewStringUTF(citr->first.c_str());
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        jstring valueJava = env->NewStringUTF(citr->second.c_str());
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        env->CallObjectMethod(hashMap, put, keyJava, valueJava);
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        env->DeleteLocalRef(keyJava);
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        env->DeleteLocalRef(valueJava);
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    }
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    auto hashMapGobal = static_cast<jobject>(env->NewGlobalRef(hashMap));
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    env->DeleteLocalRef(hashMap);
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    env->DeleteLocalRef(mapClass);
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    return hashMapGobal;
+[internal][vvb2060][vvb2060@gmail.com]}
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]extern "C"
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]JNIEXPORT jobject JNICALL
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]Java_org_lsposed_lspd_service_ObfuscationManager_getSignatures(JNIEnv *env, [[maybe_unused]] jclass obfuscation_manager) {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    maybeInit(env);
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    static jobject signatures_jni = nullptr;
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    if (signatures_jni) return signatures_jni;
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    decltype(signatures) signatures_java;
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    for (const auto &i: signatures) {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        signatures_java[to_java(i.first)] = to_java(i.second);
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    }
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    signatures_jni = stringMapToJavaHashMap(env, signatures_java);
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    return signatures_jni;
+[external][admin][admin@0x.mk]}
+[external][admin][admin@0x.mk]
+[external][shana][shana@zju.edu.cn]static int obfuscateDex(const void *dex, size_t size) {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    // const char* new_sig = obfuscated_signature.c_str();
+[external][admin][admin@0x.mk]    dex::Reader reader{reinterpret_cast<const dex::u1*>(dex), size};
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    reader.CreateFullIr();
+[external][admin][admin@0x.mk]    auto ir = reader.GetIr();
+[external][admin][admin@0x.mk]    for (auto &i: ir->strings) {
+[external][admin][admin@0x.mk]        const char *s = i->c_str();
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        for (const auto &signature: signatures) {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]            char* p = const_cast<char *>(strstr(s, signature.first.c_str()));
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]            if (p) {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                auto new_sig = signature.second.c_str();
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                // NOLINTNEXTLINE bugprone-not-null-terminated-result
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                memcpy(p, new_sig, strlen(new_sig));
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]            }
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]    dex::Writer writer(ir);
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    size_t new_size;
+[external][admin][admin@0x.mk]    WA allocator;
+[external][admin][admin@0x.mk]    auto *p_dex = writer.CreateImage(&allocator, &new_size);  // allocates memory only once
+[external][admin][admin@0x.mk]    return allocator.GetFd(p_dex);
+[external][admin][admin@0x.mk]}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]extern "C"
+[external][admin][admin@0x.mk]JNIEXPORT jobject
+[external][shana][shana@zju.edu.cn]Java_org_lsposed_lspd_service_ObfuscationManager_obfuscateDex(JNIEnv *env, [[maybe_unused]] jclass obfuscation_manager,
+[external][admin][admin@0x.mk]                                                       jobject memory) {
+[external][shana][shana@zju.edu.cn]    maybeInit(env);
+[external][admin][admin@0x.mk]    int fd = ASharedMemory_dupFromJava(env, memory);
+[external][admin][admin@0x.mk]    auto size = ASharedMemory_getSize(fd);
+[external][admin][admin@0x.mk]    LOGD("fd=%d, size=%zu", fd, size);
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    const void* mem = mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+[external][admin][admin@0x.mk]    if (mem == MAP_FAILED) {
+[external][admin][admin@0x.mk]        LOGE("old dex map failed?");
+[external][admin][admin@0x.mk]        return nullptr;
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    auto new_fd = obfuscateDex(mem, size);
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    // construct new shared mem with fd
+[external][admin][admin@0x.mk]    auto java_fd = JNI_NewObject(env, class_file_descriptor, method_file_descriptor_ctor, new_fd);
+[external][admin][admin@0x.mk]    auto java_sm = JNI_NewObject(env, class_shared_memory, method_shared_memory_ctor, java_fd);
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    return java_sm.release();
+[external][admin][admin@0x.mk]}

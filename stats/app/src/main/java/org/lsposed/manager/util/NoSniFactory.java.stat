@@ -1,0 +1,59 @@
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.manager.util;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import java.io.IOException;
+[internal][vvb2060][vvb2060@gmail.com]import java.net.InetAddress;
+[internal][vvb2060][vvb2060@gmail.com]import java.net.Socket;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import javax.net.ssl.SSLSocketFactory;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]public final class NoSniFactory extends SSLSocketFactory {
+[internal][vvb2060][vvb2060@gmail.com]    private static final SSLSocketFactory defaultFactory = (SSLSocketFactory) getDefault();
+[internal][vvb2060][vvb2060@gmail.com]    @SuppressWarnings("deprecation")
+[internal][vvb2060][vvb2060@gmail.com]    private static final android.net.SSLCertificateSocketFactory openSSLSocket =
+[internal][vvb2060][vvb2060@gmail.com]            (android.net.SSLCertificateSocketFactory) android.net.SSLCertificateSocketFactory
+[internal][vvb2060][vvb2060@gmail.com]                    .getDefault(1000);
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    @Override
+[internal][vvb2060][vvb2060@gmail.com]    public String[] getDefaultCipherSuites() {
+[internal][vvb2060][vvb2060@gmail.com]        return defaultFactory.getDefaultCipherSuites();
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    @Override
+[internal][vvb2060][vvb2060@gmail.com]    public String[] getSupportedCipherSuites() {
+[internal][vvb2060][vvb2060@gmail.com]        return defaultFactory.getSupportedCipherSuites();
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    @Override
+[internal][vvb2060][vvb2060@gmail.com]    public Socket createSocket(Socket s, String host, int port, boolean autoClose) throws IOException {
+[internal][vvb2060][vvb2060@gmail.com]        return config(defaultFactory.createSocket(s, host, port, autoClose));
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    @Override
+[internal][vvb2060][vvb2060@gmail.com]    public Socket createSocket(String host, int port) throws IOException {
+[internal][vvb2060][vvb2060@gmail.com]        return config(defaultFactory.createSocket(host, port));
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    @Override
+[internal][vvb2060][vvb2060@gmail.com]    public Socket createSocket(String host, int port, InetAddress localHost, int localPort) throws IOException {
+[internal][vvb2060][vvb2060@gmail.com]        return config(defaultFactory.createSocket(host, port, localHost, localPort));
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    @Override
+[internal][vvb2060][vvb2060@gmail.com]    public Socket createSocket(InetAddress host, int port) throws IOException {
+[internal][vvb2060][vvb2060@gmail.com]        return config(defaultFactory.createSocket(host, port));
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    @Override
+[internal][vvb2060][vvb2060@gmail.com]    public Socket createSocket(InetAddress address, int port, InetAddress localAddress, int localPort) throws IOException {
+[internal][vvb2060][vvb2060@gmail.com]        return config(defaultFactory.createSocket(address, port, localAddress, localPort));
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    private Socket config(Socket socket) {
+[internal][vvb2060][vvb2060@gmail.com]        try {
+[internal][vvb2060][vvb2060@gmail.com]            openSSLSocket.setHostname(socket, null);
+[internal][vvb2060][vvb2060@gmail.com]            openSSLSocket.setUseSessionTickets(socket, true);
+[internal][vvb2060][vvb2060@gmail.com]        } catch (IllegalArgumentException ignored) {
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]        return socket;
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]}

@@ -1,0 +1,463 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * Copyright (C) 2021 - 2022 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][admin][admin@0x.mk]package de.robv.android.xposed;
+[external][admin][admin@0x.mk]
+[external][shana][shana@zju.edu.cn]import android.app.ActivityThread;
+[external][admin][admin@0x.mk]import android.content.res.Resources;
+[external][admin][admin@0x.mk]import android.content.res.TypedArray;
+[external][admin][admin@0x.mk]import android.util.Log;
+[external][admin][admin@0x.mk]
+[external][noreply][noreply@nullptr.icu]import org.lsposed.lspd.impl.LSPosedBridge;
+[external][noreply][noreply@nullptr.icu]import org.lsposed.lspd.impl.LSPosedHookCallback;
+[external][shana][shana@zju.edu.cn]import org.lsposed.lspd.nativebridge.HookBridge;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.lspd.nativebridge.ResourcesHook;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]import java.lang.reflect.AccessibleObject;
+[external][shana][shana@zju.edu.cn]import java.lang.reflect.Executable;
+[external][admin][admin@0x.mk]import java.lang.reflect.InvocationTargetException;
+[external][admin][admin@0x.mk]import java.lang.reflect.Member;
+[external][admin][admin@0x.mk]import java.lang.reflect.Method;
+[external][admin][admin@0x.mk]import java.lang.reflect.Modifier;
+[external][shana][shana@zju.edu.cn]import java.lang.reflect.Proxy;
+[external][admin][admin@0x.mk]import java.util.Arrays;
+[external][admin][admin@0x.mk]import java.util.HashSet;
+[external][admin][admin@0x.mk]import java.util.Set;
+[external][shana][shana@zju.edu.cn]import java.util.concurrent.CopyOnWriteArraySet;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]import de.robv.android.xposed.callbacks.XC_InitPackageResources;
+[external][admin][admin@0x.mk]import de.robv.android.xposed.callbacks.XC_LoadPackage;
+[external][noreply][noreply@nullptr.icu]import io.github.libxposed.api.XposedInterface;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]/**
+[external][admin][admin@0x.mk] * This class contains most of Xposed's central logic, such as initialization and callbacks used by
+[external][admin][admin@0x.mk] * the native side. It also includes methods to add new hooks.
+[external][admin][admin@0x.mk] */
+[external][admin][admin@0x.mk]public final class XposedBridge {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * The system class loader which can be used to locate Android framework classes.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Application classes cannot be retrieved from it.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @see ClassLoader#getSystemClassLoader
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static final ClassLoader BOOTCLASSLOADER = XposedBridge.class.getClassLoader();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @hide
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static final String TAG = "LSPosed-Bridge";
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @deprecated Use {@link #getXposedVersion()} instead.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Deprecated
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static int XPOSED_BRIDGE_VERSION;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private static final Object[] EMPTY_ARRAY = new Object[0];
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    // built-in handlers
+[external][shana][shana@zju.edu.cn]    public static final CopyOnWriteArraySet<XC_LoadPackage> sLoadedPackageCallbacks = new CopyOnWriteArraySet<>();
+[external][shana][shana@zju.edu.cn]    /*package*/ static final CopyOnWriteArraySet<XC_InitPackageResources> sInitPackageResourcesCallbacks = new CopyOnWriteArraySet<>();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private XposedBridge() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static volatile ClassLoader dummyClassLoader = null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static void initXResources() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (dummyClassLoader != null) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Resources res = Resources.getSystem();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Class<?> resClass = res.getClass();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Class<?> taClass = TypedArray.class;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            try {
+[external][shana][shana@zju.edu.cn]                try {
+[external][shana][shana@zju.edu.cn]                    TypedArray ta = res.obtainTypedArray(res.getIdentifier(
+[external][shana][shana@zju.edu.cn]                            "preloaded_drawables", "array", "android"));
+[external][shana][shana@zju.edu.cn]                    taClass = ta.getClass();
+[external][shana][shana@zju.edu.cn]                    ta.recycle();
+[external][shana][shana@zju.edu.cn]                } catch (NullPointerException npe) {
+[external][shana][shana@zju.edu.cn]                    // For ZUI devices, the creation of TypedArray needs to check the configuration
+[external][shana][shana@zju.edu.cn]                    // from ActivityThread.currentActivityThread. However, we do not have a valid
+[external][shana][shana@zju.edu.cn]                    // ActivityThread for now and the call will throw an NPE. Luckily they check the
+[external][shana][shana@zju.edu.cn]                    // nullability of the result configuration. So we hereby set a dummy
+[external][shana][shana@zju.edu.cn]                    // ActivityThread to bypass such a situation.
+[internal][canyie][31466456+canyie@users.noreply.github.com]                    var fake = XposedHelpers.newInstance(ActivityThread.class);
+[internal][canyie][31466456+canyie@users.noreply.github.com]                    XposedHelpers.setStaticObjectField(ActivityThread.class, "sCurrentActivityThread", fake);
+[external][shana][shana@zju.edu.cn]                    try {
+[external][shana][shana@zju.edu.cn]                        TypedArray ta = res.obtainTypedArray(res.getIdentifier(
+[external][shana][shana@zju.edu.cn]                                "preloaded_drawables", "array", "android"));
+[external][shana][shana@zju.edu.cn]                        taClass = ta.getClass();
+[external][shana][shana@zju.edu.cn]                        ta.recycle();
+[external][shana][shana@zju.edu.cn]                    } finally {
+[external][shana][shana@zju.edu.cn]                        XposedHelpers.setStaticObjectField(ActivityThread.class, "sCurrentActivityThread", null);
+[external][shana][shana@zju.edu.cn]                    }
+[external][shana][shana@zju.edu.cn]                }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            } catch (Resources.NotFoundException nfe) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                XposedBridge.log(nfe);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][shana][shana@zju.edu.cn]            ResourcesHook.makeInheritable(resClass);
+[external][shana][shana@zju.edu.cn]            ResourcesHook.makeInheritable(taClass);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            ClassLoader myCL = XposedBridge.class.getClassLoader();
+[internal][vvb2060][vvb2060@gmail.com]            assert myCL != null;
+[external][shana][shana@zju.edu.cn]            dummyClassLoader = ResourcesHook.buildDummyClassLoader(myCL.getParent(), resClass.getName(), taClass.getName());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            dummyClassLoader.loadClass("xposed.dummy.XResourcesSuperClass");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            dummyClassLoader.loadClass("xposed.dummy.XTypedArraySuperClass");
+[internal][vvb2060][vvb2060@gmail.com]            XposedHelpers.setObjectField(myCL, "parent", dummyClassLoader);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (Throwable throwable) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(throwable);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedInit.disableResources = true;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Returns the currently installed version of the Xposed framework.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static int getXposedVersion() {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        return XposedInterface.API;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Writes a message to the Xposed modules log.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * <p class="warning"><b>DON'T FLOOD THE LOG!!!</b> This is only meant for error logging.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * If you want to write information/debug messages, use logcat.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param text The log message.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public synchronized static void log(String text) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        Log.i(TAG, text);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Logs a stack trace to the Xposed modules log.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * <p class="warning"><b>DON'T FLOOD THE LOG!!!</b> This is only meant for error logging.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * If you want to write information/debug messages, use logcat.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param t The Throwable object for the stack trace.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public synchronized static void log(Throwable t) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        String logStr = Log.getStackTraceString(t);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        Log.e(TAG, logStr);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Deoptimize a method to avoid callee being inlined.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @param deoptimizedMethod The method to deoptmize. Generally it should be a caller of a method
+[external][shana][shana@zju.edu.cn]     *                          that is inlined.
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public static void deoptimizeMethod(Member deoptimizedMethod) {
+[external][shana][shana@zju.edu.cn]        if (!(deoptimizedMethod instanceof Executable)) {
+[external][shana][shana@zju.edu.cn]            throw new IllegalArgumentException("Only methods and constructors can be deoptimized: " + deoptimizedMethod);
+[external][shana][shana@zju.edu.cn]        } else if (Modifier.isAbstract(deoptimizedMethod.getModifiers())) {
+[external][shana][shana@zju.edu.cn]            throw new IllegalArgumentException("Cannot deoptimize abstract methods: " + deoptimizedMethod);
+[external][shana][shana@zju.edu.cn]        } else if (Proxy.isProxyClass(deoptimizedMethod.getDeclaringClass())) {
+[external][shana][shana@zju.edu.cn]            throw new IllegalArgumentException("Cannot deoptimize methods from proxy class: " + deoptimizedMethod);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        HookBridge.deoptimizeMethod((Executable) deoptimizedMethod);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Hook any method (or constructor) with the specified callback. See below for some wrappers
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * that make it easier to find a method/constructor in one step.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param hookMethod The method to be hooked.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param callback   The callback to be executed when the hooked method is called.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @return An object that can be used to remove the hook.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @see XposedHelpers#findAndHookMethod(String, ClassLoader, String, Object...)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @see XposedHelpers#findAndHookMethod(Class, String, Object...)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @see #hookAllMethods
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @see XposedHelpers#findAndHookConstructor(String, ClassLoader, Object...)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @see XposedHelpers#findAndHookConstructor(Class, Object...)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @see #hookAllConstructors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static XC_MethodHook.Unhook hookMethod(Member hookMethod, XC_MethodHook callback) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (!(hookMethod instanceof Executable)) {
+[external][shana][shana@zju.edu.cn]            throw new IllegalArgumentException("Only methods and constructors can be hooked: " + hookMethod);
+[external][shana][shana@zju.edu.cn]        } else if (Modifier.isAbstract(hookMethod.getModifiers())) {
+[external][shana][shana@zju.edu.cn]            throw new IllegalArgumentException("Cannot hook abstract methods: " + hookMethod);
+[external][shana][shana@zju.edu.cn]        } else if (hookMethod.getDeclaringClass().getClassLoader() == XposedBridge.class.getClassLoader()) {
+[external][shana][shana@zju.edu.cn]            throw new IllegalArgumentException("Do not allow hooking inner methods");
+[external][shana][shana@zju.edu.cn]        } else if (hookMethod.getDeclaringClass() == Method.class && hookMethod.getName().equals("invoke")) {
+[external][shana][shana@zju.edu.cn]            throw new IllegalArgumentException("Cannot hook Method.invoke");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][admin][admin@0x.mk]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (callback == null) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalArgumentException("callback should not be null!");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][admin][admin@0x.mk]
+[external][noreply][noreply@nullptr.icu]        if (!HookBridge.hookMethod(false, (Executable) hookMethod, LSPosedBridge.NativeHooker.class, callback.priority, callback)) {
+[external][shana][shana@zju.edu.cn]            log("Failed to hook " + hookMethod);
+[external][shana][shana@zju.edu.cn]            return null;
+[external][shana][shana@zju.edu.cn]        }
+[external][admin][admin@0x.mk]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return callback.new Unhook(hookMethod);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Removes the callback for a hooked method/constructor.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param hookMethod The method for which the callback should be removed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param callback   The reference to the callback as specified in {@link #hookMethod}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @deprecated Use {@link XC_MethodHook.Unhook#unhook} instead. An instance of the {@code Unhook}
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * class is returned when you hook the method.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Deprecated
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static void unhookMethod(Member hookMethod, XC_MethodHook callback) {
+[external][shana][shana@zju.edu.cn]        if (hookMethod instanceof Executable) {
+[external][noreply][noreply@nullptr.icu]            HookBridge.unhookMethod(false, (Executable) hookMethod, callback);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Hooks all methods with a certain name that were declared in the specified class. Inherited
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * methods and constructors are not considered. For constructors, use
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * {@link #hookAllConstructors} instead.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param hookClass  The class to check for declared methods.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param methodName The name of the method(s) to hook.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param callback   The callback to be executed when the hooked methods are called.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @return A set containing one object for each found method which can be used to unhook it.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @SuppressWarnings("UnusedReturnValue")
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Set<XC_MethodHook.Unhook> hookAllMethods(Class<?> hookClass, String methodName, XC_MethodHook callback) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        Set<XC_MethodHook.Unhook> unhooks = new HashSet<>();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        for (Member method : hookClass.getDeclaredMethods())
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (method.getName().equals(methodName))
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                unhooks.add(hookMethod(method, callback));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return unhooks;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Hook all constructors of the specified class.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param hookClass The class to check for constructors.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param callback  The callback to be executed when the hooked constructors are called.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @return A set containing one object for each found constructor which can be used to unhook it.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @SuppressWarnings("UnusedReturnValue")
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Set<XC_MethodHook.Unhook> hookAllConstructors(Class<?> hookClass, XC_MethodHook callback) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        Set<XC_MethodHook.Unhook> unhooks = new HashSet<>();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        for (Member constructor : hookClass.getDeclaredConstructors())
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            unhooks.add(hookMethod(constructor, callback));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return unhooks;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Adds a callback to be executed when an app ("Android package") is loaded.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * <p class="note">You probably don't need to call this. Simply implement {@link IXposedHookLoadPackage}
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * in your module class and Xposed will take care of registering it as a callback.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param callback The callback to be executed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @hide
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static void hookLoadPackage(XC_LoadPackage callback) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        synchronized (sLoadedPackageCallbacks) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            sLoadedPackageCallbacks.add(callback);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][admin][admin@0x.mk]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Adds a callback to be executed when the resources for an app are initialized.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * <p class="note">You probably don't need to call this. Simply implement {@link IXposedHookInitPackageResources}
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * in your module class and Xposed will take care of registering it as a callback.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param callback The callback to be executed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @hide
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static void hookInitPackageResources(XC_InitPackageResources callback) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        synchronized (sInitPackageResourcesCallbacks) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            sInitPackageResourcesCallbacks.add(callback);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][admin][admin@0x.mk]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Basically the same as {@link Method#invoke}, but calls the original method
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * as it was before the interception by Xposed. Also, access permissions are not checked.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * <p class="caution">There are very few cases where this method is needed. A common mistake is
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * to replace a method and then invoke the original one based on dynamic conditions. This
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * creates overhead and skips further hooks by other modules. Instead, just hook (don't replace)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * the method and call {@code param.setResult(null)} in {@link XC_MethodHook#beforeHookedMethod}
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * if the original method should be skipped.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param method     The method to be called.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param thisObject For non-static calls, the "this" pointer, otherwise {@code null}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param args       Arguments for the method call as Object[] array.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @return The result returned from the invoked method.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @throws NullPointerException      if {@code receiver == null} for a non-static method
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @throws IllegalAccessException    if this method is not accessible (see {@link AccessibleObject})
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @throws IllegalArgumentException  if the number of arguments doesn't match the number of parameters, the receiver
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *                                   is incompatible with the declaring class, or an argument could not be unboxed
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *                                   or converted by a widening conversion to the corresponding parameter type
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @throws InvocationTargetException if an exception was thrown by the invoked method
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Object invokeOriginalMethod(Member method, Object thisObject, Object[] args)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throws Throwable {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (args == null) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            args = EMPTY_ARRAY;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][admin][admin@0x.mk]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (!(method instanceof Executable)) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalArgumentException("method must be of type Method or Constructor");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][admin][admin@0x.mk]
+[external][shana][shana@zju.edu.cn]        return HookBridge.invokeOriginalMethod((Executable) method, thisObject, args);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @hide
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static final class CopyOnWriteSortedSet<E> {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        private transient volatile Object[] elements = EMPTY_ARRAY;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        @SuppressWarnings("UnusedReturnValue")
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public synchronized boolean add(E e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            int index = indexOf(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (index >= 0)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                return false;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Object[] newElements = new Object[elements.length + 1];
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            System.arraycopy(elements, 0, newElements, 0, elements.length);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            newElements[elements.length] = e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Arrays.sort(newElements);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            elements = newElements;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return true;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        @SuppressWarnings("UnusedReturnValue")
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public synchronized boolean remove(E e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            int index = indexOf(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (index == -1)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                return false;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Object[] newElements = new Object[elements.length - 1];
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            System.arraycopy(elements, 0, newElements, 0, index);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            System.arraycopy(elements, index + 1, newElements, index, elements.length - index - 1);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            elements = newElements;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return true;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        private int indexOf(Object o) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            for (int i = 0; i < elements.length; i++) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                if (o.equals(elements[i]))
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    return i;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return -1;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public Object[] getSnapshot() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return elements;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]        public <T> T[] getSnapshot(T[] a) {
+[external][shana][shana@zju.edu.cn]            var snapshot = getSnapshot();
+[external][shana][shana@zju.edu.cn]            return (T[]) Arrays.copyOf(snapshot, snapshot.length, a.getClass());
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public synchronized void clear() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            elements = EMPTY_ARRAY;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][noreply][noreply@nullptr.icu]    public static class LegacyApiSupport<T extends Executable> {
+[external][noreply][noreply@nullptr.icu]        private final XC_MethodHook.MethodHookParam<T> param;
+[external][noreply][noreply@nullptr.icu]        private final LSPosedHookCallback<T> callback;
+[external][noreply][noreply@nullptr.icu]        private final Object[] snapshot;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][noreply][noreply@nullptr.icu]        private int beforeIdx;
+[external][shana][shana@zju.edu.cn]
+[external][noreply][noreply@nullptr.icu]        public LegacyApiSupport(LSPosedHookCallback<T> callback, Object[] legacySnapshot) {
+[external][noreply][noreply@nullptr.icu]            this.param = new XC_MethodHook.MethodHookParam<>();
+[external][noreply][noreply@nullptr.icu]            this.callback = callback;
+[external][noreply][noreply@nullptr.icu]            this.snapshot = legacySnapshot;
+[external][noreply][noreply@nullptr.icu]        }
+[external][shana][shana@zju.edu.cn]
+[external][noreply][noreply@nullptr.icu]        public void handleBefore() {
+[external][noreply][noreply@nullptr.icu]            syncronizeApi(param, callback, true);
+[external][noreply][noreply@nullptr.icu]            for (beforeIdx = 0; beforeIdx < snapshot.length; beforeIdx++) {
+[external][shana][shana@zju.edu.cn]                try {
+[external][noreply][noreply@nullptr.icu]                    var cb = (XC_MethodHook) snapshot[beforeIdx];
+[external][noreply][noreply@nullptr.icu]                    cb.beforeHookedMethod(param);
+[external][shana][shana@zju.edu.cn]                } catch (Throwable t) {
+[external][shana][shana@zju.edu.cn]                    XposedBridge.log(t);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]                    // reset result (ignoring what the unexpectedly exiting callback did)
+[external][shana][shana@zju.edu.cn]                    param.setResult(null);
+[external][shana][shana@zju.edu.cn]                    param.returnEarly = false;
+[external][shana][shana@zju.edu.cn]                    continue;
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]                if (param.returnEarly) {
+[external][shana][shana@zju.edu.cn]                    // skip remaining "before" callbacks and corresponding "after" callbacks
+[external][shana][shana@zju.edu.cn]                    beforeIdx++;
+[external][shana][shana@zju.edu.cn]                    break;
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            }
+[external][noreply][noreply@nullptr.icu]            syncronizeApi(param, callback, false);
+[external][noreply][noreply@nullptr.icu]        }
+[external][shana][shana@zju.edu.cn]
+[external][noreply][noreply@nullptr.icu]        public void handleAfter() {
+[external][noreply][noreply@nullptr.icu]            syncronizeApi(param, callback, true);
+[external][noreply][noreply@nullptr.icu]            for (int afterIdx = beforeIdx - 1; afterIdx >= 0; afterIdx--) {
+[external][shana][shana@zju.edu.cn]                Object lastResult = param.getResult();
+[external][shana][shana@zju.edu.cn]                Throwable lastThrowable = param.getThrowable();
+[external][shana][shana@zju.edu.cn]                try {
+[external][noreply][noreply@nullptr.icu]                    var cb = (XC_MethodHook) snapshot[afterIdx];
+[external][noreply][noreply@nullptr.icu]                    cb.afterHookedMethod(param);
+[external][shana][shana@zju.edu.cn]                } catch (Throwable t) {
+[external][shana][shana@zju.edu.cn]                    XposedBridge.log(t);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]                    // reset to last result (ignoring what the unexpectedly exiting callback did)
+[external][noreply][noreply@nullptr.icu]                    if (lastThrowable == null) {
+[external][shana][shana@zju.edu.cn]                        param.setResult(lastResult);
+[external][noreply][noreply@nullptr.icu]                    } else {
+[external][shana][shana@zju.edu.cn]                        param.setThrowable(lastThrowable);
+[external][noreply][noreply@nullptr.icu]                    }
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            }
+[external][noreply][noreply@nullptr.icu]            syncronizeApi(param, callback, false);
+[external][shana][shana@zju.edu.cn]        }
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]        private void syncronizeApi(XC_MethodHook.MethodHookParam<T> param, LSPosedHookCallback<T> callback, boolean forward) {
+[external][noreply][noreply@nullptr.icu]            if (forward) {
+[external][noreply][noreply@nullptr.icu]                param.method = callback.method;
+[external][noreply][noreply@nullptr.icu]                param.thisObject = callback.thisObject;
+[external][noreply][noreply@nullptr.icu]                param.args = callback.args;
+[external][noreply][noreply@nullptr.icu]                param.result = callback.result;
+[external][noreply][noreply@nullptr.icu]                param.throwable = callback.throwable;
+[external][noreply][noreply@nullptr.icu]                param.returnEarly = callback.isSkipped;
+[external][noreply][noreply@nullptr.icu]            } else {
+[external][noreply][noreply@nullptr.icu]                callback.method = param.method;
+[external][noreply][noreply@nullptr.icu]                callback.thisObject = param.thisObject;
+[external][noreply][noreply@nullptr.icu]                callback.args = param.args;
+[external][noreply][noreply@nullptr.icu]                callback.result = param.result;
+[external][noreply][noreply@nullptr.icu]                callback.throwable = param.throwable;
+[external][noreply][noreply@nullptr.icu]                callback.isSkipped = param.returnEarly;
+[external][noreply][noreply@nullptr.icu]            }
+[external][noreply][noreply@nullptr.icu]        }
+[external][noreply][noreply@nullptr.icu]    }
+[external][admin][admin@0x.mk]}

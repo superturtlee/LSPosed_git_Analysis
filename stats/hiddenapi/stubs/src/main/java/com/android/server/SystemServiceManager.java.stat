@@ -1,0 +1,7 @@
+[external][shana][shana@zju.edu.cn]package com.android.server;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import java.util.ArrayList;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public class SystemServiceManager {
+[external][shana][shana@zju.edu.cn]    private final ArrayList<SystemService> mServices = new ArrayList<>();
+[external][shana][shana@zju.edu.cn]}

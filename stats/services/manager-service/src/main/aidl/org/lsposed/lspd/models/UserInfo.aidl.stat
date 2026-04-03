@@ -1,0 +1,6 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]package org.lsposed.lspd.models;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]parcelable UserInfo {
+[external][shana][shana@zju.edu.cn]    int id;
+[external][shana][shana@zju.edu.cn]    String name;
+[external][shana][shana@zju.edu.cn]}

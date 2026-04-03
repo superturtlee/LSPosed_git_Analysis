@@ -1,0 +1,136 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][admin][admin@0x.mk] * Copyright (C) 2021 - 2022 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][hsushulong][hsushulong@gmail.com]#include <jni.h>
+[external][hsushulong][hsushulong@gmail.com]#include <cstring>
+[external][hsushulong][hsushulong@gmail.com]#include <cstdlib>
+[external][hsushulong][hsushulong@gmail.com]#include <array>
+[external][hsushulong][hsushulong@gmail.com]#include "logging.h"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#include "loader.h"
+[external][shana][shana@zju.edu.cn]#include "config_impl.h"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#include "magisk_loader.h"
+[external][shana][shana@zju.edu.cn]#include "symbol_cache.h"
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]#define RIRU_MODULE
+[external][shana][shana@zju.edu.cn]#include "riru.h"
+[external][hsushulong][hsushulong@gmail.com]
+[external][shana][shana@zju.edu.cn]namespace lspd {
+[external][shana][shana@zju.edu.cn]    int *allowUnload = nullptr;
+[external][shana][shana@zju.edu.cn]    namespace {
+[external][shana][shana@zju.edu.cn]        std::string magiskPath;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        jstring nice_name = nullptr;
+[external][shana][shana@zju.edu.cn]        jstring app_dir = nullptr;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        void onModuleLoaded() {
+[external][shana][shana@zju.edu.cn]            LOGI("onModuleLoaded: welcome to LSPosed!");
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]            LOGI("onModuleLoaded: version v{} ({})", versionName, versionCode);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            MagiskLoader::Init();
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]            ConfigImpl::Init();
+[external][shana][shana@zju.edu.cn]        }
+[external][hsushulong][hsushulong@gmail.com]
+[external][shana][shana@zju.edu.cn]        void nativeForkAndSpecializePre(JNIEnv *env, jclass, jint *_uid, jint *,
+[external][shana][shana@zju.edu.cn]                                        jintArray *gids, jint *,
+[external][shana][shana@zju.edu.cn]                                        jobjectArray *, jint *,
+[external][shana][shana@zju.edu.cn]                                        jstring *, jstring *_nice_name,
+[external][shana][shana@zju.edu.cn]                                        jintArray *, jintArray *,
+[external][shana][shana@zju.edu.cn]                                        jboolean *start_child_zygote, jstring *,
+[external][shana][shana@zju.edu.cn]                                        jstring *_app_data_dir, jboolean *,
+[external][shana][shana@zju.edu.cn]                                        jobjectArray *,
+[external][shana][shana@zju.edu.cn]                                        jobjectArray *,
+[external][shana][shana@zju.edu.cn]                                        jboolean *,
+[external][shana][shana@zju.edu.cn]                                        jboolean *) {
+[external][shana][shana@zju.edu.cn]            nice_name = *_nice_name;
+[external][shana][shana@zju.edu.cn]            app_dir = *_app_data_dir;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            MagiskLoader::GetInstance()->OnNativeForkAndSpecializePre(env, *_uid, *gids,
+[external][shana][shana@zju.edu.cn]                                                                 nice_name,
+[external][shana][shana@zju.edu.cn]                                                                 *start_child_zygote,
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                                                                 *_app_data_dir);
+[external][shana][shana@zju.edu.cn]        }
+[external][admin][admin@0x.mk]
+[external][shana][shana@zju.edu.cn]        void nativeForkAndSpecializePost(JNIEnv *env, jclass, jint res) {
+[external][shana][shana@zju.edu.cn]            if (res == 0)
+[external][shana][shana@zju.edu.cn]                MagiskLoader::GetInstance()->OnNativeForkAndSpecializePost(env, nice_name, app_dir);
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]
+[external][shana][shana@zju.edu.cn]        void nativeForkSystemServerPre(JNIEnv *env, jclass, uid_t *, gid_t *,
+[external][shana][shana@zju.edu.cn]                                       jintArray *, jint *,
+[external][shana][shana@zju.edu.cn]                                       jobjectArray *, jlong *,
+[external][shana][shana@zju.edu.cn]                                       jlong *) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            MagiskLoader::GetInstance()->OnNativeForkSystemServerPre(env);
+[external][shana][shana@zju.edu.cn]        }
+[external][admin][admin@0x.mk]
+[external][shana][shana@zju.edu.cn]        void nativeForkSystemServerPost(JNIEnv *env, jclass, jint res) {
+[external][shana][shana@zju.edu.cn]            if (res == 0)
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                MagiskLoader::GetInstance()->OnNativeForkSystemServerPost(env);
+[external][admin][admin@0x.mk]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        /* method added in Android Q */
+[external][wanghan1995315][wanghan1995315@gmail.com]        void specializeAppProcessPre(JNIEnv *env, jclass, jint *_uid, jint *,
+[external][wanghan1995315][wanghan1995315@gmail.com]                                     jintArray *gids, jint *,
+[external][wanghan1995315][wanghan1995315@gmail.com]                                     jobjectArray *, jint *,
+[external][shana][shana@zju.edu.cn]                                     jstring *, jstring *_nice_name,
+[external][shana][shana@zju.edu.cn]                                     jboolean *start_child_zygote, jstring *,
+[external][shana][shana@zju.edu.cn]                                     jstring *_app_data_dir, jboolean *,
+[external][shana][shana@zju.edu.cn]                                     jobjectArray *,
+[external][shana][shana@zju.edu.cn]                                     jobjectArray *,
+[external][shana][shana@zju.edu.cn]                                     jboolean *,
+[external][shana][shana@zju.edu.cn]                                     jboolean *) {
+[external][shana][shana@zju.edu.cn]            nice_name = *_nice_name;
+[external][shana][shana@zju.edu.cn]            app_dir = *_app_data_dir;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            MagiskLoader::GetInstance()->OnNativeForkAndSpecializePre(env, *_uid, *gids,
+[external][shana][shana@zju.edu.cn]                                                                 nice_name,
+[external][shana][shana@zju.edu.cn]                                                                 *start_child_zygote,
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                                                                 *_app_data_dir);
+[external][admin][admin@0x.mk]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        void specializeAppProcessPost(JNIEnv *env, jclass) {
+[external][shana][shana@zju.edu.cn]            MagiskLoader::GetInstance()->OnNativeForkAndSpecializePost(env, nice_name, app_dir);
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    RiruVersionedModuleInfo module{
+[external][shana][shana@zju.edu.cn]            .moduleApiVersion = apiVersion,
+[external][shana][shana@zju.edu.cn]            .moduleInfo = RiruModuleInfo{
+[external][shana][shana@zju.edu.cn]                    .supportHide = !isDebug,
+[external][shana][shana@zju.edu.cn]                    .version = versionCode,
+[external][shana][shana@zju.edu.cn]                    .versionName = versionName,
+[external][shana][shana@zju.edu.cn]                    .onModuleLoaded = lspd::onModuleLoaded,
+[external][shana][shana@zju.edu.cn]                    .forkAndSpecializePre = lspd::nativeForkAndSpecializePre,
+[external][shana][shana@zju.edu.cn]                    .forkAndSpecializePost = lspd::nativeForkAndSpecializePost,
+[external][shana][shana@zju.edu.cn]                    .forkSystemServerPre = lspd::nativeForkSystemServerPre,
+[external][shana][shana@zju.edu.cn]                    .forkSystemServerPost = lspd::nativeForkSystemServerPost,
+[external][shana][shana@zju.edu.cn]                    .specializeAppProcessPre = lspd::specializeAppProcessPre,
+[external][shana][shana@zju.edu.cn]                    .specializeAppProcessPost = lspd::specializeAppProcessPost,
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]    };
+[external][hsushulong][hsushulong@gmail.com]}
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]RIRU_EXPORT RiruVersionedModuleInfo *init(Riru *riru) {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    LOGD("using riru {}", riru->riruApiVersion);
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    LOGD("module path: {}", riru->magiskModulePath);
+[external][shana][shana@zju.edu.cn]    lspd::magiskPath = riru->magiskModulePath;
+[external][shana][shana@zju.edu.cn]    if (!lspd::isDebug && lspd::magiskPath.find(lspd::moduleName) == std::string::npos) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        LOGE("who am i");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return nullptr;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][shana][shana@zju.edu.cn]    lspd::allowUnload = riru->allowUnload;
+[external][shana][shana@zju.edu.cn]    return &lspd::module;
+[external][shana][shana@zju.edu.cn]}

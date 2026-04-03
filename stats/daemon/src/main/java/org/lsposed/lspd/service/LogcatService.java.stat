@@ -1,0 +1,214 @@
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.lspd.service;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import android.annotation.SuppressLint;
+[external][shana][shana@zju.edu.cn]import android.os.Build;
+[internal][vvb2060][vvb2060@gmail.com]import android.os.ParcelFileDescriptor;
+[external][shana][shana@zju.edu.cn]import android.os.Process;
+[internal][vvb2060][vvb2060@gmail.com]import android.os.SELinux;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import android.os.SystemProperties;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import android.system.Os;
+[internal][vvb2060][vvb2060@gmail.com]import android.util.Log;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import java.io.File;
+[external][shana][shana@zju.edu.cn]import java.io.FileDescriptor;
+[internal][vvb2060][vvb2060@gmail.com]import java.io.IOException;
+[internal][vvb2060][vvb2060@gmail.com]import java.nio.file.Files;
+[internal][vvb2060][vvb2060@gmail.com]import java.nio.file.LinkOption;
+[internal][vvb2060][vvb2060@gmail.com]import java.nio.file.Path;
+[internal][vvb2060][vvb2060@gmail.com]import java.nio.file.Paths;
+[external][shana][shana@zju.edu.cn]import java.util.LinkedHashMap;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]public class LogcatService implements Runnable {
+[internal][vvb2060][vvb2060@gmail.com]    private static final String TAG = "LSPosedLogcat";
+[external][shana][shana@zju.edu.cn]    private static final int mode = ParcelFileDescriptor.MODE_WRITE_ONLY |
+[external][shana][shana@zju.edu.cn]            ParcelFileDescriptor.MODE_CREATE |
+[external][shana][shana@zju.edu.cn]            ParcelFileDescriptor.MODE_TRUNCATE |
+[external][shana][shana@zju.edu.cn]            ParcelFileDescriptor.MODE_APPEND;
+[external][shana][shana@zju.edu.cn]    private int modulesFd = -1;
+[external][shana][shana@zju.edu.cn]    private int verboseFd = -1;
+[internal][vvb2060][vvb2060@gmail.com]    private Thread thread = null;
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]    static class LogLRU extends LinkedHashMap<File, Object> {
+[external][shana][shana@zju.edu.cn]        private static final int MAX_ENTRIES = 10;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        public LogLRU() {
+[external][shana][shana@zju.edu.cn]            super(MAX_ENTRIES, 1f, false);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        synchronized protected boolean removeEldestEntry(Entry<File, Object> eldest) {
+[external][shana][shana@zju.edu.cn]            if (size() > MAX_ENTRIES && eldest.getKey().delete()) {
+[external][shana][shana@zju.edu.cn]                Log.d(TAG, "Deleted old log " + eldest.getKey().getAbsolutePath());
+[external][shana][shana@zju.edu.cn]                return true;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            return false;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+[external][shana][shana@zju.edu.cn]    private final LinkedHashMap<File, Object> moduleLogs = new LogLRU();
+[external][shana][shana@zju.edu.cn]    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+[external][shana][shana@zju.edu.cn]    private final LinkedHashMap<File, Object> verboseLogs = new LogLRU();
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]    @SuppressLint("UnsafeDynamicallyLoadedCode")
+[external][shana][shana@zju.edu.cn]    public LogcatService() {
+[external][shana][shana@zju.edu.cn]        String classPath = System.getProperty("java.class.path");
+[external][shana][shana@zju.edu.cn]        var abi = Process.is64Bit() ? Build.SUPPORTED_64_BIT_ABIS[0] : Build.SUPPORTED_32_BIT_ABIS[0];
+[external][shana][shana@zju.edu.cn]        System.load(classPath + "!/lib/" + abi + "/" + System.mapLibraryName("daemon"));
+[external][shana][shana@zju.edu.cn]        ConfigFileManager.moveLogDir();
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]        // Meizu devices set this prop and prevent debug logs from being recorded
+[internal][vvb2060][vvb2060@gmail.com]        if (SystemProperties.getInt("persist.sys.log_reject_level", 0) > 0) {
+[internal][vvb2060][vvb2060@gmail.com]            SystemProperties.set("persist.sys.log_reject_level", "0");
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]        getprop();
+[internal][vvb2060][vvb2060@gmail.com]        dmesg();
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    private static void getprop() {
+[internal][vvb2060][vvb2060@gmail.com]        // multithreaded process can not change their context type,
+[internal][vvb2060][vvb2060@gmail.com]        // start a new process to set restricted context to filter privacy props
+[internal][vvb2060][vvb2060@gmail.com]        var cmd = "echo -n u:r:untrusted_app:s0 > /proc/thread-self/attr/current; getprop";
+[internal][vvb2060][vvb2060@gmail.com]        try {
+[internal][vvb2060][vvb2060@gmail.com]            SELinux.setFSCreateContext("u:object_r:app_data_file:s0");
+[internal][vvb2060][vvb2060@gmail.com]            new ProcessBuilder("sh", "-c", cmd)
+[internal][vvb2060][vvb2060@gmail.com]                    .redirectOutput(ConfigFileManager.getPropsPath())
+[internal][vvb2060][vvb2060@gmail.com]                    .start();
+[internal][vvb2060][vvb2060@gmail.com]        } catch (IOException e) {
+[internal][vvb2060][vvb2060@gmail.com]            Log.e(TAG, "getprop: ", e);
+[internal][vvb2060][vvb2060@gmail.com]        } finally {
+[internal][vvb2060][vvb2060@gmail.com]            SELinux.setFSCreateContext(null);
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    private static void dmesg() {
+[internal][vvb2060][vvb2060@gmail.com]        try {
+[internal][vvb2060][vvb2060@gmail.com]            new ProcessBuilder("dmesg")
+[internal][vvb2060][vvb2060@gmail.com]                    .redirectOutput(ConfigFileManager.getKmsgPath())
+[internal][vvb2060][vvb2060@gmail.com]                    .start();
+[internal][vvb2060][vvb2060@gmail.com]        } catch (IOException e) {
+[internal][vvb2060][vvb2060@gmail.com]            Log.e(TAG, "dmesg: ", e);
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]    private native void runLogcat();
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]    @Override
+[internal][vvb2060][vvb2060@gmail.com]    public void run() {
+[internal][vvb2060][vvb2060@gmail.com]        Log.i(TAG, "start running");
+[external][shana][shana@zju.edu.cn]        runLogcat();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        Log.i(TAG, "stopped");
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    @SuppressWarnings("unused")
+[external][shana][shana@zju.edu.cn]    private int refreshFd(boolean isVerboseLog) {
+[external][shana][shana@zju.edu.cn]        try {
+[internal][vvb2060][vvb2060@gmail.com]            File log;
+[internal][vvb2060][vvb2060@gmail.com]            if (isVerboseLog) {
+[external][shana][shana@zju.edu.cn]                checkFd(verboseFd);
+[internal][vvb2060][vvb2060@gmail.com]                log = ConfigFileManager.getNewVerboseLogPath();
+[internal][vvb2060][vvb2060@gmail.com]            } else {
+[external][shana][shana@zju.edu.cn]                checkFd(modulesFd);
+[internal][vvb2060][vvb2060@gmail.com]                log = ConfigFileManager.getNewModulesLogPath();
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]            Log.i(TAG, "New log file: " + log);
+[external][shana][shana@zju.edu.cn]            ConfigFileManager.chattr0(log.toPath().getParent());
+[internal][vvb2060][vvb2060@gmail.com]            int fd = ParcelFileDescriptor.open(log, mode).detachFd();
+[external][shana][shana@zju.edu.cn]            if (isVerboseLog) {
+[external][shana][shana@zju.edu.cn]                synchronized (verboseLogs) {
+[external][shana][shana@zju.edu.cn]                    verboseLogs.put(log, new Object());
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]                verboseFd = fd;
+[external][shana][shana@zju.edu.cn]            } else {
+[external][shana][shana@zju.edu.cn]                synchronized (moduleLogs) {
+[external][shana][shana@zju.edu.cn]                    moduleLogs.put(log, new Object());
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]                modulesFd = fd;
+[external][shana][shana@zju.edu.cn]            }
+[internal][vvb2060][vvb2060@gmail.com]            return fd;
+[internal][vvb2060][vvb2060@gmail.com]        } catch (IOException e) {
+[external][shana][shana@zju.edu.cn]            if (isVerboseLog) verboseFd = -1;
+[external][shana][shana@zju.edu.cn]            else modulesFd = -1;
+[internal][vvb2060][vvb2060@gmail.com]            Log.w(TAG, "refreshFd", e);
+[internal][vvb2060][vvb2060@gmail.com]            return -1;
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]    private static void checkFd(int fd) {
+[external][shana][shana@zju.edu.cn]        if (fd == -1) return;
+[internal][vvb2060][vvb2060@gmail.com]        try {
+[external][shana][shana@zju.edu.cn]            var jfd = new FileDescriptor();
+[internal][vvb2060][vvb2060@gmail.com]            //noinspection JavaReflectionMemberAccess DiscouragedPrivateApi
+[external][shana][shana@zju.edu.cn]            jfd.getClass().getDeclaredMethod("setInt$", int.class).invoke(jfd, fd);
+[external][shana][shana@zju.edu.cn]            var stat = Os.fstat(jfd);
+[external][shana][shana@zju.edu.cn]            if (stat.st_nlink == 0) {
+[external][shana][shana@zju.edu.cn]                var file = Files.readSymbolicLink(fdToPath(fd));
+[internal][vvb2060][vvb2060@gmail.com]                var parent = file.getParent();
+[internal][vvb2060][vvb2060@gmail.com]                if (!Files.isDirectory(parent, LinkOption.NOFOLLOW_LINKS)) {
+[external][shana][shana@zju.edu.cn]                    if (ConfigFileManager.chattr0(parent))
+[external][shana][shana@zju.edu.cn]                        Files.deleteIfExists(parent);
+[internal][vvb2060][vvb2060@gmail.com]                }
+[internal][vvb2060][vvb2060@gmail.com]                var name = file.getFileName().toString();
+[internal][vvb2060][vvb2060@gmail.com]                var originName = name.substring(0, name.lastIndexOf(' '));
+[external][shana][shana@zju.edu.cn]                Files.copy(file, parent.resolve(originName));
+[internal][vvb2060][vvb2060@gmail.com]            }
+[external][shana][shana@zju.edu.cn]        } catch (Throwable e) {
+[external][shana][shana@zju.edu.cn]            Log.w(TAG, "checkFd " + fd, e);
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]    public boolean isRunning() {
+[external][shana][shana@zju.edu.cn]        return thread != null && thread.isAlive();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]    public void start() {
+[internal][vvb2060][vvb2060@gmail.com]        if (isRunning()) return;
+[internal][vvb2060][vvb2060@gmail.com]        thread = new Thread(this);
+[internal][vvb2060][vvb2060@gmail.com]        thread.setName("logcat");
+[internal][vvb2060][vvb2060@gmail.com]        thread.setUncaughtExceptionHandler((t, e) -> {
+[internal][vvb2060][vvb2060@gmail.com]            Log.e(TAG, "Crash unexpectedly: ", e);
+[internal][vvb2060][vvb2060@gmail.com]            thread = null;
+[external][shana][shana@zju.edu.cn]            start();
+[internal][vvb2060][vvb2060@gmail.com]        });
+[internal][vvb2060][vvb2060@gmail.com]        thread.start();
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]    public void startVerbose() {
+[internal][vvb2060][vvb2060@gmail.com]        Log.i(TAG, "!!start_verbose!!");
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]    public void stopVerbose() {
+[internal][vvb2060][vvb2060@gmail.com]        Log.i(TAG, "!!stop_verbose!!");
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    public void refresh(boolean isVerboseLog) {
+[internal][vvb2060][vvb2060@gmail.com]        if (isVerboseLog) {
+[internal][vvb2060][vvb2060@gmail.com]            Log.i(TAG, "!!refresh_verbose!!");
+[internal][vvb2060][vvb2060@gmail.com]        } else {
+[internal][vvb2060][vvb2060@gmail.com]            Log.i(TAG, "!!refresh_modules!!");
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    private static Path fdToPath(int fd) {
+[external][shana][shana@zju.edu.cn]        if (fd == -1) return null;
+[external][shana][shana@zju.edu.cn]        else return Paths.get("/proc/self/fd", String.valueOf(fd));
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public File getVerboseLog() {
+[external][shana][shana@zju.edu.cn]        var path = fdToPath(verboseFd);
+[external][shana][shana@zju.edu.cn]        return path == null ? null : path.toFile();
+[internal][vvb2060][vvb2060@gmail.com]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public File getModulesLog() {
+[external][shana][shana@zju.edu.cn]        var path = fdToPath(modulesFd);
+[external][shana][shana@zju.edu.cn]        return path == null ? null : path.toFile();
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    public void checkLogFile() {
+[external][shana][shana@zju.edu.cn]        if (modulesFd == -1)
+[internal][vvb2060][vvb2060@gmail.com]            refresh(false);
+[external][shana][shana@zju.edu.cn]        if (verboseFd == -1)
+[internal][vvb2060][vvb2060@gmail.com]            refresh(true);
+[external][shana][shana@zju.edu.cn]    }
+[internal][vvb2060][vvb2060@gmail.com]}

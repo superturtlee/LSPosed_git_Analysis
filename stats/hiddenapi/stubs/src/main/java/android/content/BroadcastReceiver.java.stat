@@ -1,0 +1,5 @@
+[external][shana][shana@zju.edu.cn]package android.content;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public abstract class BroadcastReceiver {
+[external][shana][shana@zju.edu.cn]    public abstract void onReceive(Context context, Intent intent);
+[external][shana][shana@zju.edu.cn]}

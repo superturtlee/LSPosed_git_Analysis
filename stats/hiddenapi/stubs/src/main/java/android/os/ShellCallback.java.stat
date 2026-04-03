@@ -1,0 +1,25 @@
+[external][shana][shana@zju.edu.cn]package android.os;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public class ShellCallback implements Parcelable {
+[internal][vvb2060][vvb2060@gmail.com]    public static final Parcelable.Creator<ShellCallback> CREATOR = new Creator<ShellCallback>() {
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public ShellCallback createFromParcel(Parcel source) {
+[external][shana][shana@zju.edu.cn]            throw new IllegalArgumentException("STUB");
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public ShellCallback[] newArray(int size) {
+[external][shana][shana@zju.edu.cn]            throw new IllegalArgumentException("STUB");
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    };
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public void writeToParcel(Parcel dest, int flags) {
+[external][shana][shana@zju.edu.cn]        throw new IllegalArgumentException("STUB");
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public int describeContents() {
+[external][shana][shana@zju.edu.cn]        throw new IllegalArgumentException("STUB");
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

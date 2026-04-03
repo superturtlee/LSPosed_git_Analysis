@@ -1,0 +1,67 @@
+[external][aryahajalizadeh][aryahajalizadeh@gmail.com]<?xml version="1.0" encoding="utf-8"?>
+[external][aryahajalizadeh][aryahajalizadeh@gmail.com]  <!--
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  -->
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+[external][shana][shana@zju.edu.cn]    xmlns:tools="http://schemas.android.com/tools">
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    <uses-permission android:name="android.permission.INTERNET" />
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]    <permission
+[internal][vvb2060][vvb2060@gmail.com]        android:name="${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+[internal][vvb2060][vvb2060@gmail.com]        android:protectionLevel="signature"
+[internal][vvb2060][vvb2060@gmail.com]        tools:node="remove" />
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    <uses-permission
+[internal][vvb2060][vvb2060@gmail.com]        android:name="${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+[internal][vvb2060][vvb2060@gmail.com]        tools:node="remove" />
+[internal][vvb2060][vvb2060@gmail.com]
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    <application
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        android:name=".App"
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        android:allowBackup="true"
+[internal][vvb2060][vvb2060@gmail.com]        android:hasFragileUserData="true"
+[internal][vvb2060][vvb2060@gmail.com]        android:icon="@drawable/ic_launcher"
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        android:label="@string/app_name"
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        android:supportsRtl="true"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        tools:ignore="AllowBackup,GoogleAppIndexingWarning"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        tools:targetApi="q">
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        <activity
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]            android:name=".ui.activity.MainActivity"
+[internal][vvb2060][vvb2060@gmail.com]            android:exported="true"
+[internal][vvb2060][vvb2060@gmail.com]            android:launchMode="singleTop">
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]            <intent-filter>
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]                <action android:name="android.intent.action.MAIN" />
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                <action android:name="android.intent.action.APPLICATION_PREFERENCES" />
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]                <category android:name="android.intent.category.LAUNCHER" />
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]            </intent-filter>
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]            <meta-data
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]                android:name="android.app.shortcuts"
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]                android:resource="@xml/shortcuts" />
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        </activity>
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]        <provider
+[internal][vvb2060][vvb2060@gmail.com]            android:name="androidx.startup.InitializationProvider"
+[internal][vvb2060][vvb2060@gmail.com]            android:authorities="${applicationId}.androidx-startup"
+[internal][vvb2060][vvb2060@gmail.com]            android:exported="false"
+[internal][vvb2060][vvb2060@gmail.com]            tools:node="remove" />
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    </application>
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]</manifest>

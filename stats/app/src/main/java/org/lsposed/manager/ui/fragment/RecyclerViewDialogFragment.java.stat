@@ -1,0 +1,87 @@
+[external][shana][shana@zju.edu.cn]/*
+[external][shana][shana@zju.edu.cn] * This file is part of LSPosed.
+[external][shana][shana@zju.edu.cn] *
+[external][shana][shana@zju.edu.cn] * LSPosed is free software: you can redistribute it and/or modify
+[external][shana][shana@zju.edu.cn] * it under the terms of the GNU General Public License as published by
+[external][shana][shana@zju.edu.cn] * the Free Software Foundation, either version 3 of the License, or
+[external][shana][shana@zju.edu.cn] * (at your option) any later version.
+[external][shana][shana@zju.edu.cn] *
+[external][shana][shana@zju.edu.cn] * LSPosed is distributed in the hope that it will be useful,
+[external][shana][shana@zju.edu.cn] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][shana][shana@zju.edu.cn] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][shana][shana@zju.edu.cn] * GNU General Public License for more details.
+[external][shana][shana@zju.edu.cn] *
+[external][shana][shana@zju.edu.cn] * You should have received a copy of the GNU General Public License
+[external][shana][shana@zju.edu.cn] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][shana][shana@zju.edu.cn] *
+[external][shana][shana@zju.edu.cn] * Copyright (C) 2021 LSPosed Contributors
+[external][shana][shana@zju.edu.cn] */
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]package org.lsposed.manager.ui.fragment;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import android.app.Dialog;
+[external][shana][shana@zju.edu.cn]import android.os.Bundle;
+[external][shana][shana@zju.edu.cn]import android.view.LayoutInflater;
+[external][shana][shana@zju.edu.cn]import android.view.View;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import androidx.annotation.NonNull;
+[external][shana][shana@zju.edu.cn]import androidx.annotation.Nullable;
+[external][shana][shana@zju.edu.cn]import androidx.appcompat.app.AppCompatDialogFragment;
+[external][shana][shana@zju.edu.cn]import androidx.recyclerview.widget.LinearLayoutManager;
+[external][shana][shana@zju.edu.cn]import androidx.recyclerview.widget.RecyclerView;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import org.lsposed.lspd.models.UserInfo;
+[external][shana][shana@zju.edu.cn]import org.lsposed.manager.R;
+[external][shana][shana@zju.edu.cn]import org.lsposed.manager.databinding.DialogTitleBinding;
+[external][shana][shana@zju.edu.cn]import org.lsposed.manager.databinding.SwiperefreshRecyclerviewBinding;
+[external][shana][shana@zju.edu.cn]import org.lsposed.manager.ui.dialog.BlurBehindDialogBuilder;
+[external][shana][shana@zju.edu.cn]import org.lsposed.manager.util.ModuleUtil;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public class RecyclerViewDialogFragment extends AppCompatDialogFragment {
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    @NonNull
+[external][shana][shana@zju.edu.cn]    public Dialog onCreateDialog(Bundle savedInstanceState) {
+[external][shana][shana@zju.edu.cn]        var parent = getParentFragment();
+[external][shana][shana@zju.edu.cn]        var arguments = getArguments();
+[external][shana][shana@zju.edu.cn]        if (!(parent instanceof ModulesFragment) || arguments == null) {
+[external][shana][shana@zju.edu.cn]            throw new IllegalStateException();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        var modulesFragment = (ModulesFragment) parent;
+[external][shana][shana@zju.edu.cn]        var user = (UserInfo) arguments.getParcelable("userInfo");
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        var pickAdaptor = modulesFragment.createPickModuleAdapter(user);
+[external][shana][shana@zju.edu.cn]        var binding = SwiperefreshRecyclerviewBinding.inflate(LayoutInflater.from(requireActivity()), null, false);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        binding.recyclerView.setAdapter(pickAdaptor);
+[external][shana][shana@zju.edu.cn]        binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireActivity()));
+[external][shana][shana@zju.edu.cn]        pickAdaptor.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+[external][shana][shana@zju.edu.cn]            @Override
+[external][shana][shana@zju.edu.cn]            public void onChanged() {
+[external][shana][shana@zju.edu.cn]                binding.swipeRefreshLayout.setRefreshing(!pickAdaptor.isLoaded());
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        });
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        binding.swipeRefreshLayout.setProgressViewEndTarget(true, binding.swipeRefreshLayout.getProgressViewEndOffset());
+[external][shana][shana@zju.edu.cn]        binding.swipeRefreshLayout.setOnRefreshListener(pickAdaptor::fullRefresh);
+[external][shana][shana@zju.edu.cn]        pickAdaptor.refresh();
+[external][shana][shana@zju.edu.cn]        var title = DialogTitleBinding.inflate(getLayoutInflater()).getRoot();
+[external][shana][shana@zju.edu.cn]        title.setText(getString(R.string.install_to_user, user.name));
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        var dialog = new BlurBehindDialogBuilder(requireActivity(), R.style.ThemeOverlay_MaterialAlertDialog_FullWidthButtons)
+[external][shana][shana@zju.edu.cn]                .setCustomTitle(title)
+[external][shana][shana@zju.edu.cn]                .setView(binding.getRoot())
+[external][shana][shana@zju.edu.cn]                .setNegativeButton(android.R.string.cancel, null)
+[external][shana][shana@zju.edu.cn]                .create();
+[external][shana][shana@zju.edu.cn]        title.setOnClickListener(s -> binding.recyclerView.smoothScrollToPosition(0));
+[external][shana][shana@zju.edu.cn]        pickAdaptor.setOnPickListener(picked -> {
+[external][shana][shana@zju.edu.cn]            var module = (ModuleUtil.InstalledModule) picked.getTag();
+[external][shana][shana@zju.edu.cn]            modulesFragment.installModuleToUser(module, user);
+[external][shana][shana@zju.edu.cn]            dialog.dismiss();
+[external][shana][shana@zju.edu.cn]        });
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        onViewCreated(binding.getRoot(), savedInstanceState);
+[external][shana][shana@zju.edu.cn]        return dialog;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    // prevent from overriding
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    public final void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+[external][shana][shana@zju.edu.cn]        super.onViewCreated(view, savedInstanceState);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

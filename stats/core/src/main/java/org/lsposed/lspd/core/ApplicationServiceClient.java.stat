@@ -1,0 +1,106 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]package org.lsposed.lspd.core;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import android.os.Bundle;
+[external][shana][shana@zju.edu.cn]import android.os.IBinder;
+[external][shana][shana@zju.edu.cn]import android.os.ParcelFileDescriptor;
+[external][shana][shana@zju.edu.cn]import android.os.RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import androidx.annotation.NonNull;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import org.lsposed.lspd.models.Module;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.lspd.service.ILSPApplicationService;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.lspd.util.Utils;
+[external][shana][shana@zju.edu.cn]
+[external][416810799][416810799@qq.com]import java.util.Collections;
+[internal][vvb2060][vvb2060@gmail.com]import java.util.List;
+[external][416810799][416810799@qq.com]
+[external][shana][shana@zju.edu.cn]public class ApplicationServiceClient implements ILSPApplicationService, IBinder.DeathRecipient {
+[external][shana][shana@zju.edu.cn]    public static ApplicationServiceClient serviceClient = null;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    final ILSPApplicationService service;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    final String processName;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private ApplicationServiceClient(@NonNull ILSPApplicationService service, @NonNull String processName) throws RemoteException {
+[external][shana][shana@zju.edu.cn]        this.service = service;
+[external][shana][shana@zju.edu.cn]        this.processName = processName;
+[external][shana][shana@zju.edu.cn]        this.service.asBinder().linkToDeath(this, 0);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    synchronized static void Init(ILSPApplicationService service, String niceName) {
+[external][shana][shana@zju.edu.cn]        var binder = service.asBinder();
+[external][shana][shana@zju.edu.cn]        if (serviceClient == null && binder != null) {
+[external][shana][shana@zju.edu.cn]            try {
+[external][shana][shana@zju.edu.cn]                serviceClient = new ApplicationServiceClient(service, niceName);
+[external][shana][shana@zju.edu.cn]            } catch (RemoteException e) {
+[external][shana][shana@zju.edu.cn]                Utils.logE("link to death error: ", e);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public List<Module> getLegacyModulesList() {
+[external][shana][shana@zju.edu.cn]        try {
+[external][shana][shana@zju.edu.cn]            return service.getLegacyModulesList();
+[external][shana][shana@zju.edu.cn]        } catch (RemoteException | NullPointerException ignored) {
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return Collections.emptyList();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public List<Module> getModulesList() {
+[external][shana][shana@zju.edu.cn]        try {
+[external][shana][shana@zju.edu.cn]            return service.getModulesList();
+[external][shana][shana@zju.edu.cn]        } catch (RemoteException | NullPointerException ignored) {
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return Collections.emptyList();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public String getPrefsPath(String packageName) {
+[external][shana][shana@zju.edu.cn]        try {
+[external][shana][shana@zju.edu.cn]            return service.getPrefsPath(packageName);
+[external][shana][shana@zju.edu.cn]        } catch (RemoteException | NullPointerException ignored) {
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return null;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public ParcelFileDescriptor requestInjectedManagerBinder(List<IBinder> binder) {
+[external][shana][shana@zju.edu.cn]        try {
+[external][shana][shana@zju.edu.cn]            return service.requestInjectedManagerBinder(binder);
+[external][shana][shana@zju.edu.cn]        } catch (RemoteException | NullPointerException ignored) {
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return null;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public IBinder asBinder() {
+[external][shana][shana@zju.edu.cn]        return service.asBinder();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public void binderDied() {
+[external][shana][shana@zju.edu.cn]        service.asBinder().unlinkToDeath(this, 0);
+[external][shana][shana@zju.edu.cn]        serviceClient = null;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

@@ -1,0 +1,242 @@
+[bot][lsposed][lsposed@lsposed.org]<?xml version="1.0" encoding="utf-8"?>
+[bot][lsposed][lsposed@lsposed.org]<!--
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~ This file is part of LSPosed.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~ LSPosed is free software: you can redistribute it and/or modify
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~ it under the terms of the GNU General Public License as published by
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~ the Free Software Foundation, either version 3 of the License, or
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~ (at your option) any later version.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~ LSPosed is distributed in the hope that it will be useful,
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~ GNU General Public License for more details.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~ You should have received a copy of the GNU General Public License
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~ Copyright (C) 2021 LSPosed Contributors
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  -->
+[bot][lsposed][lsposed@lsposed.org]<resources xmlns:tools="http://schemas.android.com/tools" tools:keep="@string/xposed_module_updated_notification_*,@string/module_is_not_activated_*">
+[bot][lsposed][lsposed@lsposed.org]    <!-- MainActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="overview">Genel bakış</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="Modules">Modüller</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <plurals name="modules_enabled_count">
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        <item quantity="one">%d modül etkin</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="other">%d modüller etkin </item>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    </plurals>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="Logs">Günlükler</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="Settings">Ayarlar</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="feedback_or_suggestion">Geri bildirim veya öneri</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="About">Hakkında</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="report_issue">Hata bildir</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo">Modül deposu</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo_up_to_date">Bütün modüller güncel</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo_published_time">%s yayınlandı</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo_updated_time">%s güncellendi</string>
+[bot][lsposed][lsposed@lsposed.org]    <plurals name="module_repo_upgradable">
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="one">%d modülü güncellenebilir</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="other">%d modülleri güncellenebilir</item>
+[bot][lsposed][lsposed@lsposed.org]    </plurals>
+[bot][lsposed][lsposed@lsposed.org]    <string name="about_view_source_code"><![CDATA[%1$s adresinden kaynak kodu görüntüleyin<br/>%2$s kanalımıza katılın]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="translators" comment="Dear translators, please add your home page here following the format. There can be more than one translator. So feel free to append yourself.">Bedircan AYAYDIN, Furkan KARCIOĞLU, Ahmet AÇIKGÖZ, Sir-C</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install">Yükle</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install_summary">LSPosed\'i yüklemek için dokunun</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="not_installed">Yüklenmedi</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="not_install_summary">LSPosed Kurulu değil</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="activated">Aktif edildi</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="partial_activated">Kısmen etkinleştirildi</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="selinux_policy_not_loaded_summary">SEPolicy düzgün yüklenmemiş</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="selinux_policy_not_loaded"><![CDATA[Bazı özellikler çalışmayacaktır.<br/>Lütfen bunu <a href="https://github.com/topjohnwu/Magisk/issues"><b>Magisk</b></a> geliştiricisine bildirin.]]></string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="system_inject_fail_summary">Sistem Çerçevesi enjeksiyonu başarısız oldu</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_inject_fail"><![CDATA[Bu nadiren yaşanır ve <b>Magisk</b> veya düşük kaliteli modüller yüzünden olabilir.<br/>Lütfen Riru ve LSPosed dışında bütün modülleri devre dışı bırakmayı deneyin veya geliştiricilere tam bir hata kaydı gönderin.]]></string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="system_prop_incorrect_summary">Sistem desteği yanlış</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_prop_incorrect"><![CDATA[Bazı gerekli sistem özellikleri silindi veya değiştirildi.<br/>Modüller zaman zaman düzgün çalışmayabilir.]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="need_update">Güncelleme gerekiyor</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="please_update_summary">Lütfen LSPosed\'in en son sürümünü yükleyin</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="info_api_version">API sürümü</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="info_framework_version">Çerçeve sürümü</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_manager_package_name">Yönetici paket adı</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="info_system_version">Sistem sürümü</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="info_device">Cihaz</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="info_system_abi">Sistem ABI\'si</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_dex2oat_wrapper">Dex Optimize Edici Sarıcısı</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enabled">Etkin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="not_enabled">Etkin değil</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="supported">Desteklenen</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="unsupported">Desteklenmiyor</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="android_version_unsatisfied">Android sürümü tatmin edici değil</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="crashed">çöktü</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="mount_failed">Bağlama başarısız</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="selinux_permissive">SELinux\'a izin verildi</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sepolicy_incorrect">SELinux politikası yanlış</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_lsposed">LSPosed\'ı güncelle</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_lsposed_msg">LSPosed\'ı güncellemek istediğinize emin misiniz? Bu cihaz güncelleme tamamlandıktan sonra yeniden başlatılacak</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_copied">Panoya kopyalandı</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- WelcomeDialog -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="parasitic_welcome">LSPosed\'a hoş geldiniz</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="parasitic_welcome_summary">Parazit yöneticiyi kullanıyorsunuz, bu da kısayol oluşturabileceğinizi veya hala bildirimden açabileceğinizi gösterir.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="parasitic_welcome_summary_no_shortcut_support">Parazit yöneticiyi kullanıyorsunuz ve bu da hala bildirimden açabileceğinizi gösterir.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="create_shortcut">Kısayol oluştur</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="never_show">Asla gösterme</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_welcome">Parazit Yönetici Önerilir</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_welcome_summary">LSPosed tespit edilmeyi önlemek için sistem parazitlemeyi destekliyor, parazit yöneticiyi bildirimden açabilirsiniz. Şu anki uygulamayı kaldırmanız önerilir.</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <!-- LogsActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="menuSaveToSd">Kaydet</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="nav_item_logs_verbose">Ayrıntılı Günlükler</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="nav_item_logs_module">Modül Günlükleri</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_saving">Günlük kaydediliyor, lütfen bekleyin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_saved">Günlükler kaydedildi</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_save_failed2">Kaydedilemedi:\n%s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menuClearLog">Günlüğü şimdi temizle</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_cleared">Günlük başarıyla temizlendi.</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="scroll_top">Yukarı kaydır</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="loading">Yükleniyor…</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="scroll_bottom">Aşağı kaydır</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menuReload">Tekrar yükle</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_clear_failed_2">Günlük temizlenemedi</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_enable_word_wrap">Yeni Satıra Geç</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enabled_verbose_log">Ayrıntılı Günlükler Aktif</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="disabled_verbose_log">Ayrıntılı Günlükler Deaktif</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <!-- ModulesActivity -->
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="module_empty_description">(açıklama yapılmadı)</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_xposed_min_version">Bu modül daha yeni bir Xposed sürümü gerektiriyor (%d) ve bu nedenle etkinleştirilemez</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_target_version_higher">Bu modül daha yeni bir Xposed sürümü (%d) için tasarlanmıştır ve bu nedenle bazı işlevler çalışmayabilir</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="no_min_version_specified">Bu modül, ihtiyaç duyduğu Xposed sürümünü belirtmiyor.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_min_version_too_low">Bu modül Xposed sürümü için oluşturuldu %1$d, ancak sürümdeki uyumsuz değişiklikler nedeniyle %2$d, devre dışı bırakıldı</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_installed_on_external_storage">Bu modül yüklenemiyor çünkü SD kartta yüklü, lütfen dahili depolama birimine taşıyın veya SD kart erişimine izin verin</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="module_uninstall">Kaldır</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="module_settings">Modül ayarları</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="view_in_repo">Repo\'da görüntüle</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstall_message">Bu modülü kaldırmak istiyor musunuz?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstalled">%1$s kaldırıldı</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstall_failed">Kaldırma başarısız</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="add_module_to_user">Kullanıcıya modül ekle</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_installed">Kullanıcıya %1$s eklendi %2$s</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="module_install_failed">Modül eklenemedi</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install_to_user">Kullanıcıya yükle %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install_to_user_message">%2$s kullanıcısına %1$s yüklemek ister misiniz? Elle kurulum yapılması tavsiye edilir, LSPosed ile kurulumu zorlamak sorunlara neden olabilir.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="expand">genişlet</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="collapse">daralt</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <!-- AppListActivity -->
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="compile_speed">Yeniden optimize et</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_speed_msg">Optimize ediliyor…</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="compile_done">Optimizasyon tamamlandı</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="app_launch">Başlat</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="compile_failed">Optimizasyon başarısız oldu: dönüş değeri boş</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="compile_failed_with_info">Optimizasyon başarısız oldu: </string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="sort_by_name">Uygulama Adı</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="sort_by_package_name">Paket ismi</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="sort_by_install_time">Yükleme zamanı</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="sort_by_update_time">Güncelleme zamanı</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_reverse">Ters</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="menu_show_system_apps">Sistem uygulamaları</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_sort">Sıralama</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="enable_module">Modülü etkinleştirin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="no_scope_selected">Herhangi bir uygulama seçmediniz. Devam et?</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="menu_show_games">Oyunlar</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="menu_show_modules">Modüller</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_denylist">Reddetme Listesi</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="failed_to_save_scope_list">Kapsam listesi kaydedilemedi</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_version">Sürüm: %1$s</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="use_recommended">Önerilen</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="no_scope_selected_has_recommended">Herhangi bir uygulama seçmediniz. Önerilen uygulamalar seçilsin mi?</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="use_recommended_message">Önerilen uygulamalar seçilsin mi?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_is_not_activated_yet">Xposed modülü henüz etkinleştirilmedi</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="requested_by_module">Önerilen</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="update_available">Güncelleme uygun: %1$s</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="module_disabled_no_selection">Hiçbir uygulama seçilmediği için %s modülü devre dışı bırakıldı.</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="android_framework">Sistem Çerçevesi</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_backup_and_restore">Yedekleme</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="menu_backup">Yedekleme</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_restore">Geri yükle</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="force_stop">Durmaya zorla</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="force_stop_dlg_title">Zorla durdurulsun mu?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="force_stop_dlg_text">Bir uygulamayı durdurmaya zorlarsanız, hatalı davranabilir.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="reboot_required">Bu değişikliğin geçerli olması için yeniden başlatma gerekiyor</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="reboot">Yeniden başlat</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="menu_hide">Gizle</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="deny_list">%s reddetme listesinde olduğundan hiçbir etkisi olmayacak.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="deny_list_info">Reddetme listesinde</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <!-- ModulesActivity and AppListActivity -->
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="modules_other_app">Diğer uygulamada görüntüle</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="module_app_info">Uygulama bilgisi</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="list_empty">¯\\\\_(ツ)_\/¯\nModül bulunamadı</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <!-- SettingsActivity -->
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="settings_group_framework">Çerçeve</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_disable_verbose_log">Ayrıntılı günlükleri devre dışı bırak</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_disable_verbose_log_summary">Ayrıntılı günlükleri dahil etme isteğini raporlayın</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="pure_black_dark_theme">Siyah koyu tema</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="pure_black_dark_theme_summary">Koyu tema etkinse saf siyah temayı kullanın</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="settings_group_theme">Tema</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup_and_restore">Yedekle</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup_summery">Modül ve kapsam listelerini yedekle.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_restore_summery">Modül ve kapsam listelerini geri yükle.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup">Yedek</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup_failed2">Yedekleme başarısız oldu:\n%s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enable_documentui">Lütfen DocumentUI\'yi etkinleştirin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_restore">Geri yükle</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_restore_failed2">Geri yüklenemedi:\n%s</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="group_network">Ağ</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="dns_over_http">HTTPS üzerinden DNS</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="dns_over_http_summary">Bazı ülkelerde DNS zehirlenmesi için geçici çözümdür</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="theme_color">Tema rengi</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="theme_color_system">Sistem tema rengi</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_show_hidden_icon_apps_enabled">Uygulamaları başlatıcı simgelerini göstermeye zorla</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_show_hidden_icon_apps_enabled_summary">Android 10\'dan sonra, uygulamaların başlatıcı simgelerini gizlenmesine izin verilmez. Bu sistem özelliğini devre dışı bırakmak için düğmeyi kapatın.</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="settings_group_system">Sistem</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_language">Dil</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_translation_contributors">Çeviri katılımcıları</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_translation">Çeviriye katılın</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_translation_summary">%s yazılımını çevirmemize yardım edin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_create_shortcut_summary">Parazit yöneticiyi açmak için bir kısayol oluşturun</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_shortcut_pinned_hint">Ayarlar_kestirme_sabitlenmis</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_unsupported_pin_shortcut_summary">Geçerli varsayılan başlatıcı, pin kısayollarını desteklemiyor</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_enable_status_notification">Durum Bildirimi</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_enable_status_notification_summary">Parazit yöneticiyi açabilmek için bir bildirim göster</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="disable_status_notification_error">Kısayol yok, bildirim devre dışı bırakılamaz</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_update_channel">Güncelleme kanalı</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_channel_stable">Stabil</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_channel_bate">Beta</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_channel_nightly">Gecelik</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_xposed_api_call_protection">Xposed API çağrı koruması</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_xposed_api_call_protection_summary">Xposed API kullanmak için dinamik olarak yüklenen modül kodunu engelleyin, bu bazı modülleri bozabilir ancak güvenliğe faydalı da olabilir</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <!-- Module Repo -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_readme">Beni oku</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="module_releases">Sürümler</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="module_information">Bilgi</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="module_information_homepage">Ana Sayfa</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="module_information_source_url">Kaynak kodu</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_information_collaborators">Ortak çalışanlar</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_release_view_assets">Dosyalar</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="menu_open_in_browser">Tarayıcıda aç</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="module_release_load_more">Eski sürümleri göster</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="module_release_no_more">Daha fazla sürüm yok</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="repo_load_failed">Modül deposu yüklenemedi: %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_upgradable_first">Önce yükseltilebilir</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="installed">Kurulmuş</string>
+[bot][lsposed][lsposed@lsposed.org]    <plurals name="module_release_assets_download_count">
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="one">%d İndir</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="other">%d indirmeler</item>
+[bot][lsposed][lsposed@lsposed.org]    </plurals>
+[bot][lsposed][lsposed@lsposed.org]    <!-- Colors -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_sakura">sakura</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_red">Kırmızı</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_pink">Pembe</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_purple">Mor</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_deep_purple">Koyu mor</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_indigo">Çivit</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_blue">Mavi</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_light_blue">Açık mavi</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_cyan">Cam göbeği</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_teal">Turkuaz</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_green">Yeşil</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_light_green">Açık yeşil</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_lime">Limon</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_yellow">Sarı</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_amber">Kehribar</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_orange">Turuncu</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_deep_orange">Koyu turuncu</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_brown">Kahverengi</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_blue_grey">Mavi gri</string>
+[bot][lsposed][lsposed@lsposed.org]</resources>

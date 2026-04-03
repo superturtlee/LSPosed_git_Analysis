@@ -1,0 +1,129 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]<!--
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  -->
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    xmlns:app="http://schemas.android.com/apk/res-auto"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    xmlns:tools="http://schemas.android.com/tools"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    android:layout_width="match_parent"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    android:layout_height="wrap_content"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    android:background="?selectableItemBackground"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    android:clickable="true"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    android:focusable="true"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    android:minHeight="?attr/listPreferredItemHeight"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    android:paddingVertical="16dp"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    android:paddingStart="16dp"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    android:paddingEnd="24dp">
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    <androidx.constraintlayout.widget.ConstraintLayout
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        android:id="@+id/item_root"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        android:layout_width="match_parent"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        android:layout_height="wrap_content"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        android:layout_gravity="center">
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]        <com.google.android.material.textview.MaterialTextView
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            android:id="@+id/app_name"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            android:layout_width="wrap_content"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            android:layout_height="wrap_content"
+[external][shana][shana@zju.edu.cn]            android:ellipsize="marquee"
+[internal][vvb2060][vvb2060@gmail.com]            android:maxLines="1"
+[external][shana][shana@zju.edu.cn]            android:scrollbars="none"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            android:textAppearance="?android:attr/textAppearanceListItem"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            android:textSize="16sp"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            app:layout_constrainedWidth="true"
+[internal][vvb2060][vvb2060@gmail.com]            app:layout_constraintBottom_toBottomOf="parent"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            app:layout_constraintBottom_toTopOf="@id/app_Package_Name"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            app:layout_constraintStart_toStartOf="parent"
+[internal][vvb2060][vvb2060@gmail.com]            app:layout_constraintTop_toTopOf="parent"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            app:layout_constraintWidth_max="wrap"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            tools:text="@tools:sample/lorem" />
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        <com.google.android.material.textview.MaterialTextView
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            android:id="@+id/app_Package_Name"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            android:layout_width="wrap_content"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            android:layout_height="wrap_content"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            android:ellipsize="marquee"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            android:maxLines="1"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            android:scrollbars="none"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            android:textAppearance="?android:attr/textAppearanceSmall"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            app:layout_constrainedWidth="true"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            app:layout_constraintBottom_toTopOf="@id/description"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            app:layout_constraintEnd_toEndOf="parent"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            app:layout_constraintHorizontal_bias="0.0"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            app:layout_constraintStart_toStartOf="parent"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            app:layout_constraintTop_toBottomOf="@id/app_name"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            app:layout_constraintWidth_max="wrap"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            tools:text="@tools:sample/lorem" />
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]        <org.lsposed.manager.ui.widget.ExpandableTextView
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            android:id="@+id/description"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            android:layout_width="wrap_content"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            android:layout_height="wrap_content"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            android:layout_gravity="center_vertical"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            android:hyphenationFrequency="fullFast"
+[internal][vvb2060][vvb2060@gmail.com]            android:maxLines="6"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            android:minHeight="48dp"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            android:scrollbars="none"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            android:textAlignment="viewStart"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            android:textAppearance="?android:attr/textAppearanceSmall"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            app:layout_constrainedWidth="true"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            app:layout_constraintBottom_toTopOf="@id/hint"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            app:layout_constraintEnd_toEndOf="parent"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            app:layout_constraintHorizontal_bias="0.0"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            app:layout_constraintStart_toStartOf="parent"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            app:layout_constraintTop_toBottomOf="@id/app_Package_Name"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            app:layout_constraintWidth_max="wrap"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            tools:ignore="RtlCompat"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            tools:text="A very very very very very very very very very very very very \n long string" />
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]        <com.google.android.material.textview.MaterialTextView
+[external][shana][shana@zju.edu.cn]            android:id="@+id/hint"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            android:layout_width="wrap_content"
+[external][shana][shana@zju.edu.cn]            android:layout_height="wrap_content"
+[external][shana][shana@zju.edu.cn]            android:layout_gravity="center_vertical"
+[external][shana][shana@zju.edu.cn]            android:textAppearance="?android:attr/textAppearanceListItemSecondary"
+[external][shana][shana@zju.edu.cn]            android:textColor="?android:attr/textColorPrimary"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            app:layout_constrainedWidth="true"
+[external][tigerbeanst][3889846+TigerBeanst@users.noreply.github.com]            app:layout_constraintBottom_toTopOf="@id/published_Time"
+[external][shana][shana@zju.edu.cn]            app:layout_constraintEnd_toEndOf="parent"
+[external][shana][shana@zju.edu.cn]            app:layout_constraintHorizontal_bias="0.0"
+[external][shana][shana@zju.edu.cn]            app:layout_constraintStart_toStartOf="parent"
+[external][shana][shana@zju.edu.cn]            app:layout_constraintTop_toBottomOf="@id/description"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            app:layout_constraintWidth_max="wrap"
+[external][shana][shana@zju.edu.cn]            tools:text="@tools:sample/lorem" />
+[external][shana][shana@zju.edu.cn]
+[external][tigerbeanst][3889846+TigerBeanst@users.noreply.github.com]        <com.google.android.material.textview.MaterialTextView
+[external][tigerbeanst][3889846+TigerBeanst@users.noreply.github.com]            android:id="@+id/published_Time"
+[external][tigerbeanst][3889846+TigerBeanst@users.noreply.github.com]            android:layout_width="wrap_content"
+[external][tigerbeanst][3889846+TigerBeanst@users.noreply.github.com]            android:layout_height="wrap_content"
+[external][tigerbeanst][3889846+TigerBeanst@users.noreply.github.com]            android:layout_gravity="center_vertical"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            android:layout_marginTop="2dp"
+[external][tigerbeanst][3889846+TigerBeanst@users.noreply.github.com]            android:textAppearance="?android:attr/textAppearanceSmall"
+[external][tigerbeanst][3889846+TigerBeanst@users.noreply.github.com]            android:textSize="12sp"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            app:layout_constrainedWidth="true"
+[external][tigerbeanst][3889846+TigerBeanst@users.noreply.github.com]            app:layout_constraintBottom_toBottomOf="parent"
+[external][tigerbeanst][3889846+TigerBeanst@users.noreply.github.com]            app:layout_constraintEnd_toEndOf="parent"
+[external][tigerbeanst][3889846+TigerBeanst@users.noreply.github.com]            app:layout_constraintHorizontal_bias="0.0"
+[external][tigerbeanst][3889846+TigerBeanst@users.noreply.github.com]            app:layout_constraintStart_toStartOf="parent"
+[external][tigerbeanst][3889846+TigerBeanst@users.noreply.github.com]            app:layout_constraintTop_toBottomOf="@id/hint"
+[external][tigerbeanst][3889846+TigerBeanst@users.noreply.github.com]            app:layout_constraintWidth_max="wrap"
+[external][tigerbeanst][3889846+TigerBeanst@users.noreply.github.com]            tools:text="@tools:sample/lorem" />
+[external][tigerbeanst][3889846+TigerBeanst@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    </androidx.constraintlayout.widget.ConstraintLayout>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]</FrameLayout>

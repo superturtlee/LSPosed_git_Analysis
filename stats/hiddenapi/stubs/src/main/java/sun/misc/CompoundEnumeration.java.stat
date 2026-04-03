@@ -1,0 +1,34 @@
+[internal][vvb2060][vvb2060@gmail.com]package sun.misc;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import java.util.Enumeration;
+[internal][vvb2060][vvb2060@gmail.com]import java.util.NoSuchElementException;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]public class CompoundEnumeration<E> implements Enumeration<E> {
+[internal][vvb2060][vvb2060@gmail.com]    private final Enumeration<E>[] enums;
+[internal][vvb2060][vvb2060@gmail.com]    private int index = 0;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    public CompoundEnumeration(Enumeration<E>[] enums) {
+[internal][vvb2060][vvb2060@gmail.com]        this.enums = enums;
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    private boolean next() {
+[internal][vvb2060][vvb2060@gmail.com]        while (index < enums.length) {
+[internal][vvb2060][vvb2060@gmail.com]            if (enums[index] != null && enums[index].hasMoreElements()) {
+[internal][vvb2060][vvb2060@gmail.com]                return true;
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]            index++;
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]        return false;
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    public boolean hasMoreElements() {
+[internal][vvb2060][vvb2060@gmail.com]        return next();
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    public E nextElement() {
+[internal][vvb2060][vvb2060@gmail.com]        if (!next()) {
+[internal][vvb2060][vvb2060@gmail.com]            throw new NoSuchElementException();
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]        return enums[index].nextElement();
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]}

@@ -1,0 +1,22 @@
+[external][shana][shana@zju.edu.cn]package android.app;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import android.content.ComponentName;
+[external][shana][shana@zju.edu.cn]import android.os.Binder;
+[external][shana][shana@zju.edu.cn]import android.os.IBinder;
+[external][shana][shana@zju.edu.cn]import android.os.IInterface;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public interface IServiceConnection extends IInterface {
+[external][shana][shana@zju.edu.cn]    void connected(ComponentName name, IBinder service, boolean dead);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    abstract class Stub extends Binder implements IServiceConnection {
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        public static IServiceConnection asInterface(IBinder obj) {
+[external][shana][shana@zju.edu.cn]            throw new UnsupportedOperationException();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public IBinder asBinder() {
+[external][shana][shana@zju.edu.cn]            throw new UnsupportedOperationException();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

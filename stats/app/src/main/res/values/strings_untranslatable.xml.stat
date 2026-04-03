@@ -1,0 +1,25 @@
+[external][416810799][416810799@qq.com]<!--
+[external][416810799][416810799@qq.com]  ~ This file is part of LSPosed.
+[external][416810799][416810799@qq.com]  ~
+[external][416810799][416810799@qq.com]  ~ LSPosed is free software: you can redistribute it and/or modify
+[external][416810799][416810799@qq.com]  ~ it under the terms of the GNU General Public License as published by
+[external][416810799][416810799@qq.com]  ~ the Free Software Foundation, either version 3 of the License, or
+[external][416810799][416810799@qq.com]  ~ (at your option) any later version.
+[external][416810799][416810799@qq.com]  ~
+[external][416810799][416810799@qq.com]  ~ LSPosed is distributed in the hope that it will be useful,
+[external][416810799][416810799@qq.com]  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][416810799][416810799@qq.com]  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][416810799][416810799@qq.com]  ~ GNU General Public License for more details.
+[external][416810799][416810799@qq.com]  ~
+[external][416810799][416810799@qq.com]  ~ You should have received a copy of the GNU General Public License
+[external][416810799][416810799@qq.com]  ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][416810799][416810799@qq.com]  ~
+[external][416810799][416810799@qq.com]  ~ Copyright (C) 2021 LSPosed Contributors
+[external][416810799][416810799@qq.com]  -->
+[external][416810799][416810799@qq.com]
+[external][shana][shana@zju.edu.cn]<resources>
+[external][416810799][416810799@qq.com]    <string name="app_name" translatable="false">LSPosed</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="install_url" translatable="false">https://github.com/LSPosed/LSPosed#install</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="latest_url" translatable="false">https://github.com/LSPosed/LSPosed/releases/latest</string>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <string name="settings_group_repo" translatable="false">@string/module_repo</string>
+[external][416810799][416810799@qq.com]</resources>

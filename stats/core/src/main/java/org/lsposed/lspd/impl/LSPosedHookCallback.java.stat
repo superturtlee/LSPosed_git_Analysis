@@ -1,0 +1,94 @@
+[external][noreply][noreply@nullptr.icu]package org.lsposed.lspd.impl;
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]import androidx.annotation.NonNull;
+[external][noreply][noreply@nullptr.icu]import androidx.annotation.Nullable;
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]import java.lang.reflect.Executable;
+[external][noreply][noreply@nullptr.icu]import java.lang.reflect.Member;
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]import io.github.libxposed.api.XposedInterface;
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]public class LSPosedHookCallback<T extends Executable> implements XposedInterface.BeforeHookCallback, XposedInterface.AfterHookCallback {
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]    public Member method;
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]    public Object thisObject;
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]    public Object[] args;
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]    public Object result;
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]    public Throwable throwable;
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]    public boolean isSkipped;
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]    public LSPosedHookCallback() {
+[external][noreply][noreply@nullptr.icu]    }
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]    // Both before and after
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]    @NonNull
+[external][noreply][noreply@nullptr.icu]    @Override
+[external][noreply][noreply@nullptr.icu]    public Member getMember() {
+[external][noreply][noreply@nullptr.icu]        return this.method;
+[external][noreply][noreply@nullptr.icu]    }
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]    @Nullable
+[external][noreply][noreply@nullptr.icu]    @Override
+[external][noreply][noreply@nullptr.icu]    public Object getThisObject() {
+[external][noreply][noreply@nullptr.icu]        return this.thisObject;
+[external][noreply][noreply@nullptr.icu]    }
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]    @NonNull
+[external][noreply][noreply@nullptr.icu]    @Override
+[external][noreply][noreply@nullptr.icu]    public Object[] getArgs() {
+[external][noreply][noreply@nullptr.icu]        return this.args;
+[external][noreply][noreply@nullptr.icu]    }
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]    // Before
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]    @Override
+[external][noreply][noreply@nullptr.icu]    public void returnAndSkip(@Nullable Object result) {
+[external][noreply][noreply@nullptr.icu]        this.result = result;
+[external][noreply][noreply@nullptr.icu]        this.throwable = null;
+[external][noreply][noreply@nullptr.icu]        this.isSkipped = true;
+[external][noreply][noreply@nullptr.icu]    }
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]    @Override
+[external][noreply][noreply@nullptr.icu]    public void throwAndSkip(@Nullable Throwable throwable) {
+[external][noreply][noreply@nullptr.icu]        this.result = null;
+[external][noreply][noreply@nullptr.icu]        this.throwable = throwable;
+[external][noreply][noreply@nullptr.icu]        this.isSkipped = true;
+[external][noreply][noreply@nullptr.icu]    }
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]    // After
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]    @Nullable
+[external][noreply][noreply@nullptr.icu]    @Override
+[external][noreply][noreply@nullptr.icu]    public Object getResult() {
+[external][noreply][noreply@nullptr.icu]        return this.result;
+[external][noreply][noreply@nullptr.icu]    }
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]    @Nullable
+[external][noreply][noreply@nullptr.icu]    @Override
+[external][noreply][noreply@nullptr.icu]    public Throwable getThrowable() {
+[external][noreply][noreply@nullptr.icu]        return this.throwable;
+[external][noreply][noreply@nullptr.icu]    }
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]    @Override
+[external][noreply][noreply@nullptr.icu]    public boolean isSkipped() {
+[external][noreply][noreply@nullptr.icu]        return this.isSkipped;
+[external][noreply][noreply@nullptr.icu]    }
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]    @Override
+[external][noreply][noreply@nullptr.icu]    public void setResult(@Nullable Object result) {
+[external][noreply][noreply@nullptr.icu]        this.result = result;
+[external][noreply][noreply@nullptr.icu]        this.throwable = null;
+[external][noreply][noreply@nullptr.icu]    }
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]    @Override
+[external][noreply][noreply@nullptr.icu]    public void setThrowable(@Nullable Throwable throwable) {
+[external][noreply][noreply@nullptr.icu]        this.result = null;
+[external][noreply][noreply@nullptr.icu]        this.throwable = throwable;
+[external][noreply][noreply@nullptr.icu]    }
+[external][noreply][noreply@nullptr.icu]}

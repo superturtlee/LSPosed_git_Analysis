@@ -1,0 +1,54 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]<?xml version="1.0" encoding="utf-8"?><!--
+[external][shana][shana@zju.edu.cn]      ~ This file is part of LSPosed.
+[external][shana][shana@zju.edu.cn]      ~
+[external][shana][shana@zju.edu.cn]      ~ LSPosed is free software: you can redistribute it and/or modify
+[external][shana][shana@zju.edu.cn]      ~ it under the terms of the GNU General Public License as published by
+[external][shana][shana@zju.edu.cn]      ~ the Free Software Foundation, either version 3 of the License, or
+[external][shana][shana@zju.edu.cn]      ~ (at your option) any later version.
+[external][shana][shana@zju.edu.cn]      ~
+[external][shana][shana@zju.edu.cn]      ~ LSPosed is distributed in the hope that it will be useful,
+[external][shana][shana@zju.edu.cn]      ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][shana][shana@zju.edu.cn]      ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][shana][shana@zju.edu.cn]      ~ GNU General Public License for more details.
+[external][shana][shana@zju.edu.cn]      ~
+[external][shana][shana@zju.edu.cn]      ~ You should have received a copy of the GNU General Public License
+[external][shana][shana@zju.edu.cn]      ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][shana][shana@zju.edu.cn]      ~
+[external][shana][shana@zju.edu.cn]      ~ Copyright (C) 2021 LSPosed Contributors
+[external][shana][shana@zju.edu.cn]      -->
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    xmlns:app="http://schemas.android.com/apk/res-auto"
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    android:layout_width="match_parent"
+[external][shana][shana@zju.edu.cn]    android:layout_height="match_parent"
+[external][shana][shana@zju.edu.cn]    app:edgeToEdge="true">
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    <androidx.constraintlayout.widget.ConstraintLayout
+[external][shana][shana@zju.edu.cn]        android:id="@+id/container"
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        android:layout_width="match_parent"
+[external][shana][shana@zju.edu.cn]        android:layout_height="match_parent">
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        <androidx.fragment.app.FragmentContainerView
+[external][shana][shana@zju.edu.cn]            android:id="@+id/nav_host_fragment"
+[external][shana][shana@zju.edu.cn]            android:name="androidx.navigation.fragment.NavHostFragment"
+[external][shana][shana@zju.edu.cn]            android:layout_width="match_parent"
+[external][shana][shana@zju.edu.cn]            android:layout_height="0dp"
+[external][shana][shana@zju.edu.cn]            android:background="?android:colorBackground"
+[external][shana][shana@zju.edu.cn]            app:defaultNavHost="true"
+[external][shana][shana@zju.edu.cn]            app:layout_constraintBottom_toTopOf="@id/nav"
+[external][shana][shana@zju.edu.cn]            app:layout_constraintStart_toStartOf="parent"
+[external][shana][shana@zju.edu.cn]            app:layout_constraintEnd_toEndOf="parent"
+[external][shana][shana@zju.edu.cn]            app:layout_constraintTop_toTopOf="parent"
+[external][shana][shana@zju.edu.cn]            app:navGraph="@navigation/main_nav" />
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        <com.google.android.material.bottomnavigation.BottomNavigationView
+[external][shana][shana@zju.edu.cn]            android:id="@+id/nav"
+[external][shana][shana@zju.edu.cn]            android:layout_width="match_parent"
+[external][shana][shana@zju.edu.cn]            android:layout_height="wrap_content"
+[external][shana][shana@zju.edu.cn]            app:fitsSystemWindowsInsets="bottom"
+[external][shana][shana@zju.edu.cn]            app:layout_constraintBottom_toBottomOf="parent"
+[external][shana][shana@zju.edu.cn]            app:layout_constraintStart_toStartOf="parent"
+[external][shana][shana@zju.edu.cn]            app:layout_constraintEnd_toEndOf="parent"
+[external][shana][shana@zju.edu.cn]            app:menu="@menu/navigation_menu" />
+[external][shana][shana@zju.edu.cn]    </androidx.constraintlayout.widget.ConstraintLayout>
+[external][shana][shana@zju.edu.cn]</androidx.coordinatorlayout.widget.CoordinatorLayout>

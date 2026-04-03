@@ -1,0 +1,28 @@
+[external][hsushulong][hsushulong@gmail.com]package android.os;
+[external][hsushulong][hsushulong@gmail.com]
+[external][shana][shana@zju.edu.cn]import android.annotation.Nullable;
+[external][shana][shana@zju.edu.cn]
+[external][hsushulong][hsushulong@gmail.com]public class ServiceManager {
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Returns a reference to a service with the given name.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @param name the name of the service to get
+[external][shana][shana@zju.edu.cn]     * @return a reference to the service, or <code>null</code> if the service doesn't exist
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    @Nullable
+[external][shana][shana@zju.edu.cn]    public static IBinder getService(String name) {
+[external][shana][shana@zju.edu.cn]        throw new RuntimeException("STUB");
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Place a new @a service called @a name into the service
+[external][shana][shana@zju.edu.cn]     * manager.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @param name the name of the new service
+[external][shana][shana@zju.edu.cn]     * @param service the service object
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public static void addService(String name, IBinder service) {
+[external][shana][shana@zju.edu.cn]        throw new RuntimeException("STUB");
+[external][shana][shana@zju.edu.cn]    }
+[external][hsushulong][hsushulong@gmail.com]}

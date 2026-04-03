@@ -1,0 +1,173 @@
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]/*
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * This file is part of LSPosed.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] *
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * (at your option) any later version.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] *
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * GNU General Public License for more details.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] *
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] *
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * Copyright (C) 2022 LSPosed Contributors
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] */
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.manager.util;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import android.annotation.SuppressLint;
+[internal][vvb2060][vvb2060@gmail.com]import android.app.PendingIntent;
+[internal][vvb2060][vvb2060@gmail.com]import android.content.BroadcastReceiver;
+[internal][vvb2060][vvb2060@gmail.com]import android.content.ComponentName;
+[internal][vvb2060][vvb2060@gmail.com]import android.content.Context;
+[internal][vvb2060][vvb2060@gmail.com]import android.content.Intent;
+[internal][vvb2060][vvb2060@gmail.com]import android.content.IntentFilter;
+[internal][vvb2060][vvb2060@gmail.com]import android.content.IntentSender;
+[internal][vvb2060][vvb2060@gmail.com]import android.content.pm.PackageManager;
+[internal][vvb2060][vvb2060@gmail.com]import android.content.pm.ShortcutInfo;
+[internal][vvb2060][vvb2060@gmail.com]import android.content.pm.ShortcutManager;
+[internal][vvb2060][vvb2060@gmail.com]import android.graphics.Bitmap;
+[internal][vvb2060][vvb2060@gmail.com]import android.graphics.Canvas;
+[internal][vvb2060][vvb2060@gmail.com]import android.graphics.drawable.AdaptiveIconDrawable;
+[internal][vvb2060][vvb2060@gmail.com]import android.graphics.drawable.BitmapDrawable;
+[internal][vvb2060][vvb2060@gmail.com]import android.graphics.drawable.Drawable;
+[internal][vvb2060][vvb2060@gmail.com]import android.graphics.drawable.Icon;
+[internal][vvb2060][vvb2060@gmail.com]import android.graphics.drawable.LayerDrawable;
+[internal][vvb2060][vvb2060@gmail.com]import android.os.Build;
+[external][howardwu20][HowardWu20@outlook.com]
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.App;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.R;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import java.util.ArrayList;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import java.util.List;
+[internal][vvb2060][vvb2060@gmail.com]import java.util.UUID;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]public class ShortcutUtil {
+[internal][vvb2060][vvb2060@gmail.com]    private static final String SHORTCUT_ID = "org.lsposed.manager.shortcut";
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    private static Bitmap getBitmap(Context context, int id) {
+[internal][vvb2060][vvb2060@gmail.com]        var r = context.getResources();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        var res = r.getDrawable(id, context.getTheme());
+[internal][vvb2060][vvb2060@gmail.com]        if (res instanceof BitmapDrawable) {
+[internal][vvb2060][vvb2060@gmail.com]            return ((BitmapDrawable) res).getBitmap();
+[internal][vvb2060][vvb2060@gmail.com]        } else {
+[internal][vvb2060][vvb2060@gmail.com]            if (res instanceof AdaptiveIconDrawable) {
+[internal][vvb2060][vvb2060@gmail.com]                var layers = new Drawable[]{((AdaptiveIconDrawable) res).getBackground(),
+[internal][vvb2060][vvb2060@gmail.com]                        ((AdaptiveIconDrawable) res).getForeground()};
+[internal][vvb2060][vvb2060@gmail.com]                res = new LayerDrawable(layers);
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]            var bitmap = Bitmap.createBitmap(res.getIntrinsicWidth(),
+[internal][vvb2060][vvb2060@gmail.com]                    res.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+[internal][vvb2060][vvb2060@gmail.com]            var canvas = new Canvas(bitmap);
+[internal][vvb2060][vvb2060@gmail.com]            res.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+[internal][vvb2060][vvb2060@gmail.com]            res.draw(canvas);
+[internal][vvb2060][vvb2060@gmail.com]            return bitmap;
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    private static Intent getLaunchIntent(Context context) {
+[internal][vvb2060][vvb2060@gmail.com]        var pm = context.getPackageManager();
+[internal][vvb2060][vvb2060@gmail.com]        var pkg = context.getPackageName();
+[internal][vvb2060][vvb2060@gmail.com]        var intent = pm.getLaunchIntentForPackage(pkg);
+[internal][vvb2060][vvb2060@gmail.com]        if (intent == null) {
+[internal][vvb2060][vvb2060@gmail.com]            try {
+[internal][vvb2060][vvb2060@gmail.com]                var pkgInfo = pm.getPackageInfo(pkg, PackageManager.GET_ACTIVITIES);
+[internal][vvb2060][vvb2060@gmail.com]                if (pkgInfo.activities != null) {
+[internal][vvb2060][vvb2060@gmail.com]                    for (var activityInfo : pkgInfo.activities) {
+[internal][vvb2060][vvb2060@gmail.com]                        if (activityInfo.processName.equals(activityInfo.packageName)) {
+[internal][vvb2060][vvb2060@gmail.com]                            intent = new Intent(Intent.ACTION_MAIN);
+[internal][vvb2060][vvb2060@gmail.com]                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+[internal][vvb2060][vvb2060@gmail.com]                            intent.setComponent(new ComponentName(pkg, activityInfo.name));
+[internal][vvb2060][vvb2060@gmail.com]                            break;
+[internal][vvb2060][vvb2060@gmail.com]                        }
+[internal][vvb2060][vvb2060@gmail.com]                    }
+[internal][vvb2060][vvb2060@gmail.com]                }
+[internal][vvb2060][vvb2060@gmail.com]            } catch (PackageManager.NameNotFoundException ignored) {
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]        if (intent != null) {
+[internal][vvb2060][vvb2060@gmail.com]            var categories = intent.getCategories();
+[internal][vvb2060][vvb2060@gmail.com]            if (categories != null) {
+[internal][vvb2060][vvb2060@gmail.com]                categories.clear();
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]            intent.addCategory("org.lsposed.manager.LAUNCH_MANAGER");
+[internal][vvb2060][vvb2060@gmail.com]            intent.setPackage(pkg);
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]        return intent;
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    @SuppressLint("InlinedApi")
+[internal][vvb2060][vvb2060@gmail.com]    private static IntentSender registerReceiver(Context context, Runnable task) {
+[internal][vvb2060][vvb2060@gmail.com]        if (task == null) return null;
+[internal][vvb2060][vvb2060@gmail.com]        var uuid = UUID.randomUUID().toString();
+[internal][vvb2060][vvb2060@gmail.com]        var filter = new IntentFilter(uuid);
+[internal][vvb2060][vvb2060@gmail.com]        var permission = "android.permission.CREATE_USERS";
+[internal][vvb2060][vvb2060@gmail.com]        var receiver = new BroadcastReceiver() {
+[internal][vvb2060][vvb2060@gmail.com]            @Override
+[internal][vvb2060][vvb2060@gmail.com]            public void onReceive(Context c, Intent intent) {
+[internal][vvb2060][vvb2060@gmail.com]                if (!uuid.equals(intent.getAction())) return;
+[internal][vvb2060][vvb2060@gmail.com]                context.unregisterReceiver(this);
+[internal][vvb2060][vvb2060@gmail.com]                task.run();
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]        };
+[internal][vvb2060][vvb2060@gmail.com]        context.registerReceiver(receiver, filter, permission,
+[external][howardwu20][HowardWu20@outlook.com]                null/* main thread */, Context.RECEIVER_EXPORTED);
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]        var intent = new Intent(uuid);
+[internal][vvb2060][vvb2060@gmail.com]        int flags = PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE;
+[internal][vvb2060][vvb2060@gmail.com]        return PendingIntent.getBroadcast(context, 0, intent, flags).getIntentSender();
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    private static ShortcutInfo.Builder getShortcutBuilder(Context context) {
+[internal][vvb2060][vvb2060@gmail.com]        var builder = new ShortcutInfo.Builder(context, SHORTCUT_ID)
+[internal][vvb2060][vvb2060@gmail.com]                .setShortLabel(context.getString(R.string.app_name))
+[internal][vvb2060][vvb2060@gmail.com]                .setIntent(getLaunchIntent(context))
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                .setIcon(Icon.createWithAdaptiveBitmap(getBitmap(context,
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        R.drawable.ic_launcher)));
+[internal][vvb2060][vvb2060@gmail.com]        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+[internal][vvb2060][vvb2060@gmail.com]            var activity = new ComponentName(context.getPackageName(),
+[internal][vvb2060][vvb2060@gmail.com]                    "android.app.AppDetailsActivity");
+[internal][vvb2060][vvb2060@gmail.com]            builder.setActivity(activity);
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        return builder;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[external][howardwu20][HowardWu20@outlook.com]    public static boolean isRequestPinShortcutSupported(Context context) throws RuntimeException {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        var sm = context.getSystemService(ShortcutManager.class);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        return sm.isRequestPinShortcutSupported();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    public static boolean requestPinLaunchShortcut(Runnable afterPinned) {
+[external][howardwu20][HowardWu20@outlook.com]        if (!App.isParasitic) throw new RuntimeException();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        var context = App.getInstance();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        var sm = context.getSystemService(ShortcutManager.class);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        if (!sm.isRequestPinShortcutSupported()) return false;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        return sm.requestPinShortcut(getShortcutBuilder(context).build(),
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                registerReceiver(context, afterPinned));
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    public static boolean updateShortcut() {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        if (!isLaunchShortcutPinned()) return false;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        var context = App.getInstance();
+[internal][vvb2060][vvb2060@gmail.com]        var sm = context.getSystemService(ShortcutManager.class);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        List<ShortcutInfo> shortcutInfoList = new ArrayList<>();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        shortcutInfoList.add(getShortcutBuilder(context).build());
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        return sm.updateShortcuts(shortcutInfoList);
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    public static boolean isLaunchShortcutPinned() {
+[internal][vvb2060][vvb2060@gmail.com]        var context = App.getInstance();
+[internal][vvb2060][vvb2060@gmail.com]        var sm = context.getSystemService(ShortcutManager.class);
+[internal][vvb2060][vvb2060@gmail.com]        for (var info : sm.getPinnedShortcuts()) {
+[internal][vvb2060][vvb2060@gmail.com]            if (SHORTCUT_ID.equals(info.getId())) {
+[external][shana][shana@zju.edu.cn]                return true;
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]        }
+[external][shana][shana@zju.edu.cn]        return false;
+[internal][vvb2060][vvb2060@gmail.com]    }
+[external][howardwu20][HowardWu20@outlook.com]
+[internal][vvb2060][vvb2060@gmail.com]}

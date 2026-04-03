@@ -1,0 +1,10 @@
+[external][shana][shana@zju.edu.cn]package android.os;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public interface Parcelable {
+[external][shana][shana@zju.edu.cn]    interface Creator<T>{
+[external][shana][shana@zju.edu.cn]        public T createFromParcel(Parcel source);
+[external][shana][shana@zju.edu.cn]        public T[] newArray(int size);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]    void writeToParcel(Parcel dest, int flags);
+[external][shana][shana@zju.edu.cn]    int describeContents();
+[external][shana][shana@zju.edu.cn]}

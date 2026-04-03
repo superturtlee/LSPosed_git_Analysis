@@ -1,0 +1,1837 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][admin][admin@0x.mk]package de.robv.android.xposed;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]import android.content.res.AssetManager;
+[external][admin][admin@0x.mk]import android.content.res.Resources;
+[external][admin][admin@0x.mk]
+[external][rinorz666][RinOrz666@gmail.com]import androidx.annotation.NonNull;
+[external][rinorz666][RinOrz666@gmail.com]import androidx.annotation.Nullable;
+[external][rinorz666][RinOrz666@gmail.com]
+[external][416810799][416810799@qq.com]import org.apache.commons.lang3.ClassUtils;
+[external][416810799][416810799@qq.com]import org.apache.commons.lang3.reflect.MemberUtilsX;
+[external][416810799][416810799@qq.com]
+[external][admin][admin@0x.mk]import java.io.ByteArrayOutputStream;
+[external][admin][admin@0x.mk]import java.io.FileInputStream;
+[external][admin][admin@0x.mk]import java.io.IOException;
+[external][admin][admin@0x.mk]import java.io.InputStream;
+[external][admin][admin@0x.mk]import java.lang.reflect.Constructor;
+[external][admin][admin@0x.mk]import java.lang.reflect.Field;
+[external][admin][admin@0x.mk]import java.lang.reflect.InvocationTargetException;
+[external][admin][admin@0x.mk]import java.lang.reflect.Member;
+[external][admin][admin@0x.mk]import java.lang.reflect.Method;
+[external][admin][admin@0x.mk]import java.lang.reflect.Modifier;
+[external][admin][admin@0x.mk]import java.math.BigInteger;
+[external][admin][admin@0x.mk]import java.security.MessageDigest;
+[external][admin][admin@0x.mk]import java.security.NoSuchAlgorithmException;
+[external][rinorz666][RinOrz666@gmail.com]import java.util.Arrays;
+[external][admin][admin@0x.mk]import java.util.HashMap;
+[external][admin][admin@0x.mk]import java.util.LinkedList;
+[external][admin][admin@0x.mk]import java.util.List;
+[external][rinorz666][RinOrz666@gmail.com]import java.util.Objects;
+[external][rinorz666][RinOrz666@gmail.com]import java.util.Optional;
+[external][admin][admin@0x.mk]import java.util.WeakHashMap;
+[external][rinorz666][RinOrz666@gmail.com]import java.util.concurrent.ConcurrentHashMap;
+[external][admin][admin@0x.mk]import java.util.concurrent.atomic.AtomicInteger;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]/**
+[external][admin][admin@0x.mk] * Helpers that simplify hooking and calling methods/constructors, getting and settings fields, ...
+[external][admin][admin@0x.mk] */
+[external][admin][admin@0x.mk]public final class XposedHelpers {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private XposedHelpers() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][rinorz666][RinOrz666@gmail.com]    private static final ConcurrentHashMap<MemberCacheKey.Field, Optional<Field>> fieldCache = new ConcurrentHashMap<>();
+[external][rinorz666][RinOrz666@gmail.com]    private static final ConcurrentHashMap<MemberCacheKey.Method, Optional<Method>> methodCache = new ConcurrentHashMap<>();
+[external][rinorz666][RinOrz666@gmail.com]    private static final ConcurrentHashMap<MemberCacheKey.Constructor, Optional<Constructor<?>>> constructorCache = new ConcurrentHashMap<>();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private static final WeakHashMap<Object, HashMap<String, Object>> additionalFields = new WeakHashMap<>();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private static final HashMap<String, ThreadLocal<AtomicInteger>> sMethodDepth = new HashMap<>();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][rinorz666][RinOrz666@gmail.com]    /**
+[external][rinorz666][RinOrz666@gmail.com]     * Note that we use object key instead of string here, because string calculation will lose all
+[external][rinorz666][RinOrz666@gmail.com]     * the benefits of 'HashMap', this is basically the solution of performance traps.
+[external][rinorz666][RinOrz666@gmail.com]     * <p>
+[external][rinorz666][RinOrz666@gmail.com]     * So in fact we only need to use the structural comparison results of the reflection object.
+[external][rinorz666][RinOrz666@gmail.com]     *
+[external][rinorz666][RinOrz666@gmail.com]     * @see <a href="https://github.com/RinOrz/LSPosed/blob/a44e1f1cdf0c5e5ebfaface828e5907f5425df1b/benchmark/src/result/ReflectionCacheBenchmark.json">benchmarks for ART</a>
+[external][rinorz666][RinOrz666@gmail.com]     * @see <a href="https://github.com/meowool-catnip/cloak/blob/main/api/src/benchmark/kotlin/com/meowool/cloak/ReflectionObjectAccessTests.kt#L37-L65">benchmarks for JVM</a>
+[external][rinorz666][RinOrz666@gmail.com]     */
+[external][rinorz666][RinOrz666@gmail.com]    private abstract static class MemberCacheKey {
+[external][rinorz666][RinOrz666@gmail.com]        private final int hash;
+[external][rinorz666][RinOrz666@gmail.com]
+[external][rinorz666][RinOrz666@gmail.com]        protected MemberCacheKey(int hash) {
+[external][rinorz666][RinOrz666@gmail.com]            this.hash = hash;
+[external][rinorz666][RinOrz666@gmail.com]        }
+[external][rinorz666][RinOrz666@gmail.com]
+[external][rinorz666][RinOrz666@gmail.com]        @Override
+[external][rinorz666][RinOrz666@gmail.com]        public abstract boolean equals(@Nullable Object obj);
+[external][rinorz666][RinOrz666@gmail.com]
+[external][rinorz666][RinOrz666@gmail.com]        @Override
+[external][rinorz666][RinOrz666@gmail.com]        public final int hashCode() {
+[external][rinorz666][RinOrz666@gmail.com]            return hash;
+[external][rinorz666][RinOrz666@gmail.com]        }
+[external][rinorz666][RinOrz666@gmail.com]
+[external][rinorz666][RinOrz666@gmail.com]        static final class Constructor extends MemberCacheKey {
+[external][rinorz666][RinOrz666@gmail.com]            private final Class<?> clazz;
+[external][rinorz666][RinOrz666@gmail.com]            private final Class<?>[] parameters;
+[external][rinorz666][RinOrz666@gmail.com]            private final boolean isExact;
+[external][rinorz666][RinOrz666@gmail.com]
+[external][rinorz666][RinOrz666@gmail.com]            public Constructor(Class<?> clazz, Class<?>[] parameters, boolean isExact) {
+[external][rinorz666][RinOrz666@gmail.com]                super(31 * Objects.hash(clazz, isExact) + Arrays.hashCode(parameters));
+[external][rinorz666][RinOrz666@gmail.com]                this.clazz = clazz;
+[external][rinorz666][RinOrz666@gmail.com]                this.parameters = parameters;
+[external][rinorz666][RinOrz666@gmail.com]                this.isExact = isExact;
+[external][rinorz666][RinOrz666@gmail.com]            }
+[external][rinorz666][RinOrz666@gmail.com]
+[external][rinorz666][RinOrz666@gmail.com]            @Override
+[external][rinorz666][RinOrz666@gmail.com]            public boolean equals(Object o) {
+[external][rinorz666][RinOrz666@gmail.com]                if (this == o) return true;
+[external][rinorz666][RinOrz666@gmail.com]                if (!(o instanceof Constructor)) return false;
+[external][rinorz666][RinOrz666@gmail.com]                Constructor that = (Constructor) o;
+[external][rinorz666][RinOrz666@gmail.com]                return isExact == that.isExact && Objects.equals(clazz, that.clazz) && Arrays.equals(parameters, that.parameters);
+[external][rinorz666][RinOrz666@gmail.com]            }
+[external][rinorz666][RinOrz666@gmail.com]
+[external][rinorz666][RinOrz666@gmail.com]            @NonNull
+[external][rinorz666][RinOrz666@gmail.com]            @Override
+[external][rinorz666][RinOrz666@gmail.com]            public String toString() {
+[external][rinorz666][RinOrz666@gmail.com]                var str = clazz.getName() + getParametersString(parameters);
+[external][rinorz666][RinOrz666@gmail.com]                if (isExact) {
+[external][rinorz666][RinOrz666@gmail.com]                    return str + "#exact";
+[external][rinorz666][RinOrz666@gmail.com]                } else {
+[external][rinorz666][RinOrz666@gmail.com]                    return str;
+[external][rinorz666][RinOrz666@gmail.com]                }
+[external][rinorz666][RinOrz666@gmail.com]            }
+[external][rinorz666][RinOrz666@gmail.com]        }
+[external][rinorz666][RinOrz666@gmail.com]
+[external][rinorz666][RinOrz666@gmail.com]        static final class Field extends MemberCacheKey {
+[external][rinorz666][RinOrz666@gmail.com]            private final Class<?> clazz;
+[external][rinorz666][RinOrz666@gmail.com]            private final String name;
+[external][rinorz666][RinOrz666@gmail.com]
+[external][rinorz666][RinOrz666@gmail.com]            public Field(Class<?> clazz, String name) {
+[external][rinorz666][RinOrz666@gmail.com]                super(Objects.hash(clazz, name));
+[external][rinorz666][RinOrz666@gmail.com]                this.clazz = clazz;
+[external][rinorz666][RinOrz666@gmail.com]                this.name = name;
+[external][rinorz666][RinOrz666@gmail.com]            }
+[external][rinorz666][RinOrz666@gmail.com]
+[external][rinorz666][RinOrz666@gmail.com]            @Override
+[external][rinorz666][RinOrz666@gmail.com]            public boolean equals(Object o) {
+[external][rinorz666][RinOrz666@gmail.com]                if (this == o) return true;
+[external][rinorz666][RinOrz666@gmail.com]                if (!(o instanceof Field)) return false;
+[external][rinorz666][RinOrz666@gmail.com]                Field field = (Field) o;
+[external][rinorz666][RinOrz666@gmail.com]                return Objects.equals(clazz, field.clazz) && Objects.equals(name, field.name);
+[external][rinorz666][RinOrz666@gmail.com]            }
+[external][rinorz666][RinOrz666@gmail.com]
+[external][rinorz666][RinOrz666@gmail.com]            @NonNull
+[external][rinorz666][RinOrz666@gmail.com]            @Override
+[external][rinorz666][RinOrz666@gmail.com]            public String toString() {
+[external][rinorz666][RinOrz666@gmail.com]                return clazz.getName() + "#" + name;
+[external][rinorz666][RinOrz666@gmail.com]            }
+[external][rinorz666][RinOrz666@gmail.com]        }
+[external][rinorz666][RinOrz666@gmail.com]
+[external][rinorz666][RinOrz666@gmail.com]        static final class Method extends MemberCacheKey {
+[external][rinorz666][RinOrz666@gmail.com]            private final Class<?> clazz;
+[external][rinorz666][RinOrz666@gmail.com]            private final String name;
+[external][rinorz666][RinOrz666@gmail.com]            private final Class<?>[] parameters;
+[external][rinorz666][RinOrz666@gmail.com]            private final boolean isExact;
+[external][rinorz666][RinOrz666@gmail.com]
+[external][rinorz666][RinOrz666@gmail.com]            public Method(Class<?> clazz, String name, Class<?>[] parameters, boolean isExact) {
+[external][rinorz666][RinOrz666@gmail.com]                super(31 * Objects.hash(clazz, name, isExact) + Arrays.hashCode(parameters));
+[external][rinorz666][RinOrz666@gmail.com]                this.clazz = clazz;
+[external][rinorz666][RinOrz666@gmail.com]                this.name = name;
+[external][rinorz666][RinOrz666@gmail.com]                this.parameters = parameters;
+[external][rinorz666][RinOrz666@gmail.com]                this.isExact = isExact;
+[external][rinorz666][RinOrz666@gmail.com]            }
+[external][rinorz666][RinOrz666@gmail.com]
+[external][rinorz666][RinOrz666@gmail.com]            @Override
+[external][rinorz666][RinOrz666@gmail.com]            public boolean equals(Object o) {
+[external][rinorz666][RinOrz666@gmail.com]                if (this == o) return true;
+[external][rinorz666][RinOrz666@gmail.com]                if (!(o instanceof Method)) return false;
+[external][rinorz666][RinOrz666@gmail.com]                Method method = (Method) o;
+[external][rinorz666][RinOrz666@gmail.com]                return isExact == method.isExact && Objects.equals(clazz, method.clazz) && Objects.equals(name, method.name) && Arrays.equals(parameters, method.parameters);
+[external][rinorz666][RinOrz666@gmail.com]            }
+[external][rinorz666][RinOrz666@gmail.com]
+[external][rinorz666][RinOrz666@gmail.com]            @NonNull
+[external][rinorz666][RinOrz666@gmail.com]            @Override
+[external][rinorz666][RinOrz666@gmail.com]            public String toString() {
+[external][rinorz666][RinOrz666@gmail.com]                var str = clazz.getName() + '#' + name + getParametersString(parameters);
+[external][rinorz666][RinOrz666@gmail.com]                if (isExact) {
+[external][rinorz666][RinOrz666@gmail.com]                    return str + "#exact";
+[external][rinorz666][RinOrz666@gmail.com]                } else {
+[external][rinorz666][RinOrz666@gmail.com]                    return str;
+[external][rinorz666][RinOrz666@gmail.com]                }
+[external][rinorz666][RinOrz666@gmail.com]            }
+[external][rinorz666][RinOrz666@gmail.com]        }
+[external][rinorz666][RinOrz666@gmail.com]    }
+[external][rinorz666][RinOrz666@gmail.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Look up a class with the specified class loader.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * <p>There are various allowed syntaxes for the class name, but it's recommended to use one of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * these:
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * <ul>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *   <li>{@code java.lang.String}
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *   <li>{@code java.lang.String[]} (array)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *   <li>{@code android.app.ActivityThread.ResourcesKey}
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *   <li>{@code android.app.ActivityThread$ResourcesKey}
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * </ul>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param className   The class name in one of the formats mentioned above.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param classLoader The class loader, or {@code null} for the boot class loader.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @return A reference to the class.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @throws ClassNotFoundError In case the class was not found.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Class<?> findClass(String className, ClassLoader classLoader) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (classLoader == null)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            classLoader = XposedBridge.BOOTCLASSLOADER;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return ClassUtils.getClass(classLoader, className, false);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (ClassNotFoundException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new ClassNotFoundError(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Look up and return a class if it exists.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Like {@link #findClass}, but doesn't throw an exception if the class doesn't exist.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param className   The class name.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param classLoader The class loader, or {@code null} for the boot class loader.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @return A reference to the class, or {@code null} if it doesn't exist.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Class<?> findClassIfExists(String className, ClassLoader classLoader) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return findClass(className, classLoader);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (ClassNotFoundError e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Look up a field in a class and set it to accessible.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param clazz     The class which either declares or inherits the field.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param fieldName The field name.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @return A reference to the field.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @throws NoSuchFieldError In case the field was not found.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Field findField(Class<?> clazz, String fieldName) {
+[external][rinorz666][RinOrz666@gmail.com]        var key = new MemberCacheKey.Field(clazz, fieldName);
+[external][rinorz666][RinOrz666@gmail.com]
+[external][rinorz666][RinOrz666@gmail.com]        return fieldCache.computeIfAbsent(key, k -> {
+[external][rinorz666][RinOrz666@gmail.com]            try {
+[external][rinorz666][RinOrz666@gmail.com]                Field newField = findFieldRecursiveImpl(k.clazz, k.name);
+[external][rinorz666][RinOrz666@gmail.com]                newField.setAccessible(true);
+[external][rinorz666][RinOrz666@gmail.com]                return Optional.of(newField);
+[external][rinorz666][RinOrz666@gmail.com]            } catch (NoSuchFieldException e) {
+[external][rinorz666][RinOrz666@gmail.com]                return Optional.empty();
+[external][rinorz666][RinOrz666@gmail.com]            }
+[external][rinorz666][RinOrz666@gmail.com]        }).orElseThrow(() -> new NoSuchFieldError(key.toString()));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Look up and return a field if it exists.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Like {@link #findField}, but doesn't throw an exception if the field doesn't exist.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param clazz     The class which either declares or inherits the field.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param fieldName The field name.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @return A reference to the field, or {@code null} if it doesn't exist.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Field findFieldIfExists(Class<?> clazz, String fieldName) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return findField(clazz, fieldName);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (NoSuchFieldError e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private static Field findFieldRecursiveImpl(Class<?> clazz, String fieldName) throws NoSuchFieldException {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return clazz.getDeclaredField(fieldName);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (NoSuchFieldException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            while (true) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                clazz = clazz.getSuperclass();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                if (clazz == null || clazz.equals(Object.class))
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    break;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    return clazz.getDeclaredField(fieldName);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                } catch (NoSuchFieldException ignored) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Returns the first field of the given type in a class.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Might be useful for Proguard'ed classes to identify fields with unique types.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param clazz The class which either declares or inherits the field.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param type  The type of the field.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @return A reference to the first field of the given type.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @throws NoSuchFieldError In case no matching field was not found.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Field findFirstFieldByExactType(Class<?> clazz, Class<?> type) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        Class<?> clz = clazz;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        do {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            for (Field field : clz.getDeclaredFields()) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                if (field.getType() == type) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    field.setAccessible(true);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    return field;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } while ((clz = clz.getSuperclass()) != null);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        throw new NoSuchFieldError("Field of type " + type.getName() + " in class " + clazz.getName());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Look up a method and hook it. See {@link #findAndHookMethod(String, ClassLoader, String, Object...)}
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * for details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static XC_MethodHook.Unhook findAndHookMethod(Class<?> clazz, String methodName, Object... parameterTypesAndCallback) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (parameterTypesAndCallback.length == 0 || !(parameterTypesAndCallback[parameterTypesAndCallback.length - 1] instanceof XC_MethodHook))
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalArgumentException("no callback defined");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        XC_MethodHook callback = (XC_MethodHook) parameterTypesAndCallback[parameterTypesAndCallback.length - 1];
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        Method m = findMethodExact(clazz, methodName, getParameterClasses(clazz.getClassLoader(), parameterTypesAndCallback));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return XposedBridge.hookMethod(m, callback);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Look up a method and hook it. The last argument must be the callback for the hook.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * <p>This combines calls to {@link #findMethodExact(Class, String, Object...)} and
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * {@link XposedBridge#hookMethod}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * <p class="warning">The method must be declared or overridden in the given class, inherited
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * methods are not considered! That's because each method implementation exists only once in
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * the memory, and when classes inherit it, they just get another reference to the implementation.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Hooking a method therefore applies to all classes inheriting the same implementation. You
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * have to expect that the hook applies to subclasses (unless they override the method), but you
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * shouldn't have to worry about hooks applying to superclasses, hence this "limitation".
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * There could be undesired or even dangerous hooks otherwise, e.g. if you hook
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * {@code SomeClass.equals()} and that class doesn't override the {@code equals()} on some ROMs,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * making you hook {@code Object.equals()} instead.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * <p>There are two ways to specify the parameter types. If you already have a reference to the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * {@link Class}, use that. For Android framework classes, you can often use something like
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * {@code String.class}. If you don't have the class reference, you can simply use the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * full class name as a string, e.g. {@code java.lang.String} or {@code com.example.MyClass}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * It will be passed to {@link #findClass} with the same class loader that is used for the target
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * method, see its documentation for the allowed notations.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * <p>Primitive types, such as {@code int}, can be specified using {@code int.class} (recommended)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * or {@code Integer.TYPE}. Note that {@code Integer.class} doesn't refer to {@code int} but to
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * {@code Integer}, which is a normal class (boxed primitive). Therefore it must not be used when
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * the method expects an {@code int} parameter - it has to be used for {@code Integer} parameters
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * though, so check the method signature in detail.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * <p>As last argument to this method (after the list of target method parameters), you need
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * to specify the callback that should be executed when the method is invoked. It's usually
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * an anonymous subclass of {@link XC_MethodHook} or {@link XC_MethodReplacement}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * <p><b>Example</b>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * <pre class="prettyprint">
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * // In order to hook this method ...
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * package com.example;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * public class SomeClass {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *   public int doSomething(String s, int i, MyClass m) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *     ...
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *   }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * // ... you can use this call:
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * findAndHookMethod("com.example.SomeClass", lpparam.classLoader, String.class, int.class, "com.example.MyClass", new XC_MethodHook() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *   &#64;Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *   protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *     String oldText = (String) param.args[0];
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *     Log.d("MyModule", oldText);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *     param.args[0] = "test";
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *     param.args[1] = 42; // auto-boxing is working here
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *     setBooleanField(param.args[2], "great", true);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *     // This would not work (as MyClass can't be resolved at compile time):
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *     //   MyClass myClass = (MyClass) param.args[2];
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *     //   myClass.great = true;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *   }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * });
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * </pre>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param className                 The name of the class which implements the method.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param classLoader               The class loader for resolving the target and parameter classes.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param methodName                The target method name.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param parameterTypesAndCallback The parameter types of the target method, plus the callback.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @return An object which can be used to remove the callback again.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @throws NoSuchMethodError  In case the method was not found.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @throws ClassNotFoundError In case the target class or one of the parameter types couldn't be resolved.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static XC_MethodHook.Unhook findAndHookMethod(String className, ClassLoader classLoader, String methodName, Object... parameterTypesAndCallback) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return findAndHookMethod(findClass(className, classLoader), methodName, parameterTypesAndCallback);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Look up a method in a class and set it to accessible.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * See {@link #findMethodExact(String, ClassLoader, String, Object...)} for details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Method findMethodExact(Class<?> clazz, String methodName, Object... parameterTypes) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return findMethodExact(clazz, methodName, getParameterClasses(clazz.getClassLoader(), parameterTypes));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Look up and return a method if it exists.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * See {@link #findMethodExactIfExists(String, ClassLoader, String, Object...)} for details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Method findMethodExactIfExists(Class<?> clazz, String methodName, Object... parameterTypes) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return findMethodExact(clazz, methodName, parameterTypes);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (ClassNotFoundError | NoSuchMethodError e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Look up a method in a class and set it to accessible.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * The method must be declared or overridden in the given class.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * <p>See {@link #findAndHookMethod(String, ClassLoader, String, Object...)} for details about
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * the method and parameter type resolution.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param className      The name of the class which implements the method.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param classLoader    The class loader for resolving the target and parameter classes.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param methodName     The target method name.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param parameterTypes The parameter types of the target method.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @return A reference to the method.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @throws NoSuchMethodError  In case the method was not found.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @throws ClassNotFoundError In case the target class or one of the parameter types couldn't be resolved.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Method findMethodExact(String className, ClassLoader classLoader, String methodName, Object... parameterTypes) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return findMethodExact(findClass(className, classLoader), methodName, getParameterClasses(classLoader, parameterTypes));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Look up and return a method if it exists.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Like {@link #findMethodExact(String, ClassLoader, String, Object...)}, but doesn't throw an
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * exception if the method doesn't exist.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param className      The name of the class which implements the method.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param classLoader    The class loader for resolving the target and parameter classes.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param methodName     The target method name.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param parameterTypes The parameter types of the target method.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @return A reference to the method, or {@code null} if it doesn't exist.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Method findMethodExactIfExists(String className, ClassLoader classLoader, String methodName, Object... parameterTypes) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return findMethodExact(className, classLoader, methodName, parameterTypes);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (ClassNotFoundError | NoSuchMethodError e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Look up a method in a class and set it to accessible.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * See {@link #findMethodExact(String, ClassLoader, String, Object...)} for details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * <p>This variant requires that you already have reference to all the parameter types.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Method findMethodExact(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
+[external][rinorz666][RinOrz666@gmail.com]        var key = new MemberCacheKey.Method(clazz, methodName, parameterTypes, true);
+[external][rinorz666][RinOrz666@gmail.com]
+[external][rinorz666][RinOrz666@gmail.com]        return methodCache.computeIfAbsent(key, k -> {
+[external][rinorz666][RinOrz666@gmail.com]            try {
+[external][rinorz666][RinOrz666@gmail.com]                Method method = k.clazz.getDeclaredMethod(k.name, k.parameters);
+[external][rinorz666][RinOrz666@gmail.com]                method.setAccessible(true);
+[external][rinorz666][RinOrz666@gmail.com]                return Optional.of(method);
+[external][rinorz666][RinOrz666@gmail.com]            } catch (NoSuchMethodException e) {
+[external][rinorz666][RinOrz666@gmail.com]                return Optional.empty();
+[external][rinorz666][RinOrz666@gmail.com]            }
+[external][rinorz666][RinOrz666@gmail.com]        }).orElseThrow(() -> new NoSuchMethodError(key.toString()));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Returns an array of all methods declared/overridden in a class with the specified parameter types.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * <p>The return type is optional, it will not be compared if it is {@code null}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Use {@code void.class} if you want to search for methods returning nothing.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param clazz          The class to look in.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param returnType     The return type, or {@code null} (see above).
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param parameterTypes The parameter types.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @return An array with matching methods, all set to accessible already.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Method[] findMethodsByExactParameters(Class<?> clazz, Class<?> returnType, Class<?>... parameterTypes) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        List<Method> result = new LinkedList<>();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        for (Method method : clazz.getDeclaredMethods()) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (returnType != null && returnType != method.getReturnType())
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                continue;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Class<?>[] methodParameterTypes = method.getParameterTypes();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (parameterTypes.length != methodParameterTypes.length)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                continue;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            boolean match = true;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            for (int i = 0; i < parameterTypes.length; i++) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                if (parameterTypes[i] != methodParameterTypes[i]) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    match = false;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    break;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (!match)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                continue;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            method.setAccessible(true);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            result.add(method);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return result.toArray(new Method[result.size()]);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Look up a method in a class and set it to accessible.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * <p>This does'nt only look for exact matches, but for the best match. All considered candidates
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * must be compatible with the given parameter types, i.e. the parameters must be assignable
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * to the method's formal parameters. Inherited methods are considered here.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param clazz          The class which declares, inherits or overrides the method.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param methodName     The method name.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param parameterTypes The types of the method's parameters.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @return A reference to the best-matching method.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @throws NoSuchMethodError In case no suitable method was found.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Method findMethodBestMatch(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
+[external][rinorz666][RinOrz666@gmail.com]        // find the exact matching method first
+[external][rinorz666][RinOrz666@gmail.com]        try {
+[external][rinorz666][RinOrz666@gmail.com]            return findMethodExact(clazz, methodName, parameterTypes);
+[external][rinorz666][RinOrz666@gmail.com]        } catch (NoSuchMethodError ignored) {
+[external][rinorz666][RinOrz666@gmail.com]        }
+[external][rinorz666][RinOrz666@gmail.com]
+[external][rinorz666][RinOrz666@gmail.com]        // then find the best match
+[external][rinorz666][RinOrz666@gmail.com]        var key = new MemberCacheKey.Method(clazz, methodName, parameterTypes, false);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][rinorz666][RinOrz666@gmail.com]        return methodCache.computeIfAbsent(key, k -> {
+[external][rinorz666][RinOrz666@gmail.com]            Method bestMatch = null;
+[external][rinorz666][RinOrz666@gmail.com]            Class<?> clz = k.clazz;
+[external][rinorz666][RinOrz666@gmail.com]            boolean considerPrivateMethods = true;
+[external][rinorz666][RinOrz666@gmail.com]            do {
+[external][rinorz666][RinOrz666@gmail.com]                for (Method method : clz.getDeclaredMethods()) {
+[external][rinorz666][RinOrz666@gmail.com]                    // don't consider private methods of superclasses
+[external][rinorz666][RinOrz666@gmail.com]                    if (!considerPrivateMethods && Modifier.isPrivate(method.getModifiers()))
+[external][rinorz666][RinOrz666@gmail.com]                        continue;
+[external][rinorz666][RinOrz666@gmail.com]
+[external][rinorz666][RinOrz666@gmail.com]                    // compare name and parameters
+[external][rinorz666][RinOrz666@gmail.com]                    if (method.getName().equals(k.name) && ClassUtils.isAssignable(
+[external][rinorz666][RinOrz666@gmail.com]                            k.parameters,
+[external][rinorz666][RinOrz666@gmail.com]                            method.getParameterTypes(),
+[external][rinorz666][RinOrz666@gmail.com]                            true)) {
+[external][rinorz666][RinOrz666@gmail.com]                        // get accessible version of method
+[external][rinorz666][RinOrz666@gmail.com]                        if (bestMatch == null || MemberUtilsX.compareMethodFit(
+[external][rinorz666][RinOrz666@gmail.com]                                method,
+[external][rinorz666][RinOrz666@gmail.com]                                bestMatch,
+[external][rinorz666][RinOrz666@gmail.com]                                k.parameters) < 0) {
+[external][rinorz666][RinOrz666@gmail.com]                            bestMatch = method;
+[external][rinorz666][RinOrz666@gmail.com]                        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                }
+[external][rinorz666][RinOrz666@gmail.com]                considerPrivateMethods = false;
+[external][rinorz666][RinOrz666@gmail.com]            } while ((clz = clz.getSuperclass()) != null);
+[external][rinorz666][RinOrz666@gmail.com]
+[external][rinorz666][RinOrz666@gmail.com]            if (bestMatch != null) {
+[external][rinorz666][RinOrz666@gmail.com]                bestMatch.setAccessible(true);
+[external][rinorz666][RinOrz666@gmail.com]                return Optional.of(bestMatch);
+[external][rinorz666][RinOrz666@gmail.com]            } else {
+[external][rinorz666][RinOrz666@gmail.com]                return Optional.empty();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][rinorz666][RinOrz666@gmail.com]        }).orElseThrow(() -> new NoSuchMethodError(key.toString()));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Look up a method in a class and set it to accessible.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * <p>See {@link #findMethodBestMatch(Class, String, Class...)} for details. This variant
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * determines the parameter types from the classes of the given objects.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Method findMethodBestMatch(Class<?> clazz, String methodName, Object... args) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return findMethodBestMatch(clazz, methodName, getParameterTypes(args));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Look up a method in a class and set it to accessible.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * <p>See {@link #findMethodBestMatch(Class, String, Class...)} for details. This variant
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * determines the parameter types from the classes of the given objects. For any item that is
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * {@code null}, the type is taken from {@code parameterTypes} instead.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Method findMethodBestMatch(Class<?> clazz, String methodName, Class<?>[] parameterTypes, Object[] args) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        Class<?>[] argsClasses = null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        for (int i = 0; i < parameterTypes.length; i++) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (parameterTypes[i] != null)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                continue;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (argsClasses == null)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                argsClasses = getParameterTypes(args);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            parameterTypes[i] = argsClasses[i];
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return findMethodBestMatch(clazz, methodName, parameterTypes);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Returns an array with the classes of the given objects.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Class<?>[] getParameterTypes(Object... args) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        Class<?>[] clazzes = new Class<?>[args.length];
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        for (int i = 0; i < args.length; i++) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            clazzes[i] = (args[i] != null) ? args[i].getClass() : null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return clazzes;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Retrieve classes from an array, where each element might either be a Class
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * already, or a String with the full class name.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private static Class<?>[] getParameterClasses(ClassLoader classLoader, Object[] parameterTypesAndCallback) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        Class<?>[] parameterClasses = null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        for (int i = parameterTypesAndCallback.length - 1; i >= 0; i--) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Object type = parameterTypesAndCallback[i];
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (type == null)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                throw new ClassNotFoundError("parameter type must not be null", null);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // ignore trailing callback
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (type instanceof XC_MethodHook)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                continue;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (parameterClasses == null)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                parameterClasses = new Class<?>[i + 1];
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (type instanceof Class)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                parameterClasses[i] = (Class<?>) type;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            else if (type instanceof String)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                parameterClasses[i] = findClass((String) type, classLoader);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            else
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                throw new ClassNotFoundError("parameter type must either be specified as Class or String", null);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        // if there are no arguments for the method
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (parameterClasses == null)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            parameterClasses = new Class<?>[0];
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return parameterClasses;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Returns an array of the given classes.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Class<?>[] getClassesAsArray(Class<?>... clazzes) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return clazzes;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private static String getParametersString(Class<?>... clazzes) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        StringBuilder sb = new StringBuilder("(");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        boolean first = true;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        for (Class<?> clazz : clazzes) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (first)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                first = false;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            else
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                sb.append(",");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (clazz != null)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                sb.append(clazz.getCanonicalName());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            else
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                sb.append("null");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        sb.append(")");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return sb.toString();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Look up a constructor of a class and set it to accessible.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * See {@link #findMethodExact(String, ClassLoader, String, Object...)} for details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Constructor<?> findConstructorExact(Class<?> clazz, Object... parameterTypes) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return findConstructorExact(clazz, getParameterClasses(clazz.getClassLoader(), parameterTypes));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Look up and return a constructor if it exists.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * See {@link #findMethodExactIfExists(String, ClassLoader, String, Object...)} for details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Constructor<?> findConstructorExactIfExists(Class<?> clazz, Object... parameterTypes) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return findConstructorExact(clazz, parameterTypes);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (ClassNotFoundError | NoSuchMethodError e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Look up a constructor of a class and set it to accessible.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * See {@link #findMethodExact(String, ClassLoader, String, Object...)} for details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Constructor<?> findConstructorExact(String className, ClassLoader classLoader, Object... parameterTypes) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return findConstructorExact(findClass(className, classLoader), getParameterClasses(classLoader, parameterTypes));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Look up and return a constructor if it exists.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * See {@link #findMethodExactIfExists(String, ClassLoader, String, Object...)} for details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Constructor<?> findConstructorExactIfExists(String className, ClassLoader classLoader, Object... parameterTypes) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return findConstructorExact(className, classLoader, parameterTypes);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (ClassNotFoundError | NoSuchMethodError e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Look up a constructor of a class and set it to accessible.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * See {@link #findMethodExact(String, ClassLoader, String, Object...)} for details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Constructor<?> findConstructorExact(Class<?> clazz, Class<?>... parameterTypes) {
+[external][rinorz666][RinOrz666@gmail.com]        var key = new MemberCacheKey.Constructor(clazz, parameterTypes, true);
+[external][rinorz666][RinOrz666@gmail.com]
+[external][rinorz666][RinOrz666@gmail.com]        return constructorCache.computeIfAbsent(key, k -> {
+[external][rinorz666][RinOrz666@gmail.com]            try {
+[external][rinorz666][RinOrz666@gmail.com]                Constructor<?> constructor = k.clazz.getDeclaredConstructor(k.parameters);
+[external][rinorz666][RinOrz666@gmail.com]                constructor.setAccessible(true);
+[external][rinorz666][RinOrz666@gmail.com]                return Optional.of(constructor);
+[external][rinorz666][RinOrz666@gmail.com]            } catch (NoSuchMethodException e) {
+[external][rinorz666][RinOrz666@gmail.com]                return Optional.empty();
+[external][rinorz666][RinOrz666@gmail.com]            }
+[external][rinorz666][RinOrz666@gmail.com]        }).orElseThrow(() -> new NoSuchMethodError(key.toString()));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Look up a constructor and hook it. See {@link #findAndHookMethod(String, ClassLoader, String, Object...)}
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * for details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static XC_MethodHook.Unhook findAndHookConstructor(Class<?> clazz, Object... parameterTypesAndCallback) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (parameterTypesAndCallback.length == 0 || !(parameterTypesAndCallback[parameterTypesAndCallback.length - 1] instanceof XC_MethodHook))
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalArgumentException("no callback defined");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        XC_MethodHook callback = (XC_MethodHook) parameterTypesAndCallback[parameterTypesAndCallback.length - 1];
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        Constructor<?> m = findConstructorExact(clazz, getParameterClasses(clazz.getClassLoader(), parameterTypesAndCallback));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return XposedBridge.hookMethod(m, callback);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Look up a constructor and hook it. See {@link #findAndHookMethod(String, ClassLoader, String, Object...)}
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * for details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static XC_MethodHook.Unhook findAndHookConstructor(String className, ClassLoader classLoader, Object... parameterTypesAndCallback) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return findAndHookConstructor(findClass(className, classLoader), parameterTypesAndCallback);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Look up a constructor in a class and set it to accessible.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * <p>See {@link #findMethodBestMatch(Class, String, Class...)} for details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Constructor<?> findConstructorBestMatch(Class<?> clazz, Class<?>... parameterTypes) {
+[external][rinorz666][RinOrz666@gmail.com]        // find the exact matching constructor first
+[external][rinorz666][RinOrz666@gmail.com]        try {
+[external][rinorz666][RinOrz666@gmail.com]            return findConstructorExact(clazz, parameterTypes);
+[external][rinorz666][RinOrz666@gmail.com]        } catch (NoSuchMethodError ignored) {
+[external][rinorz666][RinOrz666@gmail.com]        }
+[external][rinorz666][RinOrz666@gmail.com]
+[external][rinorz666][RinOrz666@gmail.com]        // then find the best match
+[external][rinorz666][RinOrz666@gmail.com]        var key = new MemberCacheKey.Constructor(clazz, parameterTypes, false);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][rinorz666][RinOrz666@gmail.com]        return constructorCache.computeIfAbsent(key, k -> {
+[external][rinorz666][RinOrz666@gmail.com]            Constructor<?> bestMatch = null;
+[external][rinorz666][RinOrz666@gmail.com]            Constructor<?>[] constructors = k.clazz.getDeclaredConstructors();
+[external][rinorz666][RinOrz666@gmail.com]            for (Constructor<?> constructor : constructors) {
+[external][rinorz666][RinOrz666@gmail.com]                // compare name and parameters
+[external][rinorz666][RinOrz666@gmail.com]                if (ClassUtils.isAssignable(
+[external][rinorz666][RinOrz666@gmail.com]                        k.parameters,
+[external][rinorz666][RinOrz666@gmail.com]                        constructor.getParameterTypes(),
+[external][rinorz666][RinOrz666@gmail.com]                        true)) {
+[external][rinorz666][RinOrz666@gmail.com]                    // get accessible version of method
+[external][rinorz666][RinOrz666@gmail.com]                    if (bestMatch == null || MemberUtilsX.compareConstructorFit(
+[external][rinorz666][RinOrz666@gmail.com]                            constructor,
+[external][rinorz666][RinOrz666@gmail.com]                            bestMatch,
+[external][rinorz666][RinOrz666@gmail.com]                            k.parameters) < 0) {
+[external][rinorz666][RinOrz666@gmail.com]                        bestMatch = constructor;
+[external][rinorz666][RinOrz666@gmail.com]                    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][rinorz666][RinOrz666@gmail.com]            if (bestMatch != null) {
+[external][rinorz666][RinOrz666@gmail.com]                bestMatch.setAccessible(true);
+[external][rinorz666][RinOrz666@gmail.com]                return Optional.of(bestMatch);
+[external][rinorz666][RinOrz666@gmail.com]            } else {
+[external][rinorz666][RinOrz666@gmail.com]                return Optional.empty();
+[external][rinorz666][RinOrz666@gmail.com]            }
+[external][rinorz666][RinOrz666@gmail.com]        }).orElseThrow(() -> new NoSuchMethodError(key.toString()));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Look up a constructor in a class and set it to accessible.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * <p>See {@link #findMethodBestMatch(Class, String, Class...)} for details. This variant
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * determines the parameter types from the classes of the given objects.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Constructor<?> findConstructorBestMatch(Class<?> clazz, Object... args) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return findConstructorBestMatch(clazz, getParameterTypes(args));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Look up a constructor in a class and set it to accessible.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * <p>See {@link #findMethodBestMatch(Class, String, Class...)} for details. This variant
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * determines the parameter types from the classes of the given objects. For any item that is
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * {@code null}, the type is taken from {@code parameterTypes} instead.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Constructor<?> findConstructorBestMatch(Class<?> clazz, Class<?>[] parameterTypes, Object[] args) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        Class<?>[] argsClasses = null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        for (int i = 0; i < parameterTypes.length; i++) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (parameterTypes[i] != null)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                continue;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (argsClasses == null)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                argsClasses = getParameterTypes(args);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            parameterTypes[i] = argsClasses[i];
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return findConstructorBestMatch(clazz, parameterTypes);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Thrown when a class loader is unable to find a class. Unlike {@link ClassNotFoundException},
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * callers are not forced to explicitly catch this. If uncaught, the error will be passed to the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * next caller in the stack.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static final class ClassNotFoundError extends Error {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        private static final long serialVersionUID = -1070936889459514628L;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         * @hide
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public ClassNotFoundError(Throwable cause) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            super(cause);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         * @hide
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public ClassNotFoundError(String detailMessage, Throwable cause) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            super(detailMessage, cause);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Returns the index of the first parameter declared with the given type.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @throws NoSuchFieldError if there is no parameter with that type.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @hide
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static int getFirstParameterIndexByType(Member method, Class<?> type) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        Class<?>[] classes = (method instanceof Method) ?
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                ((Method) method).getParameterTypes() : ((Constructor) method).getParameterTypes();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        for (int i = 0; i < classes.length; i++) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (classes[i] == type) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                return i;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        throw new NoSuchFieldError("No parameter of type " + type + " found in " + method);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Returns the index of the parameter declared with the given type, ensuring that there is exactly one such parameter.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @throws NoSuchFieldError if there is no or more than one parameter with that type.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @hide
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static int getParameterIndexByType(Member method, Class<?> type) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        Class<?>[] classes = (method instanceof Method) ?
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                ((Method) method).getParameterTypes() : ((Constructor) method).getParameterTypes();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        int idx = -1;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        for (int i = 0; i < classes.length; i++) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (classes[i] == type) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                if (idx == -1) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    idx = i;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                } else {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    throw new NoSuchFieldError("More than one parameter of type " + type + " found in " + method);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (idx != -1) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return idx;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } else {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new NoSuchFieldError("No parameter of type " + type + " found in " + method);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    //#################################################################################################
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Sets the value of an object field in the given object instance. A class reference is not sufficient! See also {@link #findField}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static void setObjectField(Object obj, String fieldName, Object value) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            findField(obj.getClass(), fieldName).set(obj, value);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Sets the value of a {@code boolean} field in the given object instance. A class reference is not sufficient! See also {@link #findField}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static void setBooleanField(Object obj, String fieldName, boolean value) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            findField(obj.getClass(), fieldName).setBoolean(obj, value);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Sets the value of a {@code byte} field in the given object instance. A class reference is not sufficient! See also {@link #findField}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static void setByteField(Object obj, String fieldName, byte value) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            findField(obj.getClass(), fieldName).setByte(obj, value);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Sets the value of a {@code char} field in the given object instance. A class reference is not sufficient! See also {@link #findField}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static void setCharField(Object obj, String fieldName, char value) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            findField(obj.getClass(), fieldName).setChar(obj, value);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Sets the value of a {@code double} field in the given object instance. A class reference is not sufficient! See also {@link #findField}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static void setDoubleField(Object obj, String fieldName, double value) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            findField(obj.getClass(), fieldName).setDouble(obj, value);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Sets the value of a {@code float} field in the given object instance. A class reference is not sufficient! See also {@link #findField}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static void setFloatField(Object obj, String fieldName, float value) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            findField(obj.getClass(), fieldName).setFloat(obj, value);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Sets the value of an {@code int} field in the given object instance. A class reference is not sufficient! See also {@link #findField}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static void setIntField(Object obj, String fieldName, int value) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            findField(obj.getClass(), fieldName).setInt(obj, value);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Sets the value of a {@code long} field in the given object instance. A class reference is not sufficient! See also {@link #findField}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static void setLongField(Object obj, String fieldName, long value) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            findField(obj.getClass(), fieldName).setLong(obj, value);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Sets the value of a {@code short} field in the given object instance. A class reference is not sufficient! See also {@link #findField}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static void setShortField(Object obj, String fieldName, short value) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            findField(obj.getClass(), fieldName).setShort(obj, value);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    //#################################################################################################
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Returns the value of an object field in the given object instance. A class reference is not sufficient! See also {@link #findField}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Object getObjectField(Object obj, String fieldName) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return findField(obj.getClass(), fieldName).get(obj);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * For inner classes, returns the surrounding instance, i.e. the {@code this} reference of the surrounding class.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Object getSurroundingThis(Object obj) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return getObjectField(obj, "this$0");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Returns the value of a {@code boolean} field in the given object instance. A class reference is not sufficient! See also {@link #findField}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static boolean getBooleanField(Object obj, String fieldName) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return findField(obj.getClass(), fieldName).getBoolean(obj);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Returns the value of a {@code byte} field in the given object instance. A class reference is not sufficient! See also {@link #findField}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static byte getByteField(Object obj, String fieldName) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return findField(obj.getClass(), fieldName).getByte(obj);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Returns the value of a {@code char} field in the given object instance. A class reference is not sufficient! See also {@link #findField}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static char getCharField(Object obj, String fieldName) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return findField(obj.getClass(), fieldName).getChar(obj);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Returns the value of a {@code double} field in the given object instance. A class reference is not sufficient! See also {@link #findField}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static double getDoubleField(Object obj, String fieldName) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return findField(obj.getClass(), fieldName).getDouble(obj);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Returns the value of a {@code float} field in the given object instance. A class reference is not sufficient! See also {@link #findField}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static float getFloatField(Object obj, String fieldName) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return findField(obj.getClass(), fieldName).getFloat(obj);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Returns the value of an {@code int} field in the given object instance. A class reference is not sufficient! See also {@link #findField}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static int getIntField(Object obj, String fieldName) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return findField(obj.getClass(), fieldName).getInt(obj);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Returns the value of a {@code long} field in the given object instance. A class reference is not sufficient! See also {@link #findField}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static long getLongField(Object obj, String fieldName) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return findField(obj.getClass(), fieldName).getLong(obj);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Returns the value of a {@code short} field in the given object instance. A class reference is not sufficient! See also {@link #findField}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static short getShortField(Object obj, String fieldName) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return findField(obj.getClass(), fieldName).getShort(obj);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    //#################################################################################################
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Sets the value of a static object field in the given class. See also {@link #findField}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static void setStaticObjectField(Class<?> clazz, String fieldName, Object value) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            findField(clazz, fieldName).set(null, value);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Sets the value of a static {@code boolean} field in the given class. See also {@link #findField}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static void setStaticBooleanField(Class<?> clazz, String fieldName, boolean value) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            findField(clazz, fieldName).setBoolean(null, value);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Sets the value of a static {@code byte} field in the given class. See also {@link #findField}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static void setStaticByteField(Class<?> clazz, String fieldName, byte value) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            findField(clazz, fieldName).setByte(null, value);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Sets the value of a static {@code char} field in the given class. See also {@link #findField}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static void setStaticCharField(Class<?> clazz, String fieldName, char value) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            findField(clazz, fieldName).setChar(null, value);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Sets the value of a static {@code double} field in the given class. See also {@link #findField}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static void setStaticDoubleField(Class<?> clazz, String fieldName, double value) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            findField(clazz, fieldName).setDouble(null, value);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Sets the value of a static {@code float} field in the given class. See also {@link #findField}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static void setStaticFloatField(Class<?> clazz, String fieldName, float value) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            findField(clazz, fieldName).setFloat(null, value);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Sets the value of a static {@code int} field in the given class. See also {@link #findField}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static void setStaticIntField(Class<?> clazz, String fieldName, int value) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            findField(clazz, fieldName).setInt(null, value);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Sets the value of a static {@code long} field in the given class. See also {@link #findField}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static void setStaticLongField(Class<?> clazz, String fieldName, long value) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            findField(clazz, fieldName).setLong(null, value);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Sets the value of a static {@code short} field in the given class. See also {@link #findField}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static void setStaticShortField(Class<?> clazz, String fieldName, short value) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            findField(clazz, fieldName).setShort(null, value);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    //#################################################################################################
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Returns the value of a static object field in the given class. See also {@link #findField}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Object getStaticObjectField(Class<?> clazz, String fieldName) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return findField(clazz, fieldName).get(null);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Returns the value of a static {@code boolean} field in the given class. See also {@link #findField}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static boolean getStaticBooleanField(Class<?> clazz, String fieldName) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return findField(clazz, fieldName).getBoolean(null);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Sets the value of a static {@code byte} field in the given class. See also {@link #findField}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static byte getStaticByteField(Class<?> clazz, String fieldName) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return findField(clazz, fieldName).getByte(null);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Sets the value of a static {@code char} field in the given class. See also {@link #findField}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static char getStaticCharField(Class<?> clazz, String fieldName) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return findField(clazz, fieldName).getChar(null);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Sets the value of a static {@code double} field in the given class. See also {@link #findField}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static double getStaticDoubleField(Class<?> clazz, String fieldName) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return findField(clazz, fieldName).getDouble(null);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Sets the value of a static {@code float} field in the given class. See also {@link #findField}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static float getStaticFloatField(Class<?> clazz, String fieldName) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return findField(clazz, fieldName).getFloat(null);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Sets the value of a static {@code int} field in the given class. See also {@link #findField}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static int getStaticIntField(Class<?> clazz, String fieldName) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return findField(clazz, fieldName).getInt(null);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Sets the value of a static {@code long} field in the given class. See also {@link #findField}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static long getStaticLongField(Class<?> clazz, String fieldName) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return findField(clazz, fieldName).getLong(null);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Sets the value of a static {@code short} field in the given class. See also {@link #findField}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static short getStaticShortField(Class<?> clazz, String fieldName) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return findField(clazz, fieldName).getShort(null);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    //#################################################################################################
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Calls an instance or static method of the given object.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * The method is resolved using {@link #findMethodBestMatch(Class, String, Object...)}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param obj        The object instance. A class reference is not sufficient!
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param methodName The method name.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param args       The arguments for the method call.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @throws NoSuchMethodError     In case no suitable method was found.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @throws InvocationTargetError In case an exception was thrown by the invoked method.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Object callMethod(Object obj, String methodName, Object... args) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return findMethodBestMatch(obj.getClass(), methodName, args).invoke(obj, args);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (InvocationTargetException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new InvocationTargetError(e.getCause());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Calls an instance or static method of the given object.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * See {@link #callMethod(Object, String, Object...)}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * <p>This variant allows you to specify parameter types, which can help in case there are multiple
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * methods with the same name, especially if you call it with {@code null} parameters.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Object callMethod(Object obj, String methodName, Class<?>[] parameterTypes, Object... args) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return findMethodBestMatch(obj.getClass(), methodName, parameterTypes, args).invoke(obj, args);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (InvocationTargetException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new InvocationTargetError(e.getCause());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Calls a static method of the given class.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * The method is resolved using {@link #findMethodBestMatch(Class, String, Object...)}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param clazz      The class reference.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param methodName The method name.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param args       The arguments for the method call.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @throws NoSuchMethodError     In case no suitable method was found.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @throws InvocationTargetError In case an exception was thrown by the invoked method.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Object callStaticMethod(Class<?> clazz, String methodName, Object... args) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return findMethodBestMatch(clazz, methodName, args).invoke(null, args);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (InvocationTargetException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new InvocationTargetError(e.getCause());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Calls a static method of the given class.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * See {@link #callStaticMethod(Class, String, Object...)}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * <p>This variant allows you to specify parameter types, which can help in case there are multiple
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * methods with the same name, especially if you call it with {@code null} parameters.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Object callStaticMethod(Class<?> clazz, String methodName, Class<?>[] parameterTypes, Object... args) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return findMethodBestMatch(clazz, methodName, parameterTypes, args).invoke(null, args);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (InvocationTargetException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new InvocationTargetError(e.getCause());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * This class provides a wrapper for an exception thrown by a method invocation.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @see #callMethod(Object, String, Object...)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @see #callStaticMethod(Class, String, Object...)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @see #newInstance(Class, Object...)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static final class InvocationTargetError extends Error {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        private static final long serialVersionUID = -1070936889459514628L;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         * @hide
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public InvocationTargetError(Throwable cause) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            super(cause);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    //#################################################################################################
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Creates a new instance of the given class.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * The constructor is resolved using {@link #findConstructorBestMatch(Class, Object...)}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param clazz The class reference.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param args  The arguments for the constructor call.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @throws NoSuchMethodError     In case no suitable constructor was found.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @throws InvocationTargetError In case an exception was thrown by the invoked method.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @throws InstantiationError    In case the class cannot be instantiated.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Object newInstance(Class<?> clazz, Object... args) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return findConstructorBestMatch(clazz, args).newInstance(args);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (InvocationTargetException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new InvocationTargetError(e.getCause());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (InstantiationException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new InstantiationError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Creates a new instance of the given class.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * See {@link #newInstance(Class, Object...)}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * <p>This variant allows you to specify parameter types, which can help in case there are multiple
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * constructors with the same name, especially if you call it with {@code null} parameters.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Object newInstance(Class<?> clazz, Class<?>[] parameterTypes, Object... args) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return findConstructorBestMatch(clazz, parameterTypes, args).newInstance(args);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalAccessException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // should not happen
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XposedBridge.log(e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalAccessError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (IllegalArgumentException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw e;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (InvocationTargetException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new InvocationTargetError(e.getCause());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (InstantiationException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new InstantiationError(e.getMessage());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    //#################################################################################################
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Attaches any value to an object instance. This simulates adding an instance field.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * The value can be retrieved again with {@link #getAdditionalInstanceField}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param obj   The object instance for which the value should be stored.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param key   The key in the value map for this object instance.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param value The value to store.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @return The previously stored value for this instance/key combination, or {@code null} if there was none.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Object setAdditionalInstanceField(Object obj, String key, Object value) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (obj == null)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new NullPointerException("object must not be null");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (key == null)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new NullPointerException("key must not be null");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        HashMap<String, Object> objectFields;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        synchronized (additionalFields) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            objectFields = additionalFields.get(obj);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (objectFields == null) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                objectFields = new HashMap<>();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                additionalFields.put(obj, objectFields);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        synchronized (objectFields) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return objectFields.put(key, value);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Returns a value which was stored with {@link #setAdditionalInstanceField}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param obj The object instance for which the value has been stored.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param key The key in the value map for this object instance.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @return The stored value for this instance/key combination, or {@code null} if there is none.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Object getAdditionalInstanceField(Object obj, String key) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (obj == null)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new NullPointerException("object must not be null");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (key == null)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new NullPointerException("key must not be null");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        HashMap<String, Object> objectFields;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        synchronized (additionalFields) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            objectFields = additionalFields.get(obj);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (objectFields == null)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                return null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        synchronized (objectFields) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return objectFields.get(key);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Removes and returns a value which was stored with {@link #setAdditionalInstanceField}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param obj The object instance for which the value has been stored.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param key The key in the value map for this object instance.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @return The previously stored value for this instance/key combination, or {@code null} if there was none.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Object removeAdditionalInstanceField(Object obj, String key) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (obj == null)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new NullPointerException("object must not be null");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (key == null)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new NullPointerException("key must not be null");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        HashMap<String, Object> objectFields;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        synchronized (additionalFields) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            objectFields = additionalFields.get(obj);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (objectFields == null)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                return null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        synchronized (objectFields) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return objectFields.remove(key);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Like {@link #setAdditionalInstanceField}, but the value is stored for the class of {@code obj}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Object setAdditionalStaticField(Object obj, String key, Object value) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return setAdditionalInstanceField(obj.getClass(), key, value);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Like {@link #getAdditionalInstanceField}, but the value is returned for the class of {@code obj}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Object getAdditionalStaticField(Object obj, String key) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return getAdditionalInstanceField(obj.getClass(), key);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Like {@link #removeAdditionalInstanceField}, but the value is removed and returned for the class of {@code obj}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Object removeAdditionalStaticField(Object obj, String key) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return removeAdditionalInstanceField(obj.getClass(), key);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Like {@link #setAdditionalInstanceField}, but the value is stored for {@code clazz}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Object setAdditionalStaticField(Class<?> clazz, String key, Object value) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return setAdditionalInstanceField(clazz, key, value);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Like {@link #setAdditionalInstanceField}, but the value is returned for {@code clazz}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Object getAdditionalStaticField(Class<?> clazz, String key) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return getAdditionalInstanceField(clazz, key);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Like {@link #setAdditionalInstanceField}, but the value is removed and returned for {@code clazz}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Object removeAdditionalStaticField(Class<?> clazz, String key) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return removeAdditionalInstanceField(clazz, key);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    //#################################################################################################
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Loads an asset from a resource object and returns the content as {@code byte} array.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param res  The resources from which the asset should be loaded.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param path The path to the asset, as in {@link AssetManager#open}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @return The content of the asset.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static byte[] assetAsByteArray(Resources res, String path) throws IOException {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return inputStreamToByteArray(res.getAssets().open(path));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /*package*/
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    static byte[] inputStreamToByteArray(InputStream is) throws IOException {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        ByteArrayOutputStream buf = new ByteArrayOutputStream();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        byte[] temp = new byte[1024];
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        int read;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        while ((read = is.read(temp)) > 0) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            buf.write(temp, 0, read);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        is.close();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return buf.toByteArray();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Returns the lowercase hex string representation of a file's MD5 hash sum.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static String getMD5Sum(String file) throws IOException {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            MessageDigest digest = MessageDigest.getInstance("MD5");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            InputStream is = new FileInputStream(file);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            byte[] buffer = new byte[8192];
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            int read;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            while ((read = is.read(buffer)) > 0) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                digest.update(buffer, 0, read);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            is.close();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            byte[] md5sum = digest.digest();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            BigInteger bigInt = new BigInteger(1, md5sum);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return bigInt.toString(16);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (NoSuchAlgorithmException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return "";
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    //#################################################################################################
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Increments the depth counter for the given method.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * <p>The intention of the method depth counter is to keep track of the call depth for recursive
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * methods, e.g. to override parameters only for the outer call. The Xposed framework uses this
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * to load drawable replacements only once per call, even when multiple
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * {@link Resources#getDrawable} variants call each other.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param method The method name. Should be prefixed with a unique, module-specific string.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @return The updated depth.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static int incrementMethodDepth(String method) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return getMethodDepthCounter(method).get().incrementAndGet();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Decrements the depth counter for the given method.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * See {@link #incrementMethodDepth} for details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param method The method name. Should be prefixed with a unique, module-specific string.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @return The updated depth.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static int decrementMethodDepth(String method) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return getMethodDepthCounter(method).get().decrementAndGet();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Returns the current depth counter for the given method.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * See {@link #incrementMethodDepth} for details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param method The method name. Should be prefixed with a unique, module-specific string.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @return The updated depth.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static int getMethodDepth(String method) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return getMethodDepthCounter(method).get().get();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private static ThreadLocal<AtomicInteger> getMethodDepthCounter(String method) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        synchronized (sMethodDepth) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            ThreadLocal<AtomicInteger> counter = sMethodDepth.get(method);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (counter == null) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                counter = new ThreadLocal<AtomicInteger>() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    protected AtomicInteger initialValue() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        return new AtomicInteger();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                };
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                sMethodDepth.put(method, counter);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return counter;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    //#################################################################################################
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    // TODO helpers for view traversing
+[external][admin][admin@0x.mk]	/*To make it easier, I will try and implement some more helpers:
+[external][admin][admin@0x.mk]	- add view before/after existing view (I already mentioned that I think)
+[external][admin][admin@0x.mk]	- get index of view in its parent
+[external][admin][admin@0x.mk]	- get next/previous sibling (maybe with an optional argument "type", that might be ImageView.class and gives you the next sibling that is an ImageView)?
+[external][admin][admin@0x.mk]	- get next/previous element (similar to the above, but would also work if the next element has a different parent, it would just go up the hierarchy and then down again until it finds a matching element)
+[external][admin][admin@0x.mk]	- find the first child that is an instance of a specified class
+[external][admin][admin@0x.mk]	- find all (direct or indirect) children of a specified class
+[external][admin][admin@0x.mk]	*/
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]}

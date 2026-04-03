@@ -1,0 +1,645 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.lspd.service;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import static android.content.Context.BIND_AUTO_CREATE;
+[external][416810799][416810799@qq.com]import static org.lsposed.lspd.service.ServiceManager.TAG;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import static org.lsposed.lspd.service.ServiceManager.getExecutorService;
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]import android.annotation.SuppressLint;
+[external][shana][shana@zju.edu.cn]import android.app.IServiceConnection;
+[external][shana][shana@zju.edu.cn]import android.content.AttributionSource;
+[external][shana][shana@zju.edu.cn]import android.content.ComponentName;
+[external][shana][shana@zju.edu.cn]import android.content.Context;
+[external][shana][shana@zju.edu.cn]import android.content.Intent;
+[external][shana][shana@zju.edu.cn]import android.content.pm.PackageInfo;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.content.pm.PackageManager;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.content.pm.ResolveInfo;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.content.pm.VersionedPackage;
+[external][shana][shana@zju.edu.cn]import android.net.Uri;
+[external][shana][shana@zju.edu.cn]import android.os.Build;
+[external][shana][shana@zju.edu.cn]import android.os.Bundle;
+[external][shana][shana@zju.edu.cn]import android.os.IBinder;
+[external][shana][shana@zju.edu.cn]import android.os.ParcelFileDescriptor;
+[external][shana][shana@zju.edu.cn]import android.os.RemoteException;
+[external][shana][shana@zju.edu.cn]import android.os.SELinux;
+[external][shana][shana@zju.edu.cn]import android.os.SystemProperties;
+[external][shana][shana@zju.edu.cn]import android.system.ErrnoException;
+[external][shana][shana@zju.edu.cn]import android.system.Os;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.util.Log;
+[external][shana][shana@zju.edu.cn]import android.view.IWindowManager;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import androidx.annotation.NonNull;
+[external][shana][shana@zju.edu.cn]
+[internal][dr-tsng][tsng.nullptr@outlook.com]import org.lsposed.daemon.BuildConfig;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.lspd.ILSPManagerService;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.lspd.models.Application;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.lspd.models.UserInfo;
+[external][shana][shana@zju.edu.cn]import org.lsposed.lspd.util.Utils;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import java.io.File;
+[internal][vvb2060][vvb2060@gmail.com]import java.io.FileOutputStream;
+[internal][vvb2060][vvb2060@gmail.com]import java.io.IOException;
+[external][shana][shana@zju.edu.cn]import java.util.LinkedList;
+[external][416810799][416810799@qq.com]import java.util.List;
+[external][shana][shana@zju.edu.cn]import java.util.UUID;
+[internal][vvb2060][vvb2060@gmail.com]import java.util.concurrent.TimeUnit;
+[external][416810799][416810799@qq.com]
+[external][shana][shana@zju.edu.cn]import hidden.HiddenApiBridge;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import io.github.libxposed.service.IXposedService;
+[internal][vvb2060][vvb2060@gmail.com]import rikka.parcelablelist.ParcelableListSlice;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]public class LSPManagerService extends ILSPManagerService.Stub {
+[external][shana][shana@zju.edu.cn]    // this maybe useful when obtaining the manager binder
+[external][shana][shana@zju.edu.cn]    private static String RANDOM_UUID = null;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private static Intent managerIntent = null;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public class ManagerGuard implements IBinder.DeathRecipient {
+[external][shana][shana@zju.edu.cn]        private final @NonNull
+[external][shana][shana@zju.edu.cn]        IBinder binder;
+[external][shana][shana@zju.edu.cn]        private final int pid;
+[external][shana][shana@zju.edu.cn]        private final int uid;
+[external][shana][shana@zju.edu.cn]        private final IServiceConnection connection = new IServiceConnection.Stub() {
+[external][shana][shana@zju.edu.cn]            @Override
+[external][shana][shana@zju.edu.cn]            public void connected(ComponentName name, IBinder service, boolean dead) {
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        };
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        public ManagerGuard(@NonNull IBinder binder, int pid, int uid) {
+[external][shana][shana@zju.edu.cn]            guard = this;
+[external][shana][shana@zju.edu.cn]            this.pid = pid;
+[external][shana][shana@zju.edu.cn]            this.uid = uid;
+[external][shana][shana@zju.edu.cn]            this.binder = binder;
+[external][shana][shana@zju.edu.cn]            try {
+[external][shana][shana@zju.edu.cn]                this.binder.linkToDeath(this, 0);
+[external][shana][shana@zju.edu.cn]                if (Utils.isMIUI) {
+[external][shana][shana@zju.edu.cn]                    var intent = new Intent();
+[external][shana][shana@zju.edu.cn]                    intent.setComponent(ComponentName.unflattenFromString("com.miui.securitycore/com.miui.xspace.service.XSpaceService"));
+[external][shana][shana@zju.edu.cn]                    ActivityManagerService.bindService(intent, intent.getType(), connection, BIND_AUTO_CREATE, "android", 0);
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            } catch (Throwable e) {
+[external][shana][shana@zju.edu.cn]                Log.e(TAG, "manager guard", e);
+[external][shana][shana@zju.edu.cn]                guard = null;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public void binderDied() {
+[external][shana][shana@zju.edu.cn]            try {
+[external][shana][shana@zju.edu.cn]                binder.unlinkToDeath(this, 0);
+[external][shana][shana@zju.edu.cn]                ActivityManagerService.unbindService(connection);
+[external][shana][shana@zju.edu.cn]            } catch (Throwable e) {
+[external][shana][shana@zju.edu.cn]                Log.e(TAG, "manager guard", e);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            guard = null;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        boolean isAlive() {
+[external][shana][shana@zju.edu.cn]            return binder.isBinderAlive();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public ManagerGuard guard = null;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    // guard to determine the manager or the injected app
+[external][shana][shana@zju.edu.cn]    // that is to say, to make the parasitic success,
+[external][shana][shana@zju.edu.cn]    // we should make sure no extra launch after parasitic
+[external][shana][shana@zju.edu.cn]    // launch is queued and before the process is started
+[external][shana][shana@zju.edu.cn]    private boolean pendingManager = false;
+[external][shana][shana@zju.edu.cn]    private int managerPid = -1;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    LSPManagerService() {
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]    private static Intent getManagerIntent() {
+[internal][vvb2060][vvb2060@gmail.com]        if (managerIntent != null) return managerIntent;
+[external][shana][shana@zju.edu.cn]        try {
+[internal][vvb2060][vvb2060@gmail.com]            var intent = PackageService.getLaunchIntentForPackage(BuildConfig.MANAGER_INJECTED_PKG_NAME);
+[internal][vvb2060][vvb2060@gmail.com]            if (intent == null) {
+[internal][vvb2060][vvb2060@gmail.com]                var pkgInfo = PackageService.getPackageInfo(BuildConfig.MANAGER_INJECTED_PKG_NAME, PackageManager.GET_ACTIVITIES, 0);
+[internal][vvb2060][vvb2060@gmail.com]                if (pkgInfo != null && pkgInfo.activities != null && pkgInfo.activities.length > 0) {
+[internal][vvb2060][vvb2060@gmail.com]                    for (var activityInfo : pkgInfo.activities) {
+[internal][vvb2060][vvb2060@gmail.com]                        if (activityInfo.processName.equals(activityInfo.packageName)) {
+[internal][vvb2060][vvb2060@gmail.com]                            intent = new Intent();
+[internal][vvb2060][vvb2060@gmail.com]                            intent.setComponent(new ComponentName(activityInfo.packageName, activityInfo.name));
+[internal][vvb2060][vvb2060@gmail.com]                            intent.setAction(Intent.ACTION_MAIN);
+[internal][vvb2060][vvb2060@gmail.com]                            break;
+[external][shana][shana@zju.edu.cn]                        }
+[external][shana][shana@zju.edu.cn]                    }
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            }
+[internal][vvb2060][vvb2060@gmail.com]            if (intent != null) {
+[internal][vvb2060][vvb2060@gmail.com]                if (intent.getCategories() != null) intent.getCategories().clear();
+[internal][vvb2060][vvb2060@gmail.com]                intent.addCategory("org.lsposed.manager.LAUNCH_MANAGER");
+[internal][vvb2060][vvb2060@gmail.com]                intent.setPackage(BuildConfig.MANAGER_INJECTED_PKG_NAME);
+[internal][vvb2060][vvb2060@gmail.com]                managerIntent = new Intent(intent);
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]        } catch (RemoteException e) {
+[external][shana][shana@zju.edu.cn]            Log.e(TAG, "get Intent", e);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return managerIntent;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]    static void openManager(Uri withData) {
+[internal][vvb2060][vvb2060@gmail.com]        var intent = getManagerIntent();
+[internal][vvb2060][vvb2060@gmail.com]        if (intent == null) return;
+[internal][vvb2060][vvb2060@gmail.com]        intent = new Intent(intent);
+[internal][vvb2060][vvb2060@gmail.com]        intent.setData(withData);
+[external][shana][shana@zju.edu.cn]        ServiceManager.getManagerService().preStartManager(BuildConfig.MANAGER_INJECTED_PKG_NAME, intent, true);
+[external][fankes][37344460+fankes@users.noreply.github.com]    }
+[external][fankes][37344460+fankes@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]    @SuppressLint("WrongConstant")
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    public static void broadcastIntent(Intent inIntent) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        var intent = new Intent("org.lsposed.manager.NOTIFICATION");
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        intent.putExtra(Intent.EXTRA_INTENT, inIntent);
+[internal][vvb2060][vvb2060@gmail.com]        intent.addFlags(0x01000000); //Intent.FLAG_RECEIVER_INCLUDE_BACKGROUND
+[internal][vvb2060][vvb2060@gmail.com]        intent.addFlags(0x00400000); //Intent.FLAG_RECEIVER_FROM_SHELL
+[internal][vvb2060][vvb2060@gmail.com]        intent.setPackage(BuildConfig.MANAGER_INJECTED_PKG_NAME);
+[internal][vvb2060][vvb2060@gmail.com]        try {
+[internal][vvb2060][vvb2060@gmail.com]            ActivityManagerService.broadcastIntentWithFeature(null, intent,
+[internal][vvb2060][vvb2060@gmail.com]                    null, null, 0, null, null,
+[internal][vvb2060][vvb2060@gmail.com]                    null, -1, null, true, false,
+[internal][vvb2060][vvb2060@gmail.com]                    0);
+[internal][vvb2060][vvb2060@gmail.com]            intent.setPackage(BuildConfig.DEFAULT_MANAGER_PACKAGE_NAME);
+[internal][vvb2060][vvb2060@gmail.com]            ActivityManagerService.broadcastIntentWithFeature(null, intent,
+[internal][vvb2060][vvb2060@gmail.com]                    null, null, 0, null, null,
+[internal][vvb2060][vvb2060@gmail.com]                    null, -1, null, true, false,
+[internal][vvb2060][vvb2060@gmail.com]                    0);
+[internal][vvb2060][vvb2060@gmail.com]        } catch (RemoteException t) {
+[internal][vvb2060][vvb2060@gmail.com]            Log.e(TAG, "Broadcast to manager failed: ", t);
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]    public ManagerGuard guardSnapshot() {
+[external][shana][shana@zju.edu.cn]        var snapshot = guard;
+[external][shana][shana@zju.edu.cn]        return snapshot != null && snapshot.isAlive() ? snapshot : null;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private void ensureWebViewPermission(File f) {
+[external][shana][shana@zju.edu.cn]        if (!f.exists()) return;
+[external][noreply][noreply@nullptr.icu]        SELinux.setFileContext(f.getAbsolutePath(), "u:object_r:magisk_file:s0");
+[external][shana][shana@zju.edu.cn]        try {
+[external][shana][shana@zju.edu.cn]            Os.chown(f.getAbsolutePath(), BuildConfig.MANAGER_INJECTED_UID, BuildConfig.MANAGER_INJECTED_UID);
+[external][shana][shana@zju.edu.cn]        } catch (ErrnoException e) {
+[external][shana][shana@zju.edu.cn]            Log.e(TAG, "chown of webview", e);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        if (f.isDirectory()) {
+[external][shana][shana@zju.edu.cn]            for (var g : f.listFiles()) {
+[external][shana][shana@zju.edu.cn]                ensureWebViewPermission(g);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private void ensureWebViewPermission() {
+[external][shana][shana@zju.edu.cn]        try {
+[external][shana][shana@zju.edu.cn]            var pkgInfo = PackageService.getPackageInfo(BuildConfig.MANAGER_INJECTED_PKG_NAME, 0, 0);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            if (pkgInfo != null) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                var cacheDir = new File(HiddenApiBridge.ApplicationInfo_credentialProtectedDataDir(pkgInfo.applicationInfo) + "/cache");
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                // The cache directory does not exist after `pm clear`
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                cacheDir.mkdirs();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                ensureWebViewPermission(cacheDir);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            }
+[external][shana][shana@zju.edu.cn]        } catch (Throwable e) {
+[external][shana][shana@zju.edu.cn]            Log.w(TAG, "cannot ensure webview dir", e);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    // To start injected manager, we should take care about conflict
+[external][shana][shana@zju.edu.cn]    // with the target app since we won't inject into it
+[external][shana][shana@zju.edu.cn]    // if we are not going to display manager.
+[external][shana][shana@zju.edu.cn]    // Thus, when someone launching manager, we should no matter
+[external][shana][shana@zju.edu.cn]    // stop any process of the target app
+[external][shana][shana@zju.edu.cn]    // Ideally we should call force stop package here,
+[external][shana][shana@zju.edu.cn]    // however it's not feasible because it will cause deadlock
+[external][shana][shana@zju.edu.cn]    // Thus we will cancel the launch of the activity
+[external][shana][shana@zju.edu.cn]    // and manually start activity with force stopping
+[external][shana][shana@zju.edu.cn]    // However, the intent we got here is not complete since
+[external][shana][shana@zju.edu.cn]    // there's no extras. We cannot do the same thing
+[external][shana][shana@zju.edu.cn]    // where starting the target app while the manager is
+[external][shana][shana@zju.edu.cn]    // still running.
+[external][shana][shana@zju.edu.cn]    // We instead let the manager to restart the activity.
+[external][shana][shana@zju.edu.cn]    synchronized boolean preStartManager(String pkgName, Intent intent, boolean doResume) {
+[external][shana][shana@zju.edu.cn]        // first, check if it's our target app, if not continue the start
+[external][shana][shana@zju.edu.cn]        if (BuildConfig.MANAGER_INJECTED_PKG_NAME.equals(pkgName)) {
+[external][shana][shana@zju.edu.cn]            Log.d(TAG, "starting target app of parasitic manager");
+[external][shana][shana@zju.edu.cn]            // check if it's launching our manager
+[external][shana][shana@zju.edu.cn]            if (intent.getCategories() != null &&
+[external][shana][shana@zju.edu.cn]                    intent.getCategories().contains("org.lsposed.manager.LAUNCH_MANAGER")) {
+[external][shana][shana@zju.edu.cn]                Log.d(TAG, "requesting launch of manager");
+[external][shana][shana@zju.edu.cn]                // a new launch for the manager
+[external][shana][shana@zju.edu.cn]                // check if there's one running
+[external][shana][shana@zju.edu.cn]                // or it's run by ourselves after force stopping
+[external][shana][shana@zju.edu.cn]                var snapshot = guardSnapshot();
+[external][shana][shana@zju.edu.cn]                if ((RANDOM_UUID != null && intent.getCategories().contains(RANDOM_UUID)) ||
+[external][shana][shana@zju.edu.cn]                        (snapshot != null && snapshot.isAlive() && snapshot.uid == BuildConfig.MANAGER_INJECTED_UID)) {
+[external][shana][shana@zju.edu.cn]                    Log.d(TAG, "manager is still running or is on its way");
+[external][shana][shana@zju.edu.cn]                    // there's one running parasitic manager
+[external][shana][shana@zju.edu.cn]                    // or it's run by ourself after killing, resume it
+[external][shana][shana@zju.edu.cn]                    if (doResume) {
+[external][shana][shana@zju.edu.cn]                        // if doResume is true, we help do the resumption
+[external][shana][shana@zju.edu.cn]                        try {
+[external][shana][shana@zju.edu.cn]                            ActivityManagerService.startActivityAsUserWithFeature("android", null, intent, intent.getType(), null, null, 0, 0, null, null, 0);
+[external][shana][shana@zju.edu.cn]                        } catch (Throwable e) {
+[external][shana][shana@zju.edu.cn]                            Log.w(TAG, "resume manager", e);
+[external][shana][shana@zju.edu.cn]                        }
+[external][shana][shana@zju.edu.cn]                    }
+[external][shana][shana@zju.edu.cn]                    return true;
+[external][i][i@xzr.moe]                } else if (pendingManager) {
+[external][i][i@xzr.moe]                    // Check the flag in case new launch comes before finishing
+[external][i][i@xzr.moe]                    // the previous one to avoid racing.
+[external][i][i@xzr.moe]                    Log.d(TAG, "manager is still on its way when new launch comes, skipping");
+[external][i][i@xzr.moe]                    return false;
+[external][shana][shana@zju.edu.cn]                } else {
+[external][shana][shana@zju.edu.cn]                    // new parasitic manager launch, set the flag and kill
+[external][shana][shana@zju.edu.cn]                    // old processes
+[external][shana][shana@zju.edu.cn]                    // we do it by cancelling the launch (return false)
+[external][shana][shana@zju.edu.cn]                    // and start activity in a new thread
+[external][shana][shana@zju.edu.cn]                    pendingManager = true;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    getExecutorService().submit(() -> {
+[external][shana][shana@zju.edu.cn]                        ensureWebViewPermission();
+[external][shana][shana@zju.edu.cn]                        stopAndStartActivity(pkgName, intent, true);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    });
+[external][shana][shana@zju.edu.cn]                    Log.d(TAG, "requested to launch manager");
+[external][shana][shana@zju.edu.cn]                    return false;
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            } else if (pendingManager) {
+[external][shana][shana@zju.edu.cn]                // there's still parasitic manager, cancel a normal launch until
+[external][shana][shana@zju.edu.cn]                // the parasitic manager is launch
+[external][shana][shana@zju.edu.cn]                Log.d(TAG, "previous request is not yet done");
+[external][shana][shana@zju.edu.cn]                return false;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            // this is a normal launch of the target app
+[external][shana][shana@zju.edu.cn]            // send it to the manager and let it to restart the package
+[external][shana][shana@zju.edu.cn]            // if the manager is running
+[external][shana][shana@zju.edu.cn]            // or normally restart without injecting
+[external][shana][shana@zju.edu.cn]            Log.d(TAG, "launching the target app normally");
+[external][shana][shana@zju.edu.cn]            return true;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return true;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    synchronized void stopAndStartActivity(String packageName, Intent intent, boolean addUUID) {
+[external][shana][shana@zju.edu.cn]        try {
+[external][shana][shana@zju.edu.cn]            ActivityManagerService.forceStopPackage(packageName, 0);
+[external][shana][shana@zju.edu.cn]            Log.d(TAG, "stopped old package");
+[external][shana][shana@zju.edu.cn]            if (addUUID) {
+[internal][vvb2060][vvb2060@gmail.com]                intent = new Intent(intent);
+[external][shana][shana@zju.edu.cn]                RANDOM_UUID = UUID.randomUUID().toString();
+[external][shana][shana@zju.edu.cn]                intent.addCategory(RANDOM_UUID);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            ActivityManagerService.startActivityAsUserWithFeature("android", null, intent, intent.getType(), null, null, 0, 0, null, null, 0);
+[external][shana][shana@zju.edu.cn]            Log.d(TAG, "relaunching");
+[external][shana][shana@zju.edu.cn]        } catch (RemoteException e) {
+[external][shana][shana@zju.edu.cn]            Log.e(TAG, "stop and start activity", e);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    // return true to inject manager
+[external][shana][shana@zju.edu.cn]    synchronized boolean shouldStartManager(int pid, int uid, String processName) {
+[external][shana][shana@zju.edu.cn]        if (uid != BuildConfig.MANAGER_INJECTED_UID || !BuildConfig.MANAGER_INJECTED_PKG_NAME.equals(processName) || !pendingManager)
+[external][shana][shana@zju.edu.cn]            return false;
+[external][shana][shana@zju.edu.cn]        // pending parasitic manager launch it processes
+[external][shana][shana@zju.edu.cn]        // now we have its pid so we allow it to be killed
+[external][shana][shana@zju.edu.cn]        // and thus reset the pending flag and mark its pid
+[external][shana][shana@zju.edu.cn]        pendingManager = false;
+[external][shana][shana@zju.edu.cn]        managerPid = pid;
+[external][shana][shana@zju.edu.cn]        Log.d(TAG, "starting injected manager: pid = " + pid + " uid = " + uid + " processName = " + processName);
+[external][shana][shana@zju.edu.cn]        return true;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    // return true to send manager binder
+[external][shana][shana@zju.edu.cn]    synchronized boolean postStartManager(int pid, int uid) {
+[external][shana][shana@zju.edu.cn]        if (pid == managerPid && uid == BuildConfig.MANAGER_INJECTED_UID) {
+[external][shana][shana@zju.edu.cn]            RANDOM_UUID = null;
+[external][shana][shana@zju.edu.cn]            return true;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return false;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public @NonNull
+[external][shana][shana@zju.edu.cn]    IBinder obtainManagerBinder(@NonNull IBinder heartbeat, int pid, int uid) {
+[external][shana][shana@zju.edu.cn]        new ManagerGuard(heartbeat, pid, uid);
+[external][shana][shana@zju.edu.cn]        if (postStartManager(pid, uid)) {
+[external][shana][shana@zju.edu.cn]            managerPid = 0;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return this;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public boolean isRunningManager(int pid, int uid) {
+[external][shana][shana@zju.edu.cn]        var snapshotPid = managerPid;
+[external][shana][shana@zju.edu.cn]        var snapshotGuard = guardSnapshot();
+[external][shana][shana@zju.edu.cn]        return (pid == snapshotPid && uid == BuildConfig.MANAGER_INJECTED_UID) || (snapshotGuard != null && snapshotGuard.pid == pid && snapshotGuard.uid == uid);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    void onSystemServerDied() {
+[external][shana][shana@zju.edu.cn]        pendingManager = false;
+[external][shana][shana@zju.edu.cn]        managerPid = 0;
+[external][shana][shana@zju.edu.cn]        guard = null;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public IBinder asBinder() {
+[external][shana][shana@zju.edu.cn]        return this;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public int getXposedApiVersion() {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        return IXposedService.API;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public int getXposedVersionCode() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return BuildConfig.VERSION_CODE;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public String getXposedVersionName() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return BuildConfig.VERSION_NAME;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public String getApi() {
+[external][shana][shana@zju.edu.cn]        return ConfigManager.getInstance().getApi();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[internal][vvb2060][vvb2060@gmail.com]    public ParcelableListSlice<PackageInfo> getInstalledPackagesFromAllUsers(int flags, boolean filterNoProcess) throws RemoteException {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return PackageService.getInstalledPackagesFromAllUsers(flags, filterNoProcess);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public String[] enabledModules() {
+[external][shana][shana@zju.edu.cn]        return ConfigManager.getInstance().enabledModules();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public boolean enableModule(String packageName) throws RemoteException {
+[external][shana][shana@zju.edu.cn]        return ConfigManager.getInstance().enableModule(packageName);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public boolean setModuleScope(String packageName, List<Application> scope) throws RemoteException {
+[external][shana][shana@zju.edu.cn]        return ConfigManager.getInstance().setModuleScope(packageName, scope);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public List<Application> getModuleScope(String packageName) {
+[external][shana][shana@zju.edu.cn]        return ConfigManager.getInstance().getModuleScope(packageName);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public boolean disableModule(String packageName) {
+[external][shana][shana@zju.edu.cn]        return ConfigManager.getInstance().disableModule(packageName);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public boolean isVerboseLog() {
+[external][shana][shana@zju.edu.cn]        return ConfigManager.getInstance().verboseLog();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public void setVerboseLog(boolean enabled) {
+[external][shana][shana@zju.edu.cn]        ConfigManager.getInstance().setVerboseLog(enabled);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public ParcelFileDescriptor getVerboseLog() {
+[external][shana][shana@zju.edu.cn]        return ConfigManager.getInstance().getVerboseLog();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public ParcelFileDescriptor getModulesLog() {
+[internal][vvb2060][vvb2060@gmail.com]        ServiceManager.getLogcatService().checkLogFile();
+[external][shana][shana@zju.edu.cn]        return ConfigManager.getInstance().getModulesLog();
+[external][shana][shana@zju.edu.cn]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public boolean clearLogs(boolean verbose) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return ConfigManager.getInstance().clearLogs(verbose);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public PackageInfo getPackageInfo(String packageName, int flags, int uid) throws RemoteException {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return PackageService.getPackageInfo(packageName, flags, uid);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public void forceStopPackage(String packageName, int userId) throws RemoteException {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        ActivityManagerService.forceStopPackage(packageName, userId);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][howardwu20][HowardWu20@outlook.com]    public void reboot() throws RemoteException {
+[external][howardwu20][HowardWu20@outlook.com]        PowerService.reboot(false, null, false);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[internal][vvb2060][vvb2060@gmail.com]    public boolean uninstallPackage(String packageName, int userId) throws RemoteException {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[internal][vvb2060][vvb2060@gmail.com]            if (ActivityManagerService.startUserInBackground(userId)) {
+[internal][vvb2060][vvb2060@gmail.com]                var pkg = new VersionedPackage(packageName, PackageManager.VERSION_CODE_HIGHEST);
+[internal][vvb2060][vvb2060@gmail.com]                return PackageService.uninstallPackage(pkg, userId);
+[internal][vvb2060][vvb2060@gmail.com]            } else {
+[internal][vvb2060][vvb2060@gmail.com]                return false;
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]        } catch (InterruptedException | ReflectiveOperationException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Log.e(TAG, e.getMessage(), e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return false;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public boolean isSepolicyLoaded() {
+[internal][vvb2060][vvb2060@gmail.com]        return SELinux.checkSELinuxAccess("u:r:dex2oat:s0", "u:object_r:dex2oat_exec:s0",
+[internal][vvb2060][vvb2060@gmail.com]                "file", "execute_no_trans");
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public List<UserInfo> getUsers() throws RemoteException {
+[external][shana][shana@zju.edu.cn]        var users = new LinkedList<UserInfo>();
+[external][shana][shana@zju.edu.cn]        for (var user : UserService.getUsers()) {
+[external][shana][shana@zju.edu.cn]            var info = new UserInfo();
+[external][shana][shana@zju.edu.cn]            info.id = user.id;
+[external][shana][shana@zju.edu.cn]            info.name = user.name;
+[external][shana][shana@zju.edu.cn]            users.add(info);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return users;
+[external][shana][shana@zju.edu.cn]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    @Override
+[external][shana][shana@zju.edu.cn]    public int installExistingPackageAsUser(String packageName, int userId) {
+[external][shana][shana@zju.edu.cn]        try {
+[external][shana][shana@zju.edu.cn]            if (ActivityManagerService.startUserInBackground(userId))
+[external][shana][shana@zju.edu.cn]                return PackageService.installExistingPackageAsUser(packageName, userId);
+[external][shana][shana@zju.edu.cn]            else return PackageService.INSTALL_FAILED_INTERNAL_ERROR;
+[external][shana][shana@zju.edu.cn]        } catch (Throwable e) {
+[external][shana][shana@zju.edu.cn]            Log.w(TAG, "install existing package as user: ", e);
+[external][shana][shana@zju.edu.cn]            return PackageService.INSTALL_FAILED_INTERNAL_ERROR;
+[external][shana][shana@zju.edu.cn]        }
+[internal][vvb2060][vvb2060@gmail.com]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public boolean systemServerRequested() {
+[external][shana][shana@zju.edu.cn]        return ServiceManager.systemServerRequested();
+[external][shana][shana@zju.edu.cn]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public int startActivityAsUserWithFeature(Intent intent, int userId) throws RemoteException {
+[external][shana][shana@zju.edu.cn]        if (!intent.getBooleanExtra("lsp_no_switch_to_user", false)) {
+[external][shana][shana@zju.edu.cn]            intent.removeExtra("lsp_no_switch_to_user");
+[external][shana][shana@zju.edu.cn]            var currentUser = ActivityManagerService.getCurrentUser();
+[external][shana][shana@zju.edu.cn]            if (currentUser == null) return -1;
+[external][shana][shana@zju.edu.cn]            var parent = UserService.getProfileParent(userId);
+[external][shana][shana@zju.edu.cn]            if (parent < 0) return -1;
+[external][shana][shana@zju.edu.cn]            if (currentUser.id != parent) {
+[external][shana][shana@zju.edu.cn]                if (!ActivityManagerService.switchUser(parent)) return -1;
+[internal][vvb2060][vvb2060@gmail.com]                var window = android.os.ServiceManager.getService(Context.WINDOW_SERVICE);
+[external][shana][shana@zju.edu.cn]                if (window != null) {
+[external][shana][shana@zju.edu.cn]                    var wm = IWindowManager.Stub.asInterface(window);
+[external][shana][shana@zju.edu.cn]                    wm.lockNow(null);
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return ActivityManagerService.startActivityAsUserWithFeature("android", null, intent, intent.getType(), null, null, 0, 0, null, null, userId);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[internal][vvb2060][vvb2060@gmail.com]    public ParcelableListSlice<ResolveInfo> queryIntentActivitiesAsUser(Intent intent, int flags, int userId) throws RemoteException {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return PackageService.queryIntentActivities(intent, intent.getType(), flags, userId);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public boolean dex2oatFlagsLoaded() {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        return SystemProperties.get("dalvik.vm.dex2oat-flags").contains("--inline-max-code-units=0");
+[external][shana][shana@zju.edu.cn]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    @Override
+[internal][vvb2060][vvb2060@gmail.com]    public void setHiddenIcon(boolean hide) {
+[external][shana][shana@zju.edu.cn]        Bundle args = new Bundle();
+[external][shana][shana@zju.edu.cn]        args.putString("value", hide ? "0" : "1");
+[external][shana][shana@zju.edu.cn]        args.putString("_user", "0");
+[internal][vvb2060][vvb2060@gmail.com]        try {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            var contentProvider = ActivityManagerService.getContentProvider("settings", 0);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            if (contentProvider != null) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                try {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+[external][shana][shana@zju.edu.cn]                        contentProvider.call(new AttributionSource.Builder(1000).setPackageName("android").build(),
+[external][shana][shana@zju.edu.cn]                                "settings", "PUT_global", "show_hidden_icon_apps_enabled", args);
+[internal][vvb2060][vvb2060@gmail.com]                    } else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        contentProvider.call("android", null, "settings", "PUT_global", "show_hidden_icon_apps_enabled", args);
+[internal][vvb2060][vvb2060@gmail.com]                    } else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        contentProvider.call("android", "settings", "PUT_global", "show_hidden_icon_apps_enabled", args);
+[external][shana][shana@zju.edu.cn]                    }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                } catch (NoSuchMethodError e) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    Log.w(TAG, "setHiddenIcon: ", e);
+[external][shana][shana@zju.edu.cn]                }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            }
+[external][shana][shana@zju.edu.cn]        } catch (Throwable e) {
+[internal][vvb2060][vvb2060@gmail.com]            Log.w(TAG, "setHiddenIcon: ", e);
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    @Override
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    public void getLogs(ParcelFileDescriptor zipFd) {
+[external][shana][shana@zju.edu.cn]        ConfigFileManager.getLogs(zipFd);
+[internal][vvb2060][vvb2060@gmail.com]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public void restartFor(Intent intent) throws RemoteException {
+[external][shana][shana@zju.edu.cn]        forceStopPackage(BuildConfig.MANAGER_INJECTED_PKG_NAME, 0);
+[external][shana][shana@zju.edu.cn]        stopAndStartActivity(BuildConfig.MANAGER_INJECTED_PKG_NAME, intent, false);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public List<String> getDenyListPackages() {
+[external][wanghan1995315][wanghan1995315@gmail.com]        return ConfigManager.getInstance().getDenyListPackages();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]    @Override
+[internal][vvb2060][vvb2060@gmail.com]    public void flashZip(String zipPath, ParcelFileDescriptor outputStream) {
+[internal][vvb2060][vvb2060@gmail.com]        var processBuilder = new ProcessBuilder("magisk", "--install-module", zipPath);
+[internal][vvb2060][vvb2060@gmail.com]        var fd = new File("/proc/self/fd/" + outputStream.getFd());
+[internal][vvb2060][vvb2060@gmail.com]        processBuilder.redirectOutput(ProcessBuilder.Redirect.appendTo(fd));
+[internal][vvb2060][vvb2060@gmail.com]        try (outputStream; var fdw = new FileOutputStream(fd, true)) {
+[internal][vvb2060][vvb2060@gmail.com]            var proc = processBuilder.start();
+[internal][vvb2060][vvb2060@gmail.com]            if (proc.waitFor(10, TimeUnit.SECONDS)) {
+[internal][vvb2060][vvb2060@gmail.com]                var exit = proc.exitValue();
+[internal][vvb2060][vvb2060@gmail.com]                if (exit == 0) {
+[internal][vvb2060][vvb2060@gmail.com]                    fdw.write("- Reboot after 5s\n".getBytes());
+[internal][vvb2060][vvb2060@gmail.com]                    Thread.sleep(5000);
+[external][howardwu20][HowardWu20@outlook.com]                    reboot();
+[internal][vvb2060][vvb2060@gmail.com]                } else {
+[internal][vvb2060][vvb2060@gmail.com]                    var s = "! Flash failed, exit with " + exit + "\n";
+[internal][vvb2060][vvb2060@gmail.com]                    fdw.write(s.getBytes());
+[internal][vvb2060][vvb2060@gmail.com]                }
+[internal][vvb2060][vvb2060@gmail.com]            } else {
+[internal][vvb2060][vvb2060@gmail.com]                proc.destroy();
+[internal][vvb2060][vvb2060@gmail.com]                fdw.write("! Timeout, abort\n".getBytes());
+[internal][vvb2060][vvb2060@gmail.com]            }
+[external][howardwu20][HowardWu20@outlook.com]        } catch (IOException | InterruptedException | RemoteException e) {
+[internal][vvb2060][vvb2060@gmail.com]            Log.e(TAG, "flashZip: ", e);
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]    }
+[external][shana][shana@zju.edu.cn]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    @Override
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    public void clearApplicationProfileData(String packageName) throws RemoteException {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        PackageService.clearApplicationProfileData(packageName);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]    @Override
+[internal][vvb2060][vvb2060@gmail.com]    public boolean enableStatusNotification() {
+[internal][vvb2060][vvb2060@gmail.com]        return ConfigManager.getInstance().enableStatusNotification();
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    @Override
+[internal][vvb2060][vvb2060@gmail.com]    public void setEnableStatusNotification(boolean enable) {
+[internal][vvb2060][vvb2060@gmail.com]        ConfigManager.getInstance().setEnableStatusNotification(enable);
+[internal][vvb2060][vvb2060@gmail.com]        if (enable) {
+[internal][vvb2060][vvb2060@gmail.com]            LSPNotificationManager.notifyStatusNotification();
+[internal][vvb2060][vvb2060@gmail.com]        } else {
+[internal][vvb2060][vvb2060@gmail.com]            LSPNotificationManager.cancelStatusNotification();
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public boolean performDexOptMode(String packageName) throws RemoteException {
+[external][shana][shana@zju.edu.cn]        return PackageService.performDexOptMode(packageName);
+[external][shana][shana@zju.edu.cn]    }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    @Override
+[external][shana][shana@zju.edu.cn]    public boolean getDexObfuscate() {
+[external][admin][admin@0x.mk]        return ConfigManager.getInstance().dexObfuscate();
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    @Override
+[external][shana][shana@zju.edu.cn]    public void setDexObfuscate(boolean enabled) {
+[external][admin][admin@0x.mk]        ConfigManager.getInstance().setDexObfuscate(enabled);
+[external][admin][admin@0x.mk]    }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    @Override
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    public int getDex2OatWrapperCompatibility() {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            return ServiceManager.getDex2OatService().getCompatibility();
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        } else {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            return 0;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    }
+[external][shana][shana@zju.edu.cn]}

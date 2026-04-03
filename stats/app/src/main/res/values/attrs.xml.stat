@@ -1,0 +1,85 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]<?xml version="1.0" encoding="utf-8"?><!--
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  -->
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]<resources>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    <attr name="colorNormal" format="color" />
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    <attr name="colorInstall" format="color" />
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    <declare-styleable name="SubtitleCollapsingToolbarLayout">
+[external][shana][shana@zju.edu.cn]        <!-- Specifies extra space on the start, top, end and bottom sides of the the expanded title text.
+[external][shana][shana@zju.edu.cn]             Margin values should be positive,
+[external][shana][shana@zju.edu.cn]             subtitle will also be affected. -->
+[external][shana][shana@zju.edu.cn]        <attr name="expandedTitleMargin" />
+[external][shana][shana@zju.edu.cn]        <!-- Specifies extra space on the start side of the the expanded title text. Margin values should be positive,
+[external][shana][shana@zju.edu.cn]             subtitle will also be affected. -->
+[external][shana][shana@zju.edu.cn]        <attr name="expandedTitleMarginStart" />
+[external][shana][shana@zju.edu.cn]        <!-- Specifies extra space on the top side of the the expanded title text. Margin values should be positive,
+[external][shana][shana@zju.edu.cn]             subtitle will also be affected. -->
+[external][shana][shana@zju.edu.cn]        <attr name="expandedTitleMarginTop" />
+[external][shana][shana@zju.edu.cn]        <!-- Specifies extra space on the end side of the the expanded title text. Margin values should be positive,
+[external][shana][shana@zju.edu.cn]             subtitle will also be affected. -->
+[external][shana][shana@zju.edu.cn]        <attr name="expandedTitleMarginEnd" />
+[external][shana][shana@zju.edu.cn]        <!-- Specifies extra space on the bottom side of the the expanded title text. Margin values should be positive,
+[external][shana][shana@zju.edu.cn]             subtitle will also be affected. -->
+[external][shana][shana@zju.edu.cn]        <attr name="expandedTitleMarginBottom" />
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        <!-- The text appearance of the CollapsingToolbarLayout's title when it is fully 'expanded' -->
+[external][shana][shana@zju.edu.cn]        <attr name="expandedTitleTextAppearance" />
+[external][shana][shana@zju.edu.cn]        <!-- The text appearance of the CollapsingToolbarLayout's subtitle when it is fully 'expanded' -->
+[external][shana][shana@zju.edu.cn]        <attr name="expandedSubtitleTextAppearance" format="reference" />
+[external][shana][shana@zju.edu.cn]        <!-- The text appearance of the CollapsingToolbarLayouts title when it is fully 'collapsed' -->
+[external][shana][shana@zju.edu.cn]        <attr name="collapsedTitleTextAppearance" />
+[external][shana][shana@zju.edu.cn]        <!-- The text appearance of the CollapsingToolbarLayouts subtitle when it is fully 'collapsed' -->
+[external][shana][shana@zju.edu.cn]        <attr name="collapsedSubtitleTextAppearance" format="reference" />
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        <!-- The drawable to use as a scrim on top of the CollapsingToolbarLayouts
+[external][shana][shana@zju.edu.cn]             content when it has been scrolled sufficiently off screen. -->
+[external][shana][shana@zju.edu.cn]        <attr name="contentScrim" />
+[external][shana][shana@zju.edu.cn]        <!-- The drawable to use as a scrim for the status bar content when the
+[external][shana][shana@zju.edu.cn]             CollapsingToolbarLayout has been scrolled sufficiently off screen.
+[external][shana][shana@zju.edu.cn]             Only works on Lollipop with the correct setup. -->
+[external][shana][shana@zju.edu.cn]        <attr name="statusBarScrim" />
+[external][shana][shana@zju.edu.cn]        <!-- The id of the primary Toolbar child that you wish to use for the purpose of collapsing.
+[external][shana][shana@zju.edu.cn]             This Toolbar descendant view does not need to be a direct child of the layout.
+[external][shana][shana@zju.edu.cn]             If you do not set this, the first direct Toolbar child found will be used. -->
+[external][shana][shana@zju.edu.cn]        <attr name="toolbarId" />
+[external][shana][shana@zju.edu.cn]        <!-- Specifies the amount of visible height in pixels used to define when to trigger a
+[external][shana][shana@zju.edu.cn]             scrim visibility change. -->
+[external][shana][shana@zju.edu.cn]        <attr name="scrimVisibleHeightTrigger" />
+[external][shana][shana@zju.edu.cn]        <!-- Specifies the duration used for scrim visibility animations. -->
+[external][shana][shana@zju.edu.cn]        <attr name="scrimAnimationDuration" />
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        <!-- Specifies how the title should be positioned when collapsed,
+[external][shana][shana@zju.edu.cn]             subtitle will also be affected. -->
+[external][shana][shana@zju.edu.cn]        <attr name="collapsedTitleGravity" />
+[external][shana][shana@zju.edu.cn]        <!-- Specifies how the title should be positioned when expanded,
+[external][shana][shana@zju.edu.cn]             subtitle will also be affected. -->
+[external][shana][shana@zju.edu.cn]        <attr name="expandedTitleGravity" />
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        <!-- Whether the CollapsingToolbarLayout should draw its own shrinking/growing title. -->
+[external][shana][shana@zju.edu.cn]        <attr name="titleEnabled" />
+[external][shana][shana@zju.edu.cn]        <!-- The title to show when titleEnabled is set to true. -->
+[external][shana][shana@zju.edu.cn]        <attr name="title" />
+[external][shana][shana@zju.edu.cn]        <!-- The subtitle to show when titleEnabled is set to true. -->
+[external][shana][shana@zju.edu.cn]        <attr name="subtitle" />
+[external][shana][shana@zju.edu.cn]    </declare-styleable>
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]</resources>

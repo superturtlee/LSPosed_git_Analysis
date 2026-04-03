@@ -1,0 +1,26 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]package android.os;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]import android.annotation.NonNull;
+[internal][vvb2060][vvb2060@gmail.com]import android.annotation.Nullable;
+[internal][vvb2060][vvb2060@gmail.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]public class SystemProperties {
+[internal][vvb2060][vvb2060@gmail.com]    public static String get(@NonNull String key) {
+[internal][vvb2060][vvb2060@gmail.com]        throw new UnsupportedOperationException("Stub");
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    public static String get(@NonNull String key, @Nullable String def) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        throw new UnsupportedOperationException("Stub");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]    public static void set(@NonNull String key, @Nullable String val) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        throw new UnsupportedOperationException("Stub");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static boolean getBoolean(@NonNull String key, boolean def) {
+[external][shana][shana@zju.edu.cn]        throw new UnsupportedOperationException("Stub");
+[external][shana][shana@zju.edu.cn]    }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    public static int getInt(@NonNull String key, int def) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        throw new UnsupportedOperationException("Stub");
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]}

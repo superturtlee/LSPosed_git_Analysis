@@ -1,0 +1,21 @@
+[bot][lsposed][lsposed@lsposed.org]<?xml version="1.0" encoding="utf-8"?>
+[bot][lsposed][lsposed@lsposed.org]<resources>
+[bot][lsposed][lsposed@lsposed.org]    <!-- Notification -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_is_not_activated_yet">Xposed modul još nije aktiviran</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_is_not_activated_yet_main_user_detailed">%1$s je instaliran, ali još nije aktiviran</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_is_not_activated_yet_multi_user_detailed">%1$s je instaliran korisniku %2$s, ali još nije aktiviran</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="xposed_module_updated_notification_title">Modul Xposed ažuriran</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="xposed_module_updated_notification_content">%s je ažuriran, prisilno zaustavite i ponovno pokrenite aplikacije u njegovom opsegu</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="xposed_module_updated_notification_title_system">Xposed modul je ažuriran, potrebno je ponovno pokretanje sustava</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="xposed_module_updated_notification_content_system">%s je ažuriran, budući da opseg sadrži System Framework, potrebno je ponovno pokretanje za primjenu promjena</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_updated_channel_name">Ažuriranje modula dovršeno</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="status_channel_name">LSPosed status</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="lsposed_running_notification_title">LSPosed je učitan</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="lsposed_running_notification_content">Dodirnite obavijest da otvorite upravitelja</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="xposed_module_request_scope_title">Zahtjev za opseg</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="xposed_module_request_scope_content">%1$s na korisniku %2$s zahtijeva dodavanje %3$s svom opsegu.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="scope_channel_name">Zahtjev za opseg</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="scope_approve">Odobriti</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="scope_deny">Poreći</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="nerver_ask_again">Nikad ne pitaj</string>
+[bot][lsposed][lsposed@lsposed.org]</resources>

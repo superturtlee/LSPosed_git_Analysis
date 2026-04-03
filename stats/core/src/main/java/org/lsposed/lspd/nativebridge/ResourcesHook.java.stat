@@ -1,0 +1,38 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.lspd.nativebridge;
+[external][hsushulong][hsushulong@gmail.com]
+[external][shana][shana@zju.edu.cn]import android.content.res.Resources;
+[external][shana][shana@zju.edu.cn]import android.content.res.XResources;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import dalvik.annotation.optimization.FastNative;
+[external][shana][shana@zju.edu.cn]
+[external][hsushulong][hsushulong@gmail.com]public class ResourcesHook {
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]    public static native boolean initXResourcesNative();
+[external][hsushulong][hsushulong@gmail.com]
+[external][shana][shana@zju.edu.cn]    public static native boolean makeInheritable(Class<?> clazz);
+[external][hsushulong][hsushulong@gmail.com]
+[external][shana][shana@zju.edu.cn]    public static native ClassLoader buildDummyClassLoader(ClassLoader parent, String resourceSuperClass, String typedArraySuperClass);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @FastNative
+[external][shana][shana@zju.edu.cn]    public static native void rewriteXmlReferencesNative(long parserPtr, XResources origRes, Resources repRes);
+[external][hsushulong][hsushulong@gmail.com]}

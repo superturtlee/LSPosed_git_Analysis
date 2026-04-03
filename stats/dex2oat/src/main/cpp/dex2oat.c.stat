@@ -1,0 +1,125 @@
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]/*
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * This file is part of LSPosed.
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] *
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * (at your option) any later version.
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] *
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * GNU General Public License for more details.
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] *
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] *
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * Copyright (C) 2022 LSPosed Contributors
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] */
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]//
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]// Created by Nullptr on 2022/4/1.
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]//
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#include <errno.h>
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#include <stdio.h>
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#include <string.h>
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#include <sys/socket.h>
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#include <sys/un.h>
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#include <unistd.h>
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#include "logging.h"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#if defined(__LP64__)
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]# define LP_SELECT(lp32, lp64) lp64
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#else
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]# define LP_SELECT(lp32, lp64) lp32
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#endif
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#define ID_VEC(is64, is_debug) (((is64) << 1) | (is_debug))
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]const char kSockName[] = "5291374ceda0aef7c5d86cd2a4f6a3ac\0";
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]static ssize_t xrecvmsg(int sockfd, struct msghdr *msg, int flags) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    int rec = recvmsg(sockfd, msg, flags);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    if (rec < 0) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        PLOGE("recvmsg");
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    return rec;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]}
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]static void *recv_fds(int sockfd, char *cmsgbuf, size_t bufsz, int cnt) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    struct iovec iov = {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            .iov_base = &cnt,
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            .iov_len  = sizeof(cnt),
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    };
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    struct msghdr msg = {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            .msg_iov        = &iov,
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            .msg_iovlen     = 1,
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            .msg_control    = cmsgbuf,
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            .msg_controllen = bufsz
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    };
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    xrecvmsg(sockfd, &msg, MSG_WAITALL);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    struct cmsghdr *cmsg = CMSG_FIRSTHDR(&msg);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    if (msg.msg_controllen != bufsz ||
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        cmsg == NULL ||
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        cmsg->cmsg_len != CMSG_LEN(sizeof(int) * cnt) ||
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        cmsg->cmsg_level != SOL_SOCKET ||
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        cmsg->cmsg_type != SCM_RIGHTS) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        return NULL;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    return CMSG_DATA(cmsg);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]}
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]static int recv_fd(int sockfd) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    char cmsgbuf[CMSG_SPACE(sizeof(int))];
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    void *data = recv_fds(sockfd, cmsgbuf, sizeof(cmsgbuf), 1);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    if (data == NULL)
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        return -1;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    int result;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    memcpy(&result, data, sizeof(int));
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    return result;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]}
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]static int read_int(int fd) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    int val;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    if (read(fd, &val, sizeof(val)) != sizeof(val))
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        return -1;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    return val;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]}
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]static void write_int(int fd, int val) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    if (fd < 0) return;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    write(fd, &val, sizeof(val));
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]}
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]int main(int argc, char **argv) {
+[internal][vvb2060][vvb2060@gmail.com]    LOGD("dex2oat wrapper ppid=%d", getppid());
+[internal][vvb2060][vvb2060@gmail.com]    struct sockaddr_un sock = {};
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    sock.sun_family = AF_UNIX;
+[internal][vvb2060][vvb2060@gmail.com]    strlcpy(sock.sun_path + 1, kSockName, sizeof(sock.sun_path) - 1);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    int sock_fd = socket(AF_UNIX, SOCK_STREAM, 0);
+[internal][vvb2060][vvb2060@gmail.com]    size_t len = sizeof(sa_family_t) + strlen(sock.sun_path + 1) + 1;
+[internal][vvb2060][vvb2060@gmail.com]    if (connect(sock_fd, (struct sockaddr *) &sock, len)) {
+[internal][vvb2060][vvb2060@gmail.com]        PLOGE("failed to connect to %s", sock.sun_path + 1);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        return 1;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    write_int(sock_fd, ID_VEC(LP_SELECT(0, 1), strstr(argv[0], "dex2oatd") != NULL));
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    int stock_fd = recv_fd(sock_fd);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    read_int(sock_fd);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    close(sock_fd);
+[internal][vvb2060][vvb2060@gmail.com]    LOGD("sock: %s %d", sock.sun_path + 1, stock_fd);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    const char *new_argv[argc + 2];
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    for (int i = 0; i < argc; i++) new_argv[i] = argv[i];
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    new_argv[argc] = "--inline-max-code-units=0";
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    new_argv[argc + 1] = NULL;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    fexecve(stock_fd, (char **) new_argv, environ);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    PLOGE("fexecve failed");
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    return 2;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]}

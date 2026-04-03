@@ -1,0 +1,242 @@
+[bot][lsposed][lsposed@lsposed.org]<?xml version="1.0" encoding="utf-8"?>
+[bot][lsposed][lsposed@lsposed.org]<!--
+[bot][lsposed][lsposed@lsposed.org]  ~ This file is part of LSPosed.
+[bot][lsposed][lsposed@lsposed.org]  ~
+[bot][lsposed][lsposed@lsposed.org]  ~ LSPosed is free software: you can redistribute it and/or modify
+[bot][lsposed][lsposed@lsposed.org]  ~ it under the terms of the GNU General Public License as published by
+[bot][lsposed][lsposed@lsposed.org]  ~ the Free Software Foundation, either version 3 of the License, or
+[bot][lsposed][lsposed@lsposed.org]  ~ (at your option) any later version.
+[bot][lsposed][lsposed@lsposed.org]  ~
+[bot][lsposed][lsposed@lsposed.org]  ~ LSPosed is distributed in the hope that it will be useful,
+[bot][lsposed][lsposed@lsposed.org]  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+[bot][lsposed][lsposed@lsposed.org]  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[bot][lsposed][lsposed@lsposed.org]  ~ GNU General Public License for more details.
+[bot][lsposed][lsposed@lsposed.org]  ~
+[bot][lsposed][lsposed@lsposed.org]  ~ You should have received a copy of the GNU General Public License
+[bot][lsposed][lsposed@lsposed.org]  ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[bot][lsposed][lsposed@lsposed.org]  ~
+[bot][lsposed][lsposed@lsposed.org]  ~ Copyright (C) 2021 LSPosed Contributors
+[bot][lsposed][lsposed@lsposed.org]  -->
+[bot][lsposed][lsposed@lsposed.org]<resources xmlns:tools="http://schemas.android.com/tools" tools:keep="@string/xposed_module_updated_notification_*,@string/module_is_not_activated_*">
+[bot][lsposed][lsposed@lsposed.org]    <!-- MainActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="overview">Visió general</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="Modules">Mòduls</string>
+[bot][lsposed][lsposed@lsposed.org]    <plurals name="modules_enabled_count">
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="one">%d Mòdul activat</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="other">%d Mòduls activats</item>
+[bot][lsposed][lsposed@lsposed.org]    </plurals>
+[bot][lsposed][lsposed@lsposed.org]    <string name="Logs">Logs</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="Settings">Configuració</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="feedback_or_suggestion">Comentari o suggeriment</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="About">Sobre</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="report_issue">Reportar problema</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo">Repositori</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo_up_to_date">Tots els mòduls actualitzats</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo_published_time">Published at %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo_updated_time">Actualitzat a les %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <plurals name="module_repo_upgradable">
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="one">%d mòdul actualitzable</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="other">%d mòduls actualitzables</item>
+[bot][lsposed][lsposed@lsposed.org]    </plurals>
+[bot][lsposed][lsposed@lsposed.org]    <string name="about_view_source_code"><![CDATA[Veure codi font a %1$s<br/>Uneix-te al nostre %2$s canal]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="translators" comment="Dear translators, please add your home page here following the format. There can be more than one translator. So feel free to append yourself.">Frederic Blay,  Ghost Face, Yannick Kamin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install">Instalar</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install_summary">Toca per instal·lar LSPosed</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="not_installed">No instalat</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="not_install_summary">LSPosed no està instal·lat</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="activated">Activat</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="partial_activated">Parcialment activat</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="selinux_policy_not_loaded_summary">SEPolicy no s\'ha carregat correctament</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="selinux_policy_not_loaded"><![CDATA[Algunes funcions no funcionaran.<br/>Informeu-ho al desenvolupador <a href="https://github.com/topjohnwu/Magisk/issues"><b>Magisk</b></a>.]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_inject_fail_summary">La injecció del marc del sistema ha fallat</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_inject_fail"><![CDATA[Això és poc comú i podria ser causat per <b>Magisk</b> o algún Mòdul de baixa qualitat<br/>Si us plau, prova a desactivar els demés mòduls de magisk excepte Riru i LSPosed o envia un informe complet als desarrolladors.]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_prop_incorrect_summary">Prop del sistema incorrecte</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_prop_incorrect"><![CDATA[S\'han suprimit o modificat algunes propietats necessàries del sistema.<br/>Els mòduls poden invalidar-se ocasionalment.]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="need_update">Cal actualitzar</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="please_update_summary">Instal·leu la darrera versió de LSPosed</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_api_version">Versió de l\'API</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_framework_version">Versió del marc</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_manager_package_name">Nom del paquet del gestor</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_system_version">Versió del sistema</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_device">Dispositiu</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_system_abi">Sistema ABI</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_dex2oat_wrapper">Embolcall de Dex Optimizer</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enabled">Habilitat</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="not_enabled">No habilitat</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="supported">Admet</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="unsupported">Sense suport</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="android_version_unsatisfied">La versió d\'Android no està satisfeta</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="crashed">Estavellat</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="mount_failed">El muntatge ha fallat</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="selinux_permissive">SELinux és permissiu</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sepolicy_incorrect">La política de SELinux és incorrecta</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_lsposed">Actualització LSPosed</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_lsposed_msg">Confirmeu per actualitzar LSPosed? Aquest dispositiu es reiniciarà un cop finalitzada l\'actualització</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_copied">S\'ha copiat al porta-retalls</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- WelcomeDialog -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="parasitic_welcome">Benvingut a LSPosed</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="parasitic_welcome_summary">Esteu utilitzant el gestor de paràsits, que pot crear dreceres o encara obrir-se des de la notificació.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="parasitic_welcome_summary_no_shortcut_support">Esteu utilitzant el gestor de paràsits, que es pot obrir des de la notificació.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="create_shortcut">Crear accès directe</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="never_show">No mostris mai</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_welcome">Administrador de paràsits recomanat</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_welcome_summary">LSPosed ara admet la parasitització del sistema per evitar la detecció, podeu obrir el gestor de paràsits des de la notificació. Es recomana desinstal·lar l\'aplicació actual.</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- LogsActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="menuSaveToSd">Desa</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="nav_item_logs_verbose">Registres detallats</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="nav_item_logs_module">Registres de mòduls</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_saving">S\'està desant el registre, espereu</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_saved">Registres guardats</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_save_failed2">No s\'ha pogut desar:\n%s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menuClearLog">Esborra el registre ara</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_cleared">El registre s\'ha esborrat correctament.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="scroll_top">Desplaceu-vos cap a dalt</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="loading">Carregant…</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="scroll_bottom">Desplaceu-vos cap avall</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menuReload">Recarregar</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_clear_failed_2">No s\'ha pogut esborrar el registre</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_enable_word_wrap">L\'ajust de línia</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enabled_verbose_log">Registre detallat activat</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="disabled_verbose_log">Registre detallat desactivat</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- ModulesActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_empty_description">(no s\'ofereix cap descripció)</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_xposed_min_version">Aquest mòdul requereix una versió més nova de Xposed (%d) i per tant no es pot activar</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_target_version_higher">Aquest mòdul està dissenyat per a una versió més nova de Xposed (%d) i per tant algunes funcionalitats poden no funcionar</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="no_min_version_specified">Aquest mòdul no especifica la versió de Xposed que necessita.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_min_version_too_low">Aquest mòdul es va crear per a Xposed versió %1$d, però a causa de canvis incompatibles a la versió %2$d, s\'ha desactivat</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_installed_on_external_storage">Aquest mòdul no es pot carregar perquè està instal·lat a la targeta SD, moveu-lo a l\'emmagatzematge intern</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstall">Desinstal·la</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_settings">Configuració del mòdul</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="view_in_repo">Veure a Repo</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstall_message">Voleu desinstal·lar aquest mòdul?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstalled">Desinstal·lat %1$s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstall_failed">La desinstal·lació no s\'ha realitzat correctament</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="add_module_to_user">Afegeix un mòdul a l\'usuari</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_installed">S\'ha afegit %1$s a l\'usuari %2$s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_install_failed">S\'ha produït un error en afegir el mòdul</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install_to_user">Instal·lar a l\'usuari %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install_to_user_message">Voleu instal·lar %1$s a l\'usuari %2$s? Es recomana instal·lar manualment, forçar la instal·lació mitjançant LSPosed pot causar problemes.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="expand">expandir</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="collapse">col·lapse</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- AppListActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_speed">Torna a optimitzar</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_speed_msg">Optimització…</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_done">Optimització completa</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_launch">Llança\'l</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_failed">L\'optimització ha fallat: el valor de retorn és buit</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_failed_with_info">L\'optimització ha fallat: </string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_by_name">Nom de l\'aplicació</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_by_package_name">Nom del paquet</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_by_install_time">Temps d\'instal·lació</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_by_update_time">Hora d\'actualització</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_reverse">Revés</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_system_apps">Aplicacions del sistema</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_sort">Classificació</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enable_module">Activa el mòdul</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="no_scope_selected">No heu seleccionat cap aplicació. Continuar?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_games">Jocs</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_modules">Mòduls</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_denylist">Llista de denegació</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="failed_to_save_scope_list">No s\'ha pogut desar la llista d\'àmbits</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_version">Versió: %1$s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="use_recommended">Recomanat</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="no_scope_selected_has_recommended">No heu seleccionat cap aplicació. Seleccioneu aplicacions recomanades?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="use_recommended_message">Vols seleccionar aplicacions recomanades?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_is_not_activated_yet">El mòdul Xposed encara no està activat</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="requested_by_module">Recomanat</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_available">Actualització disponible: %1$s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_disabled_no_selection">El mòdul %s s\'ha desactivat perquè no s\'ha seleccionat cap aplicació.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="android_framework">Marc del sistema</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_backup_and_restore">Còpia de seguretat</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_backup">Còpia de seguretat</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_restore">Restaurar</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="force_stop">Parada forçada</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="force_stop_dlg_title">Parada forçada?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="force_stop_dlg_text">Si forços l\'aturada d\'una aplicació, és possible que es comporti malament.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="reboot_required">Cal reiniciar perquè s\'apliqui aquest canvi</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="reboot">Reinicieu</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_hide">Amaga</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="deny_list">%s és a la llista denegada. És possible que no tingui efecte.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="deny_list_info">A la llista denegada</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- ModulesActivity and AppListActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="modules_other_app">Veure en una altra aplicació</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_app_info">Informació de l\'aplicació</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="list_empty">¯\\\\_(ツ)_\/¯\nAquí no hi ha res</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- SettingsActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_group_framework">Marc</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_disable_verbose_log">Desactiva els registres detallats</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_disable_verbose_log_summary">Sol·licitud d\'informes de problemes per incloure registres detallats</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="pure_black_dark_theme">Tema negre fosc</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="pure_black_dark_theme_summary">Utilitzeu el tema negre pur si el tema fosc està habilitat</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_group_theme">Tema</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup_and_restore">Còpia de seguretat i restaurar</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup_summery">Llista de mòduls de còpia de seguretat i llistes d\'abast.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_restore_summery">Restaura la llista de mòduls i les llistes d\'abast.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup">Còpia de seguretat</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup_failed2">No s\'ha pogut fer la còpia de seguretat:\n%s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enable_documentui">Si us plau, activeu DocumentUI</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_restore">Restaurar</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_restore_failed2">No s\'ha pogut restaurar:\n%s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="group_network">Xarxa</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="dns_over_http">DNS sobre HTTPS</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="dns_over_http_summary">Solució alternativa a l\'enverinament per DNS en algunes nacions</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="theme_color">Color del tema</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="theme_color_system">Color del tema del sistema</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_show_hidden_icon_apps_enabled">Força les aplicacions a mostrar icones del llançador</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_show_hidden_icon_apps_enabled_summary">Després d\'Android 10, les aplicacions no poden amagar les icones del llançador. Desactiveu el commutador per desactivar aquesta funció del sistema.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_group_system">Sistema</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_language">Llenguatge</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_translation_contributors">Col·laboradors de traducció</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_translation">Participar en la traducció</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_translation_summary">Ajuda\'ns a traduir %s al teu idioma</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_create_shortcut_summary">Creeu una drecera que pugui obrir el gestor de paràsits</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_shortcut_pinned_hint">Drecera fixada</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_unsupported_pin_shortcut_summary">El llançador predeterminat actual no admet dreceres de pin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_enable_status_notification">Notificació d\'estat</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_enable_status_notification_summary">Mostra una notificació que pugui obrir el gestor de paràsits</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="disable_status_notification_error">Sense drecera, no es pot desactivar la notificació</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_update_channel">Actualitza el canal</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_channel_stable">Estable</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_channel_bate">Beta</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_channel_nightly">Construcció nocturna</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_xposed_api_call_protection">Protecció de trucades de l\'API Xposed</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_xposed_api_call_protection_summary">Bloqueja el codi del mòdul carregat dinàmicament per utilitzar l\'API Xposed, això pot trencar alguns mòduls però beneficiar la seguretat</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- Module Repo -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_readme">Llegiu-me</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_releases">Alliberaments</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_information">Informació</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_information_homepage">Pàgina d\'inici</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_information_source_url">Codi font</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_information_collaborators">Col·laboradors</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_release_view_assets">Actius</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_open_in_browser">Oberta al navegador</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_release_load_more">Mostra les versions anteriors</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_release_no_more">No més llançament</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="repo_load_failed">No s\'ha pogut carregar el dipòsit del mòdul: %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_upgradable_first">Actualitzable primer</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="installed">Instal·lat</string>
+[bot][lsposed][lsposed@lsposed.org]    <plurals name="module_release_assets_download_count">
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="one">%d descàrrega</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="other">%d descàrregues</item>
+[bot][lsposed][lsposed@lsposed.org]    </plurals>
+[bot][lsposed][lsposed@lsposed.org]    <!-- Colors -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_sakura">Sakura</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_red">Vermell</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_pink">Rosa</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_purple">Porpra</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_deep_purple">Lila fosc</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_indigo">Indigo</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_blue">Blau</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_light_blue">Blau clar</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_cyan">Cian</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_teal">Teal</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_green">verd</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_light_green">Verd clar</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_lime">Lima</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_yellow">groc</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_amber">Ambre</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_orange">taronja</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_deep_orange">Taronja profund</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_brown">marró</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_blue_grey">Gris blau</string>
+[bot][lsposed][lsposed@lsposed.org]</resources>

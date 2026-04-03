@@ -1,0 +1,17 @@
+[external][shana][shana@zju.edu.cn]package android.os;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import android.annotation.NonNull;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public class UserHandle {
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public UserHandle(int h) {
+[external][shana][shana@zju.edu.cn]        throw new RuntimeException("STUB");
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public int getIdentifier() {
+[external][shana][shana@zju.edu.cn]        throw new RuntimeException("STUB");
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static final @NonNull
+[external][shana][shana@zju.edu.cn]    UserHandle ALL = null;
+[external][shana][shana@zju.edu.cn]}

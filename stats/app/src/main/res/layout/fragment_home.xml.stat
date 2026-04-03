@@ -1,0 +1,385 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]<!--
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  -->
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    xmlns:app="http://schemas.android.com/apk/res-auto"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    xmlns:tools="http://schemas.android.com/tools"
+[external][shana][shana@zju.edu.cn]    android:id="@+id/fragment_container"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    android:layout_width="match_parent"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    android:layout_height="match_parent"
+[external][shana][shana@zju.edu.cn]    app:consumeSystemWindowsInsets="@integer/internal_fragment_insets"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    app:edgeToEdge="true"
+[external][shana][shana@zju.edu.cn]    app:fitsSystemWindowsInsets="@integer/internal_fragment_insets">
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    <com.google.android.material.appbar.AppBarLayout
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        android:id="@+id/app_bar"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        android:layout_width="match_parent"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        android:layout_height="wrap_content"
+[external][shana][shana@zju.edu.cn]        android:fitsSystemWindows="false"
+[external][shana][shana@zju.edu.cn]        app:fitsSystemWindowsInsets="@integer/internal_fragment_top_insets">
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]        <com.google.android.material.appbar.CollapsingToolbarLayout
+[external][shana][shana@zju.edu.cn]            android:id="@+id/toolbar_layout"
+[external][shana][shana@zju.edu.cn]            style="?collapsingToolbarLayoutLargeStyle"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            android:layout_width="match_parent"
+[external][shana][shana@zju.edu.cn]            android:layout_height="?collapsingToolbarLayoutLargeSize"
+[external][shana][shana@zju.edu.cn]            android:fitsSystemWindows="false"
+[external][shana][shana@zju.edu.cn]            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+[external][shana][shana@zju.edu.cn]            app:titleCollapseMode="scale">
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            <View
+[external][shana][shana@zju.edu.cn]                android:id="@+id/click_view"
+[external][shana][shana@zju.edu.cn]                android:layout_width="match_parent"
+[external][shana][shana@zju.edu.cn]                android:layout_height="match_parent" />
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            <com.google.android.material.appbar.MaterialToolbar
+[external][shana][shana@zju.edu.cn]                android:id="@+id/toolbar"
+[external][shana][shana@zju.edu.cn]                android:layout_width="match_parent"
+[external][shana][shana@zju.edu.cn]                android:layout_height="?actionBarSize"
+[external][shana][shana@zju.edu.cn]                android:elevation="0dp"
+[external][shana][shana@zju.edu.cn]                app:layout_collapseMode="pin"
+[internal][vvb2060][vvb2060@gmail.com]                app:logo="@drawable/ic_launcher_round"
+[external][shana][shana@zju.edu.cn]                app:titleMarginStart="@dimen/m3_alert_dialog_icon_margin" />
+[external][shana][shana@zju.edu.cn]        </com.google.android.material.appbar.CollapsingToolbarLayout>
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    </com.google.android.material.appbar.AppBarLayout>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    <FrameLayout
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        android:layout_width="match_parent"
+[external][shana][shana@zju.edu.cn]        android:layout_height="wrap_content"
+[external][shana][shana@zju.edu.cn]        app:fitsSystemWindowsInsets="@integer/internal_fragment_bottom_insets"
+[external][shana][shana@zju.edu.cn]        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        tools:ignore="MissingPrefix">
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <rikka.widget.borderview.BorderNestedScrollView
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            android:id="@+id/nestedScrollView"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            android:layout_width="match_parent"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            android:layout_height="match_parent"
+[external][shana][shana@zju.edu.cn]            android:scrollbars="none"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            app:borderBottomVisibility="never"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            app:borderTopDrawable="@null"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            app:borderTopVisibility="whenTop">
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            <LinearLayout
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                android:layout_width="match_parent"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                android:layout_height="match_parent"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                android:animateLayoutChanges="true"
+[external][shana][shana@zju.edu.cn]                android:clipChildren="false"
+[external][shana][shana@zju.edu.cn]                android:clipToPadding="false"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                android:orientation="vertical"
+[external][shana][shana@zju.edu.cn]                android:paddingHorizontal="@dimen/m3_appbar_expanded_title_margin_horizontal"
+[external][shana][shana@zju.edu.cn]                android:paddingVertical="?dialogPreferredPadding"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                tools:context=".ui.activity.MainActivity">
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                <com.google.android.material.card.MaterialCardView
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    android:id="@+id/status"
+[external][shana][shana@zju.edu.cn]                    style="@style/Widget.Material3.CardView.Elevated"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    android:layout_width="match_parent"
+[external][shana][shana@zju.edu.cn]                    android:layout_height="wrap_content"
+[external][shana][shana@zju.edu.cn]                    android:outlineAmbientShadowColor="?colorPrimary"
+[external][shana][shana@zju.edu.cn]                    android:outlineSpotShadowColor="?colorPrimary"
+[external][shana][shana@zju.edu.cn]                    android:stateListAnimator="@null"
+[external][shana][shana@zju.edu.cn]                    app:cardBackgroundColor="?colorPrimary"
+[external][shana][shana@zju.edu.cn]                    app:cardElevation="@dimen/home_primary_elevation"
+[external][shana][shana@zju.edu.cn]                    app:cardPreventCornerOverlap="false"
+[external][shana][shana@zju.edu.cn]                    tools:targetApi="p">
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    <RelativeLayout
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        android:layout_width="match_parent"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        android:layout_height="wrap_content"
+[external][shana][shana@zju.edu.cn]                        android:padding="?dialogPreferredPadding">
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        <ImageView
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                            android:id="@+id/status_icon"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                            android:layout_width="24dp"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                            android:layout_height="24dp"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                            android:layout_centerVertical="true"
+[external][shana][shana@zju.edu.cn]                            android:tint="?colorOnPrimary"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                            app:srcCompat="@drawable/ic_round_check_circle_24"
+[external][shana][shana@zju.edu.cn]                            tools:ignore="ContentDescription" />
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]                        <com.google.android.material.textview.MaterialTextView
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                            android:id="@+id/status_title"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                            android:layout_width="wrap_content"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                            android:layout_height="wrap_content"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                            android:layout_marginStart="24dp"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                            android:layout_toEndOf="@id/status_icon"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                            android:fontFamily="sans-serif-medium"
+[external][shana][shana@zju.edu.cn]                            android:textAppearance="?textAppearanceTitleMedium"
+[external][shana][shana@zju.edu.cn]                            android:textColor="?colorOnPrimary"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                            android:textSize="16sp" />
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]                        <com.google.android.material.textview.MaterialTextView
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                            android:id="@+id/status_summary"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                            android:layout_width="wrap_content"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                            android:layout_height="wrap_content"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                            android:layout_below="@id/status_title"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                            android:layout_alignStart="@id/status_title"
+[external][shana][shana@zju.edu.cn]                            android:textAppearance="?textAppearanceBodyMedium"
+[external][shana][shana@zju.edu.cn]                            android:textColor="?colorOnPrimary" />
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    </RelativeLayout>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                </com.google.android.material.card.MaterialCardView>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                <com.google.android.material.card.MaterialCardView
+[external][shana][shana@zju.edu.cn]                    android:id="@+id/warning_card"
+[external][shana][shana@zju.edu.cn]                    style="@style/Widget.Material3.CardView.Outlined"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    android:layout_width="match_parent"
+[external][shana][shana@zju.edu.cn]                    android:layout_height="wrap_content"
+[external][shana][shana@zju.edu.cn]                    android:layout_marginTop="16dp"
+[external][shana][shana@zju.edu.cn]                    app:cardBackgroundColor="?colorErrorContainer">
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]                    <LinearLayout
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        android:layout_width="match_parent"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        android:layout_height="wrap_content"
+[external][shana][shana@zju.edu.cn]                        android:orientation="vertical"
+[external][shana][shana@zju.edu.cn]                        android:padding="?dialogPreferredPadding">
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]                        <com.google.android.material.textview.MaterialTextView
+[external][shana][shana@zju.edu.cn]                            android:id="@+id/warning_title"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                            android:layout_width="wrap_content"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                            android:layout_height="wrap_content"
+[external][shana][shana@zju.edu.cn]                            android:textAppearance="?textAppearanceTitleMedium"
+[external][shana][shana@zju.edu.cn]                            android:textColor="?colorOnErrorContainer" />
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]                        <com.google.android.material.textview.MaterialTextView
+[external][shana][shana@zju.edu.cn]                            android:id="@+id/warning_summary"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                            android:layout_width="wrap_content"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                            android:layout_height="wrap_content"
+[external][shana][shana@zju.edu.cn]                            android:textAppearance="?textAppearanceBodyMedium"
+[external][shana][shana@zju.edu.cn]                            android:textColor="?colorOnErrorContainer" />
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]                    </LinearLayout>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                </com.google.android.material.card.MaterialCardView>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                <com.google.android.material.card.MaterialCardView
+[external][shana][shana@zju.edu.cn]                    android:id="@+id/update_card"
+[external][shana][shana@zju.edu.cn]                    style="@style/Widget.Material3.CardView.Outlined"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    android:layout_width="match_parent"
+[external][shana][shana@zju.edu.cn]                    android:layout_height="wrap_content"
+[external][shana][shana@zju.edu.cn]                    android:layout_marginTop="16dp"
+[external][shana][shana@zju.edu.cn]                    app:cardBackgroundColor="?colorSecondaryContainer">
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]                    <LinearLayout
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        android:layout_width="match_parent"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        android:layout_height="wrap_content"
+[external][shana][shana@zju.edu.cn]                        android:orientation="vertical"
+[external][shana][shana@zju.edu.cn]                        android:padding="?dialogPreferredPadding">
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]                        <com.google.android.material.textview.MaterialTextView
+[external][shana][shana@zju.edu.cn]                            android:id="@+id/update_title"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                            android:layout_width="wrap_content"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                            android:layout_height="wrap_content"
+[external][shana][shana@zju.edu.cn]                            android:textAppearance="?textAppearanceTitleMedium"
+[external][shana][shana@zju.edu.cn]                            android:textColor="?colorOnSecondaryContainer" />
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]                        <com.google.android.material.textview.MaterialTextView
+[external][shana][shana@zju.edu.cn]                            android:id="@+id/update_summary"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                            android:layout_width="wrap_content"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                            android:layout_height="wrap_content"
+[external][shana][shana@zju.edu.cn]                            android:textAppearance="?textAppearanceBodyMedium"
+[external][shana][shana@zju.edu.cn]                            android:textColor="?colorOnSecondaryContainer" />
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]                        <LinearLayout
+[external][shana][shana@zju.edu.cn]                            android:layout_width="match_parent"
+[external][shana][shana@zju.edu.cn]                            android:layout_height="wrap_content"
+[external][shana][shana@zju.edu.cn]                            android:layout_marginTop="?dialogPreferredPadding"
+[external][shana][shana@zju.edu.cn]                            android:gravity="end"
+[external][shana][shana@zju.edu.cn]                            android:orientation="horizontal">
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]                            <com.google.android.material.button.MaterialButton
+[external][shana][shana@zju.edu.cn]                                android:id="@+id/update_btn"
+[external][shana][shana@zju.edu.cn]                                android:layout_width="wrap_content"
+[external][shana][shana@zju.edu.cn]                                android:layout_height="wrap_content"
+[external][shana][shana@zju.edu.cn]                                android:hint="@string/install"
+[external][shana][shana@zju.edu.cn]                                android:text="@string/install"
+[external][shana][shana@zju.edu.cn]                                android:textAlignment="center" />
+[external][shana][shana@zju.edu.cn]                        </LinearLayout>
+[external][shana][shana@zju.edu.cn]                    </LinearLayout>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                </com.google.android.material.card.MaterialCardView>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]                <com.google.android.material.card.MaterialCardView
+[internal][vvb2060][vvb2060@gmail.com]                    android:id="@+id/developer_warning_card"
+[internal][vvb2060][vvb2060@gmail.com]                    style="@style/Widget.Material3.CardView.Outlined"
+[internal][vvb2060][vvb2060@gmail.com]                    android:layout_width="match_parent"
+[internal][vvb2060][vvb2060@gmail.com]                    android:layout_height="wrap_content"
+[internal][vvb2060][vvb2060@gmail.com]                    android:layout_marginTop="16dp"
+[internal][vvb2060][vvb2060@gmail.com]                    android:visibility="gone"
+[internal][vvb2060][vvb2060@gmail.com]                    app:cardBackgroundColor="?colorSecondaryContainer">
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]                    <LinearLayout
+[internal][vvb2060][vvb2060@gmail.com]                        android:layout_width="match_parent"
+[internal][vvb2060][vvb2060@gmail.com]                        android:layout_height="wrap_content"
+[internal][vvb2060][vvb2060@gmail.com]                        android:orientation="vertical"
+[internal][vvb2060][vvb2060@gmail.com]                        android:padding="?dialogPreferredPadding">
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]                        <com.google.android.material.textview.MaterialTextView
+[internal][vvb2060][vvb2060@gmail.com]                            android:layout_width="wrap_content"
+[internal][vvb2060][vvb2060@gmail.com]                            android:layout_height="wrap_content"
+[internal][vvb2060][vvb2060@gmail.com]                            android:text="@string/developer_warning_title"
+[internal][vvb2060][vvb2060@gmail.com]                            android:textAppearance="?textAppearanceTitleMedium"
+[internal][vvb2060][vvb2060@gmail.com]                            android:textColor="?colorOnSecondaryContainer" />
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]                        <com.google.android.material.textview.MaterialTextView
+[internal][vvb2060][vvb2060@gmail.com]                            android:layout_width="wrap_content"
+[internal][vvb2060][vvb2060@gmail.com]                            android:layout_height="wrap_content"
+[internal][vvb2060][vvb2060@gmail.com]                            android:text="@string/developer_warning_summary"
+[internal][vvb2060][vvb2060@gmail.com]                            android:textAppearance="?textAppearanceBodyMedium"
+[internal][vvb2060][vvb2060@gmail.com]                            android:textColor="?colorOnSecondaryContainer" />
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]                    </LinearLayout>
+[internal][vvb2060][vvb2060@gmail.com]                </com.google.android.material.card.MaterialCardView>
+[internal][vvb2060][vvb2060@gmail.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                <com.google.android.material.card.MaterialCardView
+[external][shana][shana@zju.edu.cn]                    android:id="@+id/info_card"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    android:layout_width="match_parent"
+[external][shana][shana@zju.edu.cn]                    android:layout_height="wrap_content"
+[external][shana][shana@zju.edu.cn]                    android:layout_marginTop="16dp">
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                    <LinearLayout
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                        android:layout_width="match_parent"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        android:layout_height="wrap_content"
+[external][shana][shana@zju.edu.cn]                        android:orientation="vertical"
+[external][shana][shana@zju.edu.cn]                        android:padding="?dialogPreferredPadding">
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]                        <com.google.android.material.textview.MaterialTextView
+[external][shana][shana@zju.edu.cn]                            style="@style/DeviceInfoDialogLabel"
+[external][shana][shana@zju.edu.cn]                            android:layout_width="match_parent"
+[external][shana][shana@zju.edu.cn]                            android:layout_height="wrap_content"
+[external][shana][shana@zju.edu.cn]                            android:text="@string/info_api_version" />
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]                        <com.google.android.material.textview.MaterialTextView
+[external][shana][shana@zju.edu.cn]                            android:id="@+id/api_version"
+[external][shana][shana@zju.edu.cn]                            style="@style/DeviceInfoDialogValue"
+[external][shana][shana@zju.edu.cn]                            android:layout_width="match_parent"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                            android:layout_height="wrap_content"
+[external][shana][shana@zju.edu.cn]                            android:text="@string/not_installed" />
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]                        <com.google.android.material.textview.MaterialTextView
+[external][shana][shana@zju.edu.cn]                            style="@style/DeviceInfoDialogLabel"
+[external][shana][shana@zju.edu.cn]                            android:layout_width="match_parent"
+[external][shana][shana@zju.edu.cn]                            android:layout_height="wrap_content"
+[internal][vvb2060][vvb2060@gmail.com]                            android:text="@string/settings_xposed_api_call_protection" />
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]                        <com.google.android.material.textview.MaterialTextView
+[external][shana][shana@zju.edu.cn]                            android:id="@+id/api"
+[external][shana][shana@zju.edu.cn]                            style="@style/DeviceInfoDialogValue"
+[external][shana][shana@zju.edu.cn]                            android:layout_width="match_parent"
+[external][shana][shana@zju.edu.cn]                            android:layout_height="wrap_content"
+[external][shana][shana@zju.edu.cn]                            android:text="@string/not_installed" />
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                        <com.google.android.material.textview.MaterialTextView
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                            style="@style/DeviceInfoDialogLabel"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                            android:layout_width="match_parent"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                            android:layout_height="wrap_content"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                            android:text="@string/info_dex2oat_wrapper" />
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                        <com.google.android.material.textview.MaterialTextView
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                            android:id="@+id/dex2oat_wrapper"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                            style="@style/DeviceInfoDialogValue"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                            android:layout_width="match_parent"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                            android:layout_height="wrap_content"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                            android:text="@string/not_installed" />
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]                        <com.google.android.material.textview.MaterialTextView
+[external][shana][shana@zju.edu.cn]                            style="@style/DeviceInfoDialogLabel"
+[external][shana][shana@zju.edu.cn]                            android:layout_width="match_parent"
+[external][shana][shana@zju.edu.cn]                            android:layout_height="wrap_content"
+[external][shana][shana@zju.edu.cn]                            android:text="@string/info_framework_version" />
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]                        <com.google.android.material.textview.MaterialTextView
+[external][shana][shana@zju.edu.cn]                            android:id="@+id/framework_version"
+[external][shana][shana@zju.edu.cn]                            style="@style/DeviceInfoDialogValue"
+[external][shana][shana@zju.edu.cn]                            android:layout_width="match_parent"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                            android:layout_height="wrap_content"
+[external][shana][shana@zju.edu.cn]                            android:text="@string/not_installed" />
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]                        <com.google.android.material.textview.MaterialTextView
+[external][shana][shana@zju.edu.cn]                            style="@style/DeviceInfoDialogLabel"
+[external][shana][shana@zju.edu.cn]                            android:layout_width="match_parent"
+[external][shana][shana@zju.edu.cn]                            android:layout_height="wrap_content"
+[external][howardwu20][HowardWu20@outlook.com]                            android:text="@string/info_manager_package_name" />
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]                        <com.google.android.material.textview.MaterialTextView
+[external][howardwu20][HowardWu20@outlook.com]                            android:id="@+id/manager_package_name"
+[external][shana][shana@zju.edu.cn]                            style="@style/DeviceInfoDialogValue"
+[external][shana][shana@zju.edu.cn]                            android:layout_width="match_parent"
+[external][shana][shana@zju.edu.cn]                            android:layout_height="wrap_content"
+[external][shana][shana@zju.edu.cn]                            android:gravity="center_vertical" />
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]                        <com.google.android.material.textview.MaterialTextView
+[external][shana][shana@zju.edu.cn]                            style="@style/DeviceInfoDialogLabel"
+[external][shana][shana@zju.edu.cn]                            android:layout_width="match_parent"
+[external][shana][shana@zju.edu.cn]                            android:layout_height="wrap_content"
+[external][shana][shana@zju.edu.cn]                            android:text="@string/info_system_version" />
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]                        <com.google.android.material.textview.MaterialTextView
+[external][shana][shana@zju.edu.cn]                            android:id="@+id/system_version"
+[external][shana][shana@zju.edu.cn]                            style="@style/DeviceInfoDialogValue"
+[external][shana][shana@zju.edu.cn]                            android:layout_width="match_parent"
+[external][shana][shana@zju.edu.cn]                            android:layout_height="wrap_content" />
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]                        <com.google.android.material.textview.MaterialTextView
+[external][shana][shana@zju.edu.cn]                            style="@style/DeviceInfoDialogLabel"
+[external][shana][shana@zju.edu.cn]                            android:layout_width="match_parent"
+[external][shana][shana@zju.edu.cn]                            android:layout_height="wrap_content"
+[external][shana][shana@zju.edu.cn]                            android:text="@string/info_device" />
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]                        <com.google.android.material.textview.MaterialTextView
+[external][shana][shana@zju.edu.cn]                            android:id="@+id/device"
+[external][shana][shana@zju.edu.cn]                            style="@style/DeviceInfoDialogValue"
+[external][shana][shana@zju.edu.cn]                            android:layout_width="match_parent"
+[external][shana][shana@zju.edu.cn]                            android:layout_height="wrap_content" />
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]                        <com.google.android.material.textview.MaterialTextView
+[external][shana][shana@zju.edu.cn]                            style="@style/DeviceInfoDialogLabel"
+[external][shana][shana@zju.edu.cn]                            android:layout_width="match_parent"
+[external][shana][shana@zju.edu.cn]                            android:layout_height="wrap_content"
+[external][shana][shana@zju.edu.cn]                            android:text="@string/info_system_abi" />
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]                        <com.google.android.material.textview.MaterialTextView
+[external][shana][shana@zju.edu.cn]                            android:id="@+id/system_abi"
+[external][shana][shana@zju.edu.cn]                            style="@style/DeviceInfoDialogValue"
+[external][shana][shana@zju.edu.cn]                            android:layout_width="match_parent"
+[external][shana][shana@zju.edu.cn]                            android:layout_height="wrap_content"
+[external][shana][shana@zju.edu.cn]                            android:paddingBottom="0dp" />
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]                        <LinearLayout
+[external][shana][shana@zju.edu.cn]                            android:layout_width="match_parent"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                            android:layout_height="wrap_content"
+[external][shana][shana@zju.edu.cn]                            android:gravity="end"
+[external][shana][shana@zju.edu.cn]                            android:orientation="horizontal">
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]                            <com.google.android.material.button.MaterialButton
+[external][shana][shana@zju.edu.cn]                                android:id="@+id/copy_info"
+[external][shana][shana@zju.edu.cn]                                style="?borderlessButtonStyle"
+[external][shana][shana@zju.edu.cn]                                android:layout_width="wrap_content"
+[external][shana][shana@zju.edu.cn]                                android:layout_height="wrap_content"
+[external][shana][shana@zju.edu.cn]                                android:text="@string/copy"
+[external][shana][shana@zju.edu.cn]                                android:textAlignment="center"
+[external][shana][shana@zju.edu.cn]                                android:tooltipText="@string/copy" />
+[external][shana][shana@zju.edu.cn]                        </LinearLayout>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                    </LinearLayout>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]                </com.google.android.material.card.MaterialCardView>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            </LinearLayout>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        </rikka.widget.borderview.BorderNestedScrollView>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    </FrameLayout>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]</androidx.coordinatorlayout.widget.CoordinatorLayout>

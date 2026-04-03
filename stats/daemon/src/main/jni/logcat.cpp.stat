@@ -1,0 +1,334 @@
+[external][shana][shana@zju.edu.cn]#include "logcat.h"
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]#include <jni.h>
+[internal][vvb2060][vvb2060@gmail.com]#include <unistd.h>
+[internal][vvb2060][vvb2060@gmail.com]#include <string>
+[internal][vvb2060][vvb2060@gmail.com]#include <android/log.h>
+[internal][vvb2060][vvb2060@gmail.com]#include <array>
+[external][shana][shana@zju.edu.cn]#include <cinttypes>
+[external][shana][shana@zju.edu.cn]#include <chrono>
+[external][shana][shana@zju.edu.cn]#include <thread>
+[external][shana][shana@zju.edu.cn]#include <functional>
+[internal][canyie][31466456+canyie@users.noreply.github.com]#include <sys/system_properties.h>
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]using namespace std::string_view_literals;
+[external][shana][shana@zju.edu.cn]using namespace std::chrono_literals;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]constexpr size_t kMaxLogSize = 4 * 1024 * 1024;
+[external][shana][shana@zju.edu.cn]constexpr size_t kLogBufferSize = 64 * 1024;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]namespace {
+[external][shana][shana@zju.edu.cn]    constexpr std::array<char, ANDROID_LOG_SILENT + 1> kLogChar = {
+[external][shana][shana@zju.edu.cn]            /*ANDROID_LOG_UNKNOWN*/'?',
+[external][shana][shana@zju.edu.cn]            /*ANDROID_LOG_DEFAULT*/ '?',
+[external][shana][shana@zju.edu.cn]            /*ANDROID_LOG_VERBOSE*/ 'V',
+[external][shana][shana@zju.edu.cn]            /*ANDROID_LOG_DEBUG*/ 'D',
+[external][shana][shana@zju.edu.cn]            /*ANDROID_LOG_INFO*/'I',
+[external][shana][shana@zju.edu.cn]            /*ANDROID_LOG_WARN*/'W',
+[external][shana][shana@zju.edu.cn]            /*ANDROID_LOG_ERROR*/ 'E',
+[external][shana][shana@zju.edu.cn]            /*ANDROID_LOG_FATAL*/ 'F',
+[external][shana][shana@zju.edu.cn]            /*ANDROID_LOG_SILENT*/ 'S',
+[external][shana][shana@zju.edu.cn]    };
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    size_t ParseUint(const char *s) {
+[external][shana][shana@zju.edu.cn]        if (s[0] == '\0') return -1;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        while (isspace(*s)) {
+[external][shana][shana@zju.edu.cn]            s++;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        if (s[0] == '-') {
+[external][shana][shana@zju.edu.cn]            return -1;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        int base = (s[0] == '0' && (s[1] == 'x' || s[1] == 'X')) ? 16 : 10;
+[external][shana][shana@zju.edu.cn]        char *end;
+[external][shana][shana@zju.edu.cn]        auto result = strtoull(s, &end, base);
+[external][shana][shana@zju.edu.cn]        if (end == s) {
+[external][shana][shana@zju.edu.cn]            return -1;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        if (*end != '\0') {
+[external][shana][shana@zju.edu.cn]            const char *suffixes = "bkmgtpe";
+[external][shana][shana@zju.edu.cn]            const char *suffix;
+[external][shana][shana@zju.edu.cn]            if ((suffix = strchr(suffixes, tolower(*end))) == nullptr ||
+[external][shana][shana@zju.edu.cn]                __builtin_mul_overflow(result, 1ULL << (10 * (suffix - suffixes)), &result)) {
+[external][shana][shana@zju.edu.cn]                return -1;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        if (std::numeric_limits<size_t>::max() < result) {
+[external][shana][shana@zju.edu.cn]            return -1;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return static_cast<size_t>(result);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    inline size_t GetByteProp(std::string_view prop, size_t def = -1) {
+[external][shana][shana@zju.edu.cn]        std::array<char, PROP_VALUE_MAX> buf{};
+[external][shana][shana@zju.edu.cn]        if (__system_property_get(prop.data(), buf.data()) < 0) return def;
+[external][shana][shana@zju.edu.cn]        return ParseUint(buf.data());
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    inline std::string GetStrProp(std::string_view prop, std::string def = {}) {
+[external][shana][shana@zju.edu.cn]        std::array<char, PROP_VALUE_MAX> buf{};
+[external][shana][shana@zju.edu.cn]        if (__system_property_get(prop.data(), buf.data()) < 0) return def;
+[external][shana][shana@zju.edu.cn]        return {buf.data()};
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    inline bool SetIntProp(std::string_view prop, int val) {
+[external][shana][shana@zju.edu.cn]        auto buf = std::to_string(val);
+[external][shana][shana@zju.edu.cn]        return __system_property_set(prop.data(), buf.data()) >= 0;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    inline bool SetStrProp(std::string_view prop, std::string_view val) {
+[external][shana][shana@zju.edu.cn]        return __system_property_set(prop.data(), val.data()) >= 0;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]}  // namespace
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]class UniqueFile : public std::unique_ptr<FILE, std::function<void(FILE *)>> {
+[internal][vvb2060][vvb2060@gmail.com]    inline static deleter_type deleter = [](auto f) { f && f != stdout && fclose(f); };
+[internal][vvb2060][vvb2060@gmail.com]public:
+[internal][vvb2060][vvb2060@gmail.com]    explicit UniqueFile(FILE *f) : std::unique_ptr<FILE, std::function<void(FILE *)>>(f, deleter) {}
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    UniqueFile(int fd, const char *mode) : UniqueFile(fd > 0 ? fdopen(fd, mode) : stdout) {};
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]    UniqueFile() : UniqueFile(stdout) {};
+[internal][vvb2060][vvb2060@gmail.com]};
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]class Logcat {
+[internal][vvb2060][vvb2060@gmail.com]public:
+[external][shana][shana@zju.edu.cn]    explicit Logcat(JNIEnv *env, jobject thiz, jmethodID method) :
+[external][shana][shana@zju.edu.cn]            env_(env), thiz_(thiz), refresh_fd_method_(method) {}
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]    [[noreturn]] void Run();
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]private:
+[external][shana][shana@zju.edu.cn]    inline void RefreshFd(bool is_verbose);
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    inline void Log(std::string_view str);
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]    void OnCrash(int err);
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]    void ProcessBuffer(struct log_msg *buf);
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]    static size_t PrintLogLine(const AndroidLogEntry &entry, FILE *out);
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]    void EnsureLogWatchDog();
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]    JNIEnv *env_;
+[internal][vvb2060][vvb2060@gmail.com]    jobject thiz_;
+[internal][vvb2060][vvb2060@gmail.com]    jmethodID refresh_fd_method_;
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]    UniqueFile modules_file_{};
+[external][shana][shana@zju.edu.cn]    size_t modules_file_part_ = 0;
+[external][shana][shana@zju.edu.cn]    size_t modules_print_count_ = 0;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    UniqueFile verbose_file_{};
+[external][shana][shana@zju.edu.cn]    size_t verbose_file_part_ = 0;
+[external][shana][shana@zju.edu.cn]    size_t verbose_print_count_ = 0;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    pid_t my_pid_ = getpid();
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]    bool verbose_ = true;
+[internal][vvb2060][vvb2060@gmail.com]};
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]size_t Logcat::PrintLogLine(const AndroidLogEntry &entry, FILE *out) {
+[external][shana][shana@zju.edu.cn]    if (!out) return 0;
+[internal][vvb2060][vvb2060@gmail.com]    constexpr static size_t kMaxTimeBuff = 64;
+[internal][vvb2060][vvb2060@gmail.com]    struct tm tm{};
+[external][shana][shana@zju.edu.cn]    std::array<char, kMaxTimeBuff> time_buff{};
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]    auto now = entry.tv_sec;
+[external][shana][shana@zju.edu.cn]    auto nsec = entry.tv_nsec;
+[external][shana][shana@zju.edu.cn]    auto message_len = entry.messageLen;
+[external][shana][shana@zju.edu.cn]    const auto *message = entry.message;
+[internal][vvb2060][vvb2060@gmail.com]    if (now < 0) {
+[internal][vvb2060][vvb2060@gmail.com]        nsec = NS_PER_SEC - nsec;
+[internal][vvb2060][vvb2060@gmail.com]    }
+[external][shana][shana@zju.edu.cn]    if (message_len >= 1 && message[message_len - 1] == '\n') {
+[external][shana][shana@zju.edu.cn]        --message_len;
+[external][shana][shana@zju.edu.cn]    }
+[internal][vvb2060][vvb2060@gmail.com]    localtime_r(&now, &tm);
+[internal][vvb2060][vvb2060@gmail.com]    strftime(time_buff.data(), time_buff.size(), "%Y-%m-%dT%H:%M:%S", &tm);
+[internal][vvb2060][vvb2060@gmail.com]    int len = fprintf(out, "[ %s.%03ld %8d:%6d:%6d %c/%-15.*s ] %.*s\n",
+[internal][vvb2060][vvb2060@gmail.com]                      time_buff.data(),
+[internal][vvb2060][vvb2060@gmail.com]                      nsec / MS_PER_NSEC,
+[internal][vvb2060][vvb2060@gmail.com]                      entry.uid, entry.pid, entry.tid,
+[internal][vvb2060][vvb2060@gmail.com]                      kLogChar[entry.priority], static_cast<int>(entry.tagLen),
+[internal][vvb2060][vvb2060@gmail.com]                      entry.tag, static_cast<int>(message_len), message);
+[internal][vvb2060][vvb2060@gmail.com]    fflush(out);
+[internal][vvb2060][vvb2060@gmail.com]    // trigger overflow when failed to generate a new fd
+[internal][vvb2060][vvb2060@gmail.com]    if (len <= 0) len = kMaxLogSize;
+[internal][vvb2060][vvb2060@gmail.com]    return static_cast<size_t>(len);
+[internal][vvb2060][vvb2060@gmail.com]}
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]void Logcat::RefreshFd(bool is_verbose) {
+[internal][vvb2060][vvb2060@gmail.com]    constexpr auto start = "----part %zu start----\n";
+[internal][vvb2060][vvb2060@gmail.com]    constexpr auto end = "-----part %zu end----\n";
+[external][shana][shana@zju.edu.cn]    if (is_verbose) {
+[external][shana][shana@zju.edu.cn]        verbose_print_count_ = 0;
+[internal][vvb2060][vvb2060@gmail.com]        fprintf(verbose_file_.get(), end, verbose_file_part_);
+[internal][vvb2060][vvb2060@gmail.com]        fflush(verbose_file_.get());
+[external][shana][shana@zju.edu.cn]        verbose_file_ = UniqueFile(env_->CallIntMethod(thiz_, refresh_fd_method_, JNI_TRUE), "a");
+[external][shana][shana@zju.edu.cn]        verbose_file_part_++;
+[internal][vvb2060][vvb2060@gmail.com]        fprintf(verbose_file_.get(), start, verbose_file_part_);
+[internal][vvb2060][vvb2060@gmail.com]        fflush(verbose_file_.get());
+[external][shana][shana@zju.edu.cn]    } else {
+[external][shana][shana@zju.edu.cn]        modules_print_count_ = 0;
+[internal][vvb2060][vvb2060@gmail.com]        fprintf(modules_file_.get(), end, modules_file_part_);
+[internal][vvb2060][vvb2060@gmail.com]        fflush(modules_file_.get());
+[external][shana][shana@zju.edu.cn]        modules_file_ = UniqueFile(env_->CallIntMethod(thiz_, refresh_fd_method_, JNI_FALSE), "a");
+[external][shana][shana@zju.edu.cn]        modules_file_part_++;
+[internal][vvb2060][vvb2060@gmail.com]        fprintf(modules_file_.get(), start, modules_file_part_);
+[internal][vvb2060][vvb2060@gmail.com]        fflush(modules_file_.get());
+[external][shana][shana@zju.edu.cn]    }
+[internal][vvb2060][vvb2060@gmail.com]}
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]inline void Logcat::Log(std::string_view str) {
+[external][shana][shana@zju.edu.cn]    if (verbose_) {
+[external][shana][shana@zju.edu.cn]        fprintf(verbose_file_.get(), "%.*s", static_cast<int>(str.size()), str.data());
+[external][shana][shana@zju.edu.cn]        fflush(verbose_file_.get());
+[external][shana][shana@zju.edu.cn]    }
+[internal][vvb2060][vvb2060@gmail.com]    fprintf(modules_file_.get(), "%.*s", static_cast<int>(str.size()), str.data());
+[external][shana][shana@zju.edu.cn]    fflush(modules_file_.get());
+[internal][vvb2060][vvb2060@gmail.com]}
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]void Logcat::OnCrash(int err) {
+[external][shana][shana@zju.edu.cn]    using namespace std::string_literals;
+[internal][vvb2060][vvb2060@gmail.com]    constexpr size_t max_restart_logd_wait = 1U << 10;
+[internal][vvb2060][vvb2060@gmail.com]    static size_t kLogdCrashCount = 0;
+[internal][vvb2060][vvb2060@gmail.com]    static size_t kLogdRestartWait = 1 << 3;
+[internal][vvb2060][vvb2060@gmail.com]    if (++kLogdCrashCount >= kLogdRestartWait) {
+[internal][vvb2060][vvb2060@gmail.com]        Log("\nLogd crashed too many times, trying manually start...\n");
+[internal][vvb2060][vvb2060@gmail.com]        __system_property_set("ctl.restart", "logd");
+[internal][vvb2060][vvb2060@gmail.com]        if (kLogdRestartWait < max_restart_logd_wait) {
+[internal][vvb2060][vvb2060@gmail.com]            kLogdRestartWait <<= 1;
+[internal][vvb2060][vvb2060@gmail.com]        } else {
+[internal][vvb2060][vvb2060@gmail.com]            kLogdCrashCount = 0;
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]    } else {
+[external][shana][shana@zju.edu.cn]        Log("\nLogd maybe crashed (err="s + strerror(err) + "), retrying in 1s...\n");
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]    std::this_thread::sleep_for(1s);
+[internal][vvb2060][vvb2060@gmail.com]}
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]void Logcat::ProcessBuffer(struct log_msg *buf) {
+[internal][vvb2060][vvb2060@gmail.com]    AndroidLogEntry entry;
+[external][shana][shana@zju.edu.cn]    if (android_log_processLogBuffer(&buf->entry, &entry) < 0) return;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    entry.tagLen--;
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]    std::string_view tag(entry.tag, entry.tagLen);
+[external][shana][shana@zju.edu.cn]    bool shortcut = false;
+[external][shana][shana@zju.edu.cn]    if (tag == "LSPosed-Bridge"sv || tag == "XSharedPreferences"sv || tag == "LSPosedContext") [[unlikely]] {
+[external][shana][shana@zju.edu.cn]        modules_print_count_ += PrintLogLine(entry, modules_file_.get());
+[external][shana][shana@zju.edu.cn]        shortcut = true;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]    if (verbose_ && (shortcut || buf->id() == log_id::LOG_ID_CRASH ||
+[external][shana][shana@zju.edu.cn]                     entry.pid == my_pid_ || tag == "Magisk"sv || tag == "Dobby"sv ||
+[external][shana][shana@zju.edu.cn]                     tag.starts_with("Riru"sv) || tag.starts_with("zygisk"sv) ||
+[external][shana][shana@zju.edu.cn]                     tag == "LSPlant"sv || tag.starts_with("LSPosed"sv))) [[unlikely]] {
+[external][shana][shana@zju.edu.cn]        verbose_print_count_ += PrintLogLine(entry, verbose_file_.get());
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]    if (entry.pid == my_pid_ && tag == "LSPosedLogcat"sv) [[unlikely]] {
+[internal][vvb2060][vvb2060@gmail.com]        std::string_view msg(entry.message, entry.messageLen);
+[internal][vvb2060][vvb2060@gmail.com]        if (msg == "!!start_verbose!!"sv) {
+[external][shana][shana@zju.edu.cn]            verbose_ = true;
+[internal][vvb2060][vvb2060@gmail.com]            verbose_print_count_ += PrintLogLine(entry, verbose_file_.get());
+[internal][vvb2060][vvb2060@gmail.com]        } else if (msg == "!!stop_verbose!!"sv) {
+[external][shana][shana@zju.edu.cn]            verbose_ = false;
+[internal][vvb2060][vvb2060@gmail.com]        } else if (msg == "!!refresh_modules!!"sv) {
+[internal][vvb2060][vvb2060@gmail.com]            RefreshFd(false);
+[internal][vvb2060][vvb2060@gmail.com]        } else if (msg == "!!refresh_verbose!!"sv) {
+[internal][vvb2060][vvb2060@gmail.com]            RefreshFd(true);
+[external][shana][shana@zju.edu.cn]        }
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]}
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]void Logcat::EnsureLogWatchDog() {
+[external][shana][shana@zju.edu.cn]    constexpr static auto kLogdSizeProp = "persist.logd.size"sv;
+[external][shana][shana@zju.edu.cn]    constexpr static auto kLogdTagProp = "persist.log.tag"sv;
+[external][shana][shana@zju.edu.cn]    constexpr static auto kLogdMainSizeProp = "persist.logd.size.main"sv;
+[external][shana][shana@zju.edu.cn]    constexpr static auto kLogdCrashSizeProp = "persist.logd.size.crash"sv;
+[external][shana][shana@zju.edu.cn]    constexpr static size_t kErr = -1;
+[external][shana][shana@zju.edu.cn]    std::thread watch_dog([this] {
+[external][shana][shana@zju.edu.cn]        while (true) {
+[external][shana][shana@zju.edu.cn]            auto logd_size = GetByteProp(kLogdSizeProp);
+[external][shana][shana@zju.edu.cn]            auto logd_tag = GetStrProp(kLogdTagProp);
+[external][shana][shana@zju.edu.cn]            auto logd_main_size = GetByteProp(kLogdMainSizeProp);
+[external][shana][shana@zju.edu.cn]            auto logd_crash_size = GetByteProp(kLogdCrashSizeProp);
+[external][shana][shana@zju.edu.cn]            if (!logd_tag.empty() ||
+[external][shana][shana@zju.edu.cn]                !((logd_main_size == kErr && logd_crash_size == kErr && logd_size != kErr &&
+[external][shana][shana@zju.edu.cn]                   logd_size >= kLogBufferSize) ||
+[external][shana][shana@zju.edu.cn]                  (logd_main_size != kErr && logd_main_size >= kLogBufferSize &&
+[external][shana][shana@zju.edu.cn]                   logd_crash_size != kErr &&
+[external][shana][shana@zju.edu.cn]                   logd_crash_size >= kLogBufferSize))) {
+[external][shana][shana@zju.edu.cn]                SetIntProp(kLogdSizeProp, std::max(kLogBufferSize, logd_size));
+[external][shana][shana@zju.edu.cn]                SetIntProp(kLogdMainSizeProp, std::max(kLogBufferSize, logd_main_size));
+[external][shana][shana@zju.edu.cn]                SetIntProp(kLogdCrashSizeProp, std::max(kLogBufferSize, logd_crash_size));
+[external][shana][shana@zju.edu.cn]                SetStrProp(kLogdTagProp, "");
+[external][shana][shana@zju.edu.cn]                SetStrProp("ctl.start", "logd-reinit");
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            const auto *pi = __system_property_find(kLogdTagProp.data());
+[external][shana][shana@zju.edu.cn]            uint32_t serial = 0;
+[external][shana][shana@zju.edu.cn]            if (pi != nullptr) {
+[external][shana][shana@zju.edu.cn]                __system_property_read_callback(pi, [](auto *c, auto, auto, auto s) {
+[external][shana][shana@zju.edu.cn]                    *reinterpret_cast<uint32_t *>(c) = s;
+[external][shana][shana@zju.edu.cn]                }, &serial);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            if (!__system_property_wait(pi, serial, &serial, nullptr)) break;
+[external][shana][shana@zju.edu.cn]            if (pi != nullptr) Log("\nResetting log settings\n");
+[external][shana][shana@zju.edu.cn]            else std::this_thread::sleep_for(1s);
+[external][shana][shana@zju.edu.cn]            // log tag prop was not found; to avoid frequently trigger wait, sleep for a while
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    });
+[external][shana][shana@zju.edu.cn]    pthread_setname_np(watch_dog.native_handle(), "watchdog");
+[external][shana][shana@zju.edu.cn]    watch_dog.detach();
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]void Logcat::Run() {
+[external][shana][shana@zju.edu.cn]    constexpr size_t tail_after_crash = 10U;
+[external][shana][shana@zju.edu.cn]    size_t tail = 0;
+[internal][vvb2060][vvb2060@gmail.com]    RefreshFd(true);
+[external][shana][shana@zju.edu.cn]    RefreshFd(false);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    EnsureLogWatchDog();
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    while (true) {
+[external][shana][shana@zju.edu.cn]        std::unique_ptr<logger_list, decltype(&android_logger_list_free)> logger_list{
+[external][shana][shana@zju.edu.cn]                android_logger_list_alloc(0, tail, 0), &android_logger_list_free};
+[external][shana][shana@zju.edu.cn]        tail = tail_after_crash;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        for (log_id id:{LOG_ID_MAIN, LOG_ID_CRASH}) {
+[external][shana][shana@zju.edu.cn]            auto *logger = android_logger_open(logger_list.get(), id);
+[external][shana][shana@zju.edu.cn]            if (logger == nullptr) continue;
+[internal][vvb2060][vvb2060@gmail.com]            if (auto size = android_logger_get_log_size(logger);
+[internal][vvb2060][vvb2060@gmail.com]                    size >= 0 && static_cast<size_t>(size) < kLogBufferSize) {
+[internal][vvb2060][vvb2060@gmail.com]                android_logger_set_log_size(logger, kLogBufferSize);
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]        struct log_msg msg{};
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]        while (true) {
+[external][shana][shana@zju.edu.cn]            if (android_logger_list_read(logger_list.get(), &msg) <= 0) [[unlikely]] break;
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]            ProcessBuffer(&msg);
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]            if (verbose_print_count_ >= kMaxLogSize) [[unlikely]] RefreshFd(true);
+[external][shana][shana@zju.edu.cn]            if (modules_print_count_ >= kMaxLogSize) [[unlikely]] RefreshFd(false);
+[internal][vvb2060][vvb2060@gmail.com]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        OnCrash(errno);
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]}
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]extern "C"
+[internal][vvb2060][vvb2060@gmail.com]JNIEXPORT void JNICALL
+[external][shana][shana@zju.edu.cn]// NOLINTNEXTLINE
+[external][shana][shana@zju.edu.cn]Java_org_lsposed_lspd_service_LogcatService_runLogcat(JNIEnv *env, jobject thiz) {
+[internal][vvb2060][vvb2060@gmail.com]    jclass clazz = env->GetObjectClass(thiz);
+[external][shana][shana@zju.edu.cn]    jmethodID method = env->GetMethodID(clazz, "refreshFd", "(Z)I");
+[external][shana][shana@zju.edu.cn]    Logcat logcat(env, thiz, method);
+[internal][vvb2060][vvb2060@gmail.com]    logcat.Run();
+[internal][vvb2060][vvb2060@gmail.com]}

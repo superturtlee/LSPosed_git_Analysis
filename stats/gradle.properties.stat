@@ -1,0 +1,17 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]## For more details on how to configure your build environment visit
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]# http://www.gradle.org/docs/current/userguide/build_environment.html
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]#
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]# Specifies the JVM arguments used for the daemon process.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]# The setting is particularly useful for tweaking memory settings.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]# Default value: -Xmx1024m -XX:MaxPermSize=256m
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]# org.gradle.jvmargs=-Xmx2048m -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]#
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]# When configured, Gradle will run in incubating parallel mode.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]# This option should only be used with decoupled projects. More details, visit
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]# http://www.gradle.org/docs/current/userguide/multi_project_builds.html#sec:decoupled_projects
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]# org.gradle.parallel=true
+[external][shana][shana@zju.edu.cn]
+[internal][dr-tsng][tsng.nullptr@outlook.com]android.experimental.enableNewResourceShrinker.preciseShrinking=true
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]android.enableAppCompileTimeRClass=true
+[external][7741672-nekoinverter][7741672-NekoInverter@users.noreply.gitlab.com]android.useAndroidX=true
+[internal][vvb2060][vvb2060@gmail.com]android.nonFinalResIds=false

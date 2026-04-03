@@ -1,0 +1,345 @@
+[external][shana][shana@zju.edu.cn]/*
+[external][shana][shana@zju.edu.cn] * This file is part of LSPosed.
+[external][shana][shana@zju.edu.cn] *
+[external][shana][shana@zju.edu.cn] * LSPosed is free software: you can redistribute it and/or modify
+[external][shana][shana@zju.edu.cn] * it under the terms of the GNU General Public License as published by
+[external][shana][shana@zju.edu.cn] * the Free Software Foundation, either version 3 of the License, or
+[external][shana][shana@zju.edu.cn] * (at your option) any later version.
+[external][shana][shana@zju.edu.cn] *
+[external][shana][shana@zju.edu.cn] * LSPosed is distributed in the hope that it will be useful,
+[external][shana][shana@zju.edu.cn] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][shana][shana@zju.edu.cn] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][shana][shana@zju.edu.cn] * GNU General Public License for more details.
+[external][shana][shana@zju.edu.cn] *
+[external][shana][shana@zju.edu.cn] * You should have received a copy of the GNU General Public License
+[external][shana][shana@zju.edu.cn] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][shana][shana@zju.edu.cn] *
+[external][shana][shana@zju.edu.cn] * Copyright (C) 2022 LSPosed Contributors
+[external][shana][shana@zju.edu.cn] */
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]#include "hook_bridge.h"
+[external][shana][shana@zju.edu.cn]#include "native_util.h"
+[external][shana][shana@zju.edu.cn]#include "lsplant.hpp"
+[external][shana][shana@zju.edu.cn]#include <parallel_hashmap/phmap.h>
+[external][shana][shana@zju.edu.cn]#include <memory>
+[external][shana][shana@zju.edu.cn]#include <shared_mutex>
+[external][shana][shana@zju.edu.cn]#include <mutex>
+[external][shana][shana@zju.edu.cn]#include <set>
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]using namespace lsplant;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]namespace {
+[external][noreply][noreply@nullptr.icu]struct ModuleCallback {
+[external][noreply][noreply@nullptr.icu]    jmethodID before_method;
+[external][noreply][noreply@nullptr.icu]    jmethodID after_method;
+[external][noreply][noreply@nullptr.icu]};
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]struct HookItem {
+[external][noreply][noreply@nullptr.icu]    std::multimap<jint, jobject, std::greater<>> legacy_callbacks;
+[external][noreply][noreply@nullptr.icu]    std::multimap<jint, ModuleCallback, std::greater<>> modern_callbacks;
+[external][shana][shana@zju.edu.cn]private:
+[external][shana][shana@zju.edu.cn]    std::atomic<jobject> backup {nullptr};
+[external][shana][shana@zju.edu.cn]    static_assert(decltype(backup)::is_always_lock_free);
+[external][shana][shana@zju.edu.cn]    inline static jobject FAILED = reinterpret_cast<jobject>(std::numeric_limits<uintptr_t>::max());
+[external][shana][shana@zju.edu.cn]public:
+[external][shana][shana@zju.edu.cn]    jobject GetBackup() {
+[external][shana][shana@zju.edu.cn]        backup.wait(nullptr, std::memory_order::acquire);
+[external][shana][shana@zju.edu.cn]        if (auto bk = backup.load(std::memory_order_relaxed); bk != FAILED) {
+[external][shana][shana@zju.edu.cn]            return bk;
+[external][shana][shana@zju.edu.cn]        } else {
+[external][shana][shana@zju.edu.cn]            return nullptr;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]    void SetBackup(jobject newBackup) {
+[external][shana][shana@zju.edu.cn]        jobject null = nullptr;
+[external][shana][shana@zju.edu.cn]        backup.compare_exchange_strong(null, newBackup ? newBackup : FAILED,
+[external][shana][shana@zju.edu.cn]                                       std::memory_order_acq_rel, std::memory_order_relaxed);
+[external][shana][shana@zju.edu.cn]        backup.notify_all();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]};
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]template <class K, class V, class Hash = phmap::priv::hash_default_hash<K>,
+[external][shana][shana@zju.edu.cn]        class Eq = phmap::priv::hash_default_eq<K>,
+[external][shana][shana@zju.edu.cn]        class Alloc = phmap::priv::Allocator<phmap::priv::Pair<const K, V>>, size_t N = 4>
+[external][shana][shana@zju.edu.cn]using SharedHashMap = phmap::parallel_flat_hash_map<K, V, Hash, Eq, Alloc, N, std::shared_mutex>;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]SharedHashMap<jmethodID, std::unique_ptr<HookItem>> hooked_methods;
+[external][shana][shana@zju.edu.cn]
+[internal][canyie][31466456+canyie@users.noreply.github.com]jmethodID invoke = nullptr;
+[external][noreply][noreply@nullptr.icu]jmethodID callback_ctor = nullptr;
+[external][noreply][noreply@nullptr.icu]jfieldID before_method_field = nullptr;
+[external][noreply][noreply@nullptr.icu]jfieldID after_method_field = nullptr;
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]namespace lspd {
+[external][noreply][noreply@nullptr.icu]LSP_DEF_NATIVE_METHOD(jboolean, HookBridge, hookMethod, jboolean useModernApi, jobject hookMethod,
+[external][shana][shana@zju.edu.cn]                      jclass hooker, jint priority, jobject callback) {
+[external][shana][shana@zju.edu.cn]    bool newHook = false;
+[external][shana][shana@zju.edu.cn]#ifndef NDEBUG
+[external][shana][shana@zju.edu.cn]    struct finally {
+[external][shana][shana@zju.edu.cn]        std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+[external][shana][shana@zju.edu.cn]        bool &newHook;
+[external][shana][shana@zju.edu.cn]        ~finally() {
+[external][shana][shana@zju.edu.cn]            auto finish = std::chrono::steady_clock::now();
+[external][shana][shana@zju.edu.cn]            if (newHook) {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                LOGV("New hook took {}us",
+[external][shana][shana@zju.edu.cn]                     std::chrono::duration_cast<std::chrono::microseconds>(finish - start).count());
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    } finally {
+[external][shana][shana@zju.edu.cn]        .newHook = newHook
+[external][shana][shana@zju.edu.cn]    };
+[external][shana][shana@zju.edu.cn]#endif
+[external][shana][shana@zju.edu.cn]    auto target = env->FromReflectedMethod(hookMethod);
+[external][shana][shana@zju.edu.cn]    HookItem * hook_item = nullptr;
+[external][shana][shana@zju.edu.cn]    hooked_methods.lazy_emplace_l(target, [&hook_item](auto &it) {
+[external][shana][shana@zju.edu.cn]        hook_item = it.second.get();
+[external][shana][shana@zju.edu.cn]    }, [&hook_item, &target, &newHook](const auto &ctor) {
+[external][shana][shana@zju.edu.cn]        auto ptr = std::make_unique<HookItem>();
+[external][shana][shana@zju.edu.cn]        hook_item = ptr.get();
+[external][shana][shana@zju.edu.cn]        ctor(target, std::move(ptr));
+[external][shana][shana@zju.edu.cn]        newHook = true;
+[external][shana][shana@zju.edu.cn]    });
+[external][shana][shana@zju.edu.cn]    if (newHook) {
+[internal][vvb2060][vvb2060@gmail.com]        auto init = env->GetMethodID(hooker, "<init>", "(Ljava/lang/reflect/Executable;)V");
+[external][shana][shana@zju.edu.cn]        auto callback_method = env->ToReflectedMethod(hooker, env->GetMethodID(hooker, "callback",
+[external][shana][shana@zju.edu.cn]                                                                               "([Ljava/lang/Object;)Ljava/lang/Object;"),
+[external][shana][shana@zju.edu.cn]                                                      false);
+[internal][vvb2060][vvb2060@gmail.com]        auto hooker_object = env->NewObject(hooker, init, hookMethod);
+[external][shana][shana@zju.edu.cn]        hook_item->SetBackup(lsplant::Hook(env, hookMethod, hooker_object, callback_method));
+[external][shana][shana@zju.edu.cn]        env->DeleteLocalRef(hooker_object);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]    jobject backup = hook_item->GetBackup();
+[external][shana][shana@zju.edu.cn]    if (!backup) return JNI_FALSE;
+[external][shana][shana@zju.edu.cn]    JNIMonitor monitor(env, backup);
+[external][noreply][noreply@nullptr.icu]    if (useModernApi) {
+[external][noreply][noreply@nullptr.icu]        if (before_method_field == nullptr) {
+[external][noreply][noreply@nullptr.icu]            auto callback_class = JNI_GetObjectClass(env, callback);
+[external][noreply][noreply@nullptr.icu]            callback_ctor = JNI_GetMethodID(env, callback_class, "<init>", "(Ljava/lang/reflect/Method;Ljava/lang/reflect/Method;)V");
+[external][noreply][noreply@nullptr.icu]            before_method_field = JNI_GetFieldID(env, callback_class, "beforeInvocation", "Ljava/lang/reflect/Method;");
+[external][noreply][noreply@nullptr.icu]            after_method_field = JNI_GetFieldID(env, callback_class, "afterInvocation", "Ljava/lang/reflect/Method;");
+[external][noreply][noreply@nullptr.icu]        }
+[external][noreply][noreply@nullptr.icu]        auto before_method = JNI_GetObjectField(env, callback, before_method_field);
+[external][noreply][noreply@nullptr.icu]        auto after_method = JNI_GetObjectField(env, callback, after_method_field);
+[external][noreply][noreply@nullptr.icu]        auto callback_type = ModuleCallback {
+[external][noreply][noreply@nullptr.icu]                .before_method = env->FromReflectedMethod(before_method),
+[external][noreply][noreply@nullptr.icu]                .after_method = env->FromReflectedMethod(after_method),
+[external][noreply][noreply@nullptr.icu]        };
+[external][noreply][noreply@nullptr.icu]        hook_item->modern_callbacks.emplace(priority, callback_type);
+[external][noreply][noreply@nullptr.icu]    } else {
+[external][noreply][noreply@nullptr.icu]        hook_item->legacy_callbacks.emplace(priority, env->NewGlobalRef(callback));
+[external][noreply][noreply@nullptr.icu]    }
+[external][shana][shana@zju.edu.cn]    return JNI_TRUE;
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]
+[external][noreply][noreply@nullptr.icu]LSP_DEF_NATIVE_METHOD(jboolean, HookBridge, unhookMethod, jboolean useModernApi, jobject hookMethod, jobject callback) {
+[external][shana][shana@zju.edu.cn]    auto target = env->FromReflectedMethod(hookMethod);
+[external][shana][shana@zju.edu.cn]    HookItem * hook_item = nullptr;
+[external][shana][shana@zju.edu.cn]    hooked_methods.if_contains(target, [&hook_item](const auto &it) {
+[external][shana][shana@zju.edu.cn]        hook_item = it.second.get();
+[external][shana][shana@zju.edu.cn]    });
+[external][shana][shana@zju.edu.cn]    if (!hook_item) return JNI_FALSE;
+[external][shana][shana@zju.edu.cn]    jobject backup = hook_item->GetBackup();
+[external][shana][shana@zju.edu.cn]    if (!backup) return JNI_FALSE;
+[external][shana][shana@zju.edu.cn]    JNIMonitor monitor(env, backup);
+[external][noreply][noreply@nullptr.icu]    if (useModernApi) {
+[external][noreply][noreply@nullptr.icu]        auto before_method = JNI_GetObjectField(env, callback, before_method_field);
+[external][noreply][noreply@nullptr.icu]        auto before = env->FromReflectedMethod(before_method);
+[external][noreply][noreply@nullptr.icu]        for (auto i = hook_item->modern_callbacks.begin(); i != hook_item->modern_callbacks.end(); ++i) {
+[external][noreply][noreply@nullptr.icu]            if (before == i->second.before_method) {
+[external][noreply][noreply@nullptr.icu]                hook_item->modern_callbacks.erase(i);
+[external][noreply][noreply@nullptr.icu]                return JNI_TRUE;
+[external][noreply][noreply@nullptr.icu]            }
+[external][noreply][noreply@nullptr.icu]        }
+[external][noreply][noreply@nullptr.icu]    } else {
+[external][noreply][noreply@nullptr.icu]        for (auto i = hook_item->legacy_callbacks.begin(); i != hook_item->legacy_callbacks.end(); ++i) {
+[external][noreply][noreply@nullptr.icu]            if (env->IsSameObject(i->second, callback)) {
+[external][noreply][noreply@nullptr.icu]                hook_item->legacy_callbacks.erase(i);
+[external][noreply][noreply@nullptr.icu]                return JNI_TRUE;
+[external][noreply][noreply@nullptr.icu]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[internal][vvb2060][vvb2060@gmail.com]    return JNI_FALSE;
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]LSP_DEF_NATIVE_METHOD(jboolean, HookBridge, deoptimizeMethod, jobject hookMethod,
+[external][shana][shana@zju.edu.cn]                      jclass hooker, jint priority, jobject callback) {
+[external][shana][shana@zju.edu.cn]    return lsplant::Deoptimize(env, hookMethod);
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]LSP_DEF_NATIVE_METHOD(jobject, HookBridge, invokeOriginalMethod, jobject hookMethod,
+[external][shana][shana@zju.edu.cn]                      jobject thiz, jobjectArray args) {
+[external][shana][shana@zju.edu.cn]    auto target = env->FromReflectedMethod(hookMethod);
+[external][shana][shana@zju.edu.cn]    HookItem * hook_item = nullptr;
+[external][shana][shana@zju.edu.cn]    hooked_methods.if_contains(target, [&hook_item](const auto &it) {
+[external][shana][shana@zju.edu.cn]        hook_item = it.second.get();
+[external][shana][shana@zju.edu.cn]    });
+[external][shana][shana@zju.edu.cn]    return env->CallObjectMethod(hook_item ? hook_item->GetBackup() : hookMethod, invoke, thiz, args);
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]LSP_DEF_NATIVE_METHOD(jobject, HookBridge, allocateObject, jclass cls) {
+[external][noreply][noreply@nullptr.icu]    return env->AllocObject(cls);
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]LSP_DEF_NATIVE_METHOD(jobject, HookBridge, invokeSpecialMethod, jobject method, jcharArray shorty,
+[external][shana][shana@zju.edu.cn]                      jclass cls, jobject thiz, jobjectArray args) {
+[external][shana][shana@zju.edu.cn]    static auto* const get_int = env->GetMethodID(env->FindClass("java/lang/Integer"), "intValue", "()I");
+[external][shana][shana@zju.edu.cn]    static auto* const get_double = env->GetMethodID(env->FindClass("java/lang/Double"), "doubleValue", "()D");
+[external][shana][shana@zju.edu.cn]    static auto* const get_long = env->GetMethodID(env->FindClass("java/lang/Long"), "longValue", "()J");
+[external][shana][shana@zju.edu.cn]    static auto* const get_float = env->GetMethodID(env->FindClass("java/lang/Float"), "floatValue", "()F");
+[external][shana][shana@zju.edu.cn]    static auto* const get_short = env->GetMethodID(env->FindClass("java/lang/Short"), "shortValue", "()S");
+[external][shana][shana@zju.edu.cn]    static auto* const get_byte = env->GetMethodID(env->FindClass("java/lang/Byte"), "byteValue", "()B");
+[external][shana][shana@zju.edu.cn]    static auto* const get_char = env->GetMethodID(env->FindClass("java/lang/Character"), "charValue", "()C");
+[external][shana][shana@zju.edu.cn]    static auto* const get_boolean = env->GetMethodID(env->FindClass("java/lang/Boolean"), "booleanValue", "()Z");
+[external][shana][shana@zju.edu.cn]    static auto* const set_int = env->GetStaticMethodID(env->FindClass("java/lang/Integer"), "valueOf", "(I)Ljava/lang/Integer;");
+[external][shana][shana@zju.edu.cn]    static auto* const set_double = env->GetStaticMethodID(env->FindClass("java/lang/Double"), "valueOf", "(D)Ljava/lang/Double;");
+[external][shana][shana@zju.edu.cn]    static auto* const set_long = env->GetStaticMethodID(env->FindClass("java/lang/Long"), "valueOf", "(J)Ljava/lang/Long;");
+[external][shana][shana@zju.edu.cn]    static auto* const set_float = env->GetStaticMethodID(env->FindClass("java/lang/Float"), "valueOf", "(F)Ljava/lang/Float;");
+[external][shana][shana@zju.edu.cn]    static auto* const set_short = env->GetStaticMethodID(env->FindClass("java/lang/Short"), "valueOf", "(S)Ljava/lang/Short;");
+[external][shana][shana@zju.edu.cn]    static auto* const set_byte = env->GetStaticMethodID(env->FindClass("java/lang/Byte"), "valueOf", "(B)Ljava/lang/Byte;");
+[external][shana][shana@zju.edu.cn]    static auto* const set_char = env->GetStaticMethodID(env->FindClass("java/lang/Character"), "valueOf", "(C)Ljava/lang/Character;");
+[external][shana][shana@zju.edu.cn]    static auto* const set_boolean = env->GetStaticMethodID(env->FindClass("java/lang/Boolean"), "valueOf", "(Z)Ljava/lang/Boolean;");
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    auto target = env->FromReflectedMethod(method);
+[external][shana][shana@zju.edu.cn]    auto param_len = env->GetArrayLength(shorty) - 1;
+[external][shana][shana@zju.edu.cn]    if (env->GetArrayLength(args) != param_len) {
+[external][shana][shana@zju.edu.cn]        env->ThrowNew(env->FindClass("java/lang/IllegalArgumentException"), "args.length != parameters.length");
+[external][shana][shana@zju.edu.cn]        return nullptr;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]    if (thiz == nullptr) {
+[external][shana][shana@zju.edu.cn]        env->ThrowNew(env->FindClass("java/lang/IllegalArgumentException"), "this == null");
+[external][shana][shana@zju.edu.cn]        return nullptr;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]    std::vector<jvalue> a(param_len);
+[external][shana][shana@zju.edu.cn]    auto *const shorty_char = env->GetCharArrayElements(shorty, nullptr);
+[external][shana][shana@zju.edu.cn]    for (jint i = 0; i != param_len; ++i) {
+[external][shana][shana@zju.edu.cn]        jobject element;
+[external][shana][shana@zju.edu.cn]        switch(shorty_char[i + 1]) {
+[external][shana][shana@zju.edu.cn]            case 'I':
+[external][shana][shana@zju.edu.cn]                a[i].i = env->CallIntMethod(element = env->GetObjectArrayElement(args, i), get_int);
+[external][shana][shana@zju.edu.cn]                break;
+[external][shana][shana@zju.edu.cn]            case 'D':
+[external][shana][shana@zju.edu.cn]                a[i].d = env->CallDoubleMethod(element = env->GetObjectArrayElement(args, i), get_double);
+[external][shana][shana@zju.edu.cn]                break;
+[external][shana][shana@zju.edu.cn]            case 'J':
+[external][shana][shana@zju.edu.cn]                a[i].j = env->CallLongMethod(element = env->GetObjectArrayElement(args, i), get_long);
+[external][shana][shana@zju.edu.cn]                break;
+[external][shana][shana@zju.edu.cn]            case 'F':
+[external][shana][shana@zju.edu.cn]                a[i].f = env->CallFloatMethod(element = env->GetObjectArrayElement(args, i), get_float);
+[external][shana][shana@zju.edu.cn]                break;
+[external][shana][shana@zju.edu.cn]            case 'S':
+[external][shana][shana@zju.edu.cn]                a[i].s = env->CallShortMethod(element = env->GetObjectArrayElement(args, i), get_short);
+[external][shana][shana@zju.edu.cn]                break;
+[external][shana][shana@zju.edu.cn]            case 'B':
+[external][shana][shana@zju.edu.cn]                a[i].b = env->CallByteMethod(element = env->GetObjectArrayElement(args, i), get_byte);
+[external][shana][shana@zju.edu.cn]                break;
+[external][shana][shana@zju.edu.cn]            case 'C':
+[external][shana][shana@zju.edu.cn]                a[i].c = env->CallCharMethod(element = env->GetObjectArrayElement(args, i), get_char);
+[external][shana][shana@zju.edu.cn]                break;
+[external][shana][shana@zju.edu.cn]            case 'Z':
+[external][shana][shana@zju.edu.cn]                a[i].z = env->CallBooleanMethod(element = env->GetObjectArrayElement(args, i), get_boolean);
+[external][shana][shana@zju.edu.cn]                break;
+[external][shana][shana@zju.edu.cn]            default:
+[external][shana][shana@zju.edu.cn]            case 'L':
+[external][shana][shana@zju.edu.cn]                a[i].l = env->GetObjectArrayElement(args, i);
+[external][shana][shana@zju.edu.cn]                element = nullptr;
+[external][shana][shana@zju.edu.cn]                break;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        if (element) env->DeleteLocalRef(element);
+[external][shana][shana@zju.edu.cn]        if (env->ExceptionCheck()) return nullptr;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]    jobject value = nullptr;
+[external][shana][shana@zju.edu.cn]    switch(shorty_char[0]) {
+[external][shana][shana@zju.edu.cn]        case 'I':
+[external][shana][shana@zju.edu.cn]            value = env->CallStaticObjectMethod(jclass{nullptr}, set_int, env->CallNonvirtualIntMethodA(thiz, cls, target, a.data()));
+[external][shana][shana@zju.edu.cn]            break;
+[external][shana][shana@zju.edu.cn]        case 'D':
+[external][shana][shana@zju.edu.cn]            value = env->CallStaticObjectMethod(jclass{nullptr}, set_double, env->CallNonvirtualDoubleMethodA(thiz, cls, target, a.data()));
+[external][shana][shana@zju.edu.cn]            break;
+[external][shana][shana@zju.edu.cn]        case 'J':
+[external][shana][shana@zju.edu.cn]            value = env->CallStaticObjectMethod(jclass{nullptr}, set_long, env->CallNonvirtualLongMethodA(thiz, cls, target, a.data()));
+[external][shana][shana@zju.edu.cn]            break;
+[external][shana][shana@zju.edu.cn]        case 'F':
+[external][shana][shana@zju.edu.cn]            value = env->CallStaticObjectMethod(jclass{nullptr}, set_float, env->CallNonvirtualFloatMethodA(thiz, cls, target, a.data()));
+[external][shana][shana@zju.edu.cn]            break;
+[external][shana][shana@zju.edu.cn]        case 'S':
+[external][shana][shana@zju.edu.cn]            value = env->CallStaticObjectMethod(jclass{nullptr}, set_short, env->CallNonvirtualShortMethodA(thiz, cls, target, a.data()));
+[external][shana][shana@zju.edu.cn]            break;
+[external][shana][shana@zju.edu.cn]        case 'B':
+[external][shana][shana@zju.edu.cn]            value = env->CallStaticObjectMethod(jclass{nullptr}, set_byte, env->CallNonvirtualByteMethodA(thiz, cls, target, a.data()));
+[external][shana][shana@zju.edu.cn]            break;
+[external][shana][shana@zju.edu.cn]        case 'C':
+[external][shana][shana@zju.edu.cn]            value = env->CallStaticObjectMethod(jclass{nullptr}, set_char, env->CallNonvirtualCharMethodA(thiz, cls, target, a.data()));
+[external][shana][shana@zju.edu.cn]            break;
+[external][shana][shana@zju.edu.cn]        case 'Z':
+[external][shana][shana@zju.edu.cn]            value = env->CallStaticObjectMethod(jclass{nullptr}, set_boolean, env->CallNonvirtualBooleanMethodA(thiz, cls, target, a.data()));
+[external][shana][shana@zju.edu.cn]            break;
+[external][shana][shana@zju.edu.cn]        case 'L':
+[external][shana][shana@zju.edu.cn]            value = env->CallNonvirtualObjectMethodA(thiz, cls, target, a.data());
+[external][shana][shana@zju.edu.cn]            break;
+[external][shana][shana@zju.edu.cn]        default:
+[external][shana][shana@zju.edu.cn]        case 'V':
+[external][shana][shana@zju.edu.cn]            env->CallNonvirtualVoidMethodA(thiz, cls, target, a.data());
+[external][shana][shana@zju.edu.cn]            break;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]    env->ReleaseCharArrayElements(shorty, shorty_char, JNI_ABORT);
+[external][shana][shana@zju.edu.cn]    return value;
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]LSP_DEF_NATIVE_METHOD(jboolean, HookBridge, instanceOf, jobject object, jclass expected_class) {
+[external][shana][shana@zju.edu.cn]    return env->IsInstanceOf(object, expected_class);
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]LSP_DEF_NATIVE_METHOD(jboolean, HookBridge, setTrusted, jobject cookie) {
+[external][shana][shana@zju.edu.cn]    return lsplant::MakeDexFileTrusted(env, cookie);
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]
+[external][noreply][noreply@nullptr.icu]LSP_DEF_NATIVE_METHOD(jobjectArray, HookBridge, callbackSnapshot, jclass callback_class, jobject method) {
+[internal][vvb2060][vvb2060@gmail.com]    auto target = env->FromReflectedMethod(method);
+[internal][vvb2060][vvb2060@gmail.com]    HookItem *hook_item = nullptr;
+[external][shana][shana@zju.edu.cn]    hooked_methods.if_contains(target, [&hook_item](const auto &it) {
+[external][shana][shana@zju.edu.cn]        hook_item = it.second.get();
+[external][shana][shana@zju.edu.cn]    });
+[internal][vvb2060][vvb2060@gmail.com]    if (!hook_item) return nullptr;
+[external][shana][shana@zju.edu.cn]    jobject backup = hook_item->GetBackup();
+[external][shana][shana@zju.edu.cn]    if (!backup) return nullptr;
+[external][shana][shana@zju.edu.cn]    JNIMonitor monitor(env, backup);
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]    auto res = env->NewObjectArray(2, env->FindClass("[Ljava/lang/Object;"), nullptr);
+[external][noreply][noreply@nullptr.icu]    auto modern = env->NewObjectArray((jsize) hook_item->modern_callbacks.size(), env->FindClass("java/lang/Object"), nullptr);
+[external][noreply][noreply@nullptr.icu]    auto legacy = env->NewObjectArray((jsize) hook_item->legacy_callbacks.size(), env->FindClass("java/lang/Object"), nullptr);
+[external][noreply][noreply@nullptr.icu]    for (jsize i = 0; auto callback: hook_item->modern_callbacks) {
+[external][noreply][noreply@nullptr.icu]        auto before_method = JNI_ToReflectedMethod(env, clazz, callback.second.before_method, JNI_TRUE);
+[external][noreply][noreply@nullptr.icu]        auto after_method = JNI_ToReflectedMethod(env, clazz, callback.second.after_method, JNI_TRUE);
+[external][noreply][noreply@nullptr.icu]        auto callback_object = JNI_NewObject(env, callback_class, callback_ctor, before_method, after_method);
+[external][noreply][noreply@nullptr.icu]        env->SetObjectArrayElement(modern, i++, env->NewLocalRef(callback_object));
+[external][noreply][noreply@nullptr.icu]    }
+[external][noreply][noreply@nullptr.icu]    for (jsize i = 0; auto callback: hook_item->legacy_callbacks) {
+[external][noreply][noreply@nullptr.icu]        env->SetObjectArrayElement(legacy, i++, env->NewLocalRef(callback.second));
+[internal][vvb2060][vvb2060@gmail.com]    }
+[external][noreply][noreply@nullptr.icu]    env->SetObjectArrayElement(res, 0, modern);
+[external][noreply][noreply@nullptr.icu]    env->SetObjectArrayElement(res, 1, legacy);
+[internal][vvb2060][vvb2060@gmail.com]    return res;
+[internal][vvb2060][vvb2060@gmail.com]}
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]static JNINativeMethod gMethods[] = {
+[external][noreply][noreply@nullptr.icu]    LSP_NATIVE_METHOD(HookBridge, hookMethod, "(ZLjava/lang/reflect/Executable;Ljava/lang/Class;ILjava/lang/Object;)Z"),
+[external][noreply][noreply@nullptr.icu]    LSP_NATIVE_METHOD(HookBridge, unhookMethod, "(ZLjava/lang/reflect/Executable;Ljava/lang/Object;)Z"),
+[external][shana][shana@zju.edu.cn]    LSP_NATIVE_METHOD(HookBridge, deoptimizeMethod, "(Ljava/lang/reflect/Executable;)Z"),
+[external][shana][shana@zju.edu.cn]    LSP_NATIVE_METHOD(HookBridge, invokeOriginalMethod, "(Ljava/lang/reflect/Executable;Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"),
+[external][shana][shana@zju.edu.cn]    LSP_NATIVE_METHOD(HookBridge, invokeSpecialMethod, "(Ljava/lang/reflect/Executable;[CLjava/lang/Class;Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"),
+[external][shana][shana@zju.edu.cn]    LSP_NATIVE_METHOD(HookBridge, allocateObject, "(Ljava/lang/Class;)Ljava/lang/Object;"),
+[external][shana][shana@zju.edu.cn]    LSP_NATIVE_METHOD(HookBridge, instanceOf, "(Ljava/lang/Object;Ljava/lang/Class;)Z"),
+[external][shana][shana@zju.edu.cn]    LSP_NATIVE_METHOD(HookBridge, setTrusted, "(Ljava/lang/Object;)Z"),
+[external][noreply][noreply@nullptr.icu]    LSP_NATIVE_METHOD(HookBridge, callbackSnapshot, "(Ljava/lang/Class;Ljava/lang/reflect/Executable;)[[Ljava/lang/Object;"),
+[external][shana][shana@zju.edu.cn]};
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]void RegisterHookBridge(JNIEnv *env) {
+[internal][vvb2060][vvb2060@gmail.com]    jclass method = env->FindClass("java/lang/reflect/Method");
+[internal][canyie][31466456+canyie@users.noreply.github.com]    invoke = env->GetMethodID(
+[external][shana][shana@zju.edu.cn]            method, "invoke",
+[external][shana][shana@zju.edu.cn]            "(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;");
+[external][shana][shana@zju.edu.cn]    env->DeleteLocalRef(method);
+[external][shana][shana@zju.edu.cn]    REGISTER_LSP_NATIVE_METHODS(HookBridge);
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]} // namespace lspd

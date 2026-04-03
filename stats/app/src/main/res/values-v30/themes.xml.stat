@@ -1,0 +1,29 @@
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]<?xml version="1.0" encoding="utf-8"?><!--
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~ This file is part of LSPosed.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~ LSPosed is free software: you can redistribute it and/or modify
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~ it under the terms of the GNU General Public License as published by
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~ the Free Software Foundation, either version 3 of the License, or
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~ (at your option) any later version.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~ LSPosed is distributed in the hope that it will be useful,
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~ GNU General Public License for more details.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~ You should have received a copy of the GNU General Public License
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~ Copyright (C) 2022 LSPosed Contributors
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  -->
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]<resources>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <style name="Theme.Light" parent="Base.AppTheme.Light">
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        <item name="android:windowLayoutInDisplayCutoutMode">always</item>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    </style>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <style name="Theme" parent="Base.AppTheme">
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        <item name="android:windowLayoutInDisplayCutoutMode">always</item>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    </style>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]</resources>

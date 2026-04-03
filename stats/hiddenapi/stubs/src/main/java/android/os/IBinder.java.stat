@@ -1,0 +1,33 @@
+[external][shana][shana@zju.edu.cn]package android.os;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import android.annotation.NonNull;
+[external][shana][shana@zju.edu.cn]import android.annotation.Nullable;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import java.io.FileDescriptor;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public interface IBinder {
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    boolean transact(int code, @NonNull Parcel data, @Nullable Parcel reply, int flags);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Nullable
+[external][shana][shana@zju.edu.cn]    String getInterfaceDescriptor();
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    boolean pingBinder();
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    boolean isBinderAlive();
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Nullable
+[external][shana][shana@zju.edu.cn]    IInterface queryLocalInterface(@NonNull String descriptor);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    void dump(@NonNull FileDescriptor fd, @Nullable String[] args);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    void dumpAsync(@NonNull FileDescriptor fd, @Nullable String[] args);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    void linkToDeath(@NonNull DeathRecipient recipient, int flags);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    boolean unlinkToDeath(@NonNull DeathRecipient recipient, int flags);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    interface DeathRecipient {
+[external][shana][shana@zju.edu.cn]        void binderDied();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

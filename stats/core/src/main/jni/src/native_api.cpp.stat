@@ -1,0 +1,145 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]//
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]// Created by kotori on 2/4/21.
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]//
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]#include "native_api.h"
+[external][shana][shana@zju.edu.cn]#include "logging.h"
+[external][shana][shana@zju.edu.cn]#include "utils/hook_helper.hpp"
+[external][shana][shana@zju.edu.cn]#include <sys/mman.h>
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]#include <dobby.h>
+[external][shana][shana@zju.edu.cn]#include <list>
+[external][shana][shana@zju.edu.cn]#include <dlfcn.h>
+[external][shana][shana@zju.edu.cn]#include "native_util.h"
+[external][shana][shana@zju.edu.cn]#include "elf_util.h"
+[external][shana][shana@zju.edu.cn]
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]/*
+[internal][kotori2][17663689+kotori2@users.noreply.github.com] * Module: define xposed_native file in /assets, each line is a .so file name
+[internal][kotori2][17663689+kotori2@users.noreply.github.com] * LSP: Hook do_dlopen, if any .so file matches the name above, try to call
+[internal][kotori2][17663689+kotori2@users.noreply.github.com] *      "native_init(void*)" function in target so with function pointer of "init" below.
+[internal][kotori2][17663689+kotori2@users.noreply.github.com] * Module: Call init function with the pointer of callback function.
+[internal][kotori2][17663689+kotori2@users.noreply.github.com] * LSP: Store the callback function pointer (multiple callback allowed) and return
+[internal][kotori2][17663689+kotori2@users.noreply.github.com] *      LsposedNativeAPIEntries struct.
+[internal][kotori2][17663689+kotori2@users.noreply.github.com] * Module: Since JNI is not yet available at that time, module can store the struct to somewhere else,
+[internal][kotori2][17663689+kotori2@users.noreply.github.com] *      and handle them in JNI_Onload or later.
+[internal][kotori2][17663689+kotori2@users.noreply.github.com] * Module: Do some MAGIC provided by LSPosed framework.
+[internal][kotori2][17663689+kotori2@users.noreply.github.com] * LSP: If any so loaded by target app, we will send a callback to the specific module callback function.
+[internal][kotori2][17663689+kotori2@users.noreply.github.com] *      But an exception is, if the target skipped dlopen and handle linker stuffs on their own, the
+[internal][kotori2][17663689+kotori2@users.noreply.github.com] *      callback will not work.
+[internal][kotori2][17663689+kotori2@users.noreply.github.com] */
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]namespace lspd {
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    using lsplant::operator""_tstr;
+[external][shana][shana@zju.edu.cn]    std::list<NativeOnModuleLoaded> moduleLoadedCallbacks;
+[external][shana][shana@zju.edu.cn]    std::list<std::string> moduleNativeLibs;
+[external][shana][shana@zju.edu.cn]    std::unique_ptr<void, std::function<void(void *)>> protected_page(
+[external][shana][shana@zju.edu.cn]            mmap(nullptr, 4096, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_SHARED, -1, 0),
+[external][shana][shana@zju.edu.cn]            [](void *ptr) { munmap(ptr, 4096); });
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    const auto[entries] = []() {
+[external][shana][shana@zju.edu.cn]        auto *entries = new(protected_page.get()) NativeAPIEntries{
+[external][shana][shana@zju.edu.cn]                .version = 2,
+[external][shana][shana@zju.edu.cn]                .hookFunc = &HookFunction,
+[external][shana][shana@zju.edu.cn]                .unhookFunc = &UnhookFunction,
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        };
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        mprotect(protected_page.get(), 4096, PROT_READ);
+[external][shana][shana@zju.edu.cn]        return std::make_tuple(entries);
+[external][shana][shana@zju.edu.cn]    }();
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    void RegisterNativeLib(const std::string &library_name) {
+[external][shana][shana@zju.edu.cn]        static bool initialized = []() {
+[external][shana][shana@zju.edu.cn]            return InstallNativeAPI({
+[external][shana][shana@zju.edu.cn]                .inline_hooker = [](auto t, auto r) {
+[external][shana][shana@zju.edu.cn]                    void* bk = nullptr;
+[external][shana][shana@zju.edu.cn]                    return HookFunction(t, r, &bk) == RS_SUCCESS ? bk : nullptr;
+[external][shana][shana@zju.edu.cn]                },
+[external][shana][shana@zju.edu.cn]            });
+[external][shana][shana@zju.edu.cn]        }();
+[external][shana][shana@zju.edu.cn]        if (!initialized) [[unlikely]] return;
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        LOGD("native_api: Registered {}", library_name);
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        moduleNativeLibs.push_back(library_name);
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    }
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    bool hasEnding(std::string_view fullString, std::string_view ending) {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        if (fullString.length() >= ending.length()) {
+[external][shana][shana@zju.edu.cn]            return (0 == fullString.compare(fullString.length() - ending.length(), ending.length(),
+[external][shana][shana@zju.edu.cn]                                            ending));
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        }
+[external][shana][shana@zju.edu.cn]        return false;
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    }
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    CREATE_HOOK_STUB_ENTRY(
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]            "__dl__Z9do_dlopenPKciPK17android_dlextinfoPKv",
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]            void*, do_dlopen, (const char* name, int flags, const void* extinfo,
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                    const void* caller_addr), {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                auto *handle = backup(name, flags, extinfo, caller_addr);
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                std::string ns;
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                if (name) {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                    ns = std::string(name);
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                } else {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                    ns = "NULL";
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                }
+[external][cinit][40174090+cinit@users.noreply.github.com]                LOGD("native_api: do_dlopen({})", ns);
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                if (handle == nullptr) {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                    return nullptr;
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                }
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                for (std::string_view module_lib: moduleNativeLibs) {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                    // the so is a module so
+[external][shana][shana@zju.edu.cn]                    if (hasEnding(ns, module_lib)) [[unlikely]] {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                        LOGD("Loading module native library {}", module_lib);
+[external][shana][shana@zju.edu.cn]                        void *native_init_sym = dlsym(handle, "native_init");
+[external][shana][shana@zju.edu.cn]                        if (native_init_sym == nullptr) [[unlikely]] {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                            LOGD("Failed to get symbol \"native_init\" from library {}",
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                                 module_lib);
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                            break;
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                        }
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                        auto native_init = reinterpret_cast<NativeInit>(native_init_sym);
+[external][shana][shana@zju.edu.cn]                        auto *callback = native_init(entries);
+[external][shana][shana@zju.edu.cn]                        if (callback) {
+[external][shana][shana@zju.edu.cn]                            moduleLoadedCallbacks.push_back(callback);
+[external][shana][shana@zju.edu.cn]                            // return directly to avoid module interaction
+[external][shana][shana@zju.edu.cn]                            return handle;
+[external][shana][shana@zju.edu.cn]                        }
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                    }
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                }
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                // Callbacks
+[external][shana][shana@zju.edu.cn]                for (auto &callback: moduleLoadedCallbacks) {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                    callback(name, handle);
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                }
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                return handle;
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]            });
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    bool InstallNativeAPI(const lsplant::HookHandler & handler) {
+[external][shana][shana@zju.edu.cn]        auto *do_dlopen_sym = SandHook::ElfImg("/linker").getSymbAddress(
+[external][shana][shana@zju.edu.cn]                "__dl__Z9do_dlopenPKciPK17android_dlextinfoPKv");
+[external][shana][shana@zju.edu.cn]        LOGD("InstallNativeAPI: {}", do_dlopen_sym);
+[external][shana][shana@zju.edu.cn]        if (do_dlopen_sym) [[likely]] {
+[external][shana][shana@zju.edu.cn]            HookSymNoHandle(handler, do_dlopen_sym, do_dlopen);
+[external][shana][shana@zju.edu.cn]            return true;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return false;
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    }
+[external][shana][shana@zju.edu.cn]}

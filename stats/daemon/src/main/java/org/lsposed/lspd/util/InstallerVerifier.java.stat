@@ -1,0 +1,31 @@
+[internal][dr-tsng][tsng.nullptr@outlook.com]package org.lsposed.lspd.util;
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[internal][vvb2060][vvb2060@gmail.com]import static org.lsposed.lspd.util.SignInfo.CERTIFICATE;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][dr-tsng][tsng.nullptr@outlook.com]import com.android.apksig.ApkVerifier;
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[internal][dr-tsng][tsng.nullptr@outlook.com]import java.io.File;
+[internal][vvb2060][vvb2060@gmail.com]import java.io.IOException;
+[internal][dr-tsng][tsng.nullptr@outlook.com]import java.util.Arrays;
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[internal][dr-tsng][tsng.nullptr@outlook.com]public class InstallerVerifier {
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[internal][vvb2060][vvb2060@gmail.com]    public static void verifyInstallerSignature(String path) throws IOException {
+[internal][dr-tsng][tsng.nullptr@outlook.com]        ApkVerifier verifier = new ApkVerifier.Builder(new File(path))
+[internal][dr-tsng][tsng.nullptr@outlook.com]                .setMinCheckedPlatformVersion(27)
+[internal][dr-tsng][tsng.nullptr@outlook.com]                .build();
+[internal][dr-tsng][tsng.nullptr@outlook.com]        try {
+[internal][dr-tsng][tsng.nullptr@outlook.com]            ApkVerifier.Result result = verifier.verify();
+[internal][dr-tsng][tsng.nullptr@outlook.com]            if (!result.isVerified()) {
+[internal][vvb2060][vvb2060@gmail.com]                throw new IOException("apk signature not verified");
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]            var mainCert = result.getSignerCertificates().get(0);
+[internal][vvb2060][vvb2060@gmail.com]            if (!Arrays.equals(mainCert.getEncoded(), CERTIFICATE)) {
+[internal][vvb2060][vvb2060@gmail.com]                var dname = mainCert.getSubjectX500Principal().getName();
+[internal][vvb2060][vvb2060@gmail.com]                throw new IOException("apk signature mismatch: " + dname);
+[internal][dr-tsng][tsng.nullptr@outlook.com]            }
+[internal][vvb2060][vvb2060@gmail.com]        } catch (Exception t) {
+[internal][vvb2060][vvb2060@gmail.com]            throw new IOException(t);
+[internal][dr-tsng][tsng.nullptr@outlook.com]        }
+[internal][dr-tsng][tsng.nullptr@outlook.com]    }
+[internal][dr-tsng][tsng.nullptr@outlook.com]}

@@ -1,0 +1,490 @@
+[external][admin][admin@0x.mk]/*
+[external][admin][admin@0x.mk] * This file is part of LSPosed.
+[external][admin][admin@0x.mk] *
+[external][admin][admin@0x.mk] * LSPosed is free software: you can redistribute it and/or modify
+[external][admin][admin@0x.mk] * it under the terms of the GNU General Public License as published by
+[external][admin][admin@0x.mk] * the Free Software Foundation, either version 3 of the License, or
+[external][admin][admin@0x.mk] * (at your option) any later version.
+[external][admin][admin@0x.mk] *
+[external][admin][admin@0x.mk] * LSPosed is distributed in the hope that it will be useful,
+[external][admin][admin@0x.mk] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][admin][admin@0x.mk] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][admin][admin@0x.mk] * GNU General Public License for more details.
+[external][admin][admin@0x.mk] *
+[external][admin][admin@0x.mk] * You should have received a copy of the GNU General Public License
+[external][admin][admin@0x.mk] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][admin][admin@0x.mk] *
+[external][admin][admin@0x.mk] * Copyright (C) 2021 - 2022 LSPosed Contributors
+[external][admin][admin@0x.mk] */
+[external][admin][admin@0x.mk]
+[external][shana][shana@zju.edu.cn]package org.lsposed.lspd.service;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import static org.lsposed.lspd.service.ServiceManager.TAG;
+[internal][vvb2060][vvb2060@gmail.com]import static org.lsposed.lspd.service.ServiceManager.toGlobalNamespace;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import android.content.res.AssetManager;
+[external][shana][shana@zju.edu.cn]import android.content.res.Resources;
+[internal][vvb2060][vvb2060@gmail.com]import android.os.Binder;
+[internal][vvb2060][vvb2060@gmail.com]import android.os.ParcelFileDescriptor;
+[internal][vvb2060][vvb2060@gmail.com]import android.os.Process;
+[external][shana][shana@zju.edu.cn]import android.os.RemoteException;
+[external][shana][shana@zju.edu.cn]import android.os.SELinux;
+[internal][vvb2060][vvb2060@gmail.com]import android.os.SharedMemory;
+[internal][vvb2060][vvb2060@gmail.com]import android.system.ErrnoException;
+[external][shana][shana@zju.edu.cn]import android.system.Os;
+[internal][vvb2060][vvb2060@gmail.com]import android.system.OsConstants;
+[external][shana][shana@zju.edu.cn]import android.util.Log;
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]import androidx.annotation.Nullable;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.daemon.BuildConfig;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.lspd.models.PreLoadedApk;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.lspd.util.InstallerVerifier;
+[external][shana][shana@zju.edu.cn]import org.lsposed.lspd.util.Utils;
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]import java.io.BufferedReader;
+[external][shana][shana@zju.edu.cn]import java.io.File;
+[external][shana][shana@zju.edu.cn]import java.io.FileInputStream;
+[external][shana][shana@zju.edu.cn]import java.io.FileOutputStream;
+[external][shana][shana@zju.edu.cn]import java.io.IOException;
+[external][shana][shana@zju.edu.cn]import java.io.InputStream;
+[internal][vvb2060][vvb2060@gmail.com]import java.io.InputStreamReader;
+[external][shana][shana@zju.edu.cn]import java.io.OutputStream;
+[external][shana][shana@zju.edu.cn]import java.lang.reflect.Method;
+[internal][vvb2060][vvb2060@gmail.com]import java.nio.channels.Channels;
+[external][shana][shana@zju.edu.cn]import java.nio.channels.FileChannel;
+[external][shana][shana@zju.edu.cn]import java.nio.channels.FileLock;
+[external][shana][shana@zju.edu.cn]import java.nio.file.FileVisitResult;
+[external][shana][shana@zju.edu.cn]import java.nio.file.Files;
+[internal][vvb2060][vvb2060@gmail.com]import java.nio.file.LinkOption;
+[external][shana][shana@zju.edu.cn]import java.nio.file.OpenOption;
+[external][shana][shana@zju.edu.cn]import java.nio.file.Path;
+[internal][vvb2060][vvb2060@gmail.com]import java.nio.file.Paths;
+[external][shana][shana@zju.edu.cn]import java.nio.file.SimpleFileVisitor;
+[external][shana][shana@zju.edu.cn]import java.nio.file.StandardOpenOption;
+[external][shana][shana@zju.edu.cn]import java.nio.file.attribute.BasicFileAttributes;
+[external][shana][shana@zju.edu.cn]import java.nio.file.attribute.PosixFilePermissions;
+[external][shana][shana@zju.edu.cn]import java.time.Instant;
+[external][shana][shana@zju.edu.cn]import java.time.format.DateTimeFormatter;
+[internal][vvb2060][vvb2060@gmail.com]import java.util.ArrayList;
+[external][shana][shana@zju.edu.cn]import java.util.HashSet;
+[internal][vvb2060][vvb2060@gmail.com]import java.util.List;
+[internal][vvb2060][vvb2060@gmail.com]import java.util.Locale;
+[internal][vvb2060][vvb2060@gmail.com]import java.util.zip.Deflater;
+[external][shana][shana@zju.edu.cn]import java.util.zip.ZipEntry;
+[internal][vvb2060][vvb2060@gmail.com]import java.util.zip.ZipFile;
+[external][shana][shana@zju.edu.cn]import java.util.zip.ZipOutputStream;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import hidden.HiddenApiBridge;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public class ConfigFileManager {
+[internal][vvb2060][vvb2060@gmail.com]    static final Path basePath = Paths.get("/data/adb/lspd");
+[external][shana][shana@zju.edu.cn]    static final Path modulePath = basePath.resolve("modules");
+[internal][dr-tsng][tsng.nullptr@outlook.com]    static final Path daemonApkPath = Paths.get(System.getProperty("java.class.path", null));
+[external][howardwu20][HowardWu20@outlook.com]    static final Path managerApkPath = daemonApkPath.getParent().resolve("manager.apk");
+[internal][vvb2060][vvb2060@gmail.com]    static final File magiskDbPath = new File("/data/adb/magisk.db");
+[internal][vvb2060][vvb2060@gmail.com]    private static final Path lockPath = basePath.resolve("lock");
+[internal][vvb2060][vvb2060@gmail.com]    private static final Path configDirPath = basePath.resolve("config");
+[internal][vvb2060][vvb2060@gmail.com]    static final File dbPath = configDirPath.resolve("modules_config.db").toFile();
+[internal][vvb2060][vvb2060@gmail.com]    private static final Path logDirPath = basePath.resolve("log");
+[internal][vvb2060][vvb2060@gmail.com]    private static final Path oldLogDirPath = basePath.resolve("log.old");
+[external][shana][shana@zju.edu.cn]    private static final DateTimeFormatter formatter =
+[external][shana][shana@zju.edu.cn]            DateTimeFormatter.ISO_LOCAL_DATE_TIME.withZone(Utils.getZoneId());
+[external][shana][shana@zju.edu.cn]    @SuppressWarnings("FieldCanBeLocal")
+[external][shana][shana@zju.edu.cn]    private static FileLocker locker = null;
+[internal][vvb2060][vvb2060@gmail.com]    private static Resources res = null;
+[internal][vvb2060][vvb2060@gmail.com]    private static ParcelFileDescriptor fd = null;
+[external][shana][shana@zju.edu.cn]    private static SharedMemory preloadDex = null;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    static {
+[external][shana][shana@zju.edu.cn]        try {
+[internal][vvb2060][vvb2060@gmail.com]            Files.createDirectories(basePath);
+[internal][vvb2060][vvb2060@gmail.com]            SELinux.setFileContext(basePath.toString(), "u:object_r:system_file:s0");
+[internal][vvb2060][vvb2060@gmail.com]            Files.createDirectories(configDirPath);
+[internal][vvb2060][vvb2060@gmail.com]            createLogDirPath();
+[external][shana][shana@zju.edu.cn]        } catch (IOException e) {
+[external][shana][shana@zju.edu.cn]            Log.e(TAG, Log.getStackTraceString(e));
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static void transfer(InputStream in, OutputStream out) throws IOException {
+[external][shana][shana@zju.edu.cn]        int size = 8192;
+[external][shana][shana@zju.edu.cn]        var buffer = new byte[size];
+[external][shana][shana@zju.edu.cn]        int read;
+[external][shana][shana@zju.edu.cn]        while ((read = in.read(buffer, 0, size)) >= 0) {
+[external][shana][shana@zju.edu.cn]            out.write(buffer, 0, read);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]    private static void createLogDirPath() throws IOException {
+[internal][vvb2060][vvb2060@gmail.com]        if (!Files.isDirectory(logDirPath, LinkOption.NOFOLLOW_LINKS)) {
+[internal][vvb2060][vvb2060@gmail.com]            Files.deleteIfExists(logDirPath);
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]        Files.createDirectories(logDirPath);
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]    public static Resources getResources() {
+[external][shana][shana@zju.edu.cn]        loadRes();
+[external][shana][shana@zju.edu.cn]        return res;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private static void loadRes() {
+[internal][vvb2060][vvb2060@gmail.com]        if (res != null) return;
+[internal][vvb2060][vvb2060@gmail.com]        try {
+[external][shana][shana@zju.edu.cn]            var am = AssetManager.class.newInstance();
+[internal][vvb2060][vvb2060@gmail.com]            //noinspection JavaReflectionMemberAccess DiscouragedPrivateApi
+[internal][vvb2060][vvb2060@gmail.com]            Method addAssetPath = AssetManager.class.getDeclaredMethod("addAssetPath", String.class);
+[internal][vvb2060][vvb2060@gmail.com]            addAssetPath.setAccessible(true);
+[external][shana][shana@zju.edu.cn]            //noinspection ConstantConditions
+[internal][vvb2060][vvb2060@gmail.com]            if ((int) addAssetPath.invoke(am, daemonApkPath.toString()) > 0) {
+[external][shana][shana@zju.edu.cn]                //noinspection deprecation
+[external][shana][shana@zju.edu.cn]                res = new Resources(am, null, null);
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]        } catch (Throwable e) {
+[internal][vvb2060][vvb2060@gmail.com]            Log.e(TAG, Log.getStackTraceString(e));
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]    static void reloadConfiguration() {
+[external][shana][shana@zju.edu.cn]        loadRes();
+[external][shana][shana@zju.edu.cn]        try {
+[external][shana][shana@zju.edu.cn]            var conf = ActivityManagerService.getConfiguration();
+[external][shana][shana@zju.edu.cn]            if (conf != null)
+[external][shana][shana@zju.edu.cn]                //noinspection deprecation
+[external][shana][shana@zju.edu.cn]                res.updateConfiguration(conf, res.getDisplayMetrics());
+[external][shana][shana@zju.edu.cn]        } catch (Throwable e) {
+[external][shana][shana@zju.edu.cn]            Log.e(TAG, "reload configuration", e);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    static ParcelFileDescriptor getManagerApk() throws IOException {
+[internal][vvb2060][vvb2060@gmail.com]        if (fd != null) return fd.dup();
+[internal][vvb2060][vvb2060@gmail.com]        InstallerVerifier.verifyInstallerSignature(managerApkPath.toString());
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]        SELinux.setFileContext(managerApkPath.toString(), "u:object_r:system_file:s0");
+[internal][vvb2060][vvb2060@gmail.com]        fd = ParcelFileDescriptor.open(managerApkPath.toFile(), ParcelFileDescriptor.MODE_READ_ONLY);
+[internal][vvb2060][vvb2060@gmail.com]        return fd.dup();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    static void deleteFolderIfExists(Path target) throws IOException {
+[internal][vvb2060][vvb2060@gmail.com]        if (Files.notExists(target)) return;
+[external][shana][shana@zju.edu.cn]        Files.walkFileTree(target, new SimpleFileVisitor<>() {
+[external][shana][shana@zju.edu.cn]            @Override
+[external][shana][shana@zju.edu.cn]            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+[external][shana][shana@zju.edu.cn]                    throws IOException {
+[external][shana][shana@zju.edu.cn]                Files.delete(file);
+[external][shana][shana@zju.edu.cn]                return FileVisitResult.CONTINUE;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            @Override
+[external][shana][shana@zju.edu.cn]            public FileVisitResult postVisitDirectory(Path dir, IOException e)
+[external][shana][shana@zju.edu.cn]                    throws IOException {
+[external][shana][shana@zju.edu.cn]                if (e == null) {
+[external][shana][shana@zju.edu.cn]                    Files.delete(dir);
+[external][shana][shana@zju.edu.cn]                    return FileVisitResult.CONTINUE;
+[external][shana][shana@zju.edu.cn]                } else {
+[external][shana][shana@zju.edu.cn]                    throw e;
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        });
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static boolean chattr0(Path path) {
+[external][shana][shana@zju.edu.cn]        try {
+[internal][vvb2060][vvb2060@gmail.com]            var dir = Os.open(path.toString(), OsConstants.O_RDONLY, 0);
+[internal][vvb2060][vvb2060@gmail.com]            HiddenApiBridge.Os_ioctlInt(dir, Process.is64Bit() ? 0x40086602 : 0x40046602, 0);
+[external][shana][shana@zju.edu.cn]            Os.close(dir);
+[external][shana][shana@zju.edu.cn]            return true;
+[external][shana][shana@zju.edu.cn]        } catch (Throwable e) {
+[external][shana][shana@zju.edu.cn]            Log.d(TAG, "chattr 0", e);
+[external][shana][shana@zju.edu.cn]            return false;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    static void moveLogDir() {
+[external][shana][shana@zju.edu.cn]        try {
+[internal][vvb2060][vvb2060@gmail.com]            if (Files.exists(logDirPath)) {
+[external][shana][shana@zju.edu.cn]                if (chattr0(logDirPath)) {
+[external][shana][shana@zju.edu.cn]                    deleteFolderIfExists(oldLogDirPath);
+[external][shana][shana@zju.edu.cn]                    Files.move(logDirPath, oldLogDirPath);
+[external][shana][shana@zju.edu.cn]                }
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]            Files.createDirectories(logDirPath);
+[external][shana][shana@zju.edu.cn]        } catch (IOException e) {
+[external][shana][shana@zju.edu.cn]            Log.e(TAG, Log.getStackTraceString(e));
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private static String getNewLogFileName(String prefix) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        return prefix + "_" + formatter.format(Instant.now()) + ".log";
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    static File getNewVerboseLogPath() throws IOException {
+[internal][vvb2060][vvb2060@gmail.com]        createLogDirPath();
+[internal][vvb2060][vvb2060@gmail.com]        return logDirPath.resolve(getNewLogFileName("verbose")).toFile();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    static File getNewModulesLogPath() throws IOException {
+[internal][vvb2060][vvb2060@gmail.com]        createLogDirPath();
+[internal][vvb2060][vvb2060@gmail.com]        return logDirPath.resolve(getNewLogFileName("modules")).toFile();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]    static File getPropsPath() throws IOException {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        createLogDirPath();
+[internal][vvb2060][vvb2060@gmail.com]        return logDirPath.resolve("props.txt").toFile();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]    static File getKmsgPath() throws IOException {
+[internal][vvb2060][vvb2060@gmail.com]        createLogDirPath();
+[internal][vvb2060][vvb2060@gmail.com]        return logDirPath.resolve("kmsg.log").toFile();
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    static void getLogs(ParcelFileDescriptor zipFd) throws IllegalStateException {
+[internal][vvb2060][vvb2060@gmail.com]        try (zipFd; var os = new ZipOutputStream(new FileOutputStream(zipFd.getFileDescriptor()))) {
+[internal][vvb2060][vvb2060@gmail.com]            var comment = String.format(Locale.ROOT, "LSPosed %s %s (%d)",
+[internal][vvb2060][vvb2060@gmail.com]                    BuildConfig.BUILD_TYPE, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE);
+[internal][vvb2060][vvb2060@gmail.com]            os.setComment(comment);
+[internal][vvb2060][vvb2060@gmail.com]            os.setLevel(Deflater.BEST_COMPRESSION);
+[internal][vvb2060][vvb2060@gmail.com]            zipAddDir(os, logDirPath);
+[internal][vvb2060][vvb2060@gmail.com]            zipAddDir(os, oldLogDirPath);
+[internal][vvb2060][vvb2060@gmail.com]            zipAddDir(os, Paths.get("/data/tombstones"));
+[internal][vvb2060][vvb2060@gmail.com]            zipAddDir(os, Paths.get("/data/anr"));
+[internal][vvb2060][vvb2060@gmail.com]            var data = Paths.get("/data/data");
+[internal][vvb2060][vvb2060@gmail.com]            var app1 = data.resolve(BuildConfig.MANAGER_INJECTED_PKG_NAME + "/cache/crash");
+[internal][vvb2060][vvb2060@gmail.com]            var app2 = data.resolve(BuildConfig.DEFAULT_MANAGER_PACKAGE_NAME + "/cache/crash");
+[internal][vvb2060][vvb2060@gmail.com]            zipAddDir(os, app1);
+[internal][vvb2060][vvb2060@gmail.com]            zipAddDir(os, app2);
+[internal][vvb2060][vvb2060@gmail.com]            zipAddProcOutput(os, "full.log", "logcat", "-b", "all", "-d");
+[internal][vvb2060][vvb2060@gmail.com]            zipAddProcOutput(os, "dmesg.log", "dmesg");
+[external][shana][shana@zju.edu.cn]            var magiskDataDir = Paths.get("/data/adb");
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            try (var l = Files.list(magiskDataDir.resolve("modules"))) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                l.forEach(p -> {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    zipAddFile(os, p, magiskDataDir);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    zipAddFile(os, p.resolve("module.prop"), magiskDataDir);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    zipAddFile(os, p.resolve("remove"), magiskDataDir);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    zipAddFile(os, p.resolve("disable"), magiskDataDir);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    zipAddFile(os, p.resolve("update"), magiskDataDir);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    zipAddFile(os, p.resolve("sepolicy.rule"), magiskDataDir);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                });
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            }
+[internal][vvb2060][vvb2060@gmail.com]            var proc = Paths.get("/proc");
+[internal][vvb2060][vvb2060@gmail.com]            for (var pid : new String[]{"self", String.valueOf(Binder.getCallingPid())}) {
+[internal][vvb2060][vvb2060@gmail.com]                var pidPath = proc.resolve(pid);
+[internal][vvb2060][vvb2060@gmail.com]                zipAddFile(os, pidPath.resolve("maps"), proc);
+[internal][vvb2060][vvb2060@gmail.com]                zipAddFile(os, pidPath.resolve("mountinfo"), proc);
+[internal][vvb2060][vvb2060@gmail.com]                zipAddFile(os, pidPath.resolve("status"), proc);
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]            zipAddFile(os, dbPath.toPath(), configDirPath);
+[external][shana][shana@zju.edu.cn]            ConfigManager.getInstance().exportScopes(os);
+[external][shana][shana@zju.edu.cn]        } catch (Throwable e) {
+[external][shana][shana@zju.edu.cn]            Log.w(TAG, "get log", e);
+[internal][vvb2060][vvb2060@gmail.com]            throw new IllegalStateException(e);
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    private static void zipAddProcOutput(ZipOutputStream os, String name, String... command) {
+[internal][vvb2060][vvb2060@gmail.com]        try (var is = new ProcessBuilder(command).start().getInputStream()) {
+[internal][vvb2060][vvb2060@gmail.com]            os.putNextEntry(new ZipEntry(name));
+[internal][vvb2060][vvb2060@gmail.com]            transfer(is, os);
+[internal][vvb2060][vvb2060@gmail.com]            os.closeEntry();
+[internal][vvb2060][vvb2060@gmail.com]        } catch (IOException e) {
+[internal][vvb2060][vvb2060@gmail.com]            Log.w(TAG, name, e);
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    private static void zipAddFile(ZipOutputStream os, Path path, Path base) {
+[internal][vvb2060][vvb2060@gmail.com]        var name = base.relativize(path).toString();
+[internal][vvb2060][vvb2060@gmail.com]        if (Files.isDirectory(path)) {
+[internal][vvb2060][vvb2060@gmail.com]            try {
+[internal][vvb2060][vvb2060@gmail.com]                os.putNextEntry(new ZipEntry(name + "/"));
+[internal][vvb2060][vvb2060@gmail.com]                os.closeEntry();
+[internal][vvb2060][vvb2060@gmail.com]            } catch (IOException e) {
+[internal][vvb2060][vvb2060@gmail.com]                Log.w(TAG, name, e);
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]        } else if (Files.exists(path)) {
+[internal][vvb2060][vvb2060@gmail.com]            try (var is = new FileInputStream(path.toFile())) {
+[internal][vvb2060][vvb2060@gmail.com]                os.putNextEntry(new ZipEntry(name));
+[internal][vvb2060][vvb2060@gmail.com]                transfer(is, os);
+[internal][vvb2060][vvb2060@gmail.com]                os.closeEntry();
+[external][shana][shana@zju.edu.cn]            } catch (IOException e) {
+[external][shana][shana@zju.edu.cn]                Log.w(TAG, name, e);
+[external][shana][shana@zju.edu.cn]            }
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    private static void zipAddDir(ZipOutputStream os, Path path) throws IOException {
+[internal][vvb2060][vvb2060@gmail.com]        if (!Files.isDirectory(path)) return;
+[internal][vvb2060][vvb2060@gmail.com]        Files.walkFileTree(path, new SimpleFileVisitor<>() {
+[internal][vvb2060][vvb2060@gmail.com]            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+[external][shana][shana@zju.edu.cn]                if (Files.isRegularFile(file)) {
+[external][shana][shana@zju.edu.cn]                    var name = path.getParent().relativize(file).toString();
+[internal][vvb2060][vvb2060@gmail.com]                    try (var is = new FileInputStream(file.toFile())) {
+[internal][vvb2060][vvb2060@gmail.com]                        os.putNextEntry(new ZipEntry(name));
+[internal][vvb2060][vvb2060@gmail.com]                        transfer(is, os);
+[internal][vvb2060][vvb2060@gmail.com]                        os.closeEntry();
+[internal][vvb2060][vvb2060@gmail.com]                    } catch (IOException e) {
+[internal][vvb2060][vvb2060@gmail.com]                        Log.w(TAG, name, e);
+[internal][vvb2060][vvb2060@gmail.com]                    }
+[external][shana][shana@zju.edu.cn]                }
+[internal][vvb2060][vvb2060@gmail.com]                return FileVisitResult.CONTINUE;
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]        });
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]    private static SharedMemory readDex(InputStream in, boolean obfuscate) throws IOException, ErrnoException {
+[external][shana][shana@zju.edu.cn]        var memory = SharedMemory.create(null, in.available());
+[external][shana][shana@zju.edu.cn]        var byteBuffer = memory.mapReadWrite();
+[external][shana][shana@zju.edu.cn]        Channels.newChannel(in).read(byteBuffer);
+[external][shana][shana@zju.edu.cn]        SharedMemory.unmap(byteBuffer);
+[external][shana][shana@zju.edu.cn]        if (obfuscate) {
+[external][shana][shana@zju.edu.cn]            var newMemory = ObfuscationManager.obfuscateDex(memory);
+[external][shana][shana@zju.edu.cn]            if (memory != newMemory) {
+[external][shana][shana@zju.edu.cn]                memory.close();
+[external][shana][shana@zju.edu.cn]                memory = newMemory;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        memory.setProtect(OsConstants.PROT_READ);
+[external][shana][shana@zju.edu.cn]        return memory;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    private static void readDexes(ZipFile apkFile, List<SharedMemory> preLoadedDexes,
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                                  boolean obfuscate) {
+[internal][vvb2060][vvb2060@gmail.com]        int secondary = 2;
+[internal][vvb2060][vvb2060@gmail.com]        for (var dexFile = apkFile.getEntry("classes.dex"); dexFile != null;
+[internal][vvb2060][vvb2060@gmail.com]             dexFile = apkFile.getEntry("classes" + secondary + ".dex"), secondary++) {
+[external][shana][shana@zju.edu.cn]            try (var is = apkFile.getInputStream(dexFile)) {
+[external][shana][shana@zju.edu.cn]                preLoadedDexes.add(readDex(is, obfuscate));
+[internal][vvb2060][vvb2060@gmail.com]            } catch (IOException | ErrnoException e) {
+[internal][vvb2060][vvb2060@gmail.com]                Log.w(TAG, "Can not load " + dexFile + " in " + apkFile, e);
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    private static void readName(ZipFile apkFile, String initName, List<String> names) {
+[internal][vvb2060][vvb2060@gmail.com]        var initEntry = apkFile.getEntry(initName);
+[internal][vvb2060][vvb2060@gmail.com]        if (initEntry == null) return;
+[internal][vvb2060][vvb2060@gmail.com]        try (var in = apkFile.getInputStream(initEntry)) {
+[internal][vvb2060][vvb2060@gmail.com]            var reader = new BufferedReader(new InputStreamReader(in));
+[internal][vvb2060][vvb2060@gmail.com]            String name;
+[internal][vvb2060][vvb2060@gmail.com]            while ((name = reader.readLine()) != null) {
+[internal][vvb2060][vvb2060@gmail.com]                name = name.trim();
+[internal][vvb2060][vvb2060@gmail.com]                if (name.isEmpty() || name.startsWith("#")) continue;
+[internal][vvb2060][vvb2060@gmail.com]                names.add(name);
+[internal][vvb2060][vvb2060@gmail.com]            }
+[external][shana][shana@zju.edu.cn]        } catch (IOException | OutOfMemoryError e) {
+[internal][vvb2060][vvb2060@gmail.com]            Log.e(TAG, "Can not open " + initEntry, e);
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    @Nullable
+[external][shana][shana@zju.edu.cn]    static PreLoadedApk loadModule(String path, boolean obfuscate) {
+[internal][vvb2060][vvb2060@gmail.com]        if (path == null) return null;
+[internal][vvb2060][vvb2060@gmail.com]        var file = new PreLoadedApk();
+[internal][vvb2060][vvb2060@gmail.com]        var preLoadedDexes = new ArrayList<SharedMemory>();
+[internal][vvb2060][vvb2060@gmail.com]        var moduleClassNames = new ArrayList<String>(1);
+[internal][vvb2060][vvb2060@gmail.com]        var moduleLibraryNames = new ArrayList<String>(1);
+[internal][vvb2060][vvb2060@gmail.com]        try (var apkFile = new ZipFile(toGlobalNamespace(path))) {
+[external][shana][shana@zju.edu.cn]            readDexes(apkFile, preLoadedDexes, obfuscate);
+[external][noreply][noreply@nullptr.icu]            readName(apkFile, "META-INF/xposed/java_init.list", moduleClassNames);
+[external][shana][shana@zju.edu.cn]            if (moduleClassNames.isEmpty()) {
+[external][shana][shana@zju.edu.cn]                file.legacy = true;
+[external][shana][shana@zju.edu.cn]                readName(apkFile, "assets/xposed_init", moduleClassNames);
+[external][shana][shana@zju.edu.cn]                readName(apkFile, "assets/native_init", moduleLibraryNames);
+[external][shana][shana@zju.edu.cn]            } else {
+[external][shana][shana@zju.edu.cn]                file.legacy = false;
+[external][noreply][noreply@nullptr.icu]                readName(apkFile, "META-INF/xposed/native_init.list", moduleLibraryNames);
+[external][shana][shana@zju.edu.cn]            }
+[internal][vvb2060][vvb2060@gmail.com]        } catch (IOException e) {
+[internal][vvb2060][vvb2060@gmail.com]            Log.e(TAG, "Can not open " + path, e);
+[internal][vvb2060][vvb2060@gmail.com]            return null;
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]        if (preLoadedDexes.isEmpty()) return null;
+[internal][vvb2060][vvb2060@gmail.com]        if (moduleClassNames.isEmpty()) return null;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]        if (obfuscate) {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]            var signatures = ObfuscationManager.getSignatures();
+[internal][vvb2060][vvb2060@gmail.com]            for (int i = 0; i < moduleClassNames.size(); i++) {
+[internal][vvb2060][vvb2060@gmail.com]                var s = moduleClassNames.get(i);
+[external][shana][shana@zju.edu.cn]                for (var entry : signatures.entrySet()) {
+[external][shana][shana@zju.edu.cn]                    if (s.startsWith(entry.getKey())) {
+[external][shana][shana@zju.edu.cn]                        moduleClassNames.add(i, s.replace(entry.getKey(), entry.getValue()));
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                    }
+[internal][vvb2060][vvb2060@gmail.com]                }
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]        file.preLoadedDexes = preLoadedDexes;
+[internal][vvb2060][vvb2060@gmail.com]        file.moduleClassNames = moduleClassNames;
+[internal][vvb2060][vvb2060@gmail.com]        file.moduleLibraryNames = moduleLibraryNames;
+[internal][vvb2060][vvb2060@gmail.com]        return file;
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]    static boolean tryLock() {
+[external][shana][shana@zju.edu.cn]        var openOptions = new HashSet<OpenOption>();
+[external][shana][shana@zju.edu.cn]        openOptions.add(StandardOpenOption.CREATE);
+[external][shana][shana@zju.edu.cn]        openOptions.add(StandardOpenOption.WRITE);
+[external][shana][shana@zju.edu.cn]        var p = PosixFilePermissions.fromString("rw-------");
+[external][shana][shana@zju.edu.cn]        var permissions = PosixFilePermissions.asFileAttribute(p);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        try {
+[internal][vvb2060][vvb2060@gmail.com]            var lockChannel = FileChannel.open(lockPath, openOptions, permissions);
+[external][shana][shana@zju.edu.cn]            locker = new FileLocker(lockChannel);
+[external][shana][shana@zju.edu.cn]            return locker.isValid();
+[external][shana][shana@zju.edu.cn]        } catch (Throwable e) {
+[external][shana][shana@zju.edu.cn]            return false;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    synchronized static SharedMemory getPreloadDex(boolean obfuscate) {
+[external][shana][shana@zju.edu.cn]        if (preloadDex == null) {
+[external][shana][shana@zju.edu.cn]            try (var is = new FileInputStream("framework/lspd.dex")) {
+[external][shana][shana@zju.edu.cn]                preloadDex = readDex(is, obfuscate);
+[external][shana][shana@zju.edu.cn]            } catch (Throwable e) {
+[external][shana][shana@zju.edu.cn]                Log.e(TAG, "preload dex", e);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return preloadDex;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    static void ensureModuleFilePath(String path) throws RemoteException {
+[external][shana][shana@zju.edu.cn]        if (path == null || path.indexOf(File.separatorChar) >= 0 || ".".equals(path) || "..".equals(path)) {
+[external][shana][shana@zju.edu.cn]            throw new RemoteException("Invalid path: " + path);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    static Path resolveModuleDir(String packageName, String dir, int userId, int uid) throws IOException {
+[external][shana][shana@zju.edu.cn]        var path = modulePath.resolve(String.valueOf(userId)).resolve(packageName).resolve(dir).normalize();
+[external][shana][shana@zju.edu.cn]        if (uid != -1) {
+[external][shana][shana@zju.edu.cn]            if (path.toFile().mkdirs()) {
+[external][shana][shana@zju.edu.cn]                try {
+[external][shana][shana@zju.edu.cn]                    SELinux.setFileContext(path.toString(), "u:object_r:magisk_file:s0");
+[external][shana][shana@zju.edu.cn]                    Os.chown(path.toString(), uid, uid);
+[external][shana][shana@zju.edu.cn]                    Os.chmod(path.toString(), 0755);
+[external][shana][shana@zju.edu.cn]                } catch (ErrnoException e) {
+[external][shana][shana@zju.edu.cn]                    throw new IOException(e);
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return path;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private static class FileLocker {
+[external][shana][shana@zju.edu.cn]        private final FileChannel lockChannel;
+[external][shana][shana@zju.edu.cn]        private final FileLock locker;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        FileLocker(FileChannel lockChannel) throws IOException {
+[external][shana][shana@zju.edu.cn]            this.lockChannel = lockChannel;
+[external][shana][shana@zju.edu.cn]            this.locker = lockChannel.tryLock();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        boolean isValid() {
+[external][shana][shana@zju.edu.cn]            return this.locker != null && this.locker.isValid();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        protected void finalize() throws Throwable {
+[external][shana][shana@zju.edu.cn]            this.locker.release();
+[external][shana][shana@zju.edu.cn]            this.lockChannel.close();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

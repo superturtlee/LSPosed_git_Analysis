@@ -1,0 +1,50 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]<!--
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  -->
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    android:layout_width="match_parent"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    android:layout_height="64dp"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    xmlns:app="http://schemas.android.com/apk/res-auto"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    android:background="?selectableItemBackground"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    android:clickable="true"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    android:focusable="true">
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    <com.google.android.material.progressindicator.CircularProgressIndicator
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        android:id="@+id/progress"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        android:layout_width="36dp"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        android:layout_height="36dp"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        android:indeterminate="true"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        android:layout_gravity="center"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        android:visibility="gone"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        app:showAnimationBehavior="outward"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        app:hideAnimationBehavior="inward" />
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    <com.google.android.material.textview.MaterialTextView
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        android:id="@+id/title"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        android:layout_width="wrap_content"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        android:layout_height="wrap_content"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        android:drawableStart="@drawable/ic_keyboard_arrow_down"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        android:textAppearance="?textAppearanceListItem"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        android:textColor="?android:attr/textColorSecondary"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        android:drawablePadding="4dp"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        android:layout_gravity="center"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        android:text="@string/module_release_load_more" />
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]</FrameLayout>

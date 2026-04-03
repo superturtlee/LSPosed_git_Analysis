@@ -1,0 +1,56 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]<!--
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  -->
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]<resources>
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    <style name="AppTheme" parent="Theme.Light" />
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    <!-- SubtitleCollapsingToolbarLayout styles -->
+[external][shana][shana@zju.edu.cn]    <style name="Widget.Design.SubtitleCollapsingToolbar" parent="Widget.Design.CollapsingToolbar" />
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    <style name="TextAppearance.Design.SubtitleCollapsingToolbar.ExpandedTitle" parent="TextAppearance.Design.CollapsingToolbar.Expanded" />
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    <style name="TextAppearance.Design.SubtitleCollapsingToolbar.ExpandedSubtitle" parent="TextAppearance.AppCompat.Title">
+[external][shana][shana@zju.edu.cn]        <item name="android:textColor">?android:attr/textColorSecondary</item>
+[external][shana][shana@zju.edu.cn]    </style>
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    <style name="language_menu_style" parent="ThemeOverlay.Preference.SimpleMenuPreference.PopupMenu">
+[external][shana][shana@zju.edu.cn]        <item name="android:textAlignment">textStart</item>
+[external][shana][shana@zju.edu.cn]    </style>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <style name="Widget.Button.TextButton.Dialog.FullWidth" parent="Widget.Material3.Button.TextButton.Dialog.Flush">
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        <item name="android:layout_width">0dp</item>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        <item name="android:layout_weight">1</item>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        <item name="android:maxWidth">@null</item>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    </style>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <style name="ThemeOverlay.MaterialAlertDialog.Centered.FullWidthButtons" parent="ThemeOverlay.Material3.MaterialAlertDialog.Centered">
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        <!-- Mark spacer as gone when showing full width buttons -->
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        <item name="materialAlertDialogButtonSpacerVisibility">2</item>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        <item name="buttonBarPositiveButtonStyle">@style/Widget.Button.TextButton.Dialog.FullWidth</item>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        <item name="buttonBarNegativeButtonStyle">@style/Widget.Button.TextButton.Dialog.FullWidth</item>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        <item name="buttonBarNeutralButtonStyle">@style/Widget.Button.TextButton.Dialog.FullWidth</item>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    </style>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <style name="ThemeOverlay.MaterialAlertDialog.FullWidthButtons" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        <!-- Mark spacer as gone when showing full width buttons -->
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        <item name="materialAlertDialogButtonSpacerVisibility">2</item>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        <item name="buttonBarPositiveButtonStyle">@style/Widget.Button.TextButton.Dialog.FullWidth</item>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        <item name="buttonBarNegativeButtonStyle">@style/Widget.Button.TextButton.Dialog.FullWidth</item>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        <item name="buttonBarNeutralButtonStyle">@style/Widget.Button.TextButton.Dialog.FullWidth</item>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    </style>
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]</resources>

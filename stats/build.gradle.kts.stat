@@ -1,0 +1,120 @@
+[external][shana][shana@zju.edu.cn]/*
+[external][shana][shana@zju.edu.cn] * This file is part of LSPosed.
+[external][shana][shana@zju.edu.cn] *
+[external][shana][shana@zju.edu.cn] * LSPosed is free software: you can redistribute it and/or modify
+[external][shana][shana@zju.edu.cn] * it under the terms of the GNU General Public License as published by
+[external][shana][shana@zju.edu.cn] * the Free Software Foundation, either version 3 of the License, or
+[external][shana][shana@zju.edu.cn] * (at your option) any later version.
+[external][shana][shana@zju.edu.cn] *
+[external][shana][shana@zju.edu.cn] * LSPosed is distributed in the hope that it will be useful,
+[external][shana][shana@zju.edu.cn] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][shana][shana@zju.edu.cn] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][shana][shana@zju.edu.cn] * GNU General Public License for more details.
+[external][shana][shana@zju.edu.cn] *
+[external][shana][shana@zju.edu.cn] * You should have received a copy of the GNU General Public License
+[external][shana][shana@zju.edu.cn] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][shana][shana@zju.edu.cn] *
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * Copyright (C) 2021 - 2022 LSPosed Contributors
+[external][shana][shana@zju.edu.cn] */
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]import com.android.build.api.dsl.ApplicationDefaultConfig
+[external][shana][shana@zju.edu.cn]import com.android.build.api.dsl.CommonExtension
+[external][shana][shana@zju.edu.cn]import com.android.build.gradle.api.AndroidBasePlugin
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]plugins {
+[external][shana][shana@zju.edu.cn]    alias(libs.plugins.lsplugin.cmaker)
+[external][shana][shana@zju.edu.cn]    alias(libs.plugins.lsplugin.jgit)
+[external][shana][shana@zju.edu.cn]    alias(libs.plugins.agp.lib) apply false
+[external][shana][shana@zju.edu.cn]    alias(libs.plugins.agp.app) apply false
+[external][shana][shana@zju.edu.cn]    alias(libs.plugins.nav.safeargs) apply false
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]cmaker {
+[external][shana][shana@zju.edu.cn]    default {
+[external][shana][shana@zju.edu.cn]        arguments.addAll(
+[external][shana][shana@zju.edu.cn]            arrayOf(
+[external][shana][shana@zju.edu.cn]                "-DEXTERNAL_ROOT=${File(rootDir.absolutePath, "external")}",
+[external][shana][shana@zju.edu.cn]                "-DCORE_ROOT=${File(rootDir.absolutePath, "core/src/main/jni")}",
+[external][shana][shana@zju.edu.cn]                "-DANDROID_STL=none"
+[external][shana][shana@zju.edu.cn]            )
+[external][shana][shana@zju.edu.cn]        )
+[external][shana][shana@zju.edu.cn]        val flags = arrayOf(
+[external][shana][shana@zju.edu.cn]            "-DINJECTED_AID=$injectedPackageUid",
+[external][shana][shana@zju.edu.cn]            "-Wno-gnu-string-literal-operator-template",
+[external][shana][shana@zju.edu.cn]            "-Wno-c++2b-extensions",
+[external][shana][shana@zju.edu.cn]        )
+[external][shana][shana@zju.edu.cn]        cFlags.addAll(flags)
+[external][shana][shana@zju.edu.cn]        cppFlags.addAll(flags)
+[external][shana][shana@zju.edu.cn]        abiFilters("arm64-v8a", "armeabi-v7a", "x86", "x86_64")
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]    buildTypes {
+[external][shana][shana@zju.edu.cn]        if (it.name == "release") {
+[external][howardwu20][HowardWu20@outlook.com]            arguments += "-DDEBUG_SYMBOLS_PATH=${
+[external][howardwu20][HowardWu20@outlook.com]                layout.buildDirectory.dir("symbols").get().asFile.absolutePath
+[external][howardwu20][HowardWu20@outlook.com]            }"
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]val repo = jgit.repo()
+[external][shana][shana@zju.edu.cn]val commitCount = (repo?.commitCount("refs/remotes/origin/master") ?: 1) + 4200
+[external][shana][shana@zju.edu.cn]val latestTag = repo?.latestTag?.removePrefix("v") ?: "1.0"
+[external][shana][shana@zju.edu.cn]
+[internal][dr-tsng][tsng.nullptr@outlook.com]val injectedPackageName by extra("com.android.shell")
+[internal][dr-tsng][tsng.nullptr@outlook.com]val injectedPackageUid by extra(2000)
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[internal][vvb2060][vvb2060@gmail.com]val defaultManagerPackageName by extra("org.lsposed.manager")
+[external][shana][shana@zju.edu.cn]val verCode by extra(commitCount)
+[external][shana][shana@zju.edu.cn]val verName by extra(latestTag)
+[external][shana][shana@zju.edu.cn]val androidTargetSdkVersion by extra(34)
+[internal][vvb2060][vvb2060@gmail.com]val androidMinSdkVersion by extra(27)
+[external][shana][shana@zju.edu.cn]val androidBuildToolsVersion by extra("34.0.0")
+[external][shana][shana@zju.edu.cn]val androidCompileSdkVersion by extra(34)
+[internal][vvb2060][vvb2060@gmail.com]val androidCompileNdkVersion by extra("26.1.10909125")
+[external][shana][shana@zju.edu.cn]val androidSourceCompatibility by extra(JavaVersion.VERSION_17)
+[external][shana][shana@zju.edu.cn]val androidTargetCompatibility by extra(JavaVersion.VERSION_17)
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]tasks.register("Delete", Delete::class) {
+[external][howardwu20][HowardWu20@outlook.com]    delete(rootProject.layout.buildDirectory)
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]subprojects {
+[external][shana][shana@zju.edu.cn]    plugins.withType(AndroidBasePlugin::class.java) {
+[external][shana][shana@zju.edu.cn]        extensions.configure(CommonExtension::class.java) {
+[external][shana][shana@zju.edu.cn]            compileSdk = androidCompileSdkVersion
+[external][shana][shana@zju.edu.cn]            ndkVersion = androidCompileNdkVersion
+[external][shana][shana@zju.edu.cn]            buildToolsVersion = androidBuildToolsVersion
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            externalNativeBuild {
+[external][shana][shana@zju.edu.cn]                cmake {
+[external][shana][shana@zju.edu.cn]                    version = "3.22.1+"
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            defaultConfig {
+[external][shana][shana@zju.edu.cn]                minSdk = androidMinSdkVersion
+[external][shana][shana@zju.edu.cn]                if (this is ApplicationDefaultConfig) {
+[external][shana][shana@zju.edu.cn]                    targetSdk = androidTargetSdkVersion
+[external][shana][shana@zju.edu.cn]                    versionCode = verCode
+[external][shana][shana@zju.edu.cn]                    versionName = verName
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            lint {
+[external][shana][shana@zju.edu.cn]                abortOnError = true
+[external][shana][shana@zju.edu.cn]                checkReleaseBuilds = false
+[external][shana][shana@zju.edu.cn]            }
+[external][keta1][41381927+keta1@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]            compileOptions {
+[external][shana][shana@zju.edu.cn]                sourceCompatibility = androidSourceCompatibility
+[external][shana][shana@zju.edu.cn]                targetCompatibility = androidTargetCompatibility
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]    plugins.withType(JavaPlugin::class.java) {
+[external][shana][shana@zju.edu.cn]        extensions.configure(JavaPluginExtension::class.java) {
+[external][shana][shana@zju.edu.cn]            sourceCompatibility = androidSourceCompatibility
+[external][shana][shana@zju.edu.cn]            targetCompatibility = androidTargetCompatibility
+[external][shana][shana@zju.edu.cn]        }
+[external][keta1][41381927+keta1@users.noreply.github.com]    }
+[external][shana][shana@zju.edu.cn]}

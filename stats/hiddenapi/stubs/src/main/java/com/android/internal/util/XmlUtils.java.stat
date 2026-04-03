@@ -1,0 +1,14 @@
+[external][hsushulong][hsushulong@gmail.com]package com.android.internal.util;
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]import org.xmlpull.v1.XmlPullParserException;
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]import java.io.IOException;
+[external][hsushulong][hsushulong@gmail.com]import java.io.InputStream;
+[external][hsushulong][hsushulong@gmail.com]import java.util.HashMap;
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]public class XmlUtils {
+[external][hsushulong][hsushulong@gmail.com]	@SuppressWarnings("rawtypes")
+[external][hsushulong][hsushulong@gmail.com]	public static final HashMap readMapXml(InputStream in) throws XmlPullParserException, IOException {
+[external][hsushulong][hsushulong@gmail.com]		throw new UnsupportedOperationException("STUB");
+[external][hsushulong][hsushulong@gmail.com]	}
+[external][hsushulong][hsushulong@gmail.com]}

@@ -1,0 +1,331 @@
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.lspd.service;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import static org.lsposed.lspd.service.ServiceManager.TAG;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import android.app.INotificationManager;
+[internal][vvb2060][vvb2060@gmail.com]import android.app.Notification;
+[internal][vvb2060][vvb2060@gmail.com]import android.app.NotificationChannel;
+[internal][vvb2060][vvb2060@gmail.com]import android.app.NotificationManager;
+[internal][vvb2060][vvb2060@gmail.com]import android.app.PendingIntent;
+[internal][vvb2060][vvb2060@gmail.com]import android.content.Context;
+[internal][vvb2060][vvb2060@gmail.com]import android.content.Intent;
+[internal][vvb2060][vvb2060@gmail.com]import android.content.pm.ParceledListSlice;
+[internal][vvb2060][vvb2060@gmail.com]import android.graphics.Bitmap;
+[internal][vvb2060][vvb2060@gmail.com]import android.graphics.Canvas;
+[internal][vvb2060][vvb2060@gmail.com]import android.graphics.drawable.AdaptiveIconDrawable;
+[internal][vvb2060][vvb2060@gmail.com]import android.graphics.drawable.BitmapDrawable;
+[internal][vvb2060][vvb2060@gmail.com]import android.graphics.drawable.Drawable;
+[internal][vvb2060][vvb2060@gmail.com]import android.graphics.drawable.Icon;
+[internal][vvb2060][vvb2060@gmail.com]import android.graphics.drawable.LayerDrawable;
+[internal][vvb2060][vvb2060@gmail.com]import android.net.Uri;
+[internal][vvb2060][vvb2060@gmail.com]import android.os.Build;
+[external][shana][shana@zju.edu.cn]import android.os.Bundle;
+[internal][vvb2060][vvb2060@gmail.com]import android.os.IBinder;
+[internal][vvb2060][vvb2060@gmail.com]import android.os.RemoteException;
+[internal][vvb2060][vvb2060@gmail.com]import android.util.Log;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.daemon.R;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.lspd.util.FakeContext;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import java.util.ArrayList;
+[external][shana][shana@zju.edu.cn]import java.util.Map;
+[internal][vvb2060][vvb2060@gmail.com]import java.util.UUID;
+[external][shana][shana@zju.edu.cn]import java.util.concurrent.ConcurrentHashMap;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import io.github.libxposed.service.IXposedScopeCallback;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]public class LSPNotificationManager {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    static final String UPDATED_CHANNEL_ID = "lsposed_module_updated";
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    static final String SCOPE_CHANNEL_ID = "lsposed_module_scope";
+[internal][vvb2060][vvb2060@gmail.com]    private static final String STATUS_CHANNEL_ID = "lsposed_status";
+[internal][vvb2060][vvb2060@gmail.com]    private static final int STATUS_NOTIFICATION_ID = 2000;
+[internal][vvb2060][vvb2060@gmail.com]    private static final String opPkg = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ?
+[internal][vvb2060][vvb2060@gmail.com]            "android" : "com.android.settings";
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]    private static final Map<String, Integer> notificationIds = new ConcurrentHashMap<>();
+[internal][vvb2060][vvb2060@gmail.com]    private static int previousNotificationId = STATUS_NOTIFICATION_ID;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    static final String openManagerAction = UUID.randomUUID().toString();
+[external][shana][shana@zju.edu.cn]    static final String moduleScope = UUID.randomUUID().toString();
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    private static INotificationManager notificationManager = null;
+[internal][vvb2060][vvb2060@gmail.com]    private static IBinder binder = null;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    private static final IBinder.DeathRecipient recipient = new IBinder.DeathRecipient() {
+[internal][vvb2060][vvb2060@gmail.com]        @Override
+[internal][vvb2060][vvb2060@gmail.com]        public void binderDied() {
+[external][howardwu20][HowardWu20@outlook.com]            Log.w(TAG, "notificationManager is dead");
+[internal][vvb2060][vvb2060@gmail.com]            binder.unlinkToDeath(this, 0);
+[internal][vvb2060][vvb2060@gmail.com]            binder = null;
+[internal][vvb2060][vvb2060@gmail.com]            notificationManager = null;
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]    };
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    private static INotificationManager getNotificationManager() throws RemoteException {
+[internal][vvb2060][vvb2060@gmail.com]        if (binder == null || notificationManager == null) {
+[internal][vvb2060][vvb2060@gmail.com]            binder = android.os.ServiceManager.getService(Context.NOTIFICATION_SERVICE);
+[internal][vvb2060][vvb2060@gmail.com]            binder.linkToDeath(recipient, 0);
+[internal][vvb2060][vvb2060@gmail.com]            notificationManager = INotificationManager.Stub.asInterface(binder);
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]        return notificationManager;
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    private static Bitmap getBitmap(int id) {
+[internal][vvb2060][vvb2060@gmail.com]        var r = ConfigFileManager.getResources();
+[internal][vvb2060][vvb2060@gmail.com]        var res = r.getDrawable(id, r.newTheme());
+[internal][vvb2060][vvb2060@gmail.com]        if (res instanceof BitmapDrawable) {
+[internal][vvb2060][vvb2060@gmail.com]            return ((BitmapDrawable) res).getBitmap();
+[internal][vvb2060][vvb2060@gmail.com]        } else {
+[internal][vvb2060][vvb2060@gmail.com]            if (res instanceof AdaptiveIconDrawable) {
+[internal][vvb2060][vvb2060@gmail.com]                var layers = new Drawable[]{((AdaptiveIconDrawable) res).getBackground(),
+[internal][vvb2060][vvb2060@gmail.com]                        ((AdaptiveIconDrawable) res).getForeground()};
+[internal][vvb2060][vvb2060@gmail.com]                res = new LayerDrawable(layers);
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]            var bitmap = Bitmap.createBitmap(res.getIntrinsicWidth(),
+[internal][vvb2060][vvb2060@gmail.com]                    res.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+[internal][vvb2060][vvb2060@gmail.com]            var canvas = new Canvas(bitmap);
+[internal][vvb2060][vvb2060@gmail.com]            res.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+[internal][vvb2060][vvb2060@gmail.com]            res.draw(canvas);
+[internal][vvb2060][vvb2060@gmail.com]            return bitmap;
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    private static Icon getNotificationIcon() {
+[internal][vvb2060][vvb2060@gmail.com]        return Icon.createWithBitmap(getBitmap(R.drawable.ic_notification));
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    private static boolean hasNotificationChannelForSystem(
+[internal][vvb2060][vvb2060@gmail.com]            INotificationManager nm, String channelId) throws RemoteException {
+[external][howardwu20][HowardWu20@outlook.com]        NotificationChannel channel;
+[internal][vvb2060][vvb2060@gmail.com]        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+[external][howardwu20][HowardWu20@outlook.com]            channel = nm.getNotificationChannelForPackage("android", 1000, channelId, null, false);
+[internal][vvb2060][vvb2060@gmail.com]        } else {
+[external][howardwu20][HowardWu20@outlook.com]            channel = nm.getNotificationChannelForPackage("android", 1000, channelId, false);
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]        if (channel != null) {
+[external][howardwu20][HowardWu20@outlook.com]            Log.d(TAG, "hasNotificationChannelForSystem: " + channel);
+[external][howardwu20][HowardWu20@outlook.com]        }
+[external][howardwu20][HowardWu20@outlook.com]        return channel != null;
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    private static void createNotificationChannel(INotificationManager nm) throws RemoteException {
+[internal][vvb2060][vvb2060@gmail.com]        var context = new FakeContext();
+[internal][vvb2060][vvb2060@gmail.com]        var list = new ArrayList<NotificationChannel>();
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]        var updated = new NotificationChannel(UPDATED_CHANNEL_ID,
+[internal][vvb2060][vvb2060@gmail.com]                context.getString(R.string.module_updated_channel_name),
+[internal][vvb2060][vvb2060@gmail.com]                NotificationManager.IMPORTANCE_HIGH);
+[internal][vvb2060][vvb2060@gmail.com]        updated.setShowBadge(false);
+[internal][vvb2060][vvb2060@gmail.com]        if (hasNotificationChannelForSystem(nm, UPDATED_CHANNEL_ID)) {
+[external][howardwu20][HowardWu20@outlook.com]            Log.d(TAG, "update notification channel: " + UPDATED_CHANNEL_ID);
+[internal][vvb2060][vvb2060@gmail.com]            nm.updateNotificationChannelForPackage("android", 1000, updated);
+[internal][vvb2060][vvb2060@gmail.com]        } else {
+[internal][vvb2060][vvb2060@gmail.com]            list.add(updated);
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]        var status = new NotificationChannel(STATUS_CHANNEL_ID,
+[internal][vvb2060][vvb2060@gmail.com]                context.getString(R.string.status_channel_name),
+[internal][vvb2060][vvb2060@gmail.com]                NotificationManager.IMPORTANCE_MIN);
+[internal][vvb2060][vvb2060@gmail.com]        status.setShowBadge(false);
+[internal][vvb2060][vvb2060@gmail.com]        if (hasNotificationChannelForSystem(nm, STATUS_CHANNEL_ID)) {
+[external][howardwu20][HowardWu20@outlook.com]            Log.d(TAG, "update notification channel: " + STATUS_CHANNEL_ID);
+[internal][vvb2060][vvb2060@gmail.com]            nm.updateNotificationChannelForPackage("android", 1000, status);
+[internal][vvb2060][vvb2060@gmail.com]        } else {
+[internal][vvb2060][vvb2060@gmail.com]            list.add(status);
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]        var scope = new NotificationChannel(SCOPE_CHANNEL_ID,
+[external][shana][shana@zju.edu.cn]                context.getString(R.string.scope_channel_name),
+[external][shana][shana@zju.edu.cn]                NotificationManager.IMPORTANCE_HIGH);
+[external][shana][shana@zju.edu.cn]        scope.setShowBadge(false);
+[external][shana][shana@zju.edu.cn]        if (hasNotificationChannelForSystem(nm, SCOPE_CHANNEL_ID)) {
+[external][howardwu20][HowardWu20@outlook.com]            Log.d(TAG, "update notification channel: " + SCOPE_CHANNEL_ID);
+[external][shana][shana@zju.edu.cn]            nm.updateNotificationChannelForPackage("android", 1000, scope);
+[external][shana][shana@zju.edu.cn]        } else {
+[external][shana][shana@zju.edu.cn]            list.add(scope);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][howardwu20][HowardWu20@outlook.com]        Log.d(TAG, "create notification channels for android: " + list);
+[internal][vvb2060][vvb2060@gmail.com]        nm.createNotificationChannelsForPackage("android", 1000, new ParceledListSlice<>(list));
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    static void notifyStatusNotification() {
+[internal][vvb2060][vvb2060@gmail.com]        var intent = new Intent(openManagerAction);
+[external][shana][shana@zju.edu.cn]        intent.setPackage("android");
+[internal][vvb2060][vvb2060@gmail.com]        var context = new FakeContext();
+[internal][vvb2060][vvb2060@gmail.com]        int flags = PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE;
+[internal][vvb2060][vvb2060@gmail.com]        var notification = new Notification.Builder(context, STATUS_CHANNEL_ID)
+[internal][vvb2060][vvb2060@gmail.com]                .setContentTitle(context.getString(R.string.lsposed_running_notification_title))
+[internal][vvb2060][vvb2060@gmail.com]                .setContentText(context.getString(R.string.lsposed_running_notification_content))
+[internal][vvb2060][vvb2060@gmail.com]                .setSmallIcon(getNotificationIcon())
+[internal][vvb2060][vvb2060@gmail.com]                .setContentIntent(PendingIntent.getBroadcast(context, 1, intent, flags))
+[internal][vvb2060][vvb2060@gmail.com]                .setVisibility(Notification.VISIBILITY_SECRET)
+[internal][vvb2060][vvb2060@gmail.com]                .setColor(0xFFF48FB1)
+[internal][vvb2060][vvb2060@gmail.com]                .setOngoing(true)
+[internal][vvb2060][vvb2060@gmail.com]                .setAutoCancel(false)
+[internal][vvb2060][vvb2060@gmail.com]                .build();
+[internal][vvb2060][vvb2060@gmail.com]        notification.extras.putString("android.substName", "LSPosed");
+[internal][vvb2060][vvb2060@gmail.com]        try {
+[internal][vvb2060][vvb2060@gmail.com]            var nm = getNotificationManager();
+[internal][vvb2060][vvb2060@gmail.com]            createNotificationChannel(nm);
+[internal][vvb2060][vvb2060@gmail.com]            nm.enqueueNotificationWithTag("android", opPkg, null,
+[internal][vvb2060][vvb2060@gmail.com]                    STATUS_NOTIFICATION_ID, notification, 0);
+[internal][vvb2060][vvb2060@gmail.com]        } catch (RemoteException e) {
+[internal][vvb2060][vvb2060@gmail.com]            Log.e(TAG, "notifyStatusNotification: ", e);
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    static void cancelStatusNotification() {
+[internal][vvb2060][vvb2060@gmail.com]        try {
+[internal][vvb2060][vvb2060@gmail.com]            var nm = getNotificationManager();
+[internal][vvb2060][vvb2060@gmail.com]            createNotificationChannel(nm);
+[internal][vvb2060][vvb2060@gmail.com]            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+[internal][vvb2060][vvb2060@gmail.com]                nm.cancelNotificationWithTag("android", "android", null, STATUS_NOTIFICATION_ID, 0);
+[internal][vvb2060][vvb2060@gmail.com]            } else {
+[internal][vvb2060][vvb2060@gmail.com]                nm.cancelNotificationWithTag("android", null, STATUS_NOTIFICATION_ID, 0);
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]        } catch (RemoteException e) {
+[internal][vvb2060][vvb2060@gmail.com]            Log.e(TAG, "cancelStatusNotification: ", e);
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    private static PendingIntent getModuleIntent(String modulePackageName, int moduleUserId) {
+[internal][vvb2060][vvb2060@gmail.com]        var intent = new Intent(openManagerAction);
+[external][shana][shana@zju.edu.cn]        intent.setPackage("android");
+[internal][vvb2060][vvb2060@gmail.com]        intent.setData(new Uri.Builder().scheme("module").encodedAuthority(modulePackageName + ":" + moduleUserId).build());
+[internal][vvb2060][vvb2060@gmail.com]        int flags = PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE;
+[internal][vvb2060][vvb2060@gmail.com]        return PendingIntent.getBroadcast(new FakeContext(), 3, intent, flags);
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]    private static PendingIntent getModuleScopeIntent(String modulePackageName, int moduleUserId, String scopePackageName, String action, IXposedScopeCallback callback) {
+[external][shana][shana@zju.edu.cn]        var intent = new Intent(moduleScope);
+[external][shana][shana@zju.edu.cn]        intent.setPackage("android");
+[external][shana][shana@zju.edu.cn]        intent.setData(new Uri.Builder().scheme("module").encodedAuthority(modulePackageName + ":" + moduleUserId).encodedPath(scopePackageName).appendQueryParameter("action", action).build());
+[external][shana][shana@zju.edu.cn]        var extras = new Bundle();
+[external][shana][shana@zju.edu.cn]        extras.putBinder("callback", callback.asBinder());
+[external][shana][shana@zju.edu.cn]        intent.putExtras(extras);
+[external][shana][shana@zju.edu.cn]        int flags = PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE;
+[external][shana][shana@zju.edu.cn]        return PendingIntent.getBroadcast(new FakeContext(), 4, intent, flags);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private static String getNotificationIdKey(String channel, String modulePackageName, int moduleUserId) {
+[external][shana][shana@zju.edu.cn]        return channel + "/" + modulePackageName + ":" + moduleUserId;
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]    private static int pushAndGetNotificationId(String channel, String modulePackageName, int moduleUserId) {
+[external][shana][shana@zju.edu.cn]        var idKey = getNotificationIdKey(channel, modulePackageName, moduleUserId);
+[internal][vvb2060][vvb2060@gmail.com]        // previousNotificationId start with 2001
+[internal][vvb2060][vvb2060@gmail.com]        // https://android.googlesource.com/platform/frameworks/base/+/master/proto/src/system_messages.proto
+[internal][vvb2060][vvb2060@gmail.com]        // https://android.googlesource.com/platform/system/core/+/master/libcutils/include/private/android_filesystem_config.h
+[internal][vvb2060][vvb2060@gmail.com]        // (AID_APP_END - AID_APP_START) x10 = 100000 < NOTE_NETWORK_AVAILABLE
+[internal][vvb2060][vvb2060@gmail.com]        return notificationIds.computeIfAbsent(idKey, key -> previousNotificationId++);
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    static void notifyModuleUpdated(String modulePackageName,
+[internal][vvb2060][vvb2060@gmail.com]                                    int moduleUserId,
+[internal][vvb2060][vvb2060@gmail.com]                                    boolean enabled,
+[internal][vvb2060][vvb2060@gmail.com]                                    boolean systemModule) {
+[internal][vvb2060][vvb2060@gmail.com]        var context = new FakeContext();
+[internal][vvb2060][vvb2060@gmail.com]        var userName = UserService.getUserName(moduleUserId);
+[internal][vvb2060][vvb2060@gmail.com]        String title = context.getString(enabled ? systemModule ?
+[internal][vvb2060][vvb2060@gmail.com]                R.string.xposed_module_updated_notification_title_system :
+[internal][vvb2060][vvb2060@gmail.com]                R.string.xposed_module_updated_notification_title :
+[internal][vvb2060][vvb2060@gmail.com]                R.string.module_is_not_activated_yet);
+[internal][vvb2060][vvb2060@gmail.com]        String content = context.getString(enabled ? systemModule ?
+[internal][vvb2060][vvb2060@gmail.com]                R.string.xposed_module_updated_notification_content_system :
+[internal][vvb2060][vvb2060@gmail.com]                R.string.xposed_module_updated_notification_content :
+[internal][vvb2060][vvb2060@gmail.com]                (moduleUserId == 0 ?
+[internal][vvb2060][vvb2060@gmail.com]                        R.string.module_is_not_activated_yet_main_user_detailed :
+[internal][vvb2060][vvb2060@gmail.com]                        R.string.module_is_not_activated_yet_multi_user_detailed), modulePackageName, userName);
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]        var style = new Notification.BigTextStyle();
+[internal][vvb2060][vvb2060@gmail.com]        style.bigText(content);
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]        var notification = new Notification.Builder(context, UPDATED_CHANNEL_ID)
+[internal][vvb2060][vvb2060@gmail.com]                .setContentTitle(title)
+[internal][vvb2060][vvb2060@gmail.com]                .setContentText(content)
+[internal][vvb2060][vvb2060@gmail.com]                .setSmallIcon(getNotificationIcon())
+[internal][vvb2060][vvb2060@gmail.com]                .setContentIntent(getModuleIntent(modulePackageName, moduleUserId))
+[internal][vvb2060][vvb2060@gmail.com]                .setVisibility(Notification.VISIBILITY_SECRET)
+[internal][vvb2060][vvb2060@gmail.com]                .setColor(0xFFF48FB1)
+[internal][vvb2060][vvb2060@gmail.com]                .setAutoCancel(true)
+[internal][vvb2060][vvb2060@gmail.com]                .setStyle(style)
+[internal][vvb2060][vvb2060@gmail.com]                .build();
+[internal][vvb2060][vvb2060@gmail.com]        notification.extras.putString("android.substName", "LSPosed");
+[internal][vvb2060][vvb2060@gmail.com]        try {
+[internal][vvb2060][vvb2060@gmail.com]            var nm = getNotificationManager();
+[internal][vvb2060][vvb2060@gmail.com]            nm.enqueueNotificationWithTag("android", opPkg, modulePackageName,
+[external][shana][shana@zju.edu.cn]                    pushAndGetNotificationId(UPDATED_CHANNEL_ID, modulePackageName, moduleUserId),
+[internal][vvb2060][vvb2060@gmail.com]                    notification, 0);
+[internal][vvb2060][vvb2060@gmail.com]        } catch (RemoteException e) {
+[internal][vvb2060][vvb2060@gmail.com]            Log.e(TAG, "notify module updated", e);
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]    static void requestModuleScope(String modulePackageName, int moduleUserId, String scopePackageName, IXposedScopeCallback callback) {
+[internal][vvb2060][vvb2060@gmail.com]        var context = new FakeContext();
+[internal][vvb2060][vvb2060@gmail.com]        var userName = UserService.getUserName(moduleUserId);
+[internal][vvb2060][vvb2060@gmail.com]        String title = context.getString(R.string.xposed_module_request_scope_title);
+[internal][vvb2060][vvb2060@gmail.com]        String content = context.getString(R.string.xposed_module_request_scope_content, modulePackageName, userName, scopePackageName);
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]        var style = new Notification.BigTextStyle();
+[internal][vvb2060][vvb2060@gmail.com]        style.bigText(content);
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]        var notification = new Notification.Builder(context, SCOPE_CHANNEL_ID)
+[internal][vvb2060][vvb2060@gmail.com]                .setContentTitle(title)
+[internal][vvb2060][vvb2060@gmail.com]                .setContentText(content)
+[internal][vvb2060][vvb2060@gmail.com]                .setSmallIcon(getNotificationIcon())
+[internal][vvb2060][vvb2060@gmail.com]                .setVisibility(Notification.VISIBILITY_SECRET)
+[internal][vvb2060][vvb2060@gmail.com]                .setColor(0xFFF48FB1)
+[internal][vvb2060][vvb2060@gmail.com]                .setAutoCancel(true)
+[internal][vvb2060][vvb2060@gmail.com]                .setTimeoutAfter(1000 * 60 * 60)
+[internal][vvb2060][vvb2060@gmail.com]                .setStyle(style)
+[internal][vvb2060][vvb2060@gmail.com]                .setDeleteIntent(getModuleScopeIntent(modulePackageName, moduleUserId, scopePackageName, "delete", callback))
+[internal][vvb2060][vvb2060@gmail.com]                .setActions(new Notification.Action.Builder(
+[internal][vvb2060][vvb2060@gmail.com]                                Icon.createWithResource(context, R.drawable.ic_baseline_check_24),
+[internal][vvb2060][vvb2060@gmail.com]                                context.getString(R.string.scope_approve),
+[internal][vvb2060][vvb2060@gmail.com]                                getModuleScopeIntent(modulePackageName, moduleUserId, scopePackageName, "approve", callback))
+[internal][vvb2060][vvb2060@gmail.com]                                .build(),
+[internal][vvb2060][vvb2060@gmail.com]                        new Notification.Action.Builder(
+[internal][vvb2060][vvb2060@gmail.com]                                Icon.createWithResource(context, R.drawable.ic_baseline_close_24),
+[internal][vvb2060][vvb2060@gmail.com]                                context.getString(R.string.scope_deny),
+[internal][vvb2060][vvb2060@gmail.com]                                getModuleScopeIntent(modulePackageName, moduleUserId, scopePackageName, "deny", callback))
+[internal][vvb2060][vvb2060@gmail.com]                                .build(),
+[internal][vvb2060][vvb2060@gmail.com]                        new Notification.Action.Builder(
+[internal][vvb2060][vvb2060@gmail.com]                                Icon.createWithResource(context, R.drawable.ic_baseline_block_24),
+[internal][vvb2060][vvb2060@gmail.com]                                context.getString(R.string.nerver_ask_again),
+[internal][vvb2060][vvb2060@gmail.com]                                getModuleScopeIntent(modulePackageName, moduleUserId, scopePackageName, "block", callback))
+[internal][vvb2060][vvb2060@gmail.com]                                .build()
+[internal][vvb2060][vvb2060@gmail.com]                ).build();
+[internal][vvb2060][vvb2060@gmail.com]        notification.extras.putString("android.substName", "LSPosed");
+[external][shana][shana@zju.edu.cn]        try {
+[external][shana][shana@zju.edu.cn]            var nm = getNotificationManager();
+[external][shana][shana@zju.edu.cn]            nm.enqueueNotificationWithTag("android", opPkg, modulePackageName,
+[external][shana][shana@zju.edu.cn]                    pushAndGetNotificationId(SCOPE_CHANNEL_ID, modulePackageName, moduleUserId),
+[external][shana][shana@zju.edu.cn]                    notification, 0);
+[internal][vvb2060][vvb2060@gmail.com]        } catch (RemoteException e) {
+[external][shana][shana@zju.edu.cn]            try {
+[external][shana][shana@zju.edu.cn]                callback.onScopeRequestFailed(scopePackageName, e.getMessage());
+[external][shana][shana@zju.edu.cn]            } catch (RemoteException ignored) {
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            Log.e(TAG, "request module scope", e);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    static void cancelNotification(String channel, String modulePackageName, int moduleUserId) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        try {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            var idKey = getNotificationIdKey(channel, modulePackageName, moduleUserId);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            var idValue = notificationIds.get(idKey);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            if (idValue == null) return;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            var nm = getNotificationManager();
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                nm.cancelNotificationWithTag("android", "android", modulePackageName, idValue, 0);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            } else {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                nm.cancelNotificationWithTag("android", modulePackageName, idValue, 0);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            notificationIds.remove(idKey);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        } catch (RemoteException e) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            Log.e(TAG, "cancel notification", e);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    }
+[internal][vvb2060][vvb2060@gmail.com]}

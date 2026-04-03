@@ -1,0 +1,38 @@
+[external][shana][shana@zju.edu.cn]<!--
+[external][shana][shana@zju.edu.cn]  ~ This file is part of LSPosed.
+[external][shana][shana@zju.edu.cn]  ~
+[external][shana][shana@zju.edu.cn]  ~ LSPosed is free software: you can redistribute it and/or modify
+[external][shana][shana@zju.edu.cn]  ~ it under the terms of the GNU General Public License as published by
+[external][shana][shana@zju.edu.cn]  ~ the Free Software Foundation, either version 3 of the License, or
+[external][shana][shana@zju.edu.cn]  ~ (at your option) any later version.
+[external][shana][shana@zju.edu.cn]  ~
+[external][shana][shana@zju.edu.cn]  ~ LSPosed is distributed in the hope that it will be useful,
+[external][shana][shana@zju.edu.cn]  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][shana][shana@zju.edu.cn]  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][shana][shana@zju.edu.cn]  ~ GNU General Public License for more details.
+[external][shana][shana@zju.edu.cn]  ~
+[external][shana][shana@zju.edu.cn]  ~ You should have received a copy of the GNU General Public License
+[external][shana][shana@zju.edu.cn]  ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][shana][shana@zju.edu.cn]  ~
+[external][shana][shana@zju.edu.cn]  ~ Copyright (C) 2021 LSPosed Contributors
+[external][shana][shana@zju.edu.cn]  -->
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    xmlns:app="http://schemas.android.com/apk/res-auto"
+[external][shana][shana@zju.edu.cn]    android:id="@+id/swipe_refresh_layout"
+[external][shana][shana@zju.edu.cn]    android:layout_width="match_parent"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    android:layout_height="match_parent">
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <org.lsposed.manager.ui.widget.EmptyStateRecyclerView
+[external][shana][shana@zju.edu.cn]        android:id="@+id/recycler_view"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        android:layout_width="match_parent"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        android:layout_height="match_parent"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        android:clipToPadding="false"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        android:fadeScrollbars="true"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        android:scrollbarStyle="insideOverlay"
+[external][shana][shana@zju.edu.cn]        android:scrollbars="vertical"
+[external][shana][shana@zju.edu.cn]        app:borderBottomVisibility="never"
+[external][shana][shana@zju.edu.cn]        app:borderTopDrawable="@null"
+[external][shana][shana@zju.edu.cn]        app:borderTopVisibility="whenTop"
+[external][shana][shana@zju.edu.cn]        app:fitsSystemWindowsInsets="@integer/internal_fragment_bottom_insets" />
+[external][shana][shana@zju.edu.cn]</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

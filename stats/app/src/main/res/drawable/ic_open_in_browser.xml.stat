@@ -1,0 +1,30 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]<!--
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  -->
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]<vector xmlns:android="http://schemas.android.com/apk/res/android"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    android:width="24dp"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    android:height="24dp"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    android:viewportWidth="24"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    android:viewportHeight="24"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    android:tint="?attr/colorControlNormal">
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    <path
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        android:fillColor="@android:color/white"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        android:pathData="M19,4L5,4c-1.11,0 -2,0.9 -2,2v12c0,1.1 0.89,2 2,2h4v-2L5,18L5,8h14v10h-4v2h4c1.1,0 2,-0.9 2,-2L21,6c0,-1.1 -0.89,-2 -2,-2zM12,10l-4,4h3v6h2v-6h3l-4,-4z" />
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]</vector>

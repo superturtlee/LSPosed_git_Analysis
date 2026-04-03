@@ -1,0 +1,56 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.manager.util;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.app.Activity;
+[internal][vvb2060][vvb2060@gmail.com]import android.content.ActivityNotFoundException;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]import android.net.Uri;
+[internal][vvb2060][vvb2060@gmail.com]import android.widget.Toast;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import androidx.browser.customtabs.CustomTabColorSchemeParams;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]import androidx.browser.customtabs.CustomTabsIntent;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import rikka.core.util.ResourceUtils;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]public final class NavUtil {
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static void startURL(Activity activity, Uri uri) {
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        CustomTabsIntent.Builder customTabsIntent = new CustomTabsIntent.Builder();
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        customTabsIntent.setShowTitle(true);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        CustomTabColorSchemeParams params = new CustomTabColorSchemeParams.Builder()
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                .setToolbarColor(ResourceUtils.resolveColor(activity.getTheme(), android.R.attr.colorBackground))
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                .setNavigationBarColor(ResourceUtils.resolveColor(activity.getTheme(), android.R.attr.navigationBarColor))
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                .setNavigationBarDividerColor(0)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                .build();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        customTabsIntent.setDefaultColorSchemeParams(params);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        boolean night = ResourceUtils.isNightMode(activity.getResources().getConfiguration());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        customTabsIntent.setColorScheme(night ? CustomTabsIntent.COLOR_SCHEME_DARK : CustomTabsIntent.COLOR_SCHEME_LIGHT);
+[internal][vvb2060][vvb2060@gmail.com]        try {
+[internal][vvb2060][vvb2060@gmail.com]            customTabsIntent.build().launchUrl(activity, uri);
+[internal][vvb2060][vvb2060@gmail.com]        } catch (ActivityNotFoundException ignored) {
+[internal][vvb2060][vvb2060@gmail.com]            Toast.makeText(activity, uri.toString(), Toast.LENGTH_SHORT).show();
+[internal][vvb2060][vvb2060@gmail.com]        }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static void startURL(Activity activity, String url) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        startURL(activity, Uri.parse(url));
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    }
+[internal][vvb2060][vvb2060@gmail.com]}

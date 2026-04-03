@@ -1,0 +1,83 @@
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]name: Bug report/反馈 Bug
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]description: Report errors or unexpected behavior./反馈错误或异常行为。
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]labels: [bug]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]body:
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]  - type: markdown
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    attributes:
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]      value: |
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        Thanks for reporting issues of LSPosed!
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        To make it easier for us to help you please enter detailed information below.
+[internal][vvb2060][vvb2060@gmail.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        感谢给 LSPosed 汇报问题！
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        为了使我们更好地帮助你，请提供以下信息。
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        为了防止重复汇报，标题请务必使用英文。
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]  - type: textarea
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    attributes:
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]      label: Steps to reproduce/复现步骤
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]      placeholder: |
+[internal][vvb2060][vvb2060@gmail.com]        1.
+[internal][vvb2060][vvb2060@gmail.com]        2.
+[internal][vvb2060][vvb2060@gmail.com]        3.
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    validations:
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]      required: true
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]  - type: textarea
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    attributes:
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]      label: Expected behaviour/预期行为
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]      placeholder: Tell us what should happen/正常情况下应该发生什么
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    validations:
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]      required: true
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]  - type: textarea
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    attributes:
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]      label: Actual behaviour/实际行为
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]      placeholder: Tell us what happens instead/实际上发生了什么
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    validations:
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]      required: true
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]  - type: textarea
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    attributes:
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]      label: Xposed Module List/Xposed 模块列表
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]      render: shell
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    validations:
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]      required: true
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]  - type: textarea
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    attributes:
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]      label: Magisk Module List/Magisk 模块列表
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]      render: shell
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    validations:
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]      required: true
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]  - type: input
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    attributes:
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]      label: LSPosed version/LSPosed 版本
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]      description:  Don't use 'latest'. Specify actual version with 4 digits, otherwise your issue will be closed./不要填用“最新版”。给出四位版本号，不然 issue 会被关闭。
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    validations:
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]      required: true
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]  - type: input
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    attributes:
+[internal][vvb2060][vvb2060@gmail.com]      label: Android version/Android 版本
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    validations:
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]      required: true
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]  - type: input
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    attributes:
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]      label: Magisk version/Magisk 版本
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    validations:
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]      required: true
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]  - type: input
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    attributes:
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]      label: Riru version/Riru 版本
+[external][shana][shana@zju.edu.cn]      description: If you are using Zygisk version, input `N/A` instead./如果正在使用 Zygisk 版本，请键入 `N/A`。
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    validations:
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]      required: true
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]  - type: checkboxes
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    id: latest
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    attributes:
+[external][wanghan1995315][wanghan1995315@gmail.com]      label: Version requirement/版本要求
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]      options:
+[external][wanghan1995315][wanghan1995315@gmail.com]        - label: I am using latest debug CI version of LSPosed and enable verbose log/我正在使用最新 CI 调试版本且启用详细日志
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]          required: true
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]  - type: textarea
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    attributes:
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]      label: Logs/日志
+[internal][vvb2060][vvb2060@gmail.com]      description: For usage issues, please provide the log zip saved from manager; for activation issues, please provide [bugreport](https://developer.android.com/studio/debug/bug-report). Without logs zip, the issue will be closed. /使用问题请提供从管理器保存的日志压缩包；激活问题请提供 [bugreport](https://developer.android.google.cn/studio/debug/bug-report?hl=zh-cn) 日志。没有日志附件的问题会被关闭。
+[internal][vvb2060][vvb2060@gmail.com]      placeholder: Upload logs zip by clicking the bar on the bottom. Upload logs to other websites or using external links is prohibited. /点击文本框底栏上传日志压缩包，禁止上传到其它网站或使用外链提供日志。
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    validations:
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]      required: true

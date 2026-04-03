@@ -1,0 +1,7 @@
+[external][hsushulong][hsushulong@gmail.com]package android.content.res;
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]public class TypedArray {
+[external][hsushulong][hsushulong@gmail.com]	protected TypedArray(Resources resources) {
+[external][hsushulong][hsushulong@gmail.com]		throw new UnsupportedOperationException("STUB");
+[external][hsushulong][hsushulong@gmail.com]	}
+[external][hsushulong][hsushulong@gmail.com]}

@@ -1,0 +1,125 @@
+[internal][dr-tsng][tsng.nullptr@outlook.com]/*
+[internal][dr-tsng][tsng.nullptr@outlook.com] * This file is part of LSPosed.
+[internal][dr-tsng][tsng.nullptr@outlook.com] *
+[internal][dr-tsng][tsng.nullptr@outlook.com] * LSPosed is free software: you can redistribute it and/or modify
+[internal][dr-tsng][tsng.nullptr@outlook.com] * it under the terms of the GNU General Public License as published by
+[internal][dr-tsng][tsng.nullptr@outlook.com] * the Free Software Foundation, either version 3 of the License, or
+[internal][dr-tsng][tsng.nullptr@outlook.com] * (at your option) any later version.
+[internal][dr-tsng][tsng.nullptr@outlook.com] *
+[internal][dr-tsng][tsng.nullptr@outlook.com] * LSPosed is distributed in the hope that it will be useful,
+[internal][dr-tsng][tsng.nullptr@outlook.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[internal][dr-tsng][tsng.nullptr@outlook.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[internal][dr-tsng][tsng.nullptr@outlook.com] * GNU General Public License for more details.
+[internal][dr-tsng][tsng.nullptr@outlook.com] *
+[internal][dr-tsng][tsng.nullptr@outlook.com] * You should have received a copy of the GNU General Public License
+[internal][dr-tsng][tsng.nullptr@outlook.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[internal][dr-tsng][tsng.nullptr@outlook.com] *
+[internal][dr-tsng][tsng.nullptr@outlook.com] * Copyright (C) 2021 LSPosed Contributors
+[internal][dr-tsng][tsng.nullptr@outlook.com] */
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[external][shana][shana@zju.edu.cn]import com.android.build.api.dsl.ApplicationExtension
+[internal][dr-tsng][tsng.nullptr@outlook.com]import com.android.ide.common.signing.KeystoreHelper
+[internal][dr-tsng][tsng.nullptr@outlook.com]import java.io.PrintStream
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[external][shana][shana@zju.edu.cn]plugins {
+[external][shana][shana@zju.edu.cn]    alias(libs.plugins.agp.app)
+[external][shana][shana@zju.edu.cn]    alias(libs.plugins.lsplugin.resopt)
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]
+[internal][dr-tsng][tsng.nullptr@outlook.com]val daemonName = "LSPosed"
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[internal][dr-tsng][tsng.nullptr@outlook.com]val injectedPackageName: String by rootProject.extra
+[internal][dr-tsng][tsng.nullptr@outlook.com]val injectedPackageUid: Int by rootProject.extra
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[external][shana][shana@zju.edu.cn]val agpVersion: String by project
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[internal][dr-tsng][tsng.nullptr@outlook.com]val defaultManagerPackageName: String by rootProject.extra
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[internal][dr-tsng][tsng.nullptr@outlook.com]android {
+[internal][dr-tsng][tsng.nullptr@outlook.com]    buildFeatures {
+[internal][dr-tsng][tsng.nullptr@outlook.com]        prefab = true
+[external][shana][shana@zju.edu.cn]        buildConfig = true
+[internal][dr-tsng][tsng.nullptr@outlook.com]    }
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[internal][dr-tsng][tsng.nullptr@outlook.com]    defaultConfig {
+[internal][dr-tsng][tsng.nullptr@outlook.com]        applicationId = "org.lsposed.daemon"
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[internal][dr-tsng][tsng.nullptr@outlook.com]        buildConfigField(
+[internal][dr-tsng][tsng.nullptr@outlook.com]            "String",
+[internal][dr-tsng][tsng.nullptr@outlook.com]            "DEFAULT_MANAGER_PACKAGE_NAME",
+[internal][dr-tsng][tsng.nullptr@outlook.com]            """"$defaultManagerPackageName""""
+[internal][dr-tsng][tsng.nullptr@outlook.com]        )
+[internal][dr-tsng][tsng.nullptr@outlook.com]        buildConfigField("String", "MANAGER_INJECTED_PKG_NAME", """"$injectedPackageName"""")
+[internal][dr-tsng][tsng.nullptr@outlook.com]        buildConfigField("int", "MANAGER_INJECTED_UID", """$injectedPackageUid""")
+[internal][dr-tsng][tsng.nullptr@outlook.com]    }
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[internal][dr-tsng][tsng.nullptr@outlook.com]    buildTypes {
+[external][shana][shana@zju.edu.cn]        all {
+[external][shana][shana@zju.edu.cn]            externalNativeBuild {
+[external][shana][shana@zju.edu.cn]                cmake {
+[external][shana][shana@zju.edu.cn]                    arguments += "-DANDROID_ALLOW_UNDEFINED_SYMBOLS=true"
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[internal][dr-tsng][tsng.nullptr@outlook.com]        release {
+[internal][dr-tsng][tsng.nullptr@outlook.com]            isMinifyEnabled = true
+[external][shana][shana@zju.edu.cn]            isShrinkResources = true
+[internal][dr-tsng][tsng.nullptr@outlook.com]            proguardFiles("proguard-rules.pro")
+[internal][dr-tsng][tsng.nullptr@outlook.com]        }
+[internal][dr-tsng][tsng.nullptr@outlook.com]    }
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[internal][dr-tsng][tsng.nullptr@outlook.com]    externalNativeBuild {
+[external][shana][shana@zju.edu.cn]        cmake {
+[external][shana][shana@zju.edu.cn]            path("src/main/jni/CMakeLists.txt")
+[internal][dr-tsng][tsng.nullptr@outlook.com]        }
+[internal][dr-tsng][tsng.nullptr@outlook.com]    }
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[external][shana][shana@zju.edu.cn]    namespace = "org.lsposed.daemon"
+[internal][dr-tsng][tsng.nullptr@outlook.com]}
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[external][shana][shana@zju.edu.cn]android.applicationVariants.all {
+[external][shana][shana@zju.edu.cn]    val variantCapped = name.replaceFirstChar { it.uppercase() }
+[external][shana][shana@zju.edu.cn]    val variantLowered = name.lowercase()
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[external][howardwu20][HowardWu20@outlook.com]    val outSrcDir =
+[external][howardwu20][HowardWu20@outlook.com]        layout.buildDirectory.dir("generated/source/signInfo/${variantLowered}").get()
+[internal][dr-tsng][tsng.nullptr@outlook.com]    val signInfoTask = tasks.register("generate${variantCapped}SignInfo") {
+[internal][dr-tsng][tsng.nullptr@outlook.com]        dependsOn(":app:validateSigning${variantCapped}")
+[external][howardwu20][HowardWu20@outlook.com]        val sign = rootProject.project(":app").extensions
+[external][howardwu20][HowardWu20@outlook.com]            .getByType(ApplicationExtension::class.java)
+[external][howardwu20][HowardWu20@outlook.com]            .buildTypes.named(variantLowered).get().signingConfig
+[external][shana][shana@zju.edu.cn]        val outSrc = file("$outSrcDir/org/lsposed/lspd/util/SignInfo.java")
+[internal][dr-tsng][tsng.nullptr@outlook.com]        outputs.file(outSrc)
+[internal][dr-tsng][tsng.nullptr@outlook.com]        doLast {
+[internal][dr-tsng][tsng.nullptr@outlook.com]            outSrc.parentFile.mkdirs()
+[internal][dr-tsng][tsng.nullptr@outlook.com]            val certificateInfo = KeystoreHelper.getCertificateInfo(
+[internal][dr-tsng][tsng.nullptr@outlook.com]                sign?.storeType,
+[internal][dr-tsng][tsng.nullptr@outlook.com]                sign?.storeFile,
+[internal][dr-tsng][tsng.nullptr@outlook.com]                sign?.storePassword,
+[internal][dr-tsng][tsng.nullptr@outlook.com]                sign?.keyPassword,
+[internal][dr-tsng][tsng.nullptr@outlook.com]                sign?.keyAlias
+[internal][dr-tsng][tsng.nullptr@outlook.com]            )
+[internal][dr-tsng][tsng.nullptr@outlook.com]            PrintStream(outSrc).print(
+[internal][dr-tsng][tsng.nullptr@outlook.com]                """
+[internal][dr-tsng][tsng.nullptr@outlook.com]                |package org.lsposed.lspd.util;
+[internal][dr-tsng][tsng.nullptr@outlook.com]                |public final class SignInfo {
+[internal][dr-tsng][tsng.nullptr@outlook.com]                |    public static final byte[] CERTIFICATE = {${
+[internal][dr-tsng][tsng.nullptr@outlook.com]                    certificateInfo.certificate.encoded.joinToString(",")
+[internal][dr-tsng][tsng.nullptr@outlook.com]                }};
+[internal][dr-tsng][tsng.nullptr@outlook.com]                |}""".trimMargin()
+[internal][dr-tsng][tsng.nullptr@outlook.com]            )
+[internal][dr-tsng][tsng.nullptr@outlook.com]        }
+[internal][dr-tsng][tsng.nullptr@outlook.com]    }
+[external][howardwu20][HowardWu20@outlook.com]    registerJavaGeneratingTask(signInfoTask, outSrcDir.asFile)
+[internal][dr-tsng][tsng.nullptr@outlook.com]}
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[internal][dr-tsng][tsng.nullptr@outlook.com]dependencies {
+[external][shana][shana@zju.edu.cn]    implementation(libs.libxposed.`interface`)
+[external][shana][shana@zju.edu.cn]    implementation(libs.agp.apksig)
+[external][shana][shana@zju.edu.cn]    implementation(libs.commons.lang3)
+[external][shana][shana@zju.edu.cn]    implementation(projects.hiddenapi.bridge)
+[external][shana][shana@zju.edu.cn]    implementation(projects.services.daemonService)
+[external][shana][shana@zju.edu.cn]    implementation(projects.services.managerService)
+[external][shana][shana@zju.edu.cn]    compileOnly(libs.androidx.annotation)
+[external][shana][shana@zju.edu.cn]    compileOnly(projects.hiddenapi.stubs)
+[internal][dr-tsng][tsng.nullptr@outlook.com]}

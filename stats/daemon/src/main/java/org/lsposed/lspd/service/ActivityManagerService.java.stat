@@ -1,0 +1,212 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.lspd.service;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][416810799][416810799@qq.com]import static org.lsposed.lspd.service.ServiceManager.TAG;
+[external][416810799][416810799@qq.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import android.app.ContentProviderHolder;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.app.IActivityManager;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.app.IApplicationThread;
+[external][shana][shana@zju.edu.cn]import android.app.IServiceConnection;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import android.app.IUidObserver;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.app.ProfilerInfo;
+[internal][vvb2060][vvb2060@gmail.com]import android.content.Context;
+[external][shana][shana@zju.edu.cn]import android.content.IContentProvider;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.content.IIntentReceiver;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.content.Intent;
+[external][shana][shana@zju.edu.cn]import android.content.IntentFilter;
+[external][shana][shana@zju.edu.cn]import android.content.pm.UserInfo;
+[external][shana][shana@zju.edu.cn]import android.content.res.Configuration;
+[external][shana][shana@zju.edu.cn]import android.os.Build;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.os.Bundle;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.os.IBinder;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.os.RemoteException;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.os.ServiceManager;
+[external][shana][shana@zju.edu.cn]import android.util.Log;
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]public class ActivityManagerService {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private static IActivityManager am = null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private static IBinder binder = null;
+[external][howardwu20][HowardWu20@outlook.com]    private static IApplicationThread appThread = null;
+[external][shana][shana@zju.edu.cn]    private static IBinder token = null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    private static final IBinder.DeathRecipient deathRecipient = new IBinder.DeathRecipient() {
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public void binderDied() {
+[external][shana][shana@zju.edu.cn]            Log.w(TAG, "am is dead");
+[external][shana][shana@zju.edu.cn]            binder.unlinkToDeath(this, 0);
+[external][shana][shana@zju.edu.cn]            binder = null;
+[external][shana][shana@zju.edu.cn]            am = null;
+[external][howardwu20][HowardWu20@outlook.com]            appThread = null;
+[external][shana][shana@zju.edu.cn]            token = null;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    };
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static IActivityManager getActivityManager() {
+[internal][vvb2060][vvb2060@gmail.com]        if (binder == null || am == null) {
+[internal][vvb2060][vvb2060@gmail.com]            binder = ServiceManager.getService(Context.ACTIVITY_SERVICE);
+[external][shana][shana@zju.edu.cn]            if (binder == null) return null;
+[external][shana][shana@zju.edu.cn]            try {
+[external][shana][shana@zju.edu.cn]                binder.linkToDeath(deathRecipient, 0);
+[external][shana][shana@zju.edu.cn]                am = IActivityManager.Stub.asInterface(binder);
+[external][shana][shana@zju.edu.cn]                // For oddo Android 9 we cannot set activity controller here...
+[external][shana][shana@zju.edu.cn]                // am.setActivityController(null, false);
+[external][shana][shana@zju.edu.cn]            } catch (RemoteException e) {
+[external][shana][shana@zju.edu.cn]                Log.e(TAG, Log.getStackTraceString(e));
+[external][shana][shana@zju.edu.cn]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return am;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    public static int broadcastIntentWithFeature(String callingFeatureId,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                                                 Intent intent, String resolvedType, IIntentReceiver resultTo, int resultCode,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                                                 String resultData, Bundle map, String[] requiredPermissions,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                                                 int appOp, Bundle options, boolean serialized, boolean sticky, int userId) throws RemoteException {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        IActivityManager am = getActivityManager();
+[external][howardwu20][HowardWu20@outlook.com]        if (am == null || appThread == null) return -1;
+[external][shana][shana@zju.edu.cn]        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+[external][shana][shana@zju.edu.cn]            try {
+[external][howardwu20][HowardWu20@outlook.com]                return am.broadcastIntentWithFeature(appThread, callingFeatureId, intent, resolvedType, resultTo,
+[external][shana][shana@zju.edu.cn]                        resultCode, resultData, null, requiredPermissions, null, null, appOp, null,
+[external][shana][shana@zju.edu.cn]                        serialized, sticky, userId);
+[external][shana][shana@zju.edu.cn]            } catch (NoSuchMethodError ignored) {
+[external][howardwu20][HowardWu20@outlook.com]                return am.broadcastIntentWithFeature(appThread, callingFeatureId, intent, resolvedType, resultTo,
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        resultCode, resultData, null, requiredPermissions, null, appOp, null,
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        serialized, sticky, userId);
+[external][shana][shana@zju.edu.cn]            }
+[external][howardwu20][HowardWu20@outlook.com]        } else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R) {
+[external][howardwu20][HowardWu20@outlook.com]            return am.broadcastIntentWithFeature(appThread, callingFeatureId, intent, resolvedType, resultTo, resultCode, resultData, map, requiredPermissions, appOp, options, serialized, sticky, userId);
+[external][shana][shana@zju.edu.cn]        } else {
+[external][howardwu20][HowardWu20@outlook.com]            return am.broadcastIntent(appThread, intent, resolvedType, resultTo, resultCode, resultData, map, requiredPermissions, appOp, options, serialized, sticky, userId);
+[external][shana][shana@zju.edu.cn]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static void forceStopPackage(String packageName, int userId) throws RemoteException {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        IActivityManager am = getActivityManager();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (am == null) return;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        am.forceStopPackage(packageName, userId);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static boolean startUserInBackground(int userId) throws RemoteException {
+[external][shana][shana@zju.edu.cn]        IActivityManager am = getActivityManager();
+[external][shana][shana@zju.edu.cn]        if (am == null) return false;
+[external][shana][shana@zju.edu.cn]        return am.startUserInBackground(userId);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static Intent registerReceiver(String callerPackage,
+[external][shana][shana@zju.edu.cn]                                          String callingFeatureId, IIntentReceiver receiver, IntentFilter filter,
+[external][shana][shana@zju.edu.cn]                                          String requiredPermission, int userId, int flags) throws RemoteException {
+[external][shana][shana@zju.edu.cn]        IActivityManager am = getActivityManager();
+[external][howardwu20][HowardWu20@outlook.com]        if (am == null || appThread == null) return null;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+[external][howardwu20][HowardWu20@outlook.com]            return am.registerReceiverWithFeature(appThread, callerPackage, callingFeatureId, "null", receiver, filter, requiredPermission, userId, flags);
+[external][howardwu20][HowardWu20@outlook.com]        else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R) {
+[external][howardwu20][HowardWu20@outlook.com]            return am.registerReceiverWithFeature(appThread, callerPackage, callingFeatureId, receiver, filter, requiredPermission, userId, flags);
+[external][shana][shana@zju.edu.cn]        } else {
+[external][howardwu20][HowardWu20@outlook.com]            return am.registerReceiver(appThread, callerPackage, receiver, filter, requiredPermission, userId, flags);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][howardwu20][HowardWu20@outlook.com]    public static void finishReceiver(IBinder intentReceiver, IBinder applicationThread, int resultCode,
+[external][howardwu20][HowardWu20@outlook.com]                                      String resultData, Bundle resultExtras, boolean resultAbort,
+[external][howardwu20][HowardWu20@outlook.com]                                      int flags) throws RemoteException {
+[external][shana][shana@zju.edu.cn]        IActivityManager am = getActivityManager();
+[external][howardwu20][HowardWu20@outlook.com]        if (am == null || appThread == null) return;
+[external][howardwu20][HowardWu20@outlook.com]        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+[external][howardwu20][HowardWu20@outlook.com]            am.finishReceiver(applicationThread, resultCode, resultData, resultExtras, resultAbort, flags);
+[external][howardwu20][HowardWu20@outlook.com]        } else {
+[external][howardwu20][HowardWu20@outlook.com]            am.finishReceiver(intentReceiver, resultCode, resultData, resultExtras, resultAbort, flags);
+[external][howardwu20][HowardWu20@outlook.com]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static int bindService(Intent service,
+[external][shana][shana@zju.edu.cn]                                  String resolvedType, IServiceConnection connection, int flags,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                                  String callingPackage, int userId) throws RemoteException {
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        IActivityManager am = getActivityManager();
+[external][howardwu20][HowardWu20@outlook.com]        if (am == null || appThread == null) return -1;
+[external][howardwu20][HowardWu20@outlook.com]        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+[external][howardwu20][HowardWu20@outlook.com]            return am.bindService(appThread, token, service, resolvedType, connection, (long) flags, callingPackage, userId);
+[external][howardwu20][HowardWu20@outlook.com]        else
+[external][howardwu20][HowardWu20@outlook.com]            return am.bindService(appThread, token, service, resolvedType, connection, flags, callingPackage, userId);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static boolean unbindService(IServiceConnection connection) throws RemoteException {
+[external][shana][shana@zju.edu.cn]        IActivityManager am = getActivityManager();
+[external][shana][shana@zju.edu.cn]        if (am == null) return false;
+[external][shana][shana@zju.edu.cn]        return am.unbindService(connection);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static int startActivityAsUserWithFeature(String callingPackage,
+[external][shana][shana@zju.edu.cn]                                                     String callingFeatureId, Intent intent, String resolvedType,
+[external][shana][shana@zju.edu.cn]                                                     IBinder resultTo, String resultWho, int requestCode, int flags,
+[external][shana][shana@zju.edu.cn]                                                     ProfilerInfo profilerInfo, Bundle options, int userId) throws RemoteException {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        IActivityManager am = getActivityManager();
+[external][howardwu20][HowardWu20@outlook.com]        if (am == null || appThread == null) return -1;
+[internal][vvb2060][vvb2060@gmail.com]        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+[external][howardwu20][HowardWu20@outlook.com]            return am.startActivityAsUserWithFeature(appThread, callingPackage, callingFeatureId, intent, resolvedType, resultTo, resultWho, requestCode, flags, profilerInfo, options, userId);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } else {
+[external][howardwu20][HowardWu20@outlook.com]            return am.startActivityAsUser(appThread, callingPackage, intent, resolvedType, resultTo, resultWho, requestCode, flags, profilerInfo, options, userId);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    public static void onSystemServerContext(IApplicationThread thread, IBinder token) {
+[external][howardwu20][HowardWu20@outlook.com]        ActivityManagerService.appThread = thread;
+[external][shana][shana@zju.edu.cn]        ActivityManagerService.token = token;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static boolean switchUser(int userid) throws RemoteException {
+[external][shana][shana@zju.edu.cn]        IActivityManager am = getActivityManager();
+[external][shana][shana@zju.edu.cn]        if (am == null) return false;
+[external][shana][shana@zju.edu.cn]        return am.switchUser(userid);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static UserInfo getCurrentUser() throws RemoteException {
+[external][shana][shana@zju.edu.cn]        IActivityManager am = getActivityManager();
+[external][shana][shana@zju.edu.cn]        if (am == null) return null;
+[external][shana][shana@zju.edu.cn]        return am.getCurrentUser();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static Configuration getConfiguration() throws RemoteException {
+[external][shana][shana@zju.edu.cn]        IActivityManager am = getActivityManager();
+[external][shana][shana@zju.edu.cn]        if (am == null) return null;
+[external][shana][shana@zju.edu.cn]        return am.getConfiguration();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static IContentProvider getContentProvider(String auth, int userId) throws RemoteException {
+[external][shana][shana@zju.edu.cn]        IActivityManager am = getActivityManager();
+[external][shana][shana@zju.edu.cn]        if (am == null) return null;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        ContentProviderHolder holder;
+[external][shana][shana@zju.edu.cn]        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            holder = am.getContentProviderExternal(auth, userId, token, null);
+[external][shana][shana@zju.edu.cn]        } else {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            holder = am.getContentProviderExternal(auth, userId, token);
+[external][shana][shana@zju.edu.cn]        }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        return holder != null ? holder.provider : null;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    public static void registerUidObserver(IUidObserver observer, int which, int cutpoint, String callingPackage) throws RemoteException {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        IActivityManager am = getActivityManager();
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        if (am == null) return;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        am.registerUidObserver(observer, which, cutpoint, callingPackage);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]}

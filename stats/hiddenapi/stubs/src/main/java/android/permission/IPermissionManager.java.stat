@@ -1,0 +1,8 @@
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]package android.permission;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import java.util.List;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]public interface IPermissionManager {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    List<?> getSplitPermissions();
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]}

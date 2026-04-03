@@ -1,0 +1,83 @@
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]/*
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * This file is part of LSPosed.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] *
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * (at your option) any later version.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] *
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * GNU General Public License for more details.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] *
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] *
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * Copyright (C) 2022 LSPosed Contributors
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] */
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.manager.ui.widget;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import android.annotation.SuppressLint;
+[internal][vvb2060][vvb2060@gmail.com]import android.content.Context;
+[internal][vvb2060][vvb2060@gmail.com]import android.util.AttributeSet;
+[internal][vvb2060][vvb2060@gmail.com]import android.view.MotionEvent;
+[internal][vvb2060][vvb2060@gmail.com]import android.view.View;
+[internal][vvb2060][vvb2060@gmail.com]import android.view.ViewParent;
+[internal][vvb2060][vvb2060@gmail.com]import android.webkit.WebView;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import androidx.annotation.NonNull;
+[internal][vvb2060][vvb2060@gmail.com]import androidx.annotation.Nullable;
+[internal][vvb2060][vvb2060@gmail.com]import androidx.recyclerview.widget.RecyclerView;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import rikka.widget.borderview.BorderRecyclerView;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]public class ScrollWebView extends WebView {
+[internal][vvb2060][vvb2060@gmail.com]    public ScrollWebView(@NonNull Context context) {
+[internal][vvb2060][vvb2060@gmail.com]        super(context);
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    public ScrollWebView(@NonNull Context context, @Nullable AttributeSet attrs) {
+[internal][vvb2060][vvb2060@gmail.com]        super(context, attrs);
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    public ScrollWebView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+[internal][vvb2060][vvb2060@gmail.com]        super(context, attrs, defStyleAttr);
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    public ScrollWebView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+[internal][vvb2060][vvb2060@gmail.com]        super(context, attrs, defStyleAttr, defStyleRes);
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    @SuppressLint("ClickableViewAccessibility")
+[internal][vvb2060][vvb2060@gmail.com]    @Override
+[internal][vvb2060][vvb2060@gmail.com]    public boolean onTouchEvent(MotionEvent event) {
+[internal][vvb2060][vvb2060@gmail.com]        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+[internal][vvb2060][vvb2060@gmail.com]            var viewParent = findViewParentIfNeeds(this);
+[internal][vvb2060][vvb2060@gmail.com]            if (viewParent != null) viewParent.requestDisallowInterceptTouchEvent(true);
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]        return super.onTouchEvent(event);
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    @Override
+[internal][vvb2060][vvb2060@gmail.com]    protected void onOverScrolled(int scrollX, int scrollY, boolean clampedX, boolean clampedY) {
+[internal][vvb2060][vvb2060@gmail.com]        if (clampedX) {
+[internal][vvb2060][vvb2060@gmail.com]            var viewParent = findViewParentIfNeeds(this);
+[internal][vvb2060][vvb2060@gmail.com]            if (viewParent != null) viewParent.requestDisallowInterceptTouchEvent(false);
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]        super.onOverScrolled(scrollX, scrollY, clampedX, clampedY);
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    private static ViewParent findViewParentIfNeeds(View v) {
+[internal][vvb2060][vvb2060@gmail.com]        var parent = v.getParent();
+[internal][vvb2060][vvb2060@gmail.com]        if (parent == null) return null;
+[internal][vvb2060][vvb2060@gmail.com]        if (parent instanceof RecyclerView && !(parent instanceof BorderRecyclerView)) {
+[internal][vvb2060][vvb2060@gmail.com]            return parent;
+[internal][vvb2060][vvb2060@gmail.com]        } else if (parent instanceof View) {
+[internal][vvb2060][vvb2060@gmail.com]            return findViewParentIfNeeds((View) parent);
+[internal][vvb2060][vvb2060@gmail.com]        } else {
+[internal][vvb2060][vvb2060@gmail.com]            return parent;
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]}

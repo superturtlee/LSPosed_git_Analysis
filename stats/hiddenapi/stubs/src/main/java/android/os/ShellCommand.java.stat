@@ -1,0 +1,33 @@
+[external][shana][shana@zju.edu.cn]package android.os;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import java.io.FileDescriptor;
+[external][shana][shana@zju.edu.cn]import java.io.InputStream;
+[external][shana][shana@zju.edu.cn]import java.io.PrintWriter;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public abstract class ShellCommand {
+[external][shana][shana@zju.edu.cn]    public int exec(Binder target, FileDescriptor in, FileDescriptor out, FileDescriptor err,
+[external][shana][shana@zju.edu.cn]                    String[] args, ShellCallback callback, ResultReceiver resultReceiver) {
+[external][shana][shana@zju.edu.cn]        throw new IllegalArgumentException("STUB!");
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public abstract int onCommand(String cmd);
+[external][shana][shana@zju.edu.cn]    public abstract void onHelp();
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public String getNextOption(){
+[external][shana][shana@zju.edu.cn]        throw new IllegalArgumentException("STUB!");
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public String getNextArgRequired() {
+[external][shana][shana@zju.edu.cn]        throw new IllegalArgumentException("STUB!");
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public PrintWriter getErrPrintWriter() {
+[external][shana][shana@zju.edu.cn]        throw new IllegalArgumentException("STUB!");
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]    public PrintWriter getOutPrintWriter() {
+[external][shana][shana@zju.edu.cn]        throw new IllegalArgumentException("STUB!");
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]    public InputStream getRawInputStream() {
+[external][shana][shana@zju.edu.cn]        throw new IllegalArgumentException("STUB!");
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

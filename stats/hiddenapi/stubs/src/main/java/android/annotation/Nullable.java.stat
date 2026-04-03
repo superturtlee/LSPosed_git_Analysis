@@ -1,0 +1,44 @@
+[external][shana][shana@zju.edu.cn]/*
+[external][shana][shana@zju.edu.cn] * Copyright (C) 2013 The Android Open Source Project
+[external][shana][shana@zju.edu.cn] *
+[external][shana][shana@zju.edu.cn] * Licensed under the Apache License, Version 2.0 (the "License");
+[external][shana][shana@zju.edu.cn] * you may not use this file except in compliance with the License.
+[external][shana][shana@zju.edu.cn] * You may obtain a copy of the License at
+[external][shana][shana@zju.edu.cn] *
+[external][shana][shana@zju.edu.cn] *      http://www.apache.org/licenses/LICENSE-2.0
+[external][shana][shana@zju.edu.cn] *
+[external][shana][shana@zju.edu.cn] * Unless required by applicable law or agreed to in writing, software
+[external][shana][shana@zju.edu.cn] * distributed under the License is distributed on an "AS IS" BASIS,
+[external][shana][shana@zju.edu.cn] * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+[external][shana][shana@zju.edu.cn] * See the License for the specific language governing permissions and
+[external][shana][shana@zju.edu.cn] * limitations under the License.
+[external][shana][shana@zju.edu.cn] */
+[external][shana][shana@zju.edu.cn]package android.annotation;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import java.lang.annotation.Retention;
+[external][shana][shana@zju.edu.cn]import java.lang.annotation.Target;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import static java.lang.annotation.ElementType.FIELD;
+[external][shana][shana@zju.edu.cn]import static java.lang.annotation.ElementType.METHOD;
+[external][shana][shana@zju.edu.cn]import static java.lang.annotation.ElementType.PARAMETER;
+[external][shana][shana@zju.edu.cn]import static java.lang.annotation.RetentionPolicy.SOURCE;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]/**
+[external][shana][shana@zju.edu.cn] * Denotes that a parameter, field or method return value can be null.
+[external][shana][shana@zju.edu.cn] * <p>
+[external][shana][shana@zju.edu.cn] * When decorating a method call parameter, this denotes that the parameter can
+[external][shana][shana@zju.edu.cn] * legitimately be null and the method will gracefully deal with it. Typically
+[external][shana][shana@zju.edu.cn] * used on optional parameters.
+[external][shana][shana@zju.edu.cn] * <p>
+[external][shana][shana@zju.edu.cn] * When decorating a method, this denotes the method might legitimately return
+[external][shana][shana@zju.edu.cn] * null.
+[external][shana][shana@zju.edu.cn] * <p>
+[external][shana][shana@zju.edu.cn] * This is a marker annotation and it has no specific attributes.
+[external][shana][shana@zju.edu.cn] *
+[external][shana][shana@zju.edu.cn] * @paramDoc This value may be {@code null}.
+[external][shana][shana@zju.edu.cn] * @returnDoc This value may be {@code null}.
+[external][shana][shana@zju.edu.cn] */
+[external][shana][shana@zju.edu.cn]@Retention(SOURCE)
+[external][shana][shana@zju.edu.cn]@Target({METHOD, PARAMETER, FIELD})
+[external][shana][shana@zju.edu.cn]public @interface Nullable {
+[external][shana][shana@zju.edu.cn]}

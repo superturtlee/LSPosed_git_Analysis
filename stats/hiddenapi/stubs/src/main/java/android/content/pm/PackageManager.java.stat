@@ -1,0 +1,10 @@
+[external][shana][shana@zju.edu.cn]package android.content.pm;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import java.util.List;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public class PackageManager {
+[external][shana][shana@zju.edu.cn]    public List<PackageInfo> getInstalledPackagesAsUser(int flags, int userId) {
+[external][shana][shana@zju.edu.cn]        throw new UnsupportedOperationException("STUB");
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]}

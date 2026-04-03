@@ -1,0 +1,36 @@
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#pragma once
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#include <android/log.h>
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#ifndef LOG_TAG
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#define LOG_TAG "LSPosedDex2Oat"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#endif
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#ifdef LOG_DISABLED
+[external][shana][shana@zju.edu.cn]#define LOGD(...) 0
+[external][shana][shana@zju.edu.cn]#define LOGV(...) 0
+[external][shana][shana@zju.edu.cn]#define LOGI(...) 0
+[external][shana][shana@zju.edu.cn]#define LOGW(...) 0
+[external][shana][shana@zju.edu.cn]#define LOGE(...) 0
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#else
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#ifndef NDEBUG
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#define LOGD(fmt, ...)                                                                             \
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG,                                                \
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                        "%s:%d#%s"                                                                 \
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                        ": " fmt,                                                                  \
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                        __FILE_NAME__, __LINE__, __PRETTY_FUNCTION__ __VA_OPT__(, ) __VA_ARGS__)
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#define LOGV(fmt, ...)                                                                             \
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG,                                              \
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                        "%s:%d#%s"                                                                 \
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                        ": " fmt,                                                                  \
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                        __FILE_NAME__, __LINE__, __PRETTY_FUNCTION__ __VA_OPT__(, ) __VA_ARGS__)
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#else
+[external][shana][shana@zju.edu.cn]#define LOGD(...) 0
+[external][shana][shana@zju.edu.cn]#define LOGV(...) 0
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#endif
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#define LOGW(...) __android_log_print(ANDROID_LOG_WARN, LOG_TAG, __VA_ARGS__)
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#define LOGF(...) __android_log_print(ANDROID_LOG_FATAL, LOG_TAG, __VA_ARGS__)
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#define PLOGE(fmt, args...) LOGE(fmt " failed with %d: %s", ##args, errno, strerror(errno))
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#endif

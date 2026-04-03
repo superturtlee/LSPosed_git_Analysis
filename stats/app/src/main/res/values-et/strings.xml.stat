@@ -1,0 +1,242 @@
+[bot][lsposed][lsposed@lsposed.org]<?xml version="1.0" encoding="utf-8"?>
+[bot][lsposed][lsposed@lsposed.org]<!--
+[bot][lsposed][lsposed@lsposed.org]  ~ This file is part of LSPosed.
+[bot][lsposed][lsposed@lsposed.org]  ~
+[bot][lsposed][lsposed@lsposed.org]  ~ LSPosed is free software: you can redistribute it and/or modify
+[bot][lsposed][lsposed@lsposed.org]  ~ it under the terms of the GNU General Public License as published by
+[bot][lsposed][lsposed@lsposed.org]  ~ the Free Software Foundation, either version 3 of the License, or
+[bot][lsposed][lsposed@lsposed.org]  ~ (at your option) any later version.
+[bot][lsposed][lsposed@lsposed.org]  ~
+[bot][lsposed][lsposed@lsposed.org]  ~ LSPosed is distributed in the hope that it will be useful,
+[bot][lsposed][lsposed@lsposed.org]  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+[bot][lsposed][lsposed@lsposed.org]  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[bot][lsposed][lsposed@lsposed.org]  ~ GNU General Public License for more details.
+[bot][lsposed][lsposed@lsposed.org]  ~
+[bot][lsposed][lsposed@lsposed.org]  ~ You should have received a copy of the GNU General Public License
+[bot][lsposed][lsposed@lsposed.org]  ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[bot][lsposed][lsposed@lsposed.org]  ~
+[bot][lsposed][lsposed@lsposed.org]  ~ Copyright (C) 2021 LSPosed Contributors
+[bot][lsposed][lsposed@lsposed.org]  -->
+[bot][lsposed][lsposed@lsposed.org]<resources xmlns:tools="http://schemas.android.com/tools" tools:keep="@string/xposed_module_updated_notification_*,@string/module_is_not_activated_*">
+[bot][lsposed][lsposed@lsposed.org]    <!-- MainActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="overview">Kodu</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="Modules">Moodulid</string>
+[bot][lsposed][lsposed@lsposed.org]    <plurals name="modules_enabled_count">
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="one">%d moodul on lubatud</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="other">%d moodulit on lubatud</item>
+[bot][lsposed][lsposed@lsposed.org]    </plurals>
+[bot][lsposed][lsposed@lsposed.org]    <string name="Logs">Logid</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="Settings">Seaded</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="feedback_or_suggestion">Tagasiside või ettepanek</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="About">Kohta</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="report_issue">Teata probleemist</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo">Repo</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo_up_to_date">Kõik moodulid on ajakohased</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo_published_time">Avaldatud %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo_updated_time">Uuendatud %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <plurals name="module_repo_upgradable">
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="one">%d moodul on täiendatav</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="other">%d moodulit täiendatavad</item>
+[bot][lsposed][lsposed@lsposed.org]    </plurals>
+[bot][lsposed][lsposed@lsposed.org]    <string name="about_view_source_code"><![CDATA[Vaata lähtekoodi aadressil %1$s<br/>Liitu meie %2$s \'i kanaliga]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="translators" comment="Dear translators, please add your home page here following the format. There can be more than one translator. So feel free to append yourself.">Subaru Pan</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install">Installi</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install_summary">Puudutage LSPosedi installimiseks</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="not_installed">Puudub</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="not_install_summary">LSPosed ei ole installitud</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="activated">Aktiveeritud</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="partial_activated">Osaliselt aktiveeritud</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="selinux_policy_not_loaded_summary">SEPolicy ei ole korralikult laetud</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="selinux_policy_not_loaded"><![CDATA[Mõned funktsioonid ei tööta.<br/>Palun teatage sellest <a href="https://github.com/topjohnwu/Magisk/issues"><b>Magisk</b></a> arendajale.]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_inject_fail_summary">System Frameworki süstimine ebaõnnestus</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_inject_fail"><![CDATA[Seda esineb harva ja selle põhjuseks võib olla <b>Magisk</b> või mõned madala kvaliteediga Magisk-moodulid.<br/>Palun proovige lülitada välja Magisk\'i moodulid peale Riru ja LSPosed või esitage täielik logi arendajatele.]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_prop_incorrect_summary">Süsteemi tugi vale</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_prop_incorrect"><![CDATA[Mõned vajalikud süsteemiomadused kustutatud või muudetud.<br/>Moodulid võivad aeg-ajalt kehtetuks muutuda.]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="need_update">Vaja uuendada</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="please_update_summary">Palun installige LSPosedi uusim versioon</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_api_version">API\'i versioon</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_framework_version">Raamistiku versioon</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_manager_package_name">Manager paketi nimi</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_system_version">Süsteemi versioon</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_device">Seade</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_system_abi">Süsteemi ABI</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_dex2oat_wrapper">Dex Optimizer Wrapper</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enabled">Lubatud</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="not_enabled">Pole lubatud</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="supported">Toetatud</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="unsupported">Toetamata</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="android_version_unsatisfied">Androidi versioon ei ole toetatud</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="crashed">Kokku jooksnud</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="mount_failed">Kinnitus ebaõnnestus</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="selinux_permissive">SELinux on lubav</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sepolicy_incorrect">SELinux policy on vale</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_lsposed">LSPosedi uuendamine</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_lsposed_msg">Kas kinnitada LSPosed uuendamine? See seade taaskäivitub pärast uuendamise lõpetamist</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_copied">Kopeeritud lõikelauale</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- WelcomeDialog -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="parasitic_welcome">Tere tulemast LSPosedisse</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="parasitic_welcome_summary">Sa kasutad parasiitide haldurit, mis võib luua otsetee või ikka avada teateid.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="parasitic_welcome_summary_no_shortcut_support">Kasutate parasiitide haldurit, mida saab avada teatisest.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="create_shortcut">Loo otsetee</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="never_show">Mitte kunagi ei näidata</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_welcome">Parasiitide haldur Soovitatav</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_welcome_summary">LSPosed toetab nüüd süsteemi parasiitide tuvastamise vältimiseks, saate avada parasiitide haldaja teatest. Praegune rakendus on soovitatav eemaldada.</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- LogsActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="menuSaveToSd">Salvesta</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="nav_item_logs_verbose">Põhjalikud logid</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="nav_item_logs_module">Moodulite logid</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_saving">Logi salvestamine, palun oodake</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_saved">Logi salvestatud</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_save_failed2">Salvestamine ebaõnnestus:\n%s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menuClearLog">Kustuta logi kohe</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_cleared">Logi edukalt kustutatud.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="scroll_top">Kerige üles</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="loading">Laadimine…</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="scroll_bottom">Kerige alla</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menuReload">Laadi uuesti</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_clear_failed_2">Logi tühjendamine ebaõnnestus</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_enable_word_wrap">Word Wrap</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enabled_verbose_log">Paljusõnaline logi on lubatud</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="disabled_verbose_log">Paljusõnaline logi on välja lülitatud</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- ModulesActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_empty_description">(kirjeldus puudub)</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_xposed_min_version">See moodul nõuab uuemat Xposed versiooni (%d) ja seega ei saa seda aktiveerida.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_target_version_higher">See moodul on mõeldud uuemale Xposedi versioonile (%d) ja seetõttu ei pruugi mõned funktsioonid töötada</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="no_min_version_specified">See moodul ei täpsusta Xposedi versiooni, mida ta vajab.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_min_version_too_low">See moodul loodi Xposedi versiooni %1$d jaoks, kuid versioonis %2$d tehtud ühildumatute muudatuste tõttu on see välja lülitatud</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_installed_on_external_storage">Seda moodulit ei saa laadida, sest see on paigaldatud SD-kaardile, palun viige see sisemällu.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstall">Eemalda</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_settings">Mooduli seaded</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="view_in_repo">Vaata Repos</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstall_message">Kas soovite selle mooduli eemaldada?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstalled">Eemaldatud %1$s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstall_failed">Eemaldamine ebaõnnestus</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="add_module_to_user">Lisa kasutajale moodul</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_installed">Lisatud %1$s kasutajale %2$s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_install_failed">Mooduli lisamine ebaõnnestus</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install_to_user">Installi kasutajale %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install_to_user_message">Tahad paigaldada %1$s kasutajale %2$s? Soovitatav on paigaldada käsitsi, LSPosed\'i kaudu sunniviisiline paigaldamine võib põhjustada probleeme.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="expand">laienda</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="collapse">kollaps</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- AppListActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_speed">Optimeeri uuesti</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_speed_msg">Optimeerimine…</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_done">Optimeeritud</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_launch">Ava</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_failed">Optimeerimine ebaõnnestus: tagastusväärtus on tühi</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_failed_with_info">Optimeerimine ebaõnnestus: </string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_by_name">Rakenduse nimi</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_by_package_name">Paketi nimi</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_by_install_time">Installimise aeg</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_by_update_time">Uuendamise aeg</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_reverse">Tagasipööra</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_system_apps">Süsteemirakendused</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_sort">Sortimisalus</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enable_module">Luba moodul</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="no_scope_selected">Te ei valinud ühtegi rakendust. Jätka?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_games">Mängud</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_modules">Moodulid</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_denylist">Denylist</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="failed_to_save_scope_list">Ei õnnestunud salvestada reguleerimisala nimekirja</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_version">Versioon: %1$s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="use_recommended">Soovitatav</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="no_scope_selected_has_recommended">Te ei valinud ühtegi rakendust. Valige soovitatud rakendused?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="use_recommended_message">Valige soovitatavad rakendused?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_is_not_activated_yet">Xposed moodul ei ole aktiveeritud</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="requested_by_module">Soovitatav</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_available">Uuendus on saadaval: %1$s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_disabled_no_selection">Moodul %s on välja lülitatud, kuna ühtegi rakendust ei ole valitud.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="android_framework">Süsteemi raamistik</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_backup_and_restore">Varukoopia</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_backup">Varukoopia</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_restore">Taasta</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="force_stop">Sundpeata</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="force_stop_dlg_title">Sundpeata?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="force_stop_dlg_text">Kui te peatate rakenduse sunniviisiliselt, võib see halvasti käituda.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="reboot_required">Selle muudatuse kohaldamiseks on vajalik taaskäivitamine</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="reboot">Taaskäivitus</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_hide">Peida</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="deny_list">%s on denylistis. See ei pruugi jõustuda.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="deny_list_info">Denylistil</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- ModulesActivity and AppListActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="modules_other_app">Vaadake teises rakenduses</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_app_info">Rakenduse teave</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="list_empty">¯\\\\_(ツ)_\/¯\nSiin pole midagi.</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- SettingsActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_group_framework">Raamistik</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_disable_verbose_log">Lülita sõnalised logid välja</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_disable_verbose_log_summary">Aruande probleemid taotluse lisada sõnalogid</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="pure_black_dark_theme">Must tume teema</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="pure_black_dark_theme_summary">Kasutage puhast musta teemat, kui tume teema on lubatud.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_group_theme">Teema</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup_and_restore">Varundamine ja taastamine</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup_summery">Moodulite varukoopiate nimekiri ja ulatusloendid.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_restore_summery">Taastab moodulite loendi ja ulatusloendite loendi.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup">Varukoopia</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup_failed2">Varundamine ebaõnnestus:\n%s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enable_documentui">Palun lubage DocumentUI</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_restore">Taasta</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_restore_failed2">Ei õnnestunud taastada:\n%s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="group_network">Võrk</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="dns_over_http">DNS üle HTTPS</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="dns_over_http_summary">Workaround DNS mürgistus mõnedes riikides</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="theme_color">Teema värv</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="theme_color_system">Süsteemi teema värv</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_show_hidden_icon_apps_enabled">Rakenduste sundimine käivitaja ikoonide kuvamiseks</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_show_hidden_icon_apps_enabled_summary">Pärast Android 10 ei ole rakendustel lubatud oma käivitaja ikoonid ära peita. Selle süsteemifunktsiooni väljalülitamiseks lülitage lüliti välja.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_group_system">Süsteem</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_language">Keel</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_translation_contributors">Tõlkimise toetajad</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_translation">Osalege tõlkimises</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_translation_summary">Aita meil tõlkida %s sinu keelde</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_create_shortcut_summary">Loo otsetee, mis võib avada parasiitide halduri</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_shortcut_pinned_hint">Otsetee kinnitatud</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_unsupported_pin_shortcut_summary">Praegune vaikekäivitusprogramm ei toeta nööpnõelte otseteid</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_enable_status_notification">Staatuse teatamine</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_enable_status_notification_summary">Kuva teatis, mis võib avada parasiitide halduri</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="disable_status_notification_error">Otsetee puudub, teavitust ei saa keelata</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_update_channel">Uuenduskanal</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_channel_stable">Stabiilne</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_channel_bate">Beeta</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_channel_nightly">Nightly build</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_xposed_api_call_protection">Xposed API call protection</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_xposed_api_call_protection_summary">Blokeerige dünaamiliselt laaditud mooduli kood, et kasutada Xposed API-t, see võib mõne mooduli rikkuda, kuid toob kasu turvalisusele</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- Module Repo -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_readme">Readme</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_releases">Väljaanded</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_information">Teave</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_information_homepage">Koduleht</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_information_source_url">Lähtekood</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_information_collaborators">Koostööpartnerid</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_release_view_assets">Varad</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_open_in_browser">Ava brauseris</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_release_load_more">Kuva vanemad versioonid</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_release_no_more">Enam ei ole väljaannet</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="repo_load_failed">Ebaõnnestus mooduli repo laadimine: %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_upgradable_first">Esimesena uuendatav</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="installed">Paigaldatud</string>
+[bot][lsposed][lsposed@lsposed.org]    <plurals name="module_release_assets_download_count">
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="one">allalaaditud on %d kord</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="other">allalaaditud on %d korda</item>
+[bot][lsposed][lsposed@lsposed.org]    </plurals>
+[bot][lsposed][lsposed@lsposed.org]    <!-- Colors -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_sakura">Sakura</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_red">Punane</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_pink">Roosa</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_purple">Lilla</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_deep_purple">Sügavlilla</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_indigo">Indigo</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_blue">Sinine</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_light_blue">Helesinine</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_cyan">Tsüaansinine</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_teal">Sinakasroheline</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_green">Roheline</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_light_green">Heleroheline</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_lime">Laimiroheline</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_yellow">Kollane</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_amber">Amber</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_orange">Oranž</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_deep_orange">Sügavoranž</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_brown">Pruun</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_blue_grey">Sinine hall</string>
+[bot][lsposed][lsposed@lsposed.org]</resources>

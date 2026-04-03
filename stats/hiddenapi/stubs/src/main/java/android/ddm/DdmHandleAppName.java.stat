@@ -1,0 +1,7 @@
+[external][shana][shana@zju.edu.cn]package android.ddm;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public class DdmHandleAppName {
+[external][shana][shana@zju.edu.cn]    public static void setAppName(String name, int userId) {
+[external][shana][shana@zju.edu.cn]        throw new RuntimeException("STUB");
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

@@ -1,0 +1,4 @@
+[external][shana][shana@zju.edu.cn]package android.os;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public class Parcel {
+[external][shana][shana@zju.edu.cn]}

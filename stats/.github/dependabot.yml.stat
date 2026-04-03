@@ -1,0 +1,23 @@
+[external][shana][shana@zju.edu.cn]version: 2
+[external][shana][shana@zju.edu.cn]updates:
+[external][shana][shana@zju.edu.cn]  - package-ecosystem: gradle
+[external][shana][shana@zju.edu.cn]    directory: "/"
+[external][shana][shana@zju.edu.cn]    schedule:
+[external][shana][shana@zju.edu.cn]      interval: daily
+[external][shana][shana@zju.edu.cn]      time: "21:00"
+[external][shana][shana@zju.edu.cn]    target-branch: master
+[external][shana][shana@zju.edu.cn]    registries:
+[external][shana][shana@zju.edu.cn]      - maven-google
+[external][stefma][StefMa@users.noreply.github.com]      - gradle-plugin
+[external][shana][shana@zju.edu.cn]    groups:
+[external][shana][shana@zju.edu.cn]      maven-dependencies:
+[external][shana][shana@zju.edu.cn]        patterns:
+[external][shana][shana@zju.edu.cn]          - "*"
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]registries:
+[external][shana][shana@zju.edu.cn]  maven-google:
+[external][shana][shana@zju.edu.cn]    type: maven-repository
+[external][shana][shana@zju.edu.cn]    url: "https://dl.google.com/dl/android/maven2/"
+[external][stefma][StefMa@users.noreply.github.com]  gradle-plugin:
+[external][shana][shana@zju.edu.cn]    type: maven-repository
+[external][shana][shana@zju.edu.cn]    url: "https://plugins.gradle.org/m2/"

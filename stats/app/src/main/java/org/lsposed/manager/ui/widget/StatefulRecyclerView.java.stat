@@ -1,0 +1,71 @@
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]/*
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * This file is part of LSPosed.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] *
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * (at your option) any later version.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] *
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * GNU General Public License for more details.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] *
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] *
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * Copyright (C) 2022 LSPosed Contributors
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] */
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]package org.lsposed.manager.ui.widget;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import android.content.Context;
+[external][shana][shana@zju.edu.cn]import android.os.Bundle;
+[external][shana][shana@zju.edu.cn]import android.os.Parcelable;
+[external][shana][shana@zju.edu.cn]import android.util.AttributeSet;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import androidx.annotation.NonNull;
+[external][shana][shana@zju.edu.cn]import androidx.annotation.Nullable;
+[external][shana][shana@zju.edu.cn]import androidx.viewpager2.adapter.StatefulAdapter;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import rikka.widget.borderview.BorderRecyclerView;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public class StatefulRecyclerView extends BorderRecyclerView {
+[external][shana][shana@zju.edu.cn]    public StatefulRecyclerView(@NonNull Context context) {
+[external][shana][shana@zju.edu.cn]        super(context);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public StatefulRecyclerView(@NonNull Context context, @Nullable AttributeSet attrs) {
+[external][shana][shana@zju.edu.cn]        super(context, attrs);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public StatefulRecyclerView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyle) {
+[external][shana][shana@zju.edu.cn]        super(context, attrs, defStyle);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public Parcelable onSaveInstanceState() {
+[external][shana][shana@zju.edu.cn]        Bundle bundle = new Bundle();
+[external][shana][shana@zju.edu.cn]        bundle.putParcelable("superState", super.onSaveInstanceState());
+[external][shana][shana@zju.edu.cn]        var adapter = getAdapter();
+[external][shana][shana@zju.edu.cn]        if (adapter instanceof StatefulAdapter) {
+[external][shana][shana@zju.edu.cn]            bundle.putParcelable("adaptor", ((StatefulAdapter) adapter).saveState());
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return bundle;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public void onRestoreInstanceState(Parcelable state) {
+[external][shana][shana@zju.edu.cn]        if (state instanceof Bundle) {
+[external][shana][shana@zju.edu.cn]            Bundle bundle = (Bundle) state;
+[external][shana][shana@zju.edu.cn]            super.onRestoreInstanceState(bundle.getParcelable("superState"));
+[external][shana][shana@zju.edu.cn]            var adapter = getAdapter();
+[external][shana][shana@zju.edu.cn]            if (adapter instanceof StatefulAdapter) {
+[external][shana][shana@zju.edu.cn]                ((StatefulAdapter) adapter).restoreState(bundle.getParcelable("adaptor"));
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        } else {
+[external][shana][shana@zju.edu.cn]            super.onRestoreInstanceState(state);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

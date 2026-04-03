@@ -1,0 +1,153 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.manager.repo.model;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import androidx.annotation.Nullable;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import com.google.gson.annotations.Expose;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import com.google.gson.annotations.SerializedName;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.util.ArrayList;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.util.List;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]public class Release {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @SerializedName("name")
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Expose
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private String name;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @SerializedName("url")
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Expose
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private String url;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @SerializedName("description")
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Expose
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private String description;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @SerializedName("descriptionHTML")
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Expose
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private String descriptionHTML;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @SerializedName("createdAt")
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Expose
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private String createdAt;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @SerializedName("publishedAt")
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Expose
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private String publishedAt;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @SerializedName("updatedAt")
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Expose
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private String updatedAt;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @SerializedName("tagName")
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Expose
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private String tagName;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @SerializedName("isPrerelease")
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Expose
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private Boolean isPrerelease;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @SerializedName("releaseAssets")
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Expose
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private List<ReleaseAsset> releaseAssets = new ArrayList<>();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    @Nullable
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public String getName() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return name;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public void setName(String name) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        this.name = name;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    @Nullable
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public String getUrl() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return url;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public void setUrl(String url) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        this.url = url;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    @Nullable
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public String getDescription() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return description;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public void setDescription(String description) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        this.description = description;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    @Nullable
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public String getDescriptionHTML() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return descriptionHTML;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public void setDescriptionHTML(String descriptionHTML) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        this.descriptionHTML = descriptionHTML;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    @Nullable
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public String getCreatedAt() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return createdAt;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public void setCreatedAt(String createdAt) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        this.createdAt = createdAt;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    @Nullable
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public String getPublishedAt() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return publishedAt;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public void setPublishedAt(String publishedAt) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        this.publishedAt = publishedAt;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    @Nullable
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public String getUpdatedAt() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return updatedAt;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public void setUpdatedAt(String updatedAt) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        this.updatedAt = updatedAt;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    @Nullable
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public String getTagName() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return tagName;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public void setTagName(String tagName) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        this.tagName = tagName;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    @Nullable
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public Boolean getIsPrerelease() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return isPrerelease;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public void setIsPrerelease(Boolean isPrerelease) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        this.isPrerelease = isPrerelease;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    @Nullable
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public List<ReleaseAsset> getReleaseAssets() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return releaseAssets;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public void setReleaseAssets(List<ReleaseAsset> releaseAssets) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        this.releaseAssets = releaseAssets;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]}

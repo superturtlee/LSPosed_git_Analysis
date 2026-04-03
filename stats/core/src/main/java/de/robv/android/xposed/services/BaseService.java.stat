@@ -1,0 +1,210 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][admin][admin@0x.mk]package de.robv.android.xposed.services;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]import java.io.ByteArrayInputStream;
+[external][admin][admin@0x.mk]import java.io.FileNotFoundException;
+[external][admin][admin@0x.mk]import java.io.IOException;
+[external][admin][admin@0x.mk]import java.io.InputStream;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]import de.robv.android.xposed.SELinuxHelper;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]/**
+[external][admin][admin@0x.mk] * General definition of a file access service provided by the Xposed framework.
+[external][admin][admin@0x.mk] *
+[external][admin][admin@0x.mk] * <p>References to a concrete subclass should generally be retrieved from {@link SELinuxHelper}.
+[external][admin][admin@0x.mk] */
+[external][admin][admin@0x.mk]public abstract class BaseService {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Flag for {@link #checkFileAccess}: Read access.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static final int R_OK = 4;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Flag for {@link #checkFileAccess}: Write access.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static final int W_OK = 2;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Flag for {@link #checkFileAccess}: Executable access.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static final int X_OK = 1;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Flag for {@link #checkFileAccess}: File/directory exists.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static final int F_OK = 0;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Checks whether the services accesses files directly (instead of using IPC).
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @return {@code true} in case direct access is possible.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public boolean hasDirectFileAccess() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return false;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Check whether a file is accessible. SELinux might enforce stricter checks.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param filename The absolute path of the file to check.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param mode     The mode for POSIX's {@code access()} function.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @return The result of the {@code access()} function.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public abstract boolean checkFileAccess(String filename, int mode);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Check whether a file exists.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param filename The absolute path of the file to check.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @return The result of the {@code access()} function.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public boolean checkFileExists(String filename) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return checkFileAccess(filename, F_OK);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Determine the size and modification time of a file.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param filename The absolute path of the file to check.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @return A {@link FileResult} object holding the result.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @throws IOException In case an error occurred while retrieving the information.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public abstract FileResult statFile(String filename) throws IOException;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Determine the size time of a file.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param filename The absolute path of the file to check.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @return The file size.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @throws IOException In case an error occurred while retrieving the information.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public long getFileSize(String filename) throws IOException {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return statFile(filename).size;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Determine the size time of a file.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param filename The absolute path of the file to check.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @return The file modification time.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @throws IOException In case an error occurred while retrieving the information.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public long getFileModificationTime(String filename) throws IOException {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return statFile(filename).mtime;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Read a file into memory.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param filename The absolute path of the file to read.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @return A {@code byte} array with the file content.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @throws IOException In case an error occurred while reading the file.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public abstract byte[] readFile(String filename) throws IOException;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Read a file into memory, but only if it has changed since the last time.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param filename     The absolute path of the file to read.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param previousSize File size of last read.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param previousTime File modification time of last read.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @return A {@link FileResult} object holding the result.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * <p>The {@link FileResult#content} field might be {@code null} if the file
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * is unmodified ({@code previousSize} and {@code previousTime} are still valid).
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @throws IOException In case an error occurred while reading the file.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public abstract FileResult readFile(String filename, long previousSize, long previousTime) throws IOException;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Read a file into memory, optionally only if it has changed since the last time.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param filename     The absolute path of the file to read.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param offset       Number of bytes to skip at the beginning of the file.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param length       Number of bytes to read (0 means read to end of file).
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param previousSize Optional: File size of last read.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param previousTime Optional: File modification time of last read.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @return A {@link FileResult} object holding the result.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * <p>The {@link FileResult#content} field might be {@code null} if the file
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * is unmodified ({@code previousSize} and {@code previousTime} are still valid).
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @throws IOException In case an error occurred while reading the file.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public abstract FileResult readFile(String filename, int offset, int length,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                                        long previousSize, long previousTime) throws IOException;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Get a stream to the file content.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Depending on the service, it may or may not be read completely into memory.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param filename The absolute path of the file to read.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @return An {@link InputStream} to the file content.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @throws IOException In case an error occurred while reading the file.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public InputStream getFileInputStream(String filename) throws IOException {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return new ByteArrayInputStream(readFile(filename));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Get a stream to the file content, but only if it has changed since the last time.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Depending on the service, it may or may not be read completely into memory.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param filename     The absolute path of the file to read.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param previousSize Optional: File size of last read.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param previousTime Optional: File modification time of last read.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @return A {@link FileResult} object holding the result.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * <p>The {@link FileResult#stream} field might be {@code null} if the file
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * is unmodified ({@code previousSize} and {@code previousTime} are still valid).
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @throws IOException In case an error occurred while reading the file.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public FileResult getFileInputStream(String filename, long previousSize, long previousTime) throws IOException {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        FileResult result = readFile(filename, previousSize, previousTime);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (result.content == null)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return result;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return new FileResult(new ByteArrayInputStream(result.content), result.size, result.mtime);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    // ----------------------------------------------------------------------------
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /*package*/ BaseService() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /*package*/
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    static void ensureAbsolutePath(String filename) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (!filename.startsWith("/")) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalArgumentException("Only absolute filenames are allowed: " + filename);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /*package*/
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    static void throwCommonIOException(int errno, String errorMsg, String filename, String defaultText) throws IOException {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        switch (errno) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            case 1: // EPERM
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            case 13: // EACCES
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                throw new FileNotFoundException(errorMsg != null ? errorMsg : "Permission denied: " + filename);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            case 2: // ENOENT
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                throw new FileNotFoundException(errorMsg != null ? errorMsg : "No such file or directory: " + filename);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            case 12: // ENOMEM
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                throw new OutOfMemoryError(errorMsg);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            case 21: // EISDIR
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                throw new FileNotFoundException(errorMsg != null ? errorMsg : "Is a directory: " + filename);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            default:
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                throw new IOException(errorMsg != null ? errorMsg : "Error " + errno + defaultText + filename);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][admin][admin@0x.mk]}

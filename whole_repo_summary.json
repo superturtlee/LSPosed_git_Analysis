@@ -1,0 +1,11 @@
+{
+  "scope": "whole_repo",
+  "ref": "--all",
+  "exclude_bots": true,
+  "period_start": "2014-01",
+  "period_end": "2024-01",
+  "total_commits": 2754,
+  "external_commits": 2304,
+  "internal_commits": 450,
+  "external_ratio": 0.8366013071895425
+}

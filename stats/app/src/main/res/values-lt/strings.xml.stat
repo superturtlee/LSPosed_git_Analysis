@@ -1,0 +1,248 @@
+[bot][lsposed][lsposed@lsposed.org]<?xml version="1.0" encoding="utf-8"?>
+[bot][lsposed][lsposed@lsposed.org]<!--
+[bot][lsposed][lsposed@lsposed.org]  ~ This file is part of LSPosed.
+[bot][lsposed][lsposed@lsposed.org]  ~
+[bot][lsposed][lsposed@lsposed.org]  ~ LSPosed is free software: you can redistribute it and/or modify
+[bot][lsposed][lsposed@lsposed.org]  ~ it under the terms of the GNU General Public License as published by
+[bot][lsposed][lsposed@lsposed.org]  ~ the Free Software Foundation, either version 3 of the License, or
+[bot][lsposed][lsposed@lsposed.org]  ~ (at your option) any later version.
+[bot][lsposed][lsposed@lsposed.org]  ~
+[bot][lsposed][lsposed@lsposed.org]  ~ LSPosed is distributed in the hope that it will be useful,
+[bot][lsposed][lsposed@lsposed.org]  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+[bot][lsposed][lsposed@lsposed.org]  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[bot][lsposed][lsposed@lsposed.org]  ~ GNU General Public License for more details.
+[bot][lsposed][lsposed@lsposed.org]  ~
+[bot][lsposed][lsposed@lsposed.org]  ~ You should have received a copy of the GNU General Public License
+[bot][lsposed][lsposed@lsposed.org]  ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[bot][lsposed][lsposed@lsposed.org]  ~
+[bot][lsposed][lsposed@lsposed.org]  ~ Copyright (C) 2021 LSPosed Contributors
+[bot][lsposed][lsposed@lsposed.org]  -->
+[bot][lsposed][lsposed@lsposed.org]<resources xmlns:tools="http://schemas.android.com/tools" tools:keep="@string/xposed_module_updated_notification_*,@string/module_is_not_activated_*">
+[bot][lsposed][lsposed@lsposed.org]    <!-- MainActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="overview">Apžvalga</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="Modules">Moduliai</string>
+[bot][lsposed][lsposed@lsposed.org]    <plurals name="modules_enabled_count">
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="one">%d modulis įjungtas</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="few">%d įjungti moduliai</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="many">%d įjungti moduliai</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="other">%d įjungti moduliai</item>
+[bot][lsposed][lsposed@lsposed.org]    </plurals>
+[bot][lsposed][lsposed@lsposed.org]    <string name="Logs">Žurnalai</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="Settings">Nustatymai</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="feedback_or_suggestion">Atsiliepimai arba pasiūlymas</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="About">About-face</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="report_issue">Pranešti apie problemą</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo">Saugykla</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo_up_to_date">Visi moduliai atnaujinti</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo_published_time">Paskelbta adresu %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo_updated_time">Atnaujinta %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <plurals name="module_repo_upgradable">
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="one">%d modulis atnaujinamas</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="few">%d atnaujinami moduliai</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="many">%d atnaujinami moduliai</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="other">%d atnaujinami moduliai</item>
+[bot][lsposed][lsposed@lsposed.org]    </plurals>
+[bot][lsposed][lsposed@lsposed.org]    <string name="about_view_source_code"><![CDATA[Peržiūrėkite šaltinio kodą adresu %1$s<br/>Prisijunkite prie mūsų %2$s kanalo]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="translators" comment="Dear translators, please add your home page here following the format. There can be more than one translator. So feel free to append yourself.">Ace Miller, im sorry</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install">Įdiekite</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install_summary">Bakstelėkite, jei norite įdiegti LSPosed</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="not_installed">Neįdiegta</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="not_install_summary">\"LSPosed\" nėra įdiegta</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="activated">Aktyvuota</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="partial_activated">Iš dalies aktyvuota</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="selinux_policy_not_loaded_summary">\"SEPolicy\" nėra tinkamai įkelta</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="selinux_policy_not_loaded"><![CDATA[Kai kurios funkcijos neveiks.<br/>Apie tai praneškite <a href="https://github.com/topjohnwu/Magisk/issues"><b>Magisk</b></a> kūrėjui.]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_inject_fail_summary">Nepavyko įšvirkšti sistemos pagrindo</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_inject_fail"><![CDATA[Tai pasitaiko retai ir gali būti dėl <b>"Magisk"</b> arba kai kurių nekokybiškų "Magisk" modulių.<br/>Pabandykite išjungti kitus "Magisk" modulius, išskyrus "Riru" ir "LSPosed", arba pateikite visą žurnalą kūrėjams.]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_prop_incorrect_summary">Neteisingas sistemos rekvizitas</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_prop_incorrect"><![CDATA[Ištrintos arba pakeistos kai kurios būtinos sistemos savybės.<br/>Moduliai kartais gali būti pripažinti negaliojančiais.]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="need_update">Reikia atnaujinti</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="please_update_summary">Įdiekite naujausią \"LSPosed\" versiją</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_api_version">API versija</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_framework_version">Pagrindų versija</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_manager_package_name">Valdytojo paketo pavadinimas</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_system_version">Sistemos versija</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_device">Įrenginys</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_system_abi">Sistemos ABI</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_dex2oat_wrapper">\"Dex Optimizer Wrapper</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enabled">Įjungta</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="not_enabled">Neįjungta</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="supported">Palaikomas</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="unsupported">Nepalaikomas</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="android_version_unsatisfied">\"Android\" versija nepatenkinti</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="crashed">Sugedo</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="mount_failed">Montavimas nepavyko</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="selinux_permissive">\"SELinux\" yra leidžiamoji</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sepolicy_incorrect">\"SELinux\" politika yra neteisinga</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_lsposed">Atnaujinti LSPosed</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_lsposed_msg">Patvirtinkite, kad atnaujintumėte LSPosed? Baigus atnaujinimą šis prietaisas bus perkrautas</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_copied">Nukopijuota į iškarpinę</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- WelcomeDialog -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="parasitic_welcome">Sveiki atvykę į LSPosed</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="parasitic_welcome_summary">Jūs naudojate parazitinį tvarkytuvą, kuris gali sukurti nuorodą arba vis dar atidaryti iš pranešimo.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="parasitic_welcome_summary_no_shortcut_support">Naudojate parazitinį tvarkytuvą, kuris gali būti atidarytas iš pranešimo.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="create_shortcut">Sukurti nuorodą</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="never_show">Niekada nerodykite</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_welcome">Rekomenduojama parazitinė vadybininkė</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_welcome_summary">\"LSPosed\" dabar palaiko sistemos parazitavimą, kad išvengtų aptikimo, galite atidaryti parazitų tvarkyklę iš pranešimo. Rekomenduojama pašalinti dabartinę programą.</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- LogsActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="menuSaveToSd">Išsaugoti</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="nav_item_logs_verbose">Žurnalai su verbaline informacija</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="nav_item_logs_module">Modulių žurnalai</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_saving">Įrašomas žurnalas, palaukite</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_saved">Išsaugoti žurnalai</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_save_failed2">Nepavyko išsaugoti:\n%s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menuClearLog">Išvalyti žurnalą dabar</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_cleared">Žurnalas sėkmingai išvalytas.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="scroll_top">Slinkti į viršų</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="loading">Įkrovimas…</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="scroll_bottom">Slinkite į apačią</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menuReload">Perkrauti</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_clear_failed_2">Nepavyko išvalyti žurnalo</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_enable_word_wrap">Žodžių apvyniojimas</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enabled_verbose_log">Įjungtas verstinis žurnalas</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="disabled_verbose_log">Išjungtas verstinis žurnalas</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- ModulesActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_empty_description">(aprašymas nepateiktas)</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_xposed_min_version">Šis modulis reikalauja naujesnės \"Xposed\" versijos (%d), todėl negali būti aktyvuotas</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_target_version_higher">Šis modulis skirtas naujesnei \"Xposed\" versijai (%d), todėl kai kurios funkcijos gali neveikti.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="no_min_version_specified">Šis modulis nenurodo jam reikalingos \"Xposed\" versijos.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_min_version_too_low">Šis modulis buvo sukurtas \"Xposed\" versijai %1$d, tačiau dėl nesuderinamų pakeitimų versijoje %2$d, jis buvo išjungtas.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_installed_on_external_storage">Šio modulio negalima įkelti, nes jis įdiegtas SD kortelėje, perkelkite jį į vidinę saugyklą</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstall">Pašalinti</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_settings">Modulio nustatymai</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="view_in_repo">Peržiūrėti Repo</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstall_message">Ar norite pašalinti šį modulį?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstalled">Išmontuota %1$s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstall_failed">Nesėkmingas pašalinimas</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="add_module_to_user">Pridėti modulį prie naudotojo</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_installed">Pridėta %1$s naudotojui %2$s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_install_failed">Nepavyko pridėti modulio</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install_to_user">Įdiegti naudotojui %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install_to_user_message">Norite įdiegti %1$s naudotojui %2$s? Rekomenduojama įdiegti rankiniu būdu, priverstinis diegimas per LSPosed gali sukelti problemų.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="expand">išplėsti</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="collapse">žlugimas</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- AppListActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_speed">Iš naujo optimizuoti</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_speed_msg">Optimizavimas…</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_done">Optimizavimas baigtas</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_launch">Paleiskite jį</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_failed">Optimizavimas nepavyko: grąžinama vertė yra tuščia</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_failed_with_info">Optimizavimas nepavyko: </string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_by_name">Programos pavadinimas</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_by_package_name">Paketo pavadinimas</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_by_install_time">Diegimo laikas</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_by_update_time">Atnaujinimo laikas</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_reverse">Atvirkštinis</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_system_apps">Sistemos programos</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_sort">Rūšiavimas</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enable_module">Įjungti modulį</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="no_scope_selected">Nepasirinkote jokios programos. Tęsti?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_games">Žaidimai</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_modules">Moduliai</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_denylist">Denylist</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="failed_to_save_scope_list">Nepavyko išsaugoti srities sąrašo</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_version">Versija: %1$s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="use_recommended">Rekomenduojama</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="no_scope_selected_has_recommended">Nepasirinkote jokios programos. Pasirinkti rekomenduojamas programas?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="use_recommended_message">Pasirinkite rekomenduojamas programas?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_is_not_activated_yet">Xposed modulis dar nėra aktyvuotas</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="requested_by_module">Rekomenduojama</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_available">Galimas atnaujinimas: %1$s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_disabled_no_selection">Modulis %s buvo išjungtas, nes nebuvo pasirinkta jokia programa.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="android_framework">Sistemos sistema</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_backup_and_restore">Atsarginė kopija</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_backup">Atsarginė kopija</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_restore">Atkurti</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="force_stop">Priverstinis sustabdymas</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="force_stop_dlg_title">Priverstinis sustojimas?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="force_stop_dlg_text">Jei priverstinai sustabdysite programą, ji gali elgtis netinkamai.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="reboot_required">Kad šis pakeitimas būtų pritaikytas, reikia perkrauti kompiuterį</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="reboot">Perkraukite</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_hide">Paslėpti</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="deny_list">%s yra denylist. Jis gali neįsigalioti.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="deny_list_info">Dėl denylist</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- ModulesActivity and AppListActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="modules_other_app">Peržiūrėti kitoje programoje</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_app_info">Programėlės informacija</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="list_empty">\\\\_(ツ)_\/¯\nČia nieko nėra</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- SettingsActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_group_framework">Sistema</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_disable_verbose_log">Išjungti verbalinius žurnalus</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_disable_verbose_log_summary">Ataskaitos klausimų prašymas įtraukti verbalinius žurnalus</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="pure_black_dark_theme">Juoda tamsi tema</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="pure_black_dark_theme_summary">Naudokite grynai juodą temą, jei įjungta tamsi tema</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_group_theme">Tema</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup_and_restore">Atsarginės kopijos kūrimas ir atkūrimas</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup_summery">Atsarginės kopijos modulių ir sričių sąrašai.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_restore_summery">Atkurti modulių ir sričių sąrašus.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup">Atsarginė kopija</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup_failed2">Nepavyko sukurti atsarginės kopijos:\n%s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enable_documentui">Įjunkite DocumentUI</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_restore">Atkurti</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_restore_failed2">Nepavyko atkurti:\n%s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="group_network">Tinklas</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="dns_over_http">DNS per HTTPS</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="dns_over_http_summary">Apėjimas DNS apsinuodijimas kai kuriose šalyse</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="theme_color">Temos spalva</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="theme_color_system">Sistemos temos spalva</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_show_hidden_icon_apps_enabled">Priversti programas rodyti paleidiklio piktogramas</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_show_hidden_icon_apps_enabled_summary">Po \"Android 10\" programėlėms neleidžiama slėpti paleidimo programos piktogramų. Norėdami išjungti šią sistemos funkciją, išjunkite perjungiklį.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_group_system">Sistema</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_language">Kalba</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_translation_contributors">Vertimo paslaugų teikėjai</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_translation">Dalyvaukite vertimo procese</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_translation_summary">Padėkite mums išversti %s į savo kalbą</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_create_shortcut_summary">Sukurti nuorodą, kuri gali atidaryti parazitinį tvarkytuvą</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_shortcut_pinned_hint">Prisegtas trumpinys</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_unsupported_pin_shortcut_summary">Dabartinė numatytoji paleidimo programa nepalaiko prisegamų nuorodų</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_enable_status_notification">Pranešimas apie būseną</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_enable_status_notification_summary">Rodyti pranešimą, kad galima atidaryti parazitinį tvarkytuvą</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="disable_status_notification_error">Nėra sparčiųjų klavišų, negalima išjungti pranešimo</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_update_channel">Atnaujinti kanalą</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_channel_stable">Stabilus</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_channel_bate">Beta</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_channel_nightly">Naktinis kūrimas</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_xposed_api_call_protection">\"Xposed API\" skambučių apsauga</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_xposed_api_call_protection_summary">Blokuoti dinamiškai įkeltą modulio kodą, kad būtų galima naudoti Xposed API, tai gali pažeisti kai kuriuos modulius, bet naudinga saugumui</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- Module Repo -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_readme">Readme</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_releases">Leidiniai</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_information">Informacija</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_information_homepage">Pradžia</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_information_source_url">Šaltinio kodas</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_information_collaborators">Bendradarbiai</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_release_view_assets">Turtas</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_open_in_browser">Atidaryti naršyklėje</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_release_load_more">Rodyti senesnes versijas</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_release_no_more">Jokio išleidimo</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="repo_load_failed">Nepavyko įkelti modulio atramos: %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_upgradable_first">Pirmiausia atnaujinamas</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="installed">Įdiegta</string>
+[bot][lsposed][lsposed@lsposed.org]    <plurals name="module_release_assets_download_count">
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="one">%d atsisiųsti</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="few">%d Parsisiųsti</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="many">%d Parsisiųsti</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="other">%d Parsisiųsti</item>
+[bot][lsposed][lsposed@lsposed.org]    </plurals>
+[bot][lsposed][lsposed@lsposed.org]    <!-- Colors -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_sakura">Sakura</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_red">Raudona</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_pink">Rožinis</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_purple">Violetinė</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_deep_purple">Tamsiai violetinė</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_indigo">Indigo</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_blue">Mėlyna</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_light_blue">Šviesiai mėlyna</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_cyan">Cyan</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_teal">Teal</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_green">Žalioji</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_light_green">Šviesiai žalia</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_lime">Lime</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_yellow">Geltona</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_amber">Amber</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_orange">Oranžinė</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_deep_orange">Tamsiai oranžinė</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_brown">Ruda</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_blue_grey">Mėlyna pilka</string>
+[bot][lsposed][lsposed@lsposed.org]</resources>

@@ -1,0 +1,78 @@
+[external][shana][shana@zju.edu.cn]/*
+[external][shana][shana@zju.edu.cn] * This file is part of LSPosed.
+[external][shana][shana@zju.edu.cn] *
+[external][shana][shana@zju.edu.cn] * LSPosed is free software: you can redistribute it and/or modify
+[external][shana][shana@zju.edu.cn] * it under the terms of the GNU General Public License as published by
+[external][shana][shana@zju.edu.cn] * the Free Software Foundation, either version 3 of the License, or
+[external][shana][shana@zju.edu.cn] * (at your option) any later version.
+[external][shana][shana@zju.edu.cn] *
+[external][shana][shana@zju.edu.cn] * LSPosed is distributed in the hope that it will be useful,
+[external][shana][shana@zju.edu.cn] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][shana][shana@zju.edu.cn] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][shana][shana@zju.edu.cn] * GNU General Public License for more details.
+[external][shana][shana@zju.edu.cn] *
+[external][shana][shana@zju.edu.cn] * You should have received a copy of the GNU General Public License
+[external][shana][shana@zju.edu.cn] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][shana][shana@zju.edu.cn] *
+[external][admin][admin@0x.mk] * Copyright (C) 2021 - 2022 LSPosed Contributors
+[external][shana][shana@zju.edu.cn] */
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]#include <sys/socket.h>
+[external][shana][shana@zju.edu.cn]#include <fcntl.h>
+[internal][vvb2060][vvb2060@gmail.com]#include <dlfcn.h>
+[external][admin][admin@0x.mk]#include <sys/mman.h>
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]#include "zygisk.h"
+[external][shana][shana@zju.edu.cn]#include "logging.h"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#include "loader.h"
+[external][shana][shana@zju.edu.cn]#include "config_impl.h"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#include "magisk_loader.h"
+[external][shana][shana@zju.edu.cn]#include "symbol_cache.h"
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]namespace lspd {
+[external][shana][shana@zju.edu.cn]    int allow_unload = 0;
+[external][shana][shana@zju.edu.cn]    int *allowUnload = &allow_unload;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    class ZygiskModule : public zygisk::ModuleBase {
+[external][shana][shana@zju.edu.cn]        JNIEnv *env_;
+[external][shana][shana@zju.edu.cn]        zygisk::Api *api_;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        void onLoad(zygisk::Api *api, JNIEnv *env) override {
+[external][shana][shana@zju.edu.cn]            env_ = env;
+[external][shana][shana@zju.edu.cn]            api_ = api;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            MagiskLoader::Init();
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]            ConfigImpl::Init();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        void preAppSpecialize(zygisk::AppSpecializeArgs *args) override {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            MagiskLoader::GetInstance()->OnNativeForkAndSpecializePre(
+[external][shana][shana@zju.edu.cn]                    env_, args->uid, args->gids, args->nice_name,
+[external][shana][shana@zju.edu.cn]                    args->is_child_zygote ? *args->is_child_zygote : false, args->app_data_dir);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        void postAppSpecialize(const zygisk::AppSpecializeArgs *args) override {
+[external][shana][shana@zju.edu.cn]            MagiskLoader::GetInstance()->OnNativeForkAndSpecializePost(env_, args->nice_name, args->app_data_dir);
+[external][shana][shana@zju.edu.cn]            if (*allowUnload) api_->setOption(zygisk::DLCLOSE_MODULE_LIBRARY);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        void preServerSpecialize([[maybe_unused]] zygisk::ServerSpecializeArgs *args) override {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            MagiskLoader::GetInstance()->OnNativeForkSystemServerPre(env_);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        void postServerSpecialize([[maybe_unused]] const zygisk::ServerSpecializeArgs *args) override {
+[external][shana][shana@zju.edu.cn]            if (__system_property_find("ro.vendor.product.ztename")) {
+[external][shana][shana@zju.edu.cn]                auto *process = env_->FindClass("android/os/Process");
+[external][shana][shana@zju.edu.cn]                auto *set_argv0 = env_->GetStaticMethodID(process, "setArgV0",
+[external][shana][shana@zju.edu.cn]                                                          "(Ljava/lang/String;)V");
+[external][shana][shana@zju.edu.cn]                auto *name = env_->NewStringUTF("system_server");
+[external][shana][shana@zju.edu.cn]                env_->CallStaticVoidMethod(process, set_argv0, name);
+[external][shana][shana@zju.edu.cn]                env_->DeleteLocalRef(name);
+[external][shana][shana@zju.edu.cn]                env_->DeleteLocalRef(process);
+[external][shana][shana@zju.edu.cn]            }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            MagiskLoader::GetInstance()->OnNativeForkSystemServerPost(env_);
+[external][shana][shana@zju.edu.cn]            if (*allowUnload) api_->setOption(zygisk::DLCLOSE_MODULE_LIBRARY);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    };
+[external][shana][shana@zju.edu.cn]} //namespace lspd
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]REGISTER_ZYGISK_MODULE(lspd::ZygiskModule);

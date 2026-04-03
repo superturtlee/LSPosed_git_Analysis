@@ -1,0 +1,24 @@
+[external][hsushulong][hsushulong@gmail.com]package xposed.dummy;
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]import android.content.res.Resources;
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]/**
+[external][hsushulong][hsushulong@gmail.com] * This class is used as super class of XResources.
+[external][hsushulong][hsushulong@gmail.com] *
+[external][hsushulong][hsushulong@gmail.com] * This implementation isn't included in the .dex file. Instead, it's created on the device.
+[external][hsushulong][hsushulong@gmail.com] * Usually, it will extend Resources, but some ROMs use their own Resources subclass.
+[external][hsushulong][hsushulong@gmail.com] * In that case, XResourcesSuperClass will extend the ROM's subclass in an attempt to increase
+[external][hsushulong][hsushulong@gmail.com] * compatibility.
+[external][hsushulong][hsushulong@gmail.com] */
+[external][hsushulong][hsushulong@gmail.com]public class XResourcesSuperClass extends Resources {
+[external][hsushulong][hsushulong@gmail.com]	/** Dummy, will never be called (objects are transferred to this class only). */
+[external][hsushulong][hsushulong@gmail.com]	protected XResourcesSuperClass() {
+[external][hsushulong][hsushulong@gmail.com]		super(null, null, null);
+[external][hsushulong][hsushulong@gmail.com]		throw new UnsupportedOperationException();
+[external][hsushulong][hsushulong@gmail.com]	}
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]	protected XResourcesSuperClass(ClassLoader classLoader) {
+[external][hsushulong][hsushulong@gmail.com]		super(classLoader);
+[external][hsushulong][hsushulong@gmail.com]		throw new UnsupportedOperationException();
+[external][hsushulong][hsushulong@gmail.com]	}
+[external][hsushulong][hsushulong@gmail.com]}

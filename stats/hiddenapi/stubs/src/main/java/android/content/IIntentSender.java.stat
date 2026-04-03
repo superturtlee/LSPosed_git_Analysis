@@ -1,0 +1,34 @@
+[external][shana][shana@zju.edu.cn]package android.content;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import android.os.Binder;
+[external][shana][shana@zju.edu.cn]import android.os.Bundle;
+[external][shana][shana@zju.edu.cn]import android.os.IBinder;
+[external][shana][shana@zju.edu.cn]import android.os.IInterface;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import androidx.annotation.RequiresApi;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public interface IIntentSender extends IInterface {
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    int send(int code, Intent intent, String resolvedType,
+[external][shana][shana@zju.edu.cn]             IIntentReceiver finishedReceiver, String requiredPermission, Bundle options);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @RequiresApi(26)
+[external][shana][shana@zju.edu.cn]    void send(int code, Intent intent, String resolvedType, IBinder whitelistToken,
+[external][shana][shana@zju.edu.cn]              IIntentReceiver finishedReceiver, String requiredPermission, Bundle options);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    abstract class Stub extends Binder implements IIntentSender {
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        public Stub() {
+[external][shana][shana@zju.edu.cn]            throw new UnsupportedOperationException();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public android.os.IBinder asBinder() {
+[external][shana][shana@zju.edu.cn]            throw new UnsupportedOperationException();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        public static IIntentSender asInterface(IBinder binder) {
+[external][shana][shana@zju.edu.cn]            throw new UnsupportedOperationException();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

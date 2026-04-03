@@ -1,0 +1,142 @@
+[internal][vvb2060][vvb2060@gmail.com]/*
+[internal][vvb2060][vvb2060@gmail.com] * Copyright 2020 Google LLC
+[internal][vvb2060][vvb2060@gmail.com] *
+[internal][vvb2060][vvb2060@gmail.com] * Licensed under the Apache License, Version 2.0 (the "License");
+[internal][vvb2060][vvb2060@gmail.com] * you may not use this file except in compliance with the License.
+[internal][vvb2060][vvb2060@gmail.com] * You may obtain a copy of the License at
+[internal][vvb2060][vvb2060@gmail.com] *
+[internal][vvb2060][vvb2060@gmail.com] *     https://www.apache.org/licenses/LICENSE-2.0
+[internal][vvb2060][vvb2060@gmail.com] *
+[internal][vvb2060][vvb2060@gmail.com] * Unless required by applicable law or agreed to in writing, software
+[internal][vvb2060][vvb2060@gmail.com] * distributed under the License is distributed on an "AS IS" BASIS,
+[internal][vvb2060][vvb2060@gmail.com] * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+[internal][vvb2060][vvb2060@gmail.com] * See the License for the specific language governing permissions and
+[internal][vvb2060][vvb2060@gmail.com] * limitations under the License.
+[internal][vvb2060][vvb2060@gmail.com] */
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.manager.util;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import android.content.Context;
+[internal][vvb2060][vvb2060@gmail.com]import android.content.pm.ApplicationInfo;
+[internal][vvb2060][vvb2060@gmail.com]import android.content.pm.PackageInfo;
+[internal][vvb2060][vvb2060@gmail.com]import android.graphics.Bitmap;
+[internal][vvb2060][vvb2060@gmail.com]import android.os.Build;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import androidx.annotation.NonNull;
+[internal][vvb2060][vvb2060@gmail.com]import androidx.annotation.Nullable;
+[internal][vvb2060][vvb2060@gmail.com]import androidx.annotation.Px;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import com.bumptech.glide.Priority;
+[internal][vvb2060][vvb2060@gmail.com]import com.bumptech.glide.load.DataSource;
+[internal][vvb2060][vvb2060@gmail.com]import com.bumptech.glide.load.Options;
+[internal][vvb2060][vvb2060@gmail.com]import com.bumptech.glide.load.data.DataFetcher;
+[internal][vvb2060][vvb2060@gmail.com]import com.bumptech.glide.load.model.ModelLoader;
+[internal][vvb2060][vvb2060@gmail.com]import com.bumptech.glide.load.model.ModelLoaderFactory;
+[internal][vvb2060][vvb2060@gmail.com]import com.bumptech.glide.load.model.MultiModelLoaderFactory;
+[internal][vvb2060][vvb2060@gmail.com]import com.bumptech.glide.signature.ObjectKey;
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]import org.lsposed.manager.App;
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]import me.zhanghai.android.appiconloader.AppIconLoader;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]public class AppIconModelLoader implements ModelLoader<PackageInfo, Bitmap> {
+[internal][vvb2060][vvb2060@gmail.com]    @NonNull
+[internal][vvb2060][vvb2060@gmail.com]    private final AppIconLoader mLoader;
+[internal][vvb2060][vvb2060@gmail.com]    @NonNull
+[internal][vvb2060][vvb2060@gmail.com]    private final Context mContext;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    private AppIconModelLoader(@Px int iconSize, boolean shrinkNonAdaptiveIcons,
+[internal][vvb2060][vvb2060@gmail.com]                               @NonNull Context context) {
+[internal][vvb2060][vvb2060@gmail.com]        mLoader = new AppIconLoader(iconSize, shrinkNonAdaptiveIcons, context);
+[internal][vvb2060][vvb2060@gmail.com]        mContext = context;
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    @Override
+[internal][vvb2060][vvb2060@gmail.com]    public boolean handles(@NonNull PackageInfo model) {
+[internal][vvb2060][vvb2060@gmail.com]        return true;
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    @Nullable
+[internal][vvb2060][vvb2060@gmail.com]    @Override
+[internal][vvb2060][vvb2060@gmail.com]    public LoadData<Bitmap> buildLoadData(@NonNull PackageInfo model, int width, int height,
+[internal][vvb2060][vvb2060@gmail.com]                                          @NonNull Options options) {
+[internal][vvb2060][vvb2060@gmail.com]        var warpApplicationInfo = new ApplicationInfo(model.applicationInfo);
+[external][shana][shana@zju.edu.cn]        warpApplicationInfo.uid = warpApplicationInfo.uid % App.PER_USER_RANGE;
+[internal][vvb2060][vvb2060@gmail.com]        var warpPackageInfo = new PackageInfo();
+[internal][vvb2060][vvb2060@gmail.com]        warpPackageInfo.applicationInfo = warpApplicationInfo;
+[internal][vvb2060][vvb2060@gmail.com]        warpPackageInfo.versionCode = model.versionCode;
+[internal][vvb2060][vvb2060@gmail.com]        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+[internal][vvb2060][vvb2060@gmail.com]            warpPackageInfo.setLongVersionCode(model.getLongVersionCode());
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]        return new LoadData<>(new ObjectKey(AppIconLoader.getIconKey(warpPackageInfo, mContext)),
+[internal][vvb2060][vvb2060@gmail.com]                new Fetcher(mLoader, warpApplicationInfo));
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    private static class Fetcher implements DataFetcher<Bitmap> {
+[internal][vvb2060][vvb2060@gmail.com]        @NonNull
+[internal][vvb2060][vvb2060@gmail.com]        private final AppIconLoader mLoader;
+[internal][vvb2060][vvb2060@gmail.com]        @NonNull
+[internal][vvb2060][vvb2060@gmail.com]        private final ApplicationInfo mApplicationInfo;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]        public Fetcher(@NonNull AppIconLoader loader, @NonNull ApplicationInfo applicationInfo) {
+[internal][vvb2060][vvb2060@gmail.com]            mLoader = loader;
+[internal][vvb2060][vvb2060@gmail.com]            mApplicationInfo = applicationInfo;
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]        @Override
+[internal][vvb2060][vvb2060@gmail.com]        public void loadData(@NonNull Priority priority,
+[internal][vvb2060][vvb2060@gmail.com]                             @NonNull DataCallback<? super Bitmap> callback) {
+[internal][vvb2060][vvb2060@gmail.com]            try {
+[internal][vvb2060][vvb2060@gmail.com]                Bitmap icon = mLoader.loadIcon(mApplicationInfo);
+[internal][vvb2060][vvb2060@gmail.com]                callback.onDataReady(icon);
+[internal][vvb2060][vvb2060@gmail.com]            } catch (Exception e) {
+[internal][vvb2060][vvb2060@gmail.com]                callback.onLoadFailed(e);
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]        @Override
+[internal][vvb2060][vvb2060@gmail.com]        public void cleanup() {
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]        @Override
+[internal][vvb2060][vvb2060@gmail.com]        public void cancel() {
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]        @NonNull
+[internal][vvb2060][vvb2060@gmail.com]        @Override
+[internal][vvb2060][vvb2060@gmail.com]        public Class<Bitmap> getDataClass() {
+[internal][vvb2060][vvb2060@gmail.com]            return Bitmap.class;
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]        @NonNull
+[internal][vvb2060][vvb2060@gmail.com]        @Override
+[internal][vvb2060][vvb2060@gmail.com]        public DataSource getDataSource() {
+[internal][vvb2060][vvb2060@gmail.com]            return DataSource.LOCAL;
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    public static class Factory implements ModelLoaderFactory<PackageInfo, Bitmap> {
+[internal][vvb2060][vvb2060@gmail.com]        @Px
+[internal][vvb2060][vvb2060@gmail.com]        private final int mIconSize;
+[internal][vvb2060][vvb2060@gmail.com]        private final boolean mShrinkNonAdaptiveIcons;
+[internal][vvb2060][vvb2060@gmail.com]        @NonNull
+[internal][vvb2060][vvb2060@gmail.com]        private final Context mContext;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]        public Factory(@Px int iconSize, boolean shrinkNonAdaptiveIcons, @NonNull Context context) {
+[internal][vvb2060][vvb2060@gmail.com]            mIconSize = iconSize;
+[internal][vvb2060][vvb2060@gmail.com]            mShrinkNonAdaptiveIcons = shrinkNonAdaptiveIcons;
+[internal][vvb2060][vvb2060@gmail.com]            mContext = context.getApplicationContext();
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]        @NonNull
+[internal][vvb2060][vvb2060@gmail.com]        @Override
+[internal][vvb2060][vvb2060@gmail.com]        public ModelLoader<PackageInfo, Bitmap> build(
+[internal][vvb2060][vvb2060@gmail.com]                @NonNull MultiModelLoaderFactory multiFactory) {
+[internal][vvb2060][vvb2060@gmail.com]            return new AppIconModelLoader(mIconSize, mShrinkNonAdaptiveIcons, mContext);
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]        @Override
+[internal][vvb2060][vvb2060@gmail.com]        public void teardown() {
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]}

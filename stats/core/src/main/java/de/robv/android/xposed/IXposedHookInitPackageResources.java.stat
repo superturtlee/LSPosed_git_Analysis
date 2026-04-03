@@ -1,0 +1,36 @@
+[external][admin][admin@0x.mk]package de.robv.android.xposed;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]import android.content.res.XResources;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]import de.robv.android.xposed.callbacks.XC_InitPackageResources;
+[external][admin][admin@0x.mk]import de.robv.android.xposed.callbacks.XC_InitPackageResources.InitPackageResourcesParam;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]/**
+[external][admin][admin@0x.mk] * Get notified when the resources for an app are initialized.
+[external][admin][admin@0x.mk] * In {@link #handleInitPackageResources}, resource replacements can be created.
+[external][admin][admin@0x.mk] *
+[external][admin][admin@0x.mk] * <p>This interface should be implemented by the module's main class. Xposed will take care of
+[external][admin][admin@0x.mk] * registering it as a callback automatically.
+[external][admin][admin@0x.mk] */
+[external][admin][admin@0x.mk]public interface IXposedHookInitPackageResources extends IXposedMod {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * This method is called when resources for an app are being initialized.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Modules can call special methods of the {@link XResources} class in order to replace resources.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param resparam Information about the resources.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @throws Throwable Everything the callback throws is caught and logged.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    void handleInitPackageResources(InitPackageResourcesParam resparam) throws Throwable;
+[external][admin][admin@0x.mk]
+[external][shana][shana@zju.edu.cn]    /** @hide */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    final class Wrapper extends XC_InitPackageResources {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        private final IXposedHookInitPackageResources instance;
+[external][shana][shana@zju.edu.cn]        public Wrapper(IXposedHookInitPackageResources instance) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            this.instance = instance;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public void handleInitPackageResources(InitPackageResourcesParam resparam) throws Throwable {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            instance.handleInitPackageResources(resparam);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][admin][admin@0x.mk]}

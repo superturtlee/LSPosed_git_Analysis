@@ -1,0 +1,8 @@
+[external][shana][shana@zju.edu.cn]package com.android.server;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public class LocalServices {
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static <T> T getService(Class<T> type) {
+[external][shana][shana@zju.edu.cn]        throw new UnsupportedOperationException("STUB");
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

@@ -1,0 +1,91 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * <!--This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors-->
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]package org.lsposed.manager.ui.widget;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.content.Context;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.graphics.Canvas;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.graphics.Paint;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.text.Layout;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.text.StaticLayout;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.text.TextPaint;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.util.AttributeSet;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.util.DisplayMetrics;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import androidx.annotation.Nullable;
+[external][shana][shana@zju.edu.cn]import androidx.recyclerview.widget.ConcatAdapter;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.manager.R;
+[external][shana][shana@zju.edu.cn]import org.lsposed.manager.util.SimpleStatefulAdaptor;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import rikka.core.util.ResourceUtils;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]public class EmptyStateRecyclerView extends StatefulRecyclerView {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private final TextPaint paint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private final String emptyText;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public EmptyStateRecyclerView(Context context) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        this(context, null);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public EmptyStateRecyclerView(Context context, @Nullable AttributeSet attrs) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        this(context, attrs, 0);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public EmptyStateRecyclerView(Context context, @Nullable AttributeSet attrs, int defStyle) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        super(context, attrs, defStyle);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        DisplayMetrics dm = context.getResources().getDisplayMetrics();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        paint.setColor(ResourceUtils.resolveColor(context.getTheme(), android.R.attr.textColorSecondary));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        paint.setTextSize(16f * dm.scaledDensity);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        emptyText = context.getString(R.string.list_empty);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    protected void dispatchDraw(Canvas canvas) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        super.dispatchDraw(canvas);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        var adapter = getAdapter();
+[external][shana][shana@zju.edu.cn]        if (adapter instanceof ConcatAdapter) {
+[external][shana][shana@zju.edu.cn]            for (var a : ((ConcatAdapter) adapter).getAdapters()) {
+[external][shana][shana@zju.edu.cn]                if (a instanceof EmptyStateAdapter) {
+[external][shana][shana@zju.edu.cn]                    adapter = a;
+[external][shana][shana@zju.edu.cn]                    break;
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        if (adapter instanceof EmptyStateAdapter && ((EmptyStateAdapter<?>) adapter).isLoaded() && adapter.getItemCount() == 0) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            final int width = getMeasuredWidth() - getPaddingLeft() - getPaddingRight();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            final int height = getMeasuredHeight() - getPaddingTop() - getPaddingBottom();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            var textLayout = new StaticLayout(emptyText, paint, width, Layout.Alignment.ALIGN_CENTER, 1.0f, 0.0f, false);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            canvas.save();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            canvas.translate(getPaddingLeft(), (height >> 1) + getPaddingTop() - (textLayout.getHeight() >> 1));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            textLayout.draw(canvas);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            canvas.restore();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    public abstract static class EmptyStateAdapter<T extends ViewHolder> extends SimpleStatefulAdaptor<T> {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        abstract public boolean isLoaded();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]}

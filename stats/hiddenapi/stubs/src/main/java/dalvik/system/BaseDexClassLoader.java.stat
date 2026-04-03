@@ -1,0 +1,17 @@
+[external][hsushulong][hsushulong@gmail.com]package dalvik.system;
+[external][hsushulong][hsushulong@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import java.nio.ByteBuffer;
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]public class BaseDexClassLoader extends ClassLoader {
+[internal][vvb2060][vvb2060@gmail.com]    public BaseDexClassLoader(ByteBuffer[] dexFiles, ClassLoader parent) {
+[internal][vvb2060][vvb2060@gmail.com]        throw new RuntimeException("Stub!");
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    public BaseDexClassLoader(ByteBuffer[] dexFiles, String librarySearchPath, ClassLoader parent) {
+[internal][vvb2060][vvb2060@gmail.com]        throw new RuntimeException("Stub!");
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    public String getLdLibraryPath() {
+[external][hsushulong][hsushulong@gmail.com]        throw new RuntimeException("Stub!");
+[external][hsushulong][hsushulong@gmail.com]    }
+[external][hsushulong][hsushulong@gmail.com]}

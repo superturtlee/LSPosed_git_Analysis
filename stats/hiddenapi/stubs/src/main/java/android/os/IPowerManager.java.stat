@@ -1,0 +1,12 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]package android.os;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]public interface IPowerManager extends IInterface {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    void reboot(boolean confirm, String reason, boolean wait) throws RemoteException;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    abstract class Stub extends Binder implements IPowerManager {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public static IPowerManager asInterface(IBinder obj) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new UnsupportedOperationException();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]}

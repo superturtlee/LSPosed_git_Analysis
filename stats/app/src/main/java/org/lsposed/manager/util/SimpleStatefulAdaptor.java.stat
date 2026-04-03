@@ -1,0 +1,105 @@
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]/*
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * This file is part of LSPosed.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] *
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * (at your option) any later version.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] *
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * GNU General Public License for more details.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] *
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] *
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * Copyright (C) 2022 LSPosed Contributors
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] */
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]package org.lsposed.manager.util;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import android.os.Bundle;
+[external][shana][shana@zju.edu.cn]import android.os.Parcelable;
+[external][shana][shana@zju.edu.cn]import android.util.SparseArray;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import androidx.annotation.CallSuper;
+[external][shana][shana@zju.edu.cn]import androidx.annotation.NonNull;
+[external][shana][shana@zju.edu.cn]import androidx.recyclerview.widget.RecyclerView;
+[external][shana][shana@zju.edu.cn]import androidx.viewpager2.adapter.StatefulAdapter;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import java.util.HashMap;
+[external][shana][shana@zju.edu.cn]import java.util.List;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public abstract class SimpleStatefulAdaptor<T extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<T> implements StatefulAdapter {
+[external][shana][shana@zju.edu.cn]    HashMap<Long, SparseArray<Parcelable>> states = new HashMap<>();
+[external][shana][shana@zju.edu.cn]    protected RecyclerView rv = null;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public SimpleStatefulAdaptor() {
+[external][shana][shana@zju.edu.cn]        setStateRestorationPolicy(StateRestorationPolicy.PREVENT_WHEN_EMPTY);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    @CallSuper
+[external][shana][shana@zju.edu.cn]    public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
+[external][shana][shana@zju.edu.cn]        rv = recyclerView;
+[external][shana][shana@zju.edu.cn]        super.onAttachedToRecyclerView(recyclerView);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public void onViewRecycled(@NonNull T holder) {
+[external][shana][shana@zju.edu.cn]        saveStateOf(holder);
+[external][shana][shana@zju.edu.cn]        super.onViewRecycled(holder);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    @CallSuper
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public final void onBindViewHolder(@NonNull T holder, int position, @NonNull List<Object> payloads) {
+[external][shana][shana@zju.edu.cn]        var state = states.remove(holder.getItemId());
+[external][shana][shana@zju.edu.cn]        if (state != null) {
+[external][shana][shana@zju.edu.cn]            holder.itemView.restoreHierarchyState(state);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        onBindViewHolder(holder, position);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private void saveStateOf(@NonNull RecyclerView.ViewHolder holder) {
+[external][shana][shana@zju.edu.cn]        var state = new SparseArray<Parcelable>();
+[external][shana][shana@zju.edu.cn]        holder.itemView.saveHierarchyState(state);
+[external][shana][shana@zju.edu.cn]        states.put(holder.getItemId(), state);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @NonNull
+[external][shana][shana@zju.edu.cn]    public Parcelable saveState() {
+[external][shana][shana@zju.edu.cn]        for (int childCount = rv.getChildCount(), i = 0; i < childCount; ++i) {
+[external][shana][shana@zju.edu.cn]            saveStateOf(rv.getChildViewHolder(rv.getChildAt(i)));
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        var out = new Bundle();
+[external][shana][shana@zju.edu.cn]        for (var state : states.entrySet()) {
+[external][shana][shana@zju.edu.cn]            var item = new Bundle();
+[external][shana][shana@zju.edu.cn]            for (int i = 0; i < state.getValue().size(); ++i) {
+[external][shana][shana@zju.edu.cn]                item.putParcelable(String.valueOf(state.getValue().keyAt(i)), state.getValue().valueAt(i));
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            out.putParcelable(String.valueOf(state.getKey()), item);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return out;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public void restoreState(@NonNull Parcelable savedState) {
+[external][shana][shana@zju.edu.cn]        if (savedState instanceof Bundle) {
+[external][shana][shana@zju.edu.cn]            for (var stateKey : ((Bundle) savedState).keySet()) {
+[external][shana][shana@zju.edu.cn]                var array = new SparseArray<Parcelable>();
+[external][shana][shana@zju.edu.cn]                var state = ((Bundle) savedState).getParcelable(stateKey);
+[external][shana][shana@zju.edu.cn]                if (state instanceof Bundle) {
+[external][shana][shana@zju.edu.cn]                    for (var itemKey : ((Bundle) state).keySet()) {
+[external][shana][shana@zju.edu.cn]                        var item = ((Bundle) state).getParcelable(itemKey);
+[external][shana][shana@zju.edu.cn]                        array.put(Integer.parseInt(itemKey), item);
+[external][shana][shana@zju.edu.cn]                    }
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]                states.put(Long.parseLong(stateKey), array);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]}

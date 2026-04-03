@@ -1,0 +1,219 @@
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]/*
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * This file is part of LSPosed.
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] *
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * (at your option) any later version.
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] *
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * GNU General Public License for more details.
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] *
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] *
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * Copyright (C) 2022 LSPosed Contributors
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] */
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]package org.lsposed.lspd.service;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import static org.lsposed.lspd.ILSPManagerService.DEX2OAT_CRASHED;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import static org.lsposed.lspd.ILSPManagerService.DEX2OAT_MOUNT_FAILED;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import static org.lsposed.lspd.ILSPManagerService.DEX2OAT_OK;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import static org.lsposed.lspd.ILSPManagerService.DEX2OAT_SELINUX_PERMISSIVE;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import static org.lsposed.lspd.ILSPManagerService.DEX2OAT_SEPOLICY_INCORRECT;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import android.net.LocalServerSocket;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import android.os.Build;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import android.os.FileObserver;
+[external][rawer886][rawer886@qq.com]import android.os.Process;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import android.os.SELinux;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import android.system.ErrnoException;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import android.system.Os;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import android.system.OsConstants;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import android.util.Log;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import androidx.annotation.Nullable;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import androidx.annotation.RequiresApi;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]import java.io.File;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import java.io.FileDescriptor;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import java.io.IOException;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import java.nio.file.Files;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import java.nio.file.Paths;
+[internal][vvb2060][vvb2060@gmail.com]import java.util.ArrayList;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]@RequiresApi(Build.VERSION_CODES.Q)
+[internal][vvb2060][vvb2060@gmail.com]public class Dex2OatService implements Runnable {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    private static final String TAG = "LSPosedDex2Oat";
+[internal][vvb2060][vvb2060@gmail.com]    private static final String WRAPPER32 = "bin/dex2oat32";
+[internal][vvb2060][vvb2060@gmail.com]    private static final String WRAPPER64 = "bin/dex2oat64";
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]    private final String[] dex2oatArray = new String[4];
+[internal][vvb2060][vvb2060@gmail.com]    private final FileDescriptor[] fdArray = new FileDescriptor[4];
+[internal][vvb2060][vvb2060@gmail.com]    private final FileObserver selinuxObserver;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    private int compatibility = DEX2OAT_OK;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]    private void openDex2oat(int id, String path) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        try {
+[internal][vvb2060][vvb2060@gmail.com]            var fd = Os.open(path, OsConstants.O_RDONLY, 0);
+[internal][vvb2060][vvb2060@gmail.com]            dex2oatArray[id] = path;
+[internal][vvb2060][vvb2060@gmail.com]            fdArray[id] = fd;
+[internal][vvb2060][vvb2060@gmail.com]        } catch (ErrnoException ignored) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        }
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]    public Dex2OatService() {
+[internal][vvb2060][vvb2060@gmail.com]        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
+[external][rawer886][rawer886@qq.com]            openDex2oat(Process.is64Bit() ? 2 : 0, "/apex/com.android.runtime/bin/dex2oat");
+[external][rawer886][rawer886@qq.com]            openDex2oat(Process.is64Bit() ? 3 : 1, "/apex/com.android.runtime/bin/dex2oatd");
+[internal][vvb2060][vvb2060@gmail.com]        } else {
+[internal][vvb2060][vvb2060@gmail.com]            openDex2oat(0, "/apex/com.android.art/bin/dex2oat32");
+[internal][vvb2060][vvb2060@gmail.com]            openDex2oat(1, "/apex/com.android.art/bin/dex2oatd32");
+[internal][vvb2060][vvb2060@gmail.com]            openDex2oat(2, "/apex/com.android.art/bin/dex2oat64");
+[internal][vvb2060][vvb2060@gmail.com]            openDex2oat(3, "/apex/com.android.art/bin/dex2oatd64");
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]        var enforce = Paths.get("/sys/fs/selinux/enforce");
+[internal][vvb2060][vvb2060@gmail.com]        var policy = Paths.get("/sys/fs/selinux/policy");
+[internal][vvb2060][vvb2060@gmail.com]        var list = new ArrayList<File>();
+[internal][vvb2060][vvb2060@gmail.com]        list.add(enforce.toFile());
+[internal][vvb2060][vvb2060@gmail.com]        list.add(policy.toFile());
+[internal][vvb2060][vvb2060@gmail.com]        selinuxObserver = new FileObserver(list, FileObserver.CLOSE_WRITE) {
+[internal][vvb2060][vvb2060@gmail.com]            @Override
+[internal][vvb2060][vvb2060@gmail.com]            public synchronized void onEvent(int i, @Nullable String s) {
+[internal][vvb2060][vvb2060@gmail.com]                Log.d(TAG, "SELinux status changed");
+[internal][vvb2060][vvb2060@gmail.com]                if (compatibility == DEX2OAT_CRASHED) {
+[internal][vvb2060][vvb2060@gmail.com]                    stopWatching();
+[internal][vvb2060][vvb2060@gmail.com]                    return;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]                boolean enforcing = false;
+[internal][vvb2060][vvb2060@gmail.com]                try (var is = Files.newInputStream(enforce)) {
+[internal][vvb2060][vvb2060@gmail.com]                    enforcing = is.read() == '1';
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                } catch (IOException ignored) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]                if (!enforcing) {
+[internal][vvb2060][vvb2060@gmail.com]                    if (compatibility == DEX2OAT_OK) doMount(false);
+[internal][vvb2060][vvb2060@gmail.com]                    compatibility = DEX2OAT_SELINUX_PERMISSIVE;
+[internal][vvb2060][vvb2060@gmail.com]                } else if (SELinux.checkSELinuxAccess("u:r:untrusted_app:s0",
+[internal][vvb2060][vvb2060@gmail.com]                        "u:object_r:dex2oat_exec:s0", "file", "execute")
+[internal][vvb2060][vvb2060@gmail.com]                        || SELinux.checkSELinuxAccess("u:r:untrusted_app:s0",
+[internal][vvb2060][vvb2060@gmail.com]                        "u:object_r:dex2oat_exec:s0", "file", "execute_no_trans")) {
+[internal][vvb2060][vvb2060@gmail.com]                    if (compatibility == DEX2OAT_OK) doMount(false);
+[internal][vvb2060][vvb2060@gmail.com]                    compatibility = DEX2OAT_SEPOLICY_INCORRECT;
+[internal][vvb2060][vvb2060@gmail.com]                } else if (compatibility != DEX2OAT_OK) {
+[internal][vvb2060][vvb2060@gmail.com]                    doMount(true);
+[internal][vvb2060][vvb2060@gmail.com]                    if (notMounted()) {
+[internal][vvb2060][vvb2060@gmail.com]                        doMount(false);
+[internal][vvb2060][vvb2060@gmail.com]                        compatibility = DEX2OAT_MOUNT_FAILED;
+[internal][vvb2060][vvb2060@gmail.com]                        stopWatching();
+[internal][vvb2060][vvb2060@gmail.com]                    } else {
+[internal][vvb2060][vvb2060@gmail.com]                        compatibility = DEX2OAT_OK;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                    }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]            @Override
+[internal][vvb2060][vvb2060@gmail.com]            public void stopWatching() {
+[internal][vvb2060][vvb2060@gmail.com]                super.stopWatching();
+[internal][vvb2060][vvb2060@gmail.com]                Log.w(TAG, "SELinux observer stopped");
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]        };
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]    private boolean notMounted() {
+[internal][vvb2060][vvb2060@gmail.com]        for (int i = 0; i < dex2oatArray.length; i++) {
+[internal][vvb2060][vvb2060@gmail.com]            var bin = dex2oatArray[i];
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            if (bin == null) continue;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            try {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                var apex = Os.stat("/proc/1/root" + bin);
+[internal][vvb2060][vvb2060@gmail.com]                var wrapper = Os.stat(i < 2 ? WRAPPER32 : WRAPPER64);
+[internal][vvb2060][vvb2060@gmail.com]                if (apex.st_dev != wrapper.st_dev || apex.st_ino != wrapper.st_ino) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                    Log.w(TAG, "Check mount failed for " + bin);
+[internal][vvb2060][vvb2060@gmail.com]                    return true;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            } catch (ErrnoException e) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                Log.e(TAG, "Check mount failed for " + bin, e);
+[internal][vvb2060][vvb2060@gmail.com]                return true;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        Log.d(TAG, "Check mount succeeded");
+[internal][vvb2060][vvb2060@gmail.com]        return false;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]    private void doMount(boolean enabled) {
+[internal][vvb2060][vvb2060@gmail.com]        doMountNative(enabled, dex2oatArray[0], dex2oatArray[1], dex2oatArray[2], dex2oatArray[3]);
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]    public void start() {
+[internal][vvb2060][vvb2060@gmail.com]        if (notMounted()) { // Already mounted when restart daemon
+[internal][vvb2060][vvb2060@gmail.com]            doMount(true);
+[internal][vvb2060][vvb2060@gmail.com]            if (notMounted()) {
+[internal][vvb2060][vvb2060@gmail.com]                doMount(false);
+[internal][vvb2060][vvb2060@gmail.com]                compatibility = DEX2OAT_MOUNT_FAILED;
+[internal][vvb2060][vvb2060@gmail.com]                return;
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]        var thread = new Thread(this);
+[internal][vvb2060][vvb2060@gmail.com]        thread.setName("dex2oat");
+[internal][vvb2060][vvb2060@gmail.com]        thread.start();
+[internal][vvb2060][vvb2060@gmail.com]        selinuxObserver.startWatching();
+[internal][vvb2060][vvb2060@gmail.com]        selinuxObserver.onEvent(0, null);
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]    @Override
+[internal][vvb2060][vvb2060@gmail.com]    public void run() {
+[internal][vvb2060][vvb2060@gmail.com]        Log.i(TAG, "Dex2oat wrapper daemon start");
+[internal][vvb2060][vvb2060@gmail.com]        var sockPath = getSockPath();
+[internal][vvb2060][vvb2060@gmail.com]        Log.d(TAG, "wrapper path: " + sockPath);
+[internal][vvb2060][vvb2060@gmail.com]        var magisk_file = "u:object_r:magisk_file:s0";
+[internal][vvb2060][vvb2060@gmail.com]        var dex2oat_exec = "u:object_r:dex2oat_exec:s0";
+[internal][vvb2060][vvb2060@gmail.com]        if (SELinux.checkSELinuxAccess("u:r:dex2oat:s0", dex2oat_exec,
+[internal][vvb2060][vvb2060@gmail.com]                "file", "execute_no_trans")) {
+[internal][vvb2060][vvb2060@gmail.com]            SELinux.setFileContext(WRAPPER32, dex2oat_exec);
+[internal][vvb2060][vvb2060@gmail.com]            SELinux.setFileContext(WRAPPER64, dex2oat_exec);
+[internal][vvb2060][vvb2060@gmail.com]            setSockCreateContext("u:r:dex2oat:s0");
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        } else {
+[internal][vvb2060][vvb2060@gmail.com]            SELinux.setFileContext(WRAPPER32, magisk_file);
+[internal][vvb2060][vvb2060@gmail.com]            SELinux.setFileContext(WRAPPER64, magisk_file);
+[internal][vvb2060][vvb2060@gmail.com]            setSockCreateContext("u:r:installd:s0");
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        }
+[internal][vvb2060][vvb2060@gmail.com]        try (var server = new LocalServerSocket(sockPath)) {
+[internal][vvb2060][vvb2060@gmail.com]            setSockCreateContext(null);
+[internal][vvb2060][vvb2060@gmail.com]            while (true) {
+[internal][vvb2060][vvb2060@gmail.com]                try (var client = server.accept();
+[internal][vvb2060][vvb2060@gmail.com]                     var is = client.getInputStream();
+[internal][vvb2060][vvb2060@gmail.com]                     var os = client.getOutputStream()) {
+[internal][vvb2060][vvb2060@gmail.com]                    var id = is.read();
+[internal][vvb2060][vvb2060@gmail.com]                    var fd = new FileDescriptor[]{fdArray[id]};
+[internal][vvb2060][vvb2060@gmail.com]                    client.setFileDescriptorsForSend(fd);
+[internal][vvb2060][vvb2060@gmail.com]                    os.write(1);
+[internal][vvb2060][vvb2060@gmail.com]                    Log.d(TAG, "Sent stock fd: is64 = " + ((id & 0b10) != 0) +
+[internal][vvb2060][vvb2060@gmail.com]                            ", isDebug = " + ((id & 0b01) != 0));
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            }
+[internal][vvb2060][vvb2060@gmail.com]        } catch (IOException e) {
+[internal][vvb2060][vvb2060@gmail.com]            Log.e(TAG, "Dex2oat wrapper daemon crashed", e);
+[internal][vvb2060][vvb2060@gmail.com]            if (compatibility == DEX2OAT_OK) {
+[internal][vvb2060][vvb2060@gmail.com]                doMount(false);
+[internal][vvb2060][vvb2060@gmail.com]                compatibility = DEX2OAT_CRASHED;
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    public int getCompatibility() {
+[internal][vvb2060][vvb2060@gmail.com]        return compatibility;
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    private native void doMountNative(boolean enabled,
+[internal][vvb2060][vvb2060@gmail.com]                                      String r32, String d32, String r64, String d64);
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    private static native boolean setSockCreateContext(String context);
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    private native String getSockPath();
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]}

@@ -1,0 +1,35 @@
+[external][shana][shana@zju.edu.cn]package org.lsposed.lspd.hooker;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import android.os.Build;
+[external][shana][shana@zju.edu.cn]
+[external][noreply][noreply@nullptr.icu]import org.lsposed.lspd.impl.LSPosedBridge;
+[external][shana][shana@zju.edu.cn]import org.lsposed.lspd.nativebridge.HookBridge;
+[external][shana][shana@zju.edu.cn]
+[external][noreply][noreply@nullptr.icu]import io.github.libxposed.api.XposedInterface;
+[external][noreply][noreply@nullptr.icu]import io.github.libxposed.api.annotations.AfterInvocation;
+[external][noreply][noreply@nullptr.icu]import io.github.libxposed.api.annotations.XposedHooker;
+[external][shana][shana@zju.edu.cn]
+[external][noreply][noreply@nullptr.icu]@XposedHooker
+[external][noreply][noreply@nullptr.icu]public class OpenDexFileHooker implements XposedInterface.Hooker {
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]    @AfterInvocation
+[external][noreply][noreply@nullptr.icu]    public static void afterHookedMethod(XposedInterface.AfterHookCallback callback) {
+[external][shana][shana@zju.edu.cn]        ClassLoader classLoader = null;
+[external][noreply][noreply@nullptr.icu]        for (var arg : callback.getArgs()) {
+[external][shana][shana@zju.edu.cn]            if (arg instanceof ClassLoader) {
+[external][shana][shana@zju.edu.cn]                classLoader = (ClassLoader) arg;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.P && classLoader == null) {
+[external][noreply][noreply@nullptr.icu]            classLoader = LSPosedBridge.class.getClassLoader();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        while (classLoader != null) {
+[external][noreply][noreply@nullptr.icu]            if (classLoader == LSPosedBridge.class.getClassLoader()) {
+[external][noreply][noreply@nullptr.icu]                HookBridge.setTrusted(callback.getResult());
+[external][shana][shana@zju.edu.cn]                return;
+[external][shana][shana@zju.edu.cn]            } else {
+[external][shana][shana@zju.edu.cn]                classLoader = classLoader.getParent();
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

@@ -1,0 +1,11 @@
+[external][shana][shana@zju.edu.cn]package android.os;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import android.content.pm.UserInfo;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import java.util.List;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public class UserManager {
+[external][shana][shana@zju.edu.cn]    public List<UserInfo> getUsers() {
+[external][shana][shana@zju.edu.cn]        throw new UnsupportedOperationException("STUB");
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

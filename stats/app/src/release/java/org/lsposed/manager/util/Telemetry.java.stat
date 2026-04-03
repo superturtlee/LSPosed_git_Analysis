@@ -1,0 +1,16 @@
+[external][shana][shana@zju.edu.cn]package org.lsposed.manager.util;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import android.app.Application;
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]import java.util.Map;
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]public class Telemetry {
+[internal][vvb2060][vvb2060@gmail.com]    public static void start(Application application) {
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    public static void trackEvent(String name, Map<String, String> properties) {
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    public static void trackError(Throwable throwable, Map<String, String> properties) {
+[internal][vvb2060][vvb2060@gmail.com]    }
+[external][shana][shana@zju.edu.cn]}

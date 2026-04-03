@@ -1,0 +1,136 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.lspd.util;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]import java.io.ByteArrayOutputStream;
+[external][admin][admin@0x.mk]import java.io.File;
+[external][admin][admin@0x.mk]import java.io.IOException;
+[external][admin][admin@0x.mk]import java.io.InputStream;
+[external][admin][admin@0x.mk]import java.util.HashMap;
+[external][admin][admin@0x.mk]import java.util.Map;
+[external][admin][admin@0x.mk]import java.util.jar.JarFile;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]import pxb.android.axml.AxmlReader;
+[external][admin][admin@0x.mk]import pxb.android.axml.AxmlVisitor;
+[external][admin][admin@0x.mk]import pxb.android.axml.NodeVisitor;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]public class MetaDataReader {
+[external][admin][admin@0x.mk]    private final HashMap<String, Object> metaData = new HashMap<>();
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    public static Map<String, Object> getMetaData(File apk) throws IOException {
+[external][admin][admin@0x.mk]        return new MetaDataReader(apk).metaData;
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    private MetaDataReader(File apk) throws IOException {
+[internal][vvb2060][vvb2060@gmail.com]        try (JarFile zip = new JarFile(apk);
+[internal][vvb2060][vvb2060@gmail.com]             var is = zip.getInputStream(zip.getEntry("AndroidManifest.xml"))) {
+[internal][vvb2060][vvb2060@gmail.com]            var reader = new AxmlReader(getBytesFromInputStream(is));
+[internal][vvb2060][vvb2060@gmail.com]            reader.accept(new AxmlVisitor() {
+[internal][vvb2060][vvb2060@gmail.com]                @Override
+[internal][vvb2060][vvb2060@gmail.com]                public NodeVisitor child(String ns, String name) {
+[internal][vvb2060][vvb2060@gmail.com]                    NodeVisitor child = super.child(ns, name);
+[internal][vvb2060][vvb2060@gmail.com]                    return new ManifestTagVisitor(child);
+[internal][vvb2060][vvb2060@gmail.com]                }
+[internal][vvb2060][vvb2060@gmail.com]            });
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    public static byte[] getBytesFromInputStream(InputStream inputStream) throws IOException {
+[external][admin][admin@0x.mk]        try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+[external][admin][admin@0x.mk]            byte[] b = new byte[1024];
+[external][admin][admin@0x.mk]            int n;
+[external][admin][admin@0x.mk]            while ((n = inputStream.read(b)) != -1) {
+[external][admin][admin@0x.mk]                bos.write(b, 0, n);
+[external][admin][admin@0x.mk]            }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            return bos.toByteArray();
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    private class ManifestTagVisitor extends NodeVisitor {
+[external][admin][admin@0x.mk]        public ManifestTagVisitor(NodeVisitor child) {
+[external][admin][admin@0x.mk]            super(child);
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]        @Override
+[external][admin][admin@0x.mk]        public NodeVisitor child(String ns, String name) {
+[external][admin][admin@0x.mk]            NodeVisitor child = super.child(ns, name);
+[external][admin][admin@0x.mk]            if ("application".equals(name)) {
+[external][admin][admin@0x.mk]                return new ApplicationTagVisitor(child);
+[external][admin][admin@0x.mk]            }
+[external][admin][admin@0x.mk]            return child;
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]        private class ApplicationTagVisitor extends NodeVisitor {
+[external][admin][admin@0x.mk]            public ApplicationTagVisitor(NodeVisitor child) {
+[external][admin][admin@0x.mk]                super(child);
+[external][admin][admin@0x.mk]            }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]            @Override
+[external][admin][admin@0x.mk]            public NodeVisitor child(String ns, String name) {
+[external][admin][admin@0x.mk]                NodeVisitor child = super.child(ns, name);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                if ("meta-data".equals(name)) {
+[external][admin][admin@0x.mk]                    return new MetaDataVisitor(child);
+[external][admin][admin@0x.mk]                }
+[external][admin][admin@0x.mk]                return child;
+[external][admin][admin@0x.mk]            }
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    private class MetaDataVisitor extends NodeVisitor {
+[external][admin][admin@0x.mk]        public String name = null;
+[external][admin][admin@0x.mk]        public Object value = null;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[external][admin][admin@0x.mk]        public MetaDataVisitor(NodeVisitor child) {
+[external][admin][admin@0x.mk]            super(child);
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]        @Override
+[external][admin][admin@0x.mk]        public void attr(String ns, String name, int resourceId, int type, Object obj) {
+[external][admin][admin@0x.mk]            if (type == 3 && "name".equals(name)) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                this.name = (String) obj;
+[external][admin][admin@0x.mk]            }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            if ("value".equals(name)) {
+[external][admin][admin@0x.mk]                value = obj;
+[external][admin][admin@0x.mk]            }
+[external][admin][admin@0x.mk]            super.attr(ns, name, resourceId, type, obj);
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]        @Override
+[external][admin][admin@0x.mk]        public void end() {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            if (name != null && value != null) {
+[external][admin][admin@0x.mk]                metaData.put(name, value);
+[external][admin][admin@0x.mk]            }
+[external][admin][admin@0x.mk]            super.end();
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    public static int extractIntPart(String str) {
+[external][admin][admin@0x.mk]        int result = 0, length = str.length();
+[external][admin][admin@0x.mk]        for (int offset = 0; offset < length; offset++) {
+[external][admin][admin@0x.mk]            char c = str.charAt(offset);
+[external][admin][admin@0x.mk]            if ('0' <= c && c <= '9')
+[external][admin][admin@0x.mk]                result = result * 10 + (c - '0');
+[external][admin][admin@0x.mk]            else
+[external][admin][admin@0x.mk]                break;
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]        return result;
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]}

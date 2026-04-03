@@ -1,0 +1,90 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][admin][admin@0x.mk]package de.robv.android.xposed.services;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]import java.io.InputStream;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]/**
+[external][admin][admin@0x.mk] * Holder for the result of a {@link BaseService#readFile} or  {@link BaseService#statFile} call.
+[external][admin][admin@0x.mk] */
+[external][admin][admin@0x.mk]public final class FileResult {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * File content, might be {@code null} if the file wasn't read.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public final byte[] content;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * File input stream, might be {@code null} if the file wasn't read.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public final InputStream stream;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * File size.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public final long size;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * File last modification time.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public final long mtime;
+[external][admin][admin@0x.mk]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /*package*/ FileResult(long size, long mtime) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        this.content = null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        this.stream = null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        this.size = size;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        this.mtime = mtime;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][admin][admin@0x.mk]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /*package*/ FileResult(byte[] content, long size, long mtime) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        this.content = content;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        this.stream = null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        this.size = size;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        this.mtime = mtime;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][admin][admin@0x.mk]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /*package*/ FileResult(InputStream stream, long size, long mtime) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        this.content = null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        this.stream = stream;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        this.size = size;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        this.mtime = mtime;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][admin][admin@0x.mk]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @hide
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public String toString() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        StringBuilder sb = new StringBuilder("{");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (content != null) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            sb.append("content.length: ");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            sb.append(content.length);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            sb.append(", ");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (stream != null) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            sb.append("stream: ");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            sb.append(stream.toString());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            sb.append(", ");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        sb.append("size: ");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        sb.append(size);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        sb.append(", mtime: ");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        sb.append(mtime);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        sb.append("}");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return sb.toString();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][admin][admin@0x.mk]}

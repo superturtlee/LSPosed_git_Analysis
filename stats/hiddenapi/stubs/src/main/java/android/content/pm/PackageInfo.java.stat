@@ -1,0 +1,6 @@
+[external][shana][shana@zju.edu.cn]package android.content.pm;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public class PackageInfo {
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public String overlayTarget;
+[external][shana][shana@zju.edu.cn]}

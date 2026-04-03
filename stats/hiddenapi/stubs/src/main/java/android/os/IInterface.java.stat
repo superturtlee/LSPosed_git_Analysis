@@ -1,0 +1,6 @@
+[external][shana][shana@zju.edu.cn]package android.os;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public interface IInterface {
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    IBinder asBinder();
+[external][shana][shana@zju.edu.cn]}

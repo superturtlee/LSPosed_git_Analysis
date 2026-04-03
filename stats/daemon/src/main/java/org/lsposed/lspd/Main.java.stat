@@ -1,0 +1,10 @@
+[internal][dr-tsng][tsng.nullptr@outlook.com]package org.lsposed.lspd;
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[internal][dr-tsng][tsng.nullptr@outlook.com]import org.lsposed.lspd.service.ServiceManager;
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[internal][dr-tsng][tsng.nullptr@outlook.com]public class Main {
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[internal][dr-tsng][tsng.nullptr@outlook.com]    public static void main(String[] args) {
+[internal][dr-tsng][tsng.nullptr@outlook.com]        ServiceManager.start(args);
+[internal][dr-tsng][tsng.nullptr@outlook.com]    }
+[internal][dr-tsng][tsng.nullptr@outlook.com]}

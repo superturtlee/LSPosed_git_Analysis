@@ -1,0 +1,138 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]package android.app;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.content.IIntentReceiver;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.content.Intent;
+[external][shana][shana@zju.edu.cn]import android.content.IntentFilter;
+[external][shana][shana@zju.edu.cn]import android.content.pm.UserInfo;
+[external][shana][shana@zju.edu.cn]import android.content.res.Configuration;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.os.Binder;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.os.Bundle;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.os.IBinder;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.os.IInterface;
+[external][shana][shana@zju.edu.cn]import android.os.RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import androidx.annotation.RequiresApi;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]public interface IActivityManager extends IInterface {
+[external][shana][shana@zju.edu.cn]    @RequiresApi(31)
+[external][shana][shana@zju.edu.cn]    int broadcastIntentWithFeature(IApplicationThread caller, String callingFeatureId,
+[external][shana][shana@zju.edu.cn]                                   Intent intent, String resolvedType, IIntentReceiver resultTo,
+[external][shana][shana@zju.edu.cn]                                   int resultCode, String resultData, Bundle resultExtras,
+[external][shana][shana@zju.edu.cn]                                   String[] requiredPermissions, String[] excludedPermissions,
+[external][shana][shana@zju.edu.cn]                                   String[] excludePackages, int appOp, Bundle bOptions,
+[external][shana][shana@zju.edu.cn]                                   boolean serialized, boolean sticky, int userId) throws RemoteException;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    @RequiresApi(31)
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    int broadcastIntentWithFeature(IApplicationThread caller, String callingFeatureId,
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                                   Intent intent, String resolvedType, IIntentReceiver resultTo,
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                                   int resultCode, String resultData, Bundle resultExtras,
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                                   String[] requiredPermissions, String[] excludedPermissions,
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                                   int appOp, Bundle bOptions,
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                                   boolean serialized, boolean sticky, int userId) throws RemoteException;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    @RequiresApi(30)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    int broadcastIntentWithFeature(IApplicationThread caller, String callingFeatureId,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                                   Intent intent, String resolvedType, IIntentReceiver resultTo, int resultCode,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                                   String resultData, Bundle map, String[] requiredPermissions,
+[external][shana][shana@zju.edu.cn]                                   int appOp, Bundle options, boolean serialized, boolean sticky, int userId) throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    int broadcastIntent(IApplicationThread caller, Intent intent,
+[external][shana][shana@zju.edu.cn]                        String resolvedType, IIntentReceiver resultTo, int resultCode,
+[external][shana][shana@zju.edu.cn]                        String resultData, Bundle map, String[] requiredPermissions,
+[external][shana][shana@zju.edu.cn]                        int appOp, Bundle options, boolean serialized, boolean sticky, int userId) throws RemoteException;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    int startActivity(IApplicationThread caller, String callingPackage, Intent intent,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                      String resolvedType, IBinder resultTo, String resultWho, int requestCode,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                      int flags, ProfilerInfo profilerInfo, Bundle options) throws RemoteException;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @RequiresApi(30)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    int startActivityWithFeature(IApplicationThread caller, String callingPackage,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                                 String callingFeatureId, Intent intent, String resolvedType,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                                 IBinder resultTo, String resultWho, int requestCode, int flags,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                                 ProfilerInfo profilerInfo, Bundle options) throws RemoteException;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    int startActivityAsUser(IApplicationThread caller, String callingPackage,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                            Intent intent, String resolvedType, IBinder resultTo, String resultWho,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                            int requestCode, int flags, ProfilerInfo profilerInfo,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                            Bundle options, int userId) throws RemoteException;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @RequiresApi(30)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    int startActivityAsUserWithFeature(IApplicationThread caller, String callingPackage,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                                       String callingFeatureId, Intent intent, String resolvedType,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                                       IBinder resultTo, String resultWho, int requestCode, int flags,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                                       ProfilerInfo profilerInfo, Bundle options, int userId) throws RemoteException;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    void forceStopPackage(String packageName, int userId) throws RemoteException;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    boolean startUserInBackground(int userid) throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    Intent registerReceiver(IApplicationThread caller, String callerPackage,
+[external][shana][shana@zju.edu.cn]                            IIntentReceiver receiver, IntentFilter filter,
+[external][shana][shana@zju.edu.cn]                            String requiredPermission, int userId, int flags) throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][howardwu20][HowardWu20@outlook.com]    void finishReceiver(IBinder caller, int resultCode, String resultData,
+[external][howardwu20][HowardWu20@outlook.com]                        Bundle resultExtras, boolean resultAbort, int flags) throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @RequiresApi(30)
+[external][shana][shana@zju.edu.cn]    Intent registerReceiverWithFeature(IApplicationThread caller, String callerPackage,
+[external][shana][shana@zju.edu.cn]                                       String callingFeatureId, IIntentReceiver receiver, IntentFilter filter,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                                       String requiredPermission, int userId, int flags) throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @RequiresApi(31)
+[external][shana][shana@zju.edu.cn]    Intent registerReceiverWithFeature(IApplicationThread caller, String callerPackage, String callingFeatureId,
+[external][shana][shana@zju.edu.cn]                                       String receiverId, IIntentReceiver receiver, IntentFilter filter,
+[external][shana][shana@zju.edu.cn]                                       String requiredPermission, int userId, int flags) throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    int bindService(IApplicationThread caller, IBinder token, Intent service,
+[external][shana][shana@zju.edu.cn]                    String resolvedType, IServiceConnection connection, int flags,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    String callingPackage, int userId) throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][howardwu20][HowardWu20@outlook.com]    @RequiresApi(34)
+[external][howardwu20][HowardWu20@outlook.com]    int bindService(IApplicationThread caller, IBinder token, Intent service,
+[external][howardwu20][HowardWu20@outlook.com]                    String resolvedType, IServiceConnection connection, long flags,
+[external][howardwu20][HowardWu20@outlook.com]                    String callingPackage, int userId) throws RemoteException;
+[external][howardwu20][HowardWu20@outlook.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    boolean unbindService(IServiceConnection connection) throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    boolean switchUser(int userid) throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    UserInfo getCurrentUser() throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    void setActivityController(IActivityController watcher, boolean imAMonkey) throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @RequiresApi(29)
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    ContentProviderHolder getContentProviderExternal(String name, int userId, IBinder token, String tag) throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    ContentProviderHolder getContentProviderExternal(String name, int userId, IBinder token) throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    Configuration getConfiguration() throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    void registerUidObserver(IUidObserver observer, int which, int cutpoint, String callingPackage) throws RemoteException;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    abstract class Stub extends Binder implements IActivityManager {
+[external][shana][shana@zju.edu.cn]        public static int TRANSACTION_setActivityController;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public static IActivityManager asInterface(IBinder obj) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new UnsupportedOperationException();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]}

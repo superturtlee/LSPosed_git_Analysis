@@ -1,0 +1,81 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.lspd.deopt;
+[external][hsushulong][hsushulong@gmail.com]
+[external][416810799][416810799@qq.com]import static org.lsposed.lspd.deopt.InlinedMethodCallers.KEY_BOOT_IMAGE;
+[external][416810799][416810799@qq.com]import static org.lsposed.lspd.deopt.InlinedMethodCallers.KEY_BOOT_IMAGE_MIUI_RES;
+[external][416810799][416810799@qq.com]import static org.lsposed.lspd.deopt.InlinedMethodCallers.KEY_SYSTEM_SERVER;
+[external][416810799][416810799@qq.com]
+[external][shana][shana@zju.edu.cn]import org.lsposed.lspd.nativebridge.HookBridge;
+[external][shana][shana@zju.edu.cn]import org.lsposed.lspd.util.Hookers;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.lspd.util.Utils;
+[external][hsushulong][hsushulong@gmail.com]
+[external][shana][shana@zju.edu.cn]import java.lang.reflect.Executable;
+[external][hsushulong][hsushulong@gmail.com]import java.util.Arrays;
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]import de.robv.android.xposed.XposedHelpers;
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]public class PrebuiltMethodsDeopter {
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]    public static void deoptMethods(String where, ClassLoader cl) {
+[external][shana][shana@zju.edu.cn]        Object[][] callers = InlinedMethodCallers.get(where);
+[external][hsushulong][hsushulong@gmail.com]        if (callers == null) {
+[external][hsushulong][hsushulong@gmail.com]            return;
+[external][hsushulong][hsushulong@gmail.com]        }
+[external][shana][shana@zju.edu.cn]        for (Object[] caller : callers) {
+[external][hsushulong][hsushulong@gmail.com]            try {
+[external][shana][shana@zju.edu.cn]                if (caller.length < 2) continue;
+[external][shana][shana@zju.edu.cn]                if (!(caller[0] instanceof String)) continue;
+[external][shana][shana@zju.edu.cn]                if (!(caller[1] instanceof String)) continue;
+[external][shana][shana@zju.edu.cn]                Executable method;
+[external][shana][shana@zju.edu.cn]                Object[] params = new Object[caller.length - 2];
+[external][shana][shana@zju.edu.cn]                System.arraycopy(caller, 2, params, 0, params.length);
+[external][shana][shana@zju.edu.cn]                if ("<init>".equals(caller[1])) {
+[external][shana][shana@zju.edu.cn]                    method = XposedHelpers.findConstructorExactIfExists((String) caller[0], cl, params);
+[external][shana][shana@zju.edu.cn]                } else {
+[external][shana][shana@zju.edu.cn]                    method = XposedHelpers.findMethodExactIfExists((String) caller[0], cl, (String) caller[1], params);
+[external][hsushulong][hsushulong@gmail.com]                }
+[external][hsushulong][hsushulong@gmail.com]                if (method != null) {
+[external][shana][shana@zju.edu.cn]                    Hookers.logD("deoptimizing " + method);
+[external][shana][shana@zju.edu.cn]                    HookBridge.deoptimizeMethod(method);
+[external][hsushulong][hsushulong@gmail.com]                }
+[external][hsushulong][hsushulong@gmail.com]            } catch (Throwable throwable) {
+[external][hsushulong][hsushulong@gmail.com]                Utils.logE("error when deopting method: " + Arrays.toString(caller), throwable);
+[external][hsushulong][hsushulong@gmail.com]            }
+[external][hsushulong][hsushulong@gmail.com]        }
+[external][hsushulong][hsushulong@gmail.com]    }
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]    public static void deoptBootMethods() {
+[external][hsushulong][hsushulong@gmail.com]        // todo check if has been done before
+[external][hsushulong][hsushulong@gmail.com]        deoptMethods(KEY_BOOT_IMAGE, null);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static void deoptResourceMethods() {
+[external][shana][shana@zju.edu.cn]        if (Utils.isMIUI) {
+[external][shana][shana@zju.edu.cn]            //deopt these only for MIUI
+[external][hsushulong][hsushulong@gmail.com]            deoptMethods(KEY_BOOT_IMAGE_MIUI_RES, null);
+[external][hsushulong][hsushulong@gmail.com]        }
+[external][hsushulong][hsushulong@gmail.com]    }
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]    public static void deoptSystemServerMethods(ClassLoader sysCL) {
+[external][hsushulong][hsushulong@gmail.com]        deoptMethods(KEY_SYSTEM_SERVER, sysCL);
+[external][hsushulong][hsushulong@gmail.com]    }
+[external][hsushulong][hsushulong@gmail.com]}

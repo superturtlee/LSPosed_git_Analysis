@@ -1,0 +1,4 @@
+[external][shana][shana@zju.edu.cn]package org.xmlpull.v1;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public class XmlPullParserException extends Throwable {
+[external][shana][shana@zju.edu.cn]}

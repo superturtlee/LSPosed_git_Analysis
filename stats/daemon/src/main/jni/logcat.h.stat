@@ -1,0 +1,63 @@
+[internal][vvb2060][vvb2060@gmail.com]#pragma once
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]#include <stdint.h>
+[internal][vvb2060][vvb2060@gmail.com]#include <sys/types.h>
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]#include <android/log.h>
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]#define NS_PER_SEC 1000000000L
+[internal][vvb2060][vvb2060@gmail.com]#define MS_PER_NSEC 1000000
+[internal][vvb2060][vvb2060@gmail.com]#define LOGGER_ENTRY_MAX_LEN (5 * 1024)
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]#ifdef __cplusplus
+[internal][vvb2060][vvb2060@gmail.com]extern "C" {
+[internal][vvb2060][vvb2060@gmail.com]#endif
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]typedef struct AndroidLogEntry_t {
+[internal][vvb2060][vvb2060@gmail.com]    time_t tv_sec;
+[internal][vvb2060][vvb2060@gmail.com]    long tv_nsec;
+[internal][vvb2060][vvb2060@gmail.com]    android_LogPriority priority;
+[internal][vvb2060][vvb2060@gmail.com]    int32_t uid;
+[internal][vvb2060][vvb2060@gmail.com]    int32_t pid;
+[internal][vvb2060][vvb2060@gmail.com]    int32_t tid;
+[internal][vvb2060][vvb2060@gmail.com]    const char *tag;
+[internal][vvb2060][vvb2060@gmail.com]    size_t tagLen;
+[internal][vvb2060][vvb2060@gmail.com]    size_t messageLen;
+[internal][vvb2060][vvb2060@gmail.com]    const char *message;
+[internal][vvb2060][vvb2060@gmail.com]} AndroidLogEntry;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]struct logger_entry {
+[internal][vvb2060][vvb2060@gmail.com]    uint16_t len;      /* length of the payload */
+[internal][vvb2060][vvb2060@gmail.com]    uint16_t hdr_size; /* sizeof(struct logger_entry) */
+[internal][vvb2060][vvb2060@gmail.com]    int32_t pid;       /* generating process's pid */
+[internal][vvb2060][vvb2060@gmail.com]    uint32_t tid;      /* generating process's tid */
+[internal][vvb2060][vvb2060@gmail.com]    uint32_t sec;      /* seconds since Epoch */
+[internal][vvb2060][vvb2060@gmail.com]    uint32_t nsec;     /* nanoseconds */
+[internal][vvb2060][vvb2060@gmail.com]    uint32_t lid;      /* log id of the payload, bottom 4 bits currently */
+[internal][vvb2060][vvb2060@gmail.com]    uint32_t uid;      /* generating process's uid */
+[internal][vvb2060][vvb2060@gmail.com]};
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]struct log_msg {
+[internal][vvb2060][vvb2060@gmail.com]    union alignas(4) {
+[internal][vvb2060][vvb2060@gmail.com]        unsigned char buf[LOGGER_ENTRY_MAX_LEN + 1];
+[internal][vvb2060][vvb2060@gmail.com]        struct logger_entry entry;
+[internal][vvb2060][vvb2060@gmail.com]    };
+[internal][vvb2060][vvb2060@gmail.com]#ifdef __cplusplus
+[internal][vvb2060][vvb2060@gmail.com]    log_id_t id() {
+[internal][vvb2060][vvb2060@gmail.com]        return static_cast<log_id_t>(entry.lid);
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]#endif
+[internal][vvb2060][vvb2060@gmail.com]};
+[internal][vvb2060][vvb2060@gmail.com]struct logger;
+[internal][vvb2060][vvb2060@gmail.com]struct logger_list;
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]long android_logger_get_log_size(struct logger* logger);
+[external][shana][shana@zju.edu.cn]int android_logger_set_log_size(struct logger *logger, unsigned long size);
+[external][shana][shana@zju.edu.cn]struct logger_list *android_logger_list_alloc(int mode, unsigned int tail, pid_t pid);
+[external][shana][shana@zju.edu.cn]void android_logger_list_free(struct logger_list *logger_list);
+[external][shana][shana@zju.edu.cn]int android_logger_list_read(struct logger_list *logger_list, struct log_msg *log_msg);
+[external][shana][shana@zju.edu.cn]struct logger *android_logger_open(struct logger_list *logger_list, log_id_t id);
+[external][shana][shana@zju.edu.cn]int android_log_processLogBuffer(struct logger_entry *buf, AndroidLogEntry *entry);
+[internal][vvb2060][vvb2060@gmail.com]#ifdef __cplusplus
+[internal][vvb2060][vvb2060@gmail.com]}
+[internal][vvb2060][vvb2060@gmail.com]#endif

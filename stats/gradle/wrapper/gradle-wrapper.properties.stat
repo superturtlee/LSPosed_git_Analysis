@@ -1,0 +1,7 @@
+[external][hsushulong][hsushulong@gmail.com]distributionBase=GRADLE_USER_HOME
+[external][hsushulong][hsushulong@gmail.com]distributionPath=wrapper/dists
+[internal][vvb2060][vvb2060@gmail.com]distributionUrl=https\://services.gradle.org/distributions/gradle-8.5-bin.zip
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]networkTimeout=10000
+[external][howardwu20][HowardWu20@outlook.com]validateDistributionUrl=true
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]zipStoreBase=GRADLE_USER_HOME
+[internal][vvb2060][vvb2060@gmail.com]zipStorePath=wrapper/dists

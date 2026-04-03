@@ -1,0 +1,63 @@
+[external][howardwu20][HowardWu20@outlook.com]/*
+[external][howardwu20][HowardWu20@outlook.com] * <!--This file is part of LSPosed.
+[external][howardwu20][HowardWu20@outlook.com] *
+[external][howardwu20][HowardWu20@outlook.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][howardwu20][HowardWu20@outlook.com] * it under the terms of the GNU General Public License as published by
+[external][howardwu20][HowardWu20@outlook.com] * the Free Software Foundation, either version 3 of the License, or
+[external][howardwu20][HowardWu20@outlook.com] * (at your option) any later version.
+[external][howardwu20][HowardWu20@outlook.com] *
+[external][howardwu20][HowardWu20@outlook.com] * LSPosed is distributed in the hope that it will be useful,
+[external][howardwu20][HowardWu20@outlook.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][howardwu20][HowardWu20@outlook.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][howardwu20][HowardWu20@outlook.com] * GNU General Public License for more details.
+[external][howardwu20][HowardWu20@outlook.com] *
+[external][howardwu20][HowardWu20@outlook.com] * You should have received a copy of the GNU General Public License
+[external][howardwu20][HowardWu20@outlook.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][howardwu20][HowardWu20@outlook.com] *
+[external][howardwu20][HowardWu20@outlook.com] * Copyright (C) 2023 LSPosed Contributors-->
+[external][howardwu20][HowardWu20@outlook.com] */
+[external][howardwu20][HowardWu20@outlook.com]
+[external][howardwu20][HowardWu20@outlook.com]package org.lsposed.lspd.service;
+[external][howardwu20][HowardWu20@outlook.com]
+[external][howardwu20][HowardWu20@outlook.com]import static android.content.Context.POWER_SERVICE;
+[external][howardwu20][HowardWu20@outlook.com]import static org.lsposed.lspd.service.ServiceManager.TAG;
+[external][howardwu20][HowardWu20@outlook.com]
+[external][howardwu20][HowardWu20@outlook.com]import android.os.IBinder;
+[external][howardwu20][HowardWu20@outlook.com]import android.os.IPowerManager;
+[external][howardwu20][HowardWu20@outlook.com]import android.os.RemoteException;
+[external][howardwu20][HowardWu20@outlook.com]import android.os.ServiceManager;
+[external][howardwu20][HowardWu20@outlook.com]import android.util.Log;
+[external][howardwu20][HowardWu20@outlook.com]
+[external][howardwu20][HowardWu20@outlook.com]public class PowerService {
+[external][howardwu20][HowardWu20@outlook.com]    private static IPowerManager pm = null;
+[external][howardwu20][HowardWu20@outlook.com]    private static IBinder binder = null;
+[external][howardwu20][HowardWu20@outlook.com]    private static final IBinder.DeathRecipient recipient = new IBinder.DeathRecipient() {
+[external][howardwu20][HowardWu20@outlook.com]        @Override
+[external][howardwu20][HowardWu20@outlook.com]        public void binderDied() {
+[external][howardwu20][HowardWu20@outlook.com]            Log.w(TAG, "PowerManager is dead");
+[external][howardwu20][HowardWu20@outlook.com]            binder.unlinkToDeath(this, 0);
+[external][howardwu20][HowardWu20@outlook.com]            binder = null;
+[external][howardwu20][HowardWu20@outlook.com]            pm = null;
+[external][howardwu20][HowardWu20@outlook.com]        }
+[external][howardwu20][HowardWu20@outlook.com]    };
+[external][howardwu20][HowardWu20@outlook.com]
+[external][howardwu20][HowardWu20@outlook.com]    private static IPowerManager getPowerManager() {
+[external][howardwu20][HowardWu20@outlook.com]        if (binder == null || pm == null) {
+[external][howardwu20][HowardWu20@outlook.com]            binder = ServiceManager.getService(POWER_SERVICE);
+[external][howardwu20][HowardWu20@outlook.com]            if (binder == null) return null;
+[external][howardwu20][HowardWu20@outlook.com]            try {
+[external][howardwu20][HowardWu20@outlook.com]                binder.linkToDeath(recipient, 0);
+[external][howardwu20][HowardWu20@outlook.com]            } catch (RemoteException e) {
+[external][howardwu20][HowardWu20@outlook.com]                Log.e(TAG, Log.getStackTraceString(e));
+[external][howardwu20][HowardWu20@outlook.com]            }
+[external][howardwu20][HowardWu20@outlook.com]            pm = IPowerManager.Stub.asInterface(binder);
+[external][howardwu20][HowardWu20@outlook.com]        }
+[external][howardwu20][HowardWu20@outlook.com]        return pm;
+[external][howardwu20][HowardWu20@outlook.com]    }
+[external][howardwu20][HowardWu20@outlook.com]
+[external][howardwu20][HowardWu20@outlook.com]    public static void reboot(boolean confirm, String reason, boolean wait) throws RemoteException {
+[external][howardwu20][HowardWu20@outlook.com]        IPowerManager pm = getPowerManager();
+[external][howardwu20][HowardWu20@outlook.com]        if (pm == null) return;
+[external][howardwu20][HowardWu20@outlook.com]        pm.reboot(confirm, reason, wait);
+[external][howardwu20][HowardWu20@outlook.com]    }
+[external][howardwu20][HowardWu20@outlook.com]}

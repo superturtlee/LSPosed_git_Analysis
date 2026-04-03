@@ -1,0 +1,20 @@
+[internal][vvb2060][vvb2060@gmail.com]package hidden;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import java.nio.ByteBuffer;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import dalvik.system.BaseDexClassLoader;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]public class ByteBufferDexClassLoader extends BaseDexClassLoader {
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]    public ByteBufferDexClassLoader(ByteBuffer[] dexFiles, ClassLoader parent) {
+[internal][vvb2060][vvb2060@gmail.com]        super(dexFiles, parent);
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    public ByteBufferDexClassLoader(ByteBuffer[] dexFiles, String librarySearchPath, ClassLoader parent) {
+[internal][vvb2060][vvb2060@gmail.com]        super(dexFiles, librarySearchPath, parent);
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    public String getLdLibraryPath() {
+[internal][vvb2060][vvb2060@gmail.com]        return super.getLdLibraryPath();
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]}

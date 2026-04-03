@@ -1,0 +1,141 @@
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]/*
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * This file is part of LSPosed.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] *
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * (at your option) any later version.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] *
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * GNU General Public License for more details.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] *
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] *
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * Copyright (C) 2022 LSPosed Contributors
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] */
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.manager.ui.dialog;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import static org.lsposed.manager.App.TAG;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import android.content.Context;
+[internal][vvb2060][vvb2060@gmail.com]import android.content.DialogInterface;
+[internal][vvb2060][vvb2060@gmail.com]import android.graphics.Typeface;
+[internal][vvb2060][vvb2060@gmail.com]import android.os.ParcelFileDescriptor;
+[internal][vvb2060][vvb2060@gmail.com]import android.text.method.LinkMovementMethod;
+[internal][vvb2060][vvb2060@gmail.com]import android.util.Log;
+[internal][vvb2060][vvb2060@gmail.com]import android.view.LayoutInflater;
+[internal][vvb2060][vvb2060@gmail.com]import android.view.View;
+[internal][vvb2060][vvb2060@gmail.com]import android.widget.Button;
+[internal][vvb2060][vvb2060@gmail.com]import android.widget.TextView;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import androidx.annotation.NonNull;
+[internal][vvb2060][vvb2060@gmail.com]import androidx.appcompat.app.AlertDialog;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import com.google.android.material.textview.MaterialTextView;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.App;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.ConfigManager;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.R;
+[external][shana][shana@zju.edu.cn]import org.lsposed.manager.databinding.DialogTitleBinding;
+[external][shana][shana@zju.edu.cn]import org.lsposed.manager.databinding.ScrollableDialogBinding;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import java.io.BufferedReader;
+[internal][vvb2060][vvb2060@gmail.com]import java.io.IOException;
+[internal][vvb2060][vvb2060@gmail.com]import java.io.InputStreamReader;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import rikka.widget.borderview.BorderNestedScrollView;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]public class FlashDialogBuilder extends BlurBehindDialogBuilder {
+[internal][vvb2060][vvb2060@gmail.com]    private final String zipPath;
+[internal][vvb2060][vvb2060@gmail.com]    private final TextView textView;
+[internal][vvb2060][vvb2060@gmail.com]    private final BorderNestedScrollView rootView;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    public FlashDialogBuilder(@NonNull Context context, DialogInterface.OnClickListener cancel) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        super(context, R.style.ThemeOverlay_MaterialAlertDialog_Centered_FullWidthButtons);
+[internal][vvb2060][vvb2060@gmail.com]        var pref = App.getPreferences();
+[internal][vvb2060][vvb2060@gmail.com]        var notes = pref.getString("release_notes", "");
+[internal][vvb2060][vvb2060@gmail.com]        this.zipPath = pref.getString("zip_file", null);
+[external][shana][shana@zju.edu.cn]        LayoutInflater inflater = LayoutInflater.from(context);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        var title = DialogTitleBinding.inflate(inflater).getRoot();
+[external][shana][shana@zju.edu.cn]        title.setText(R.string.update_lsposed);
+[external][shana][shana@zju.edu.cn]        setCustomTitle(title);
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]        textView = new MaterialTextView(context);
+[internal][vvb2060][vvb2060@gmail.com]        var text = notes + "\n\n\n" + context.getString(R.string.update_lsposed_msg) + "\n\n";
+[internal][vvb2060][vvb2060@gmail.com]        textView.setText(text);
+[internal][vvb2060][vvb2060@gmail.com]        textView.setMovementMethod(LinkMovementMethod.getInstance());
+[external][shana][shana@zju.edu.cn]        textView.setTextIsSelectable(true);
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]        var binding = ScrollableDialogBinding.inflate(inflater, null, false);
+[external][shana][shana@zju.edu.cn]        binding.dialogContainer.addView(textView);
+[internal][vvb2060][vvb2060@gmail.com]        rootView = binding.getRoot();
+[internal][vvb2060][vvb2060@gmail.com]        setView(rootView);
+[external][shana][shana@zju.edu.cn]        title.setOnClickListener(v -> rootView.smoothScrollTo(0, 0));
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]        setNegativeButton(android.R.string.cancel, cancel);
+[internal][vvb2060][vvb2060@gmail.com]        setPositiveButton(R.string.install, null);
+[internal][vvb2060][vvb2060@gmail.com]        setCancelable(false);
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    @Override
+[internal][vvb2060][vvb2060@gmail.com]    public AlertDialog show() {
+[internal][vvb2060][vvb2060@gmail.com]        var dialog = super.show();
+[internal][vvb2060][vvb2060@gmail.com]        var button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+[internal][vvb2060][vvb2060@gmail.com]        rootView.setBorderVisibilityChangedListener((t, ot, b, ob) -> button.setEnabled(!b));
+[internal][vvb2060][vvb2060@gmail.com]        button.setOnClickListener((v) -> {
+[internal][vvb2060][vvb2060@gmail.com]            rootView.setBorderVisibilityChangedListener(null);
+[internal][vvb2060][vvb2060@gmail.com]            setFlashView(v, dialog);
+[internal][vvb2060][vvb2060@gmail.com]        });
+[internal][vvb2060][vvb2060@gmail.com]        return dialog;
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    private void setFlashView(View view, AlertDialog dialog) {
+[internal][vvb2060][vvb2060@gmail.com]        var positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+[internal][vvb2060][vvb2060@gmail.com]        var negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+[internal][vvb2060][vvb2060@gmail.com]        positiveButton.setEnabled(false);
+[internal][vvb2060][vvb2060@gmail.com]        positiveButton.setText(android.R.string.ok);
+[internal][vvb2060][vvb2060@gmail.com]        positiveButton.setOnClickListener((v) -> dialog.dismiss());
+[internal][vvb2060][vvb2060@gmail.com]        negativeButton.setVisibility(View.GONE);
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]        textView.setText("");
+[internal][vvb2060][vvb2060@gmail.com]        textView.setTypeface(Typeface.MONOSPACE);
+[internal][vvb2060][vvb2060@gmail.com]        App.getExecutorService().submit(() -> flash(view, positiveButton));
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    private void flash(View view, Button button) {
+[internal][vvb2060][vvb2060@gmail.com]        try {
+[internal][vvb2060][vvb2060@gmail.com]            var pipe = ParcelFileDescriptor.createReliablePipe();
+[internal][vvb2060][vvb2060@gmail.com]            var readSide = pipe[0];
+[internal][vvb2060][vvb2060@gmail.com]            var writeSide = pipe[1];
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]            ConfigManager.flashZip(zipPath, writeSide);
+[internal][vvb2060][vvb2060@gmail.com]            writeSide.close();
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]            var inputStream = new ParcelFileDescriptor.AutoCloseInputStream(readSide);
+[internal][vvb2060][vvb2060@gmail.com]            var reader = new BufferedReader(new InputStreamReader(inputStream));
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]            for (var line = ""; line != null; line = reader.readLine()) {
+[internal][vvb2060][vvb2060@gmail.com]                if (line.length() > 0) {
+[internal][vvb2060][vvb2060@gmail.com]                    var showLine = line + "\n";
+[internal][vvb2060][vvb2060@gmail.com]                    view.post(() -> {
+[internal][vvb2060][vvb2060@gmail.com]                        textView.append(showLine);
+[internal][vvb2060][vvb2060@gmail.com]                        rootView.fullScroll(View.FOCUS_DOWN);
+[internal][vvb2060][vvb2060@gmail.com]                    });
+[internal][vvb2060][vvb2060@gmail.com]                }
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]            reader.close();
+[internal][vvb2060][vvb2060@gmail.com]        } catch (IOException e) {
+[internal][vvb2060][vvb2060@gmail.com]            Log.e(TAG, "flash", e);
+[internal][vvb2060][vvb2060@gmail.com]            view.post(() -> textView.append("\n\n" + e.getMessage()));
+[internal][vvb2060][vvb2060@gmail.com]            rootView.fullScroll(View.FOCUS_DOWN);
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]        view.post(() -> button.setEnabled(true));
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]}

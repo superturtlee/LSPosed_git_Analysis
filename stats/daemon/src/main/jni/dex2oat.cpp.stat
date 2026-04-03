@@ -1,0 +1,119 @@
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]/*
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * This file is part of LSPosed.
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] *
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * (at your option) any later version.
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] *
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * GNU General Public License for more details.
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] *
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] *
+[internal][vvb2060][vvb2060@gmail.com] * Copyright (C) 2023 LSPosed Contributors
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] */
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#include <fcntl.h>
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#include <jni.h>
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#include <string>
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#include <sys/mount.h>
+[external][noreply][noreply@nullptr.icu]#include <sys/wait.h>
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#include <unistd.h>
+[external][shana][shana@zju.edu.cn]#include <sched.h>
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#include "logging.h"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]extern "C"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]JNIEXPORT void JNICALL
+[internal][vvb2060][vvb2060@gmail.com]Java_org_lsposed_lspd_service_Dex2OatService_doMountNative(JNIEnv *env, jobject,
+[internal][vvb2060][vvb2060@gmail.com]                                                           jboolean enabled,
+[internal][vvb2060][vvb2060@gmail.com]                                                           jstring r32, jstring d32,
+[internal][vvb2060][vvb2060@gmail.com]                                                           jstring r64, jstring d64) {
+[internal][vvb2060][vvb2060@gmail.com]    char dex2oat32[PATH_MAX], dex2oat64[PATH_MAX];
+[internal][vvb2060][vvb2060@gmail.com]    realpath("bin/dex2oat32", dex2oat32);
+[internal][vvb2060][vvb2060@gmail.com]    realpath("bin/dex2oat64", dex2oat64);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[external][noreply][noreply@nullptr.icu]    if (pid_t pid = fork(); pid > 0) { // parent
+[external][noreply][noreply@nullptr.icu]        waitpid(pid, nullptr, 0);
+[external][noreply][noreply@nullptr.icu]    } else { // child
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        int ns = open("/proc/1/ns/mnt", O_RDONLY);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        setns(ns, CLONE_NEWNS);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        close(ns);
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]        const char *r32p, *d32p, *r64p, *d64p;
+[internal][vvb2060][vvb2060@gmail.com]        if (r32) r32p = env->GetStringUTFChars(r32, nullptr);
+[internal][vvb2060][vvb2060@gmail.com]        if (d32) d32p = env->GetStringUTFChars(d32, nullptr);
+[internal][vvb2060][vvb2060@gmail.com]        if (r64) r64p = env->GetStringUTFChars(r64, nullptr);
+[internal][vvb2060][vvb2060@gmail.com]        if (d64) d64p = env->GetStringUTFChars(d64, nullptr);
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        if (enabled) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            LOGI("Enable dex2oat wrapper");
+[internal][vvb2060][vvb2060@gmail.com]            if (r32) {
+[internal][vvb2060][vvb2060@gmail.com]                mount(dex2oat32, r32p, nullptr, MS_BIND, nullptr);
+[internal][vvb2060][vvb2060@gmail.com]                mount(nullptr, r32p, nullptr, MS_BIND | MS_REMOUNT | MS_RDONLY, nullptr);
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]            if (d32) {
+[internal][vvb2060][vvb2060@gmail.com]                mount(dex2oat32, d32p, nullptr, MS_BIND, nullptr);
+[internal][vvb2060][vvb2060@gmail.com]                mount(nullptr, d32p, nullptr, MS_BIND | MS_REMOUNT | MS_RDONLY, nullptr);
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]            if (r64) {
+[internal][vvb2060][vvb2060@gmail.com]                mount(dex2oat64, r64p, nullptr, MS_BIND, nullptr);
+[internal][vvb2060][vvb2060@gmail.com]                mount(nullptr, r64p, nullptr, MS_BIND | MS_REMOUNT | MS_RDONLY, nullptr);
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]            if (d64) {
+[internal][vvb2060][vvb2060@gmail.com]                mount(dex2oat64, d64p, nullptr, MS_BIND, nullptr);
+[internal][vvb2060][vvb2060@gmail.com]                mount(nullptr, d64p, nullptr, MS_BIND | MS_REMOUNT | MS_RDONLY, nullptr);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            execlp("resetprop", "resetprop", "--delete", "dalvik.vm.dex2oat-flags", nullptr);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        } else {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            LOGI("Disable dex2oat wrapper");
+[internal][vvb2060][vvb2060@gmail.com]            if (r32) umount(r32p);
+[internal][vvb2060][vvb2060@gmail.com]            if (d32) umount(d32p);
+[internal][vvb2060][vvb2060@gmail.com]            if (r64) umount(r64p);
+[internal][vvb2060][vvb2060@gmail.com]            if (d64) umount(d64p);
+[internal][vvb2060][vvb2060@gmail.com]            execlp("resetprop", "resetprop", "dalvik.vm.dex2oat-flags", "--inline-max-code-units=0",
+[internal][vvb2060][vvb2060@gmail.com]                   nullptr);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        PLOGE("Failed to resetprop");
+[internal][vvb2060][vvb2060@gmail.com]        exit(1);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]}
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]static int setsockcreatecon_raw(const char *context) {
+[internal][vvb2060][vvb2060@gmail.com]    std::string path = "/proc/self/task/" + std::to_string(gettid()) + "/attr/sockcreate";
+[internal][vvb2060][vvb2060@gmail.com]    int fd = open(path.c_str(), O_RDWR | O_CLOEXEC);
+[internal][vvb2060][vvb2060@gmail.com]    if (fd < 0) return -1;
+[internal][vvb2060][vvb2060@gmail.com]    int ret;
+[internal][vvb2060][vvb2060@gmail.com]    if (context) {
+[internal][vvb2060][vvb2060@gmail.com]        do {
+[internal][vvb2060][vvb2060@gmail.com]            ret = write(fd, context, strlen(context) + 1);
+[internal][vvb2060][vvb2060@gmail.com]        } while (ret < 0 && errno == EINTR);
+[internal][vvb2060][vvb2060@gmail.com]    } else {
+[internal][vvb2060][vvb2060@gmail.com]        do {
+[internal][vvb2060][vvb2060@gmail.com]            ret = write(fd, nullptr, 0); // clear
+[internal][vvb2060][vvb2060@gmail.com]        } while (ret < 0 && errno == EINTR);
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]    close(fd);
+[internal][vvb2060][vvb2060@gmail.com]    return ret < 0 ? -1 : 0;
+[internal][vvb2060][vvb2060@gmail.com]}
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]extern "C"
+[internal][vvb2060][vvb2060@gmail.com]JNIEXPORT jboolean JNICALL
+[internal][vvb2060][vvb2060@gmail.com]Java_org_lsposed_lspd_service_Dex2OatService_setSockCreateContext(JNIEnv *env, jclass,
+[internal][vvb2060][vvb2060@gmail.com]                                                                  jstring contextStr) {
+[internal][vvb2060][vvb2060@gmail.com]    const char *context = env->GetStringUTFChars(contextStr, nullptr);
+[internal][vvb2060][vvb2060@gmail.com]    int ret = setsockcreatecon_raw(context);
+[internal][vvb2060][vvb2060@gmail.com]    env->ReleaseStringUTFChars(contextStr, context);
+[internal][vvb2060][vvb2060@gmail.com]    return ret == 0;
+[internal][vvb2060][vvb2060@gmail.com]}
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]extern "C"
+[internal][vvb2060][vvb2060@gmail.com]JNIEXPORT jstring JNICALL
+[internal][vvb2060][vvb2060@gmail.com]Java_org_lsposed_lspd_service_Dex2OatService_getSockPath(JNIEnv *env, jobject) {
+[internal][vvb2060][vvb2060@gmail.com]    return env->NewStringUTF("5291374ceda0aef7c5d86cd2a4f6a3ac\0");
+[internal][vvb2060][vvb2060@gmail.com]}

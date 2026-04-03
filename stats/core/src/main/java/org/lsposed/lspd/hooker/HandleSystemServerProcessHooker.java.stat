@@ -1,0 +1,54 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.lspd.hooker;
+[external][hsushulong][hsushulong@gmail.com]
+[external][noreply][noreply@nullptr.icu]import android.annotation.SuppressLint;
+[external][noreply][noreply@nullptr.icu]
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.lspd.deopt.PrebuiltMethodsDeopter;
+[external][noreply][noreply@nullptr.icu]import org.lsposed.lspd.impl.LSPosedHelper;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.lspd.util.Hookers;
+[external][hsushulong][hsushulong@gmail.com]
+[external][noreply][noreply@nullptr.icu]import io.github.libxposed.api.XposedInterface;
+[external][noreply][noreply@nullptr.icu]import io.github.libxposed.api.annotations.AfterInvocation;
+[external][noreply][noreply@nullptr.icu]import io.github.libxposed.api.annotations.XposedHooker;
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]// system_server initialization
+[external][noreply][noreply@nullptr.icu]@XposedHooker
+[external][noreply][noreply@nullptr.icu]public class HandleSystemServerProcessHooker implements XposedInterface.Hooker {
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]    public static volatile ClassLoader systemServerCL;
+[external][hsushulong][hsushulong@gmail.com]
+[external][noreply][noreply@nullptr.icu]    @SuppressLint("PrivateApi")
+[external][noreply][noreply@nullptr.icu]    @AfterInvocation
+[external][noreply][noreply@nullptr.icu]    public static void afterHookedMethod() {
+[external][shana][shana@zju.edu.cn]        Hookers.logD("ZygoteInit#handleSystemServerProcess() starts");
+[external][hsushulong][hsushulong@gmail.com]        try {
+[external][hsushulong][hsushulong@gmail.com]            // get system_server classLoader
+[external][hsushulong][hsushulong@gmail.com]            systemServerCL = Thread.currentThread().getContextClassLoader();
+[external][hsushulong][hsushulong@gmail.com]            // deopt methods in SYSTEMSERVERCLASSPATH
+[external][hsushulong][hsushulong@gmail.com]            PrebuiltMethodsDeopter.deoptSystemServerMethods(systemServerCL);
+[external][noreply][noreply@nullptr.icu]            var clazz = Class.forName("com.android.server.SystemServer", false, systemServerCL);
+[external][noreply][noreply@nullptr.icu]            LSPosedHelper.hookAllMethods(StartBootstrapServicesHooker.class, clazz, "startBootstrapServices");
+[external][hsushulong][hsushulong@gmail.com]        } catch (Throwable t) {
+[external][hsushulong][hsushulong@gmail.com]            Hookers.logE("error when hooking systemMain", t);
+[external][hsushulong][hsushulong@gmail.com]        }
+[external][hsushulong][hsushulong@gmail.com]    }
+[external][hsushulong][hsushulong@gmail.com]}

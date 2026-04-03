@@ -1,0 +1,96 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.manager.ui.widget;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.annotation.SuppressLint;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.content.Context;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.text.Layout;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.text.Spanned;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.text.style.ClickableSpan;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.util.AttributeSet;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.view.MotionEvent;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import androidx.annotation.NonNull;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]public class LinkifyTextView extends androidx.appcompat.widget.AppCompatTextView {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private ClickableSpan mCurrentSpan;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public LinkifyTextView(Context context) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        super(context);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public LinkifyTextView(Context context, AttributeSet attrs) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        super(context, attrs);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public LinkifyTextView(Context context, AttributeSet attrs, int defStyleAttr) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        super(context, attrs, defStyleAttr);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public ClickableSpan getCurrentSpan() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return mCurrentSpan;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public void clearCurrentSpan() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        mCurrentSpan = null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @SuppressLint("ClickableViewAccessibility")
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public boolean onTouchEvent(@NonNull MotionEvent event) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        // Let the parent or grandparent of TextView to handles click action.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        // Otherwise click effect like ripple will not work, and if touch area
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        // do not contain a url, the TextView will still get MotionEvent.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        // onTouchEven must be called with MotionEvent.ACTION_DOWN for each touch
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        // action on it, so we analyze touched url here.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            mCurrentSpan = null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (getText() instanceof Spanned) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                // Get this code from android.text.method.LinkMovementMethod.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                // Work fine !
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                int x = (int) event.getX();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                int y = (int) event.getY();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                x -= getTotalPaddingLeft();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                y -= getTotalPaddingTop();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                x += getScrollX();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                y += getScrollY();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                Layout layout = getLayout();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                if (null != layout) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    int line = layout.getLineForVertical(y);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    int off = layout.getOffsetForHorizontal(line, x);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    ClickableSpan[] spans = ((Spanned) getText()).getSpans(off, off, ClickableSpan.class);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    if (spans.length > 0) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        mCurrentSpan = spans[0];
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return super.onTouchEvent(event);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]}

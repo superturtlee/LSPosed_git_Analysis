@@ -1,0 +1,424 @@
+[external][shana][shana@zju.edu.cn]package org.lsposed.lspd.impl.utils;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import androidx.annotation.NonNull;
+[external][shana][shana@zju.edu.cn]import androidx.annotation.Nullable;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import org.lsposed.lspd.nativebridge.DexParserBridge;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import java.io.IOException;
+[external][shana][shana@zju.edu.cn]import java.nio.ByteBuffer;
+[external][shana][shana@zju.edu.cn]
+[external][noreply][noreply@nullptr.icu]import io.github.libxposed.api.utils.DexParser;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public class LSPosedDexParser implements DexParser {
+[external][shana][shana@zju.edu.cn]    long cookie;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @NonNull
+[external][shana][shana@zju.edu.cn]    final ByteBuffer data;
+[external][shana][shana@zju.edu.cn]    @NonNull
+[external][shana][shana@zju.edu.cn]    final StringId[] strings;
+[external][shana][shana@zju.edu.cn]    @NonNull
+[external][shana][shana@zju.edu.cn]    final TypeId[] typeIds;
+[external][shana][shana@zju.edu.cn]    @NonNull
+[external][shana][shana@zju.edu.cn]    final ProtoId[] protoIds;
+[external][shana][shana@zju.edu.cn]    @NonNull
+[external][shana][shana@zju.edu.cn]    final FieldId[] fieldIds;
+[external][shana][shana@zju.edu.cn]    @NonNull
+[external][shana][shana@zju.edu.cn]    final MethodId[] methodIds;
+[external][shana][shana@zju.edu.cn]    @NonNull
+[external][shana][shana@zju.edu.cn]    final Annotation[] annotations;
+[external][shana][shana@zju.edu.cn]    @NonNull
+[external][shana][shana@zju.edu.cn]    final Array[] arrays;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public LSPosedDexParser(@NonNull ByteBuffer buffer, boolean includeAnnotations) throws IOException {
+[external][shana][shana@zju.edu.cn]        if (!buffer.isDirect() || !buffer.asReadOnlyBuffer().hasArray()) {
+[external][shana][shana@zju.edu.cn]            data = ByteBuffer.allocateDirect(buffer.capacity());
+[external][shana][shana@zju.edu.cn]            data.put(buffer);
+[external][shana][shana@zju.edu.cn]        } else {
+[external][shana][shana@zju.edu.cn]            data = buffer;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        try {
+[external][shana][shana@zju.edu.cn]            long[] args = new long[2];
+[external][shana][shana@zju.edu.cn]            args[1] = includeAnnotations ? 1 : 0;
+[external][shana][shana@zju.edu.cn]            var out = (Object[]) DexParserBridge.openDex(buffer, args);
+[external][shana][shana@zju.edu.cn]            cookie = args[0];
+[external][shana][shana@zju.edu.cn]            // out[0]: String[]
+[external][shana][shana@zju.edu.cn]            // out[1]: int[]
+[external][shana][shana@zju.edu.cn]            // out[2]: int[][]
+[external][shana][shana@zju.edu.cn]            // out[3]: int[]
+[external][shana][shana@zju.edu.cn]            // out[4]: int[]
+[external][shana][shana@zju.edu.cn]            // out[5]: int[]
+[external][shana][shana@zju.edu.cn]            // out[6]: Object[]
+[external][shana][shana@zju.edu.cn]            // out[7]: Object[]
+[external][shana][shana@zju.edu.cn]            var strings = (Object[]) out[0];
+[external][shana][shana@zju.edu.cn]            this.strings = new StringId[strings.length];
+[external][shana][shana@zju.edu.cn]            for (int i = 0; i < strings.length; ++i) {
+[external][shana][shana@zju.edu.cn]                this.strings[i] = new LSPosedStringId(i, strings[i]);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            var typeIds = (int[]) out[1];
+[external][shana][shana@zju.edu.cn]            this.typeIds = new TypeId[typeIds.length];
+[external][shana][shana@zju.edu.cn]            for (int i = 0; i < typeIds.length; ++i) {
+[external][shana][shana@zju.edu.cn]                this.typeIds[i] = new LSPosedTypeId(i, typeIds[i]);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            var protoIds = (int[][]) out[2];
+[external][shana][shana@zju.edu.cn]            this.protoIds = new ProtoId[protoIds.length];
+[external][shana][shana@zju.edu.cn]            for (int i = 0; i < protoIds.length; ++i) {
+[external][shana][shana@zju.edu.cn]                this.protoIds[i] = new LSPosedProtoId(i, protoIds[i]);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            var fieldIds = (int[]) out[3];
+[external][shana][shana@zju.edu.cn]            this.fieldIds = new FieldId[fieldIds.length / 3];
+[external][shana][shana@zju.edu.cn]            for (int i = 0; i < this.fieldIds.length; ++i) {
+[external][shana][shana@zju.edu.cn]                this.fieldIds[i] = new LSPosedFieldId(i, fieldIds[3 * i], fieldIds[3 * i + 1], fieldIds[3 * i + 2]);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            var methodIds = (int[]) out[4];
+[external][shana][shana@zju.edu.cn]            this.methodIds = new MethodId[methodIds.length / 3];
+[external][shana][shana@zju.edu.cn]            for (int i = 0; i < this.methodIds.length / 3; ++i) {
+[external][shana][shana@zju.edu.cn]                this.methodIds[i] = new LSPosedMethodId(i, methodIds[3 * i], methodIds[3 * i + 1], methodIds[3 * i + 2]);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            if (out[5] != null && out[6] != null) {
+[external][shana][shana@zju.edu.cn]                var a = (int[]) out[5];
+[external][shana][shana@zju.edu.cn]                var b = (Object[]) out[6];
+[external][shana][shana@zju.edu.cn]                this.annotations = new Annotation[a.length / 2];
+[external][shana][shana@zju.edu.cn]                for (int i = 0; i < this.annotations.length; ++i) {
+[external][shana][shana@zju.edu.cn]                    this.annotations[i] = new LSPosedAnnotation(a[2 * i], a[2 * i + 1], (int[]) b[2 * i], (Object[]) b[2 * i + 1]);
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            } else {
+[external][shana][shana@zju.edu.cn]                this.annotations = new Annotation[0];
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            if (out[7] != null) {
+[external][shana][shana@zju.edu.cn]                var b = (Object[]) out[7];
+[external][shana][shana@zju.edu.cn]                this.arrays = new Array[b.length / 2];
+[external][shana][shana@zju.edu.cn]                for (int i = 0; i < this.arrays.length; ++i) {
+[external][shana][shana@zju.edu.cn]                    this.arrays[i] = new LSPosedArray((int[]) b[2 * i], (Object[]) b[2 * i + 1]);
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            } else {
+[external][shana][shana@zju.edu.cn]                this.arrays = new Array[0];
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        } catch (Throwable e) {
+[external][shana][shana@zju.edu.cn]            throw new IOException("Invalid dex file", e);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    synchronized public void close() {
+[external][shana][shana@zju.edu.cn]        if (cookie != 0) {
+[external][shana][shana@zju.edu.cn]            DexParserBridge.closeDex(cookie);
+[external][shana][shana@zju.edu.cn]            cookie = 0;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    static class LSPosedId<Self extends Id<Self>> implements Id<Self> {
+[external][shana][shana@zju.edu.cn]        final int id;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        LSPosedId(int id) {
+[external][shana][shana@zju.edu.cn]            this.id = id;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public int getId() {
+[external][shana][shana@zju.edu.cn]            return id;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public int compareTo(Self o) {
+[external][shana][shana@zju.edu.cn]            return id - o.getId();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    static class LSPosedStringId extends LSPosedId<StringId> implements StringId {
+[external][shana][shana@zju.edu.cn]        @NonNull
+[external][shana][shana@zju.edu.cn]        final String string;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        LSPosedStringId(int id, @NonNull Object string) {
+[external][shana][shana@zju.edu.cn]            super(id);
+[external][shana][shana@zju.edu.cn]            this.string = (String) string;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @NonNull
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public String getString() {
+[external][shana][shana@zju.edu.cn]            return string;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    class LSPosedTypeId extends LSPosedId<TypeId> implements TypeId {
+[external][shana][shana@zju.edu.cn]        @NonNull
+[external][shana][shana@zju.edu.cn]        final StringId descriptor;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        LSPosedTypeId(int id, int descriptor) {
+[external][shana][shana@zju.edu.cn]            super(id);
+[external][shana][shana@zju.edu.cn]            this.descriptor = strings[descriptor];
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @NonNull
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public StringId getDescriptor() {
+[external][shana][shana@zju.edu.cn]            return descriptor;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    class LSPosedProtoId extends LSPosedId<ProtoId> implements ProtoId {
+[external][shana][shana@zju.edu.cn]        @NonNull
+[external][shana][shana@zju.edu.cn]        final StringId shorty;
+[external][shana][shana@zju.edu.cn]        @NonNull
+[external][shana][shana@zju.edu.cn]        final TypeId returnType;
+[external][shana][shana@zju.edu.cn]        @Nullable
+[external][shana][shana@zju.edu.cn]        final TypeId[] parameters;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        LSPosedProtoId(int id, @NonNull int[] protoId) {
+[external][shana][shana@zju.edu.cn]            super(id);
+[external][shana][shana@zju.edu.cn]            this.shorty = strings[protoId[0]];
+[external][shana][shana@zju.edu.cn]            this.returnType = typeIds[protoId[1]];
+[external][shana][shana@zju.edu.cn]            if (protoId.length > 2) {
+[external][shana][shana@zju.edu.cn]                this.parameters = new TypeId[protoId.length - 2];
+[external][shana][shana@zju.edu.cn]                for (int i = 2; i < parameters.length; ++i) {
+[external][shana][shana@zju.edu.cn]                    this.parameters[i] = typeIds[protoId[i]];
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            } else {
+[external][shana][shana@zju.edu.cn]                this.parameters = null;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @NonNull
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public StringId getShorty() {
+[external][shana][shana@zju.edu.cn]            return shorty;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @NonNull
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public TypeId getReturnType() {
+[external][shana][shana@zju.edu.cn]            return returnType;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @Nullable
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public TypeId[] getParameters() {
+[external][shana][shana@zju.edu.cn]            return parameters;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    class LSPosedFieldId extends LSPosedId<FieldId> implements FieldId {
+[external][shana][shana@zju.edu.cn]        @NonNull
+[external][shana][shana@zju.edu.cn]        final TypeId type;
+[external][shana][shana@zju.edu.cn]        @NonNull
+[external][shana][shana@zju.edu.cn]        final TypeId declaringClass;
+[external][shana][shana@zju.edu.cn]        @NonNull
+[external][shana][shana@zju.edu.cn]        final StringId name;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        LSPosedFieldId(int id, int type, int declaringClass, int name) {
+[external][shana][shana@zju.edu.cn]            super(id);
+[external][shana][shana@zju.edu.cn]            this.type = typeIds[type];
+[external][shana][shana@zju.edu.cn]            this.declaringClass = typeIds[declaringClass];
+[external][shana][shana@zju.edu.cn]            this.name = strings[name];
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @NonNull
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public TypeId getType() {
+[external][shana][shana@zju.edu.cn]            return type;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @NonNull
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public TypeId getDeclaringClass() {
+[external][shana][shana@zju.edu.cn]            return declaringClass;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @NonNull
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public StringId getName() {
+[external][shana][shana@zju.edu.cn]            return name;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    class LSPosedMethodId extends LSPosedId<MethodId> implements MethodId {
+[external][shana][shana@zju.edu.cn]        @NonNull
+[external][shana][shana@zju.edu.cn]        final TypeId declaringClass;
+[external][shana][shana@zju.edu.cn]        @NonNull
+[external][shana][shana@zju.edu.cn]        final ProtoId prototype;
+[external][shana][shana@zju.edu.cn]        @NonNull
+[external][shana][shana@zju.edu.cn]        final StringId name;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        LSPosedMethodId(int id, int declaringClass, int prototype, int name) {
+[external][shana][shana@zju.edu.cn]            super(id);
+[external][shana][shana@zju.edu.cn]            this.declaringClass = typeIds[declaringClass];
+[external][shana][shana@zju.edu.cn]            this.prototype = protoIds[prototype];
+[external][shana][shana@zju.edu.cn]            this.name = strings[name];
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @NonNull
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public TypeId getDeclaringClass() {
+[external][shana][shana@zju.edu.cn]            return declaringClass;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @NonNull
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public ProtoId getPrototype() {
+[external][shana][shana@zju.edu.cn]            return prototype;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @NonNull
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public StringId getName() {
+[external][shana][shana@zju.edu.cn]            return name;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    static class LSPosedArray implements Array {
+[external][shana][shana@zju.edu.cn]        @NonNull
+[external][shana][shana@zju.edu.cn]        final Value[] values;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        LSPosedArray(int[] elements, @NonNull Object[] values) {
+[external][shana][shana@zju.edu.cn]            this.values = new Value[values.length];
+[external][shana][shana@zju.edu.cn]            for (int i = 0; i < values.length; ++i) {
+[external][shana][shana@zju.edu.cn]                this.values[i] = new LSPosedValue(elements[i], (ByteBuffer) values[i]);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @NonNull
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public Value[] getValues() {
+[external][shana][shana@zju.edu.cn]            return values;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    class LSPosedAnnotation implements Annotation {
+[external][shana][shana@zju.edu.cn]        int visibility;
+[external][shana][shana@zju.edu.cn]        @NonNull
+[external][shana][shana@zju.edu.cn]        final TypeId type;
+[external][shana][shana@zju.edu.cn]        @NonNull
+[external][shana][shana@zju.edu.cn]        final Element[] elements;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        LSPosedAnnotation(int visibility, int type, @NonNull int[] elements, @NonNull Object[] elementValues) {
+[external][shana][shana@zju.edu.cn]            this.visibility = visibility;
+[external][shana][shana@zju.edu.cn]            this.type = typeIds[type];
+[external][shana][shana@zju.edu.cn]            this.elements = new Element[elementValues.length];
+[external][shana][shana@zju.edu.cn]            for (int i = 0; i < elementValues.length; ++i) {
+[external][shana][shana@zju.edu.cn]                this.elements[i] = new LSPosedElement(elements[i * 2], elements[i * 2 + 1], (ByteBuffer) elementValues[i]);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public int getVisibility() {
+[external][shana][shana@zju.edu.cn]            return visibility;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @NonNull
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public TypeId getType() {
+[external][shana][shana@zju.edu.cn]            return type;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @NonNull
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public Element[] getElements() {
+[external][shana][shana@zju.edu.cn]            return elements;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    static class LSPosedValue implements Value {
+[external][shana][shana@zju.edu.cn]        final int valueType;
+[external][shana][shana@zju.edu.cn]        @Nullable
+[external][shana][shana@zju.edu.cn]        final byte[] value;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        LSPosedValue(int valueType, @Nullable ByteBuffer value) {
+[external][shana][shana@zju.edu.cn]            this.valueType = valueType;
+[external][shana][shana@zju.edu.cn]            if (value != null) {
+[external][shana][shana@zju.edu.cn]                this.value = new byte[value.remaining()];
+[external][shana][shana@zju.edu.cn]                value.get(this.value);
+[external][shana][shana@zju.edu.cn]            } else {
+[external][shana][shana@zju.edu.cn]                this.value = null;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @Nullable
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public byte[] getValue() {
+[external][shana][shana@zju.edu.cn]            return value;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public int getValueType() {
+[external][shana][shana@zju.edu.cn]            return valueType;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    class LSPosedElement extends LSPosedValue implements Element {
+[external][shana][shana@zju.edu.cn]        @NonNull
+[external][shana][shana@zju.edu.cn]        final StringId name;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        LSPosedElement(int name, int valueType, @Nullable ByteBuffer value) {
+[external][shana][shana@zju.edu.cn]            super(valueType, value);
+[external][shana][shana@zju.edu.cn]            this.name = strings[name];
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @NonNull
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public StringId getName() {
+[external][shana][shana@zju.edu.cn]            return name;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @NonNull
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public StringId[] getStringId() {
+[external][shana][shana@zju.edu.cn]        return strings;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @NonNull
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public TypeId[] getTypeId() {
+[external][shana][shana@zju.edu.cn]        return typeIds;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @NonNull
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public FieldId[] getFieldId() {
+[external][shana][shana@zju.edu.cn]        return fieldIds;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @NonNull
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public MethodId[] getMethodId() {
+[external][shana][shana@zju.edu.cn]        return methodIds;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @NonNull
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public ProtoId[] getProtoId() {
+[external][shana][shana@zju.edu.cn]        return protoIds;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @NonNull
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public Annotation[] getAnnotations() {
+[external][shana][shana@zju.edu.cn]        return annotations;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @NonNull
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public Array[] getArrays() {
+[external][shana][shana@zju.edu.cn]        return arrays;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    synchronized public void visitDefinedClasses(@NonNull ClassVisitor visitor) {
+[external][shana][shana@zju.edu.cn]        if (cookie == 0) {
+[external][shana][shana@zju.edu.cn]            throw new IllegalStateException("Closed");
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        var classVisitMethod = ClassVisitor.class.getDeclaredMethods()[0];
+[external][shana][shana@zju.edu.cn]        var fieldVisitMethod = FieldVisitor.class.getDeclaredMethods()[0];
+[external][shana][shana@zju.edu.cn]        var methodVisitMethod = MethodVisitor.class.getDeclaredMethods()[0];
+[external][shana][shana@zju.edu.cn]        var methodBodyVisitMethod = MethodBodyVisitor.class.getDeclaredMethods()[0];
+[external][shana][shana@zju.edu.cn]        var stopMethod = EarlyStopVisitor.class.getDeclaredMethods()[0];
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        DexParserBridge.visitClass(cookie, visitor, FieldVisitor.class, MethodVisitor.class, classVisitMethod, fieldVisitMethod, methodVisitMethod, methodBodyVisitMethod, stopMethod);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

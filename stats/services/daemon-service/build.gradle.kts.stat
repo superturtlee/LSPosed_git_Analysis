@@ -1,0 +1,46 @@
+[internal][dr-tsng][tsng.nullptr@outlook.com]/*
+[internal][dr-tsng][tsng.nullptr@outlook.com] * This file is part of LSPosed.
+[internal][dr-tsng][tsng.nullptr@outlook.com] *
+[internal][dr-tsng][tsng.nullptr@outlook.com] * LSPosed is free software: you can redistribute it and/or modify
+[internal][dr-tsng][tsng.nullptr@outlook.com] * it under the terms of the GNU General Public License as published by
+[internal][dr-tsng][tsng.nullptr@outlook.com] * the Free Software Foundation, either version 3 of the License, or
+[internal][dr-tsng][tsng.nullptr@outlook.com] * (at your option) any later version.
+[internal][dr-tsng][tsng.nullptr@outlook.com] *
+[internal][dr-tsng][tsng.nullptr@outlook.com] * LSPosed is distributed in the hope that it will be useful,
+[internal][dr-tsng][tsng.nullptr@outlook.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[internal][dr-tsng][tsng.nullptr@outlook.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[internal][dr-tsng][tsng.nullptr@outlook.com] * GNU General Public License for more details.
+[internal][dr-tsng][tsng.nullptr@outlook.com] *
+[internal][dr-tsng][tsng.nullptr@outlook.com] * You should have received a copy of the GNU General Public License
+[internal][dr-tsng][tsng.nullptr@outlook.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[internal][dr-tsng][tsng.nullptr@outlook.com] *
+[internal][dr-tsng][tsng.nullptr@outlook.com] * Copyright (C) 2021 LSPosed Contributors
+[internal][dr-tsng][tsng.nullptr@outlook.com] */
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[internal][dr-tsng][tsng.nullptr@outlook.com]plugins {
+[external][shana][shana@zju.edu.cn]    alias(libs.plugins.agp.lib)
+[internal][dr-tsng][tsng.nullptr@outlook.com]}
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[internal][dr-tsng][tsng.nullptr@outlook.com]android {
+[external][shana][shana@zju.edu.cn]    buildFeatures {
+[external][shana][shana@zju.edu.cn]        aidl = true
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[internal][dr-tsng][tsng.nullptr@outlook.com]    defaultConfig {
+[internal][dr-tsng][tsng.nullptr@outlook.com]        consumerProguardFiles("proguard-rules.pro")
+[internal][dr-tsng][tsng.nullptr@outlook.com]    }
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[internal][dr-tsng][tsng.nullptr@outlook.com]    buildTypes {
+[internal][dr-tsng][tsng.nullptr@outlook.com]        release {
+[internal][dr-tsng][tsng.nullptr@outlook.com]            isMinifyEnabled = false
+[internal][dr-tsng][tsng.nullptr@outlook.com]        }
+[internal][dr-tsng][tsng.nullptr@outlook.com]    }
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[internal][dr-tsng][tsng.nullptr@outlook.com]    aidlPackagedList += "org/lsposed/lspd/models/Module.aidl"
+[internal][dr-tsng][tsng.nullptr@outlook.com]    aidlPackagedList += "org/lsposed/lspd/models/PreloadedApk.aidl"
+[external][shana][shana@zju.edu.cn]    namespace = "org.lsposed.lspd.daemonservice"
+[internal][dr-tsng][tsng.nullptr@outlook.com]}
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[internal][dr-tsng][tsng.nullptr@outlook.com]dependencies {
+[external][shana][shana@zju.edu.cn]    compileOnly(projects.hiddenapi.stubs)
+[internal][dr-tsng][tsng.nullptr@outlook.com]}

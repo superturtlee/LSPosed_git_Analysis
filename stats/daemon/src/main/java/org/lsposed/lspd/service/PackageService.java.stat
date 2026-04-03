@@ -1,0 +1,354 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.lspd.service;
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import static android.content.pm.ServiceInfo.FLAG_ISOLATED_PROCESS;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import static org.lsposed.lspd.service.ServiceManager.TAG;
+[external][shana][shana@zju.edu.cn]import static org.lsposed.lspd.service.ServiceManager.existsInGlobalNamespace;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]import android.content.IIntentReceiver;
+[external][shana][shana@zju.edu.cn]import android.content.IIntentSender;
+[external][shana][shana@zju.edu.cn]import android.content.Intent;
+[external][shana][shana@zju.edu.cn]import android.content.IntentSender;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.content.pm.ApplicationInfo;
+[external][shana][shana@zju.edu.cn]import android.content.pm.ComponentInfo;
+[external][shana][shana@zju.edu.cn]import android.content.pm.IPackageManager;
+[external][shana][shana@zju.edu.cn]import android.content.pm.PackageInfo;
+[external][shana][shana@zju.edu.cn]import android.content.pm.PackageInstaller;
+[external][shana][shana@zju.edu.cn]import android.content.pm.PackageManager;
+[internal][vvb2060][vvb2060@gmail.com]import android.content.pm.ParceledListSlice;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.content.pm.ResolveInfo;
+[external][shana][shana@zju.edu.cn]import android.content.pm.ServiceInfo;
+[external][shana][shana@zju.edu.cn]import android.content.pm.VersionedPackage;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.os.Build;
+[external][shana][shana@zju.edu.cn]import android.os.Bundle;
+[external][shana][shana@zju.edu.cn]import android.os.IBinder;
+[external][shana][shana@zju.edu.cn]import android.os.RemoteException;
+[external][shana][shana@zju.edu.cn]import android.os.ServiceManager;
+[external][shana][shana@zju.edu.cn]import android.os.SystemProperties;
+[external][shana][shana@zju.edu.cn]import android.util.Log;
+[external][shana][shana@zju.edu.cn]import android.util.Pair;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import androidx.annotation.NonNull;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import androidx.annotation.Nullable;
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.lspd.models.Application;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]import java.lang.reflect.Constructor;
+[external][shana][shana@zju.edu.cn]import java.lang.reflect.InvocationTargetException;
+[external][shana][shana@zju.edu.cn]import java.util.ArrayList;
+[external][shana][shana@zju.edu.cn]import java.util.Collections;
+[external][shana][shana@zju.edu.cn]import java.util.HashMap;
+[external][shana][shana@zju.edu.cn]import java.util.HashSet;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.util.List;
+[external][shana][shana@zju.edu.cn]import java.util.Map;
+[external][shana][shana@zju.edu.cn]import java.util.Set;
+[external][shana][shana@zju.edu.cn]import java.util.concurrent.CountDownLatch;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import java.util.stream.Collectors;
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]import rikka.parcelablelist.ParcelableListSlice;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public class PackageService {
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    static final int INSTALL_FAILED_INTERNAL_ERROR = -110;
+[internal][vvb2060][vvb2060@gmail.com]    static final int INSTALL_REASON_UNKNOWN = 0;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    static final int MATCH_ANY_USER = 0x00400000; // PackageManager.MATCH_ANY_USER
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    static final int MATCH_ALL_FLAGS = PackageManager.MATCH_DISABLED_COMPONENTS | PackageManager.MATCH_DIRECT_BOOT_AWARE | PackageManager.MATCH_DIRECT_BOOT_UNAWARE | PackageManager.MATCH_UNINSTALLED_PACKAGES | MATCH_ANY_USER;
+[external][shana][shana@zju.edu.cn]    public static final int PER_USER_RANGE = 100000;
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]    private static IPackageManager pm = null;
+[external][shana][shana@zju.edu.cn]    private static IBinder binder = null;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    static boolean isAlive() {
+[external][shana][shana@zju.edu.cn]        var pm = getPackageManager();
+[external][shana][shana@zju.edu.cn]        return pm != null && pm.asBinder().isBinderAlive();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private static final IBinder.DeathRecipient recipient = new IBinder.DeathRecipient() {
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public void binderDied() {
+[external][shana][shana@zju.edu.cn]            Log.w(TAG, "pm is dead");
+[external][shana][shana@zju.edu.cn]            binder.unlinkToDeath(this, 0);
+[external][shana][shana@zju.edu.cn]            binder = null;
+[external][shana][shana@zju.edu.cn]            pm = null;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    };
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private static IPackageManager getPackageManager() {
+[internal][vvb2060][vvb2060@gmail.com]        if (binder == null || pm == null) {
+[external][shana][shana@zju.edu.cn]            binder = ServiceManager.getService("package");
+[external][shana][shana@zju.edu.cn]            if (binder == null) return null;
+[external][shana][shana@zju.edu.cn]            try {
+[external][shana][shana@zju.edu.cn]                binder.linkToDeath(recipient, 0);
+[external][shana][shana@zju.edu.cn]            } catch (RemoteException e) {
+[external][shana][shana@zju.edu.cn]                Log.e(TAG, Log.getStackTraceString(e));
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            pm = IPackageManager.Stub.asInterface(binder);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return pm;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    @Nullable
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static PackageInfo getPackageInfo(String packageName, int flags, int userId) throws RemoteException {
+[external][shana][shana@zju.edu.cn]        IPackageManager pm = getPackageManager();
+[external][shana][shana@zju.edu.cn]        if (pm == null) return null;
+[internal][vvb2060][vvb2060@gmail.com]        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+[external][shana][shana@zju.edu.cn]            return pm.getPackageInfo(packageName, (long) flags, userId);
+[external][shana][shana@zju.edu.cn]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return pm.getPackageInfo(packageName, flags, userId);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static @NonNull
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    Map<Integer, PackageInfo> getPackageInfoFromAllUsers(String packageName, int flags) throws RemoteException {
+[external][shana][shana@zju.edu.cn]        IPackageManager pm = getPackageManager();
+[external][shana][shana@zju.edu.cn]        Map<Integer, PackageInfo> res = new HashMap<>();
+[external][shana][shana@zju.edu.cn]        if (pm == null) return res;
+[external][shana][shana@zju.edu.cn]        for (var user : UserService.getUsers()) {
+[external][shana][shana@zju.edu.cn]            var info = getPackageInfo(packageName, flags, user.id);
+[external][shana][shana@zju.edu.cn]            if (info != null && info.applicationInfo != null) res.put(user.id, info);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return res;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    @Nullable
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static ApplicationInfo getApplicationInfo(String packageName, int flags, int userId) throws RemoteException {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        IPackageManager pm = getPackageManager();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (pm == null) return null;
+[internal][vvb2060][vvb2060@gmail.com]        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+[external][shana][shana@zju.edu.cn]            return pm.getApplicationInfo(packageName, (long) flags, userId);
+[external][shana][shana@zju.edu.cn]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return pm.getApplicationInfo(packageName, flags, userId);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    // Only for manager
+[internal][vvb2060][vvb2060@gmail.com]    public static ParcelableListSlice<PackageInfo> getInstalledPackagesFromAllUsers(int flags, boolean filterNoProcess) throws RemoteException {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        List<PackageInfo> res = new ArrayList<>();
+[external][shana][shana@zju.edu.cn]        IPackageManager pm = getPackageManager();
+[internal][vvb2060][vvb2060@gmail.com]        if (pm == null) return ParcelableListSlice.emptyList();
+[external][shana][shana@zju.edu.cn]        for (var user : UserService.getUsers()) {
+[external][shana][shana@zju.edu.cn]            // in case pkginfo of other users in primary user
+[internal][vvb2060][vvb2060@gmail.com]            ParceledListSlice<PackageInfo> infos;
+[internal][vvb2060][vvb2060@gmail.com]            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+[internal][vvb2060][vvb2060@gmail.com]                infos = pm.getInstalledPackages((long) flags, user.id);
+[internal][vvb2060][vvb2060@gmail.com]            } else {
+[internal][vvb2060][vvb2060@gmail.com]                infos = pm.getInstalledPackages(flags, user.id);
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]            res.addAll(infos
+[external][shana][shana@zju.edu.cn]                    .getList().parallelStream()
+[external][shana][shana@zju.edu.cn]                    .filter(info -> info.applicationInfo != null && info.applicationInfo.uid / PER_USER_RANGE == user.id)
+[external][shana][shana@zju.edu.cn]                    .filter(info -> {
+[external][shana][shana@zju.edu.cn]                        try {
+[external][shana][shana@zju.edu.cn]                            return isPackageAvailable(info.packageName, user.id, true);
+[external][shana][shana@zju.edu.cn]                        } catch (RemoteException e) {
+[external][shana][shana@zju.edu.cn]                            return false;
+[external][shana][shana@zju.edu.cn]                        }
+[external][shana][shana@zju.edu.cn]                    })
+[external][shana][shana@zju.edu.cn]                    .collect(Collectors.toList()));
+[external][shana][shana@zju.edu.cn]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (filterNoProcess) {
+[internal][vvb2060][vvb2060@gmail.com]            return new ParcelableListSlice<>(res.parallelStream().filter(packageInfo -> {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                try {
+[external][shana][shana@zju.edu.cn]                    PackageInfo pkgInfo = getPackageInfoWithComponents(packageInfo.packageName, MATCH_ALL_FLAGS, packageInfo.applicationInfo.uid / PER_USER_RANGE);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    return !fetchProcesses(pkgInfo).isEmpty();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                } catch (RemoteException e) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    Log.w(TAG, "filter failed", e);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    return true;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            }).collect(Collectors.toList()));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[internal][vvb2060][vvb2060@gmail.com]        return new ParcelableListSlice<>(res);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private static Set<String> fetchProcesses(PackageInfo pkgInfo) {
+[external][shana][shana@zju.edu.cn]        HashSet<String> processNames = new HashSet<>();
+[external][shana][shana@zju.edu.cn]        if (pkgInfo == null) return processNames;
+[external][shana][shana@zju.edu.cn]        for (ComponentInfo[] componentInfos : new ComponentInfo[][]{pkgInfo.activities, pkgInfo.receivers, pkgInfo.providers}) {
+[external][shana][shana@zju.edu.cn]            if (componentInfos == null) continue;
+[external][shana][shana@zju.edu.cn]            for (ComponentInfo componentInfo : componentInfos) {
+[external][shana][shana@zju.edu.cn]                processNames.add(componentInfo.processName);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        if (pkgInfo.services == null) return processNames;
+[external][shana][shana@zju.edu.cn]        for (ServiceInfo service : pkgInfo.services) {
+[external][shana][shana@zju.edu.cn]            if ((service.flags & FLAG_ISOLATED_PROCESS) == 0) {
+[external][shana][shana@zju.edu.cn]                processNames.add(service.processName);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return processNames;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static Pair<Set<String>, Integer> fetchProcessesWithUid(Application app) throws RemoteException {
+[external][shana][shana@zju.edu.cn]        IPackageManager pm = getPackageManager();
+[external][shana][shana@zju.edu.cn]        if (pm == null) return new Pair<>(Collections.emptySet(), -1);
+[external][shana][shana@zju.edu.cn]        PackageInfo pkgInfo = getPackageInfoWithComponents(app.packageName, MATCH_ALL_FLAGS, app.userId);
+[external][shana][shana@zju.edu.cn]        if (pkgInfo == null || pkgInfo.applicationInfo == null)
+[external][shana][shana@zju.edu.cn]            return new Pair<>(Collections.emptySet(), -1);
+[external][shana][shana@zju.edu.cn]        return new Pair<>(fetchProcesses(pkgInfo), pkgInfo.applicationInfo.uid);
+[external][shana][shana@zju.edu.cn]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    public static boolean isPackageAvailable(String packageName, int userId, boolean ignoreHidden) throws RemoteException {
+[external][shana][shana@zju.edu.cn]        return pm.isPackageAvailable(packageName, userId) || (ignoreHidden && pm.getApplicationHiddenSettingAsUser(packageName, userId));
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]    @SuppressWarnings({"ConstantConditions", "SameParameterValue"})
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    @Nullable
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private static PackageInfo getPackageInfoWithComponents(String packageName, int flags, int userId) throws RemoteException {
+[external][shana][shana@zju.edu.cn]        IPackageManager pm = getPackageManager();
+[external][shana][shana@zju.edu.cn]        if (pm == null) return null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        PackageInfo pkgInfo;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][shana][shana@zju.edu.cn]            pkgInfo = getPackageInfo(packageName, flags | PackageManager.GET_ACTIVITIES | PackageManager.GET_SERVICES | PackageManager.GET_RECEIVERS | PackageManager.GET_PROVIDERS, userId);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (Exception e) {
+[external][shana][shana@zju.edu.cn]            pkgInfo = getPackageInfo(packageName, flags, userId);
+[external][shana][shana@zju.edu.cn]            if (pkgInfo == null) return null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            try {
+[external][shana][shana@zju.edu.cn]                pkgInfo.activities = getPackageInfo(packageName, flags | PackageManager.GET_ACTIVITIES, userId).activities;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            } catch (Exception ignored) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            try {
+[external][shana][shana@zju.edu.cn]                pkgInfo.services = getPackageInfo(packageName, flags | PackageManager.GET_SERVICES, userId).services;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            } catch (Exception ignored) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            try {
+[external][shana][shana@zju.edu.cn]                pkgInfo.receivers = getPackageInfo(packageName, flags | PackageManager.GET_RECEIVERS, userId).receivers;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            } catch (Exception ignored) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            try {
+[external][shana][shana@zju.edu.cn]                pkgInfo.providers = getPackageInfo(packageName, flags | PackageManager.GET_PROVIDERS, userId).providers;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            } catch (Exception ignored) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][shana][shana@zju.edu.cn]        if (pkgInfo == null || pkgInfo.applicationInfo == null || (!pkgInfo.packageName.equals("android") && (pkgInfo.applicationInfo.sourceDir == null || !existsInGlobalNamespace(pkgInfo.applicationInfo.sourceDir) || !isPackageAvailable(packageName, userId, true))))
+[external][shana][shana@zju.edu.cn]            return null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return pkgInfo;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    static abstract class IntentSenderAdaptor extends IIntentSender.Stub {
+[external][shana][shana@zju.edu.cn]        public abstract void send(Intent intent);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public int send(int code, Intent intent, String resolvedType, IIntentReceiver finishedReceiver, String requiredPermission, Bundle options) {
+[external][shana][shana@zju.edu.cn]            send(intent);
+[external][shana][shana@zju.edu.cn]            return 0;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public void send(int code, Intent intent, String resolvedType, IBinder whitelistToken, IIntentReceiver finishedReceiver, String requiredPermission, Bundle options) {
+[external][shana][shana@zju.edu.cn]            send(intent);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        public IntentSender getIntentSender() throws IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException {
+[external][shana][shana@zju.edu.cn]            @SuppressWarnings("JavaReflectionMemberAccess")
+[external][shana][shana@zju.edu.cn]            Constructor<IntentSender> intentSenderConstructor = IntentSender.class.getConstructor(IIntentSender.class);
+[external][shana][shana@zju.edu.cn]            intentSenderConstructor.setAccessible(true);
+[external][shana][shana@zju.edu.cn]            return intentSenderConstructor.newInstance(this);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]    public static boolean uninstallPackage(VersionedPackage versionedPackage, int userId) throws RemoteException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+[external][shana][shana@zju.edu.cn]        CountDownLatch latch = new CountDownLatch(1);
+[external][shana][shana@zju.edu.cn]        final boolean[] result = {false};
+[internal][vvb2060][vvb2060@gmail.com]        var flag = userId == -1 ? 0x00000002 : 0; //PackageManager.DELETE_ALL_USERS = 0x00000002; UserHandle ALL = new UserHandle(-1);
+[external][shana][shana@zju.edu.cn]        pm.getPackageInstaller().uninstall(versionedPackage, "android", flag, new IntentSenderAdaptor() {
+[external][shana][shana@zju.edu.cn]            @Override
+[external][shana][shana@zju.edu.cn]            public void send(Intent intent) {
+[external][shana][shana@zju.edu.cn]                int status = intent.getIntExtra(PackageInstaller.EXTRA_STATUS, PackageInstaller.STATUS_FAILURE);
+[external][shana][shana@zju.edu.cn]                result[0] = status == PackageInstaller.STATUS_SUCCESS;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                Log.d(TAG, intent.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE));
+[external][shana][shana@zju.edu.cn]                latch.countDown();
+[external][shana][shana@zju.edu.cn]            }
+[internal][vvb2060][vvb2060@gmail.com]        }.getIntentSender(), userId == -1 ? 0 : userId);
+[external][shana][shana@zju.edu.cn]        latch.await();
+[external][shana][shana@zju.edu.cn]        return result[0];
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static int installExistingPackageAsUser(String packageName, int userId) throws RemoteException {
+[internal][vvb2060][vvb2060@gmail.com]        IPackageManager pm = getPackageManager();
+[internal][vvb2060][vvb2060@gmail.com]        Log.d(TAG, "about to install existing package " + packageName + "/" + userId);
+[internal][vvb2060][vvb2060@gmail.com]        if (pm == null) return INSTALL_FAILED_INTERNAL_ERROR;
+[internal][vvb2060][vvb2060@gmail.com]        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+[internal][vvb2060][vvb2060@gmail.com]            return pm.installExistingPackageAsUser(packageName, userId, 0, INSTALL_REASON_UNKNOWN, null);
+[internal][vvb2060][vvb2060@gmail.com]        } else {
+[internal][vvb2060][vvb2060@gmail.com]            return pm.installExistingPackageAsUser(packageName, userId, 0, INSTALL_REASON_UNKNOWN);
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    @Nullable
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    public static ParcelableListSlice<ResolveInfo> queryIntentActivities(Intent intent, String resolvedType, int flags, int userId) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        try {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            IPackageManager pm = getPackageManager();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            if (pm == null) return null;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            ParceledListSlice<ResolveInfo> infos;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                infos = pm.queryIntentActivities(intent, resolvedType, (long) flags, userId);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            } else {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                infos = pm.queryIntentActivities(intent, resolvedType, flags, userId);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            return new ParcelableListSlice<>(infos.getList());
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        } catch (Exception e) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            Log.e(TAG, "queryIntentActivities", e);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            return new ParcelableListSlice<>(new ArrayList<>());
+[internal][vvb2060][vvb2060@gmail.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    @Nullable
+[external][shana][shana@zju.edu.cn]    public static Intent getLaunchIntentForPackage(String packageName) throws RemoteException {
+[external][shana][shana@zju.edu.cn]        Intent intentToResolve = new Intent(Intent.ACTION_MAIN);
+[external][shana][shana@zju.edu.cn]        intentToResolve.addCategory(Intent.CATEGORY_INFO);
+[external][shana][shana@zju.edu.cn]        intentToResolve.setPackage(packageName);
+[internal][vvb2060][vvb2060@gmail.com]        var ris = queryIntentActivities(intentToResolve, intentToResolve.getType(), 0, 0);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // Otherwise, try to find a main launcher activity.
+[internal][vvb2060][vvb2060@gmail.com]        if (ris == null || ris.getList().size() == 0) {
+[external][shana][shana@zju.edu.cn]            // reuse the intent instance
+[external][shana][shana@zju.edu.cn]            intentToResolve.removeCategory(Intent.CATEGORY_INFO);
+[external][shana][shana@zju.edu.cn]            intentToResolve.addCategory(Intent.CATEGORY_LAUNCHER);
+[external][shana][shana@zju.edu.cn]            intentToResolve.setPackage(packageName);
+[external][shana][shana@zju.edu.cn]            ris = queryIntentActivities(intentToResolve, intentToResolve.getType(), 0, 0);
+[external][shana][shana@zju.edu.cn]        }
+[internal][vvb2060][vvb2060@gmail.com]        if (ris == null || ris.getList().size() == 0) {
+[external][shana][shana@zju.edu.cn]            return null;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        Intent intent = new Intent(intentToResolve);
+[external][shana][shana@zju.edu.cn]        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+[external][shana][shana@zju.edu.cn]        intent.setClassName(ris.getList().get(0).activityInfo.packageName,
+[external][shana][shana@zju.edu.cn]                ris.getList().get(0).activityInfo.name);
+[external][shana][shana@zju.edu.cn]        return intent;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    public static void clearApplicationProfileData(String packageName) throws RemoteException {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        IPackageManager pm = getPackageManager();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        if (pm == null) return;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        pm.clearApplicationProfileData(packageName);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    public static boolean performDexOptMode(String packageName) throws RemoteException {
+[external][shana][shana@zju.edu.cn]        IPackageManager pm = getPackageManager();
+[external][shana][shana@zju.edu.cn]        if (pm == null) return false;
+[external][shana][shana@zju.edu.cn]        return pm.performDexOptMode(packageName,
+[external][shana][shana@zju.edu.cn]                SystemProperties.getBoolean("dalvik.vm.usejitprofiles", false),
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                SystemProperties.get("pm.dexopt.install", "speed-profile"), true, true, null);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

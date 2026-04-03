@@ -1,0 +1,350 @@
+[external][shana][shana@zju.edu.cn]package org.lsposed.lspd.util;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import static org.lsposed.lspd.core.ApplicationServiceClient.serviceClient;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import android.app.ActivityThread;
+[external][shana][shana@zju.edu.cn]import android.app.LoadedApk;
+[external][shana][shana@zju.edu.cn]import android.content.BroadcastReceiver;
+[external][shana][shana@zju.edu.cn]import android.content.ComponentName;
+[external][shana][shana@zju.edu.cn]import android.content.Context;
+[external][shana][shana@zju.edu.cn]import android.content.Intent;
+[external][shana][shana@zju.edu.cn]import android.content.pm.ActivityInfo;
+[external][shana][shana@zju.edu.cn]import android.content.pm.ApplicationInfo;
+[external][shana][shana@zju.edu.cn]import android.content.pm.PackageInfo;
+[external][shana][shana@zju.edu.cn]import android.content.pm.PackageManager;
+[external][shana][shana@zju.edu.cn]import android.content.pm.ProviderInfo;
+[external][shana][shana@zju.edu.cn]import android.os.Build;
+[external][shana][shana@zju.edu.cn]import android.os.Bundle;
+[external][shana][shana@zju.edu.cn]import android.os.IBinder;
+[external][shana][shana@zju.edu.cn]import android.os.PersistableBundle;
+[external][shana][shana@zju.edu.cn]import android.os.Process;
+[external][shana][shana@zju.edu.cn]import android.os.RemoteException;
+[external][shana][shana@zju.edu.cn]import android.util.AndroidRuntimeException;
+[external][shana][shana@zju.edu.cn]import android.util.ArrayMap;
+[external][shana][shana@zju.edu.cn]import android.webkit.WebViewDelegate;
+[external][shana][shana@zju.edu.cn]import android.webkit.WebViewFactory;
+[external][shana][shana@zju.edu.cn]import android.webkit.WebViewFactoryProvider;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import org.lsposed.lspd.BuildConfig;
+[external][shana][shana@zju.edu.cn]import org.lsposed.lspd.ILSPManagerService;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import java.io.FileInputStream;
+[external][shana][shana@zju.edu.cn]import java.io.FileOutputStream;
+[external][shana][shana@zju.edu.cn]import java.lang.reflect.Method;
+[external][shana][shana@zju.edu.cn]import java.nio.channels.FileChannel;
+[external][shana][shana@zju.edu.cn]import java.util.ArrayList;
+[external][shana][shana@zju.edu.cn]import java.util.List;
+[external][shana][shana@zju.edu.cn]import java.util.Map;
+[external][shana][shana@zju.edu.cn]import java.util.concurrent.ConcurrentHashMap;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import de.robv.android.xposed.XC_MethodHook;
+[external][shana][shana@zju.edu.cn]import de.robv.android.xposed.XC_MethodReplacement;
+[external][shana][shana@zju.edu.cn]import de.robv.android.xposed.XposedBridge;
+[external][shana][shana@zju.edu.cn]import de.robv.android.xposed.XposedHelpers;
+[external][shana][shana@zju.edu.cn]import hidden.HiddenApiBridge;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public class ParasiticManagerHooker {
+[external][shana][shana@zju.edu.cn]    private static final String CHROMIUM_WEBVIEW_FACTORY_METHOD = "create";
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private static PackageInfo managerPkgInfo = null;
+[external][shana][shana@zju.edu.cn]    private static int managerFd = -1;
+[external][shana][shana@zju.edu.cn]    private final static Map<String, Bundle> states = new ConcurrentHashMap<>();
+[external][shana][shana@zju.edu.cn]    private final static Map<String, PersistableBundle> persistentStates = new ConcurrentHashMap<>();
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private synchronized static PackageInfo getManagerPkgInfo(ApplicationInfo appInfo) {
+[external][shana][shana@zju.edu.cn]        if (managerPkgInfo == null && appInfo != null) {
+[external][shana][shana@zju.edu.cn]            try {
+[external][shana][shana@zju.edu.cn]                Context ctx = ActivityThread.currentActivityThread().getSystemContext();
+[external][shana][shana@zju.edu.cn]                var sourceDir = "/proc/self/fd/" + managerFd;
+[external][shana][shana@zju.edu.cn]                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
+[external][shana][shana@zju.edu.cn]                    var dstDir = appInfo.dataDir + "/cache/lsposed.apk";
+[external][shana][shana@zju.edu.cn]                    try (var inStream = new FileInputStream(sourceDir); var outStream = new FileOutputStream(dstDir)) {
+[external][shana][shana@zju.edu.cn]                        FileChannel inChannel = inStream.getChannel();
+[external][shana][shana@zju.edu.cn]                        FileChannel outChannel = outStream.getChannel();
+[external][shana][shana@zju.edu.cn]                        inChannel.transferTo(0, inChannel.size(), outChannel);
+[external][shana][shana@zju.edu.cn]                        sourceDir = dstDir;
+[external][shana][shana@zju.edu.cn]                    } catch (Throwable e) {
+[external][shana][shana@zju.edu.cn]                        Hookers.logE("copy apk", e);
+[external][shana][shana@zju.edu.cn]                    }
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]                managerPkgInfo = ctx.getPackageManager().getPackageArchiveInfo(sourceDir, PackageManager.GET_ACTIVITIES);
+[external][shana][shana@zju.edu.cn]                var newAppInfo = managerPkgInfo.applicationInfo;
+[external][shana][shana@zju.edu.cn]                newAppInfo.sourceDir = sourceDir;
+[external][shana][shana@zju.edu.cn]                newAppInfo.publicSourceDir = sourceDir;
+[external][shana][shana@zju.edu.cn]                newAppInfo.nativeLibraryDir = appInfo.nativeLibraryDir;
+[external][shana][shana@zju.edu.cn]                newAppInfo.packageName = appInfo.packageName;
+[external][shana][shana@zju.edu.cn]                newAppInfo.dataDir = HiddenApiBridge.ApplicationInfo_credentialProtectedDataDir(appInfo);
+[external][shana][shana@zju.edu.cn]                newAppInfo.deviceProtectedDataDir = appInfo.deviceProtectedDataDir;
+[external][shana][shana@zju.edu.cn]                newAppInfo.processName = appInfo.processName;
+[external][shana][shana@zju.edu.cn]                HiddenApiBridge.ApplicationInfo_credentialProtectedDataDir(newAppInfo, HiddenApiBridge.ApplicationInfo_credentialProtectedDataDir(appInfo));
+[external][shana][shana@zju.edu.cn]                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+[external][shana][shana@zju.edu.cn]                    HiddenApiBridge.ApplicationInfo_overlayPaths(newAppInfo, HiddenApiBridge.ApplicationInfo_overlayPaths(appInfo));
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]                HiddenApiBridge.ApplicationInfo_resourceDirs(newAppInfo, HiddenApiBridge.ApplicationInfo_resourceDirs(appInfo));
+[external][shana][shana@zju.edu.cn]                newAppInfo.uid = appInfo.uid;
+[external][shana][shana@zju.edu.cn]            } catch (Throwable e) {
+[external][shana][shana@zju.edu.cn]                Utils.logE("get manager pkginfo", e);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return managerPkgInfo;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]    private static void sendBinderToManager(final ClassLoader classLoader, IBinder binder) {
+[internal][vvb2060][vvb2060@gmail.com]        try {
+[internal][vvb2060][vvb2060@gmail.com]            var clazz = XposedHelpers.findClass("org.lsposed.manager.Constants", classLoader);
+[internal][vvb2060][vvb2060@gmail.com]            var ok = (boolean) XposedHelpers.callStaticMethod(clazz, "setBinder",
+[internal][vvb2060][vvb2060@gmail.com]                    new Class[]{IBinder.class}, binder);
+[internal][vvb2060][vvb2060@gmail.com]            if (ok) return;
+[internal][vvb2060][vvb2060@gmail.com]            throw new RuntimeException("setBinder: " + false);
+[internal][vvb2060][vvb2060@gmail.com]        } catch (Throwable t) {
+[internal][vvb2060][vvb2060@gmail.com]            Utils.logW("Could not send binder to LSPosed Manager", t);
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]    private static void hookForManager(ILSPManagerService managerService) {
+[external][shana][shana@zju.edu.cn]        var managerApkHooker = new XC_MethodHook() {
+[external][shana][shana@zju.edu.cn]            @Override
+[external][shana][shana@zju.edu.cn]            protected void beforeHookedMethod(MethodHookParam param) {
+[external][shana][shana@zju.edu.cn]                Hookers.logD("ActivityThread#handleBindApplication() starts");
+[external][shana][shana@zju.edu.cn]                Object bindData = param.args[0];
+[external][shana][shana@zju.edu.cn]                ApplicationInfo appInfo = (ApplicationInfo) XposedHelpers.getObjectField(bindData, "appInfo");
+[external][shana][shana@zju.edu.cn]                XposedHelpers.setObjectField(bindData, "appInfo", getManagerPkgInfo(appInfo).applicationInfo);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        };
+[external][shana][shana@zju.edu.cn]        XposedHelpers.findAndHookMethod(ActivityThread.class,
+[external][shana][shana@zju.edu.cn]                "handleBindApplication",
+[external][shana][shana@zju.edu.cn]                "android.app.ActivityThread$AppBindData",
+[external][shana][shana@zju.edu.cn]                managerApkHooker);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        var unhooks = new XC_MethodHook.Unhook[]{null};
+[external][shana][shana@zju.edu.cn]        unhooks[0] = XposedHelpers.findAndHookMethod(
+[external][shana][shana@zju.edu.cn]                LoadedApk.class, "getClassLoader", new XC_MethodHook() {
+[external][shana][shana@zju.edu.cn]                    @Override
+[external][shana][shana@zju.edu.cn]                    protected void afterHookedMethod(MethodHookParam param) {
+[external][shana][shana@zju.edu.cn]                        var pkgInfo = getManagerPkgInfo(null);
+[external][shana][shana@zju.edu.cn]                        if (pkgInfo != null && XposedHelpers.getObjectField(param.thisObject, "mApplicationInfo") == pkgInfo.applicationInfo) {
+[internal][vvb2060][vvb2060@gmail.com]                            sendBinderToManager((ClassLoader) param.getResult(), managerService.asBinder());
+[external][shana][shana@zju.edu.cn]                            unhooks[0].unhook();
+[external][shana][shana@zju.edu.cn]                        }
+[external][shana][shana@zju.edu.cn]                    }
+[external][shana][shana@zju.edu.cn]                });
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        var activityClientRecordClass = XposedHelpers.findClass("android.app.ActivityThread$ActivityClientRecord", ActivityThread.class.getClassLoader());
+[external][shana][shana@zju.edu.cn]        var activityHooker = new XC_MethodHook() {
+[external][shana][shana@zju.edu.cn]            @Override
+[external][shana][shana@zju.edu.cn]            protected void beforeHookedMethod(MethodHookParam param) {
+[external][shana][shana@zju.edu.cn]                for (var i = 0; i < param.args.length; ++i) {
+[external][shana][shana@zju.edu.cn]                    if (param.args[i] instanceof ActivityInfo) {
+[external][shana][shana@zju.edu.cn]                        var aInfo = (ActivityInfo) param.args[i];
+[external][shana][shana@zju.edu.cn]                        var pkgInfo = getManagerPkgInfo(aInfo.applicationInfo);
+[external][shana][shana@zju.edu.cn]                        if (pkgInfo == null) return;
+[external][shana][shana@zju.edu.cn]                        for (var activity : pkgInfo.activities) {
+[external][shana][shana@zju.edu.cn]                            if ("org.lsposed.manager.ui.activity.MainActivity".equals(activity.name)) {
+[external][shana][shana@zju.edu.cn]                                activity.applicationInfo = pkgInfo.applicationInfo;
+[external][shana][shana@zju.edu.cn]                                param.args[i] = activity;
+[external][shana][shana@zju.edu.cn]                            }
+[external][shana][shana@zju.edu.cn]                        }
+[external][shana][shana@zju.edu.cn]                    }
+[external][shana][shana@zju.edu.cn]                    if (param.args[i] instanceof Intent) {
+[external][shana][shana@zju.edu.cn]                        var intent = (Intent) param.args[i];
+[external][shana][shana@zju.edu.cn]                        checkIntent(managerService, intent);
+[external][shana][shana@zju.edu.cn]                        intent.setComponent(new ComponentName(intent.getComponent().getPackageName(), "org.lsposed.manager.ui.activity.MainActivity"));
+[external][shana][shana@zju.edu.cn]                    }
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]                if (param.method.getName().equals("scheduleLaunchActivity")) {
+[external][shana][shana@zju.edu.cn]                    ActivityInfo aInfo = null;
+[internal][vvb2060][vvb2060@gmail.com]                    var parameters = ((Method) param.method).getParameterTypes();
+[external][shana][shana@zju.edu.cn]                    for (var i = 0; i < parameters.length; ++i) {
+[external][shana][shana@zju.edu.cn]                        if (parameters[i] == ActivityInfo.class) {
+[external][shana][shana@zju.edu.cn]                            aInfo = (ActivityInfo) param.args[i];
+[external][shana][shana@zju.edu.cn]                            Hookers.logD("loading state of " + aInfo.name);
+[external][shana][shana@zju.edu.cn]                        } else if (parameters[i] == Bundle.class && aInfo != null) {
+[external][shana][shana@zju.edu.cn]                            final int idx = i;
+[external][shana][shana@zju.edu.cn]                            states.computeIfPresent(aInfo.name, (k, v) -> {
+[external][shana][shana@zju.edu.cn]                                param.args[idx] = v;
+[external][shana][shana@zju.edu.cn]                                return v;
+[external][shana][shana@zju.edu.cn]                            });
+[external][shana][shana@zju.edu.cn]                        } else if (parameters[i] == PersistableBundle.class && aInfo != null) {
+[external][shana][shana@zju.edu.cn]                            final int idx = i;
+[external][shana][shana@zju.edu.cn]                            persistentStates.computeIfPresent(aInfo.name, (k, v) -> {
+[external][shana][shana@zju.edu.cn]                                param.args[idx] = v;
+[external][shana][shana@zju.edu.cn]                                return v;
+[external][shana][shana@zju.edu.cn]                            });
+[external][shana][shana@zju.edu.cn]                        }
+[external][shana][shana@zju.edu.cn]                    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            @Override
+[external][shana][shana@zju.edu.cn]            protected void afterHookedMethod(MethodHookParam param) {
+[external][shana][shana@zju.edu.cn]                for (var i = 0; i < param.args.length && activityClientRecordClass.isInstance(param.thisObject); ++i) {
+[external][shana][shana@zju.edu.cn]                    if (param.args[i] instanceof ActivityInfo) {
+[external][shana][shana@zju.edu.cn]                        var aInfo = (ActivityInfo) param.args[i];
+[external][shana][shana@zju.edu.cn]                        Hookers.logD("loading state of " + aInfo.name);
+[external][shana][shana@zju.edu.cn]                        states.computeIfPresent(aInfo.name, (k, v) -> {
+[external][shana][shana@zju.edu.cn]                            XposedHelpers.setObjectField(param.thisObject, "state", v);
+[external][shana][shana@zju.edu.cn]                            return v;
+[external][shana][shana@zju.edu.cn]                        });
+[external][shana][shana@zju.edu.cn]                        persistentStates.computeIfPresent(aInfo.name, (k, v) -> {
+[external][shana][shana@zju.edu.cn]                            XposedHelpers.setObjectField(param.thisObject, "persistentState", v);
+[external][shana][shana@zju.edu.cn]                            return v;
+[external][shana][shana@zju.edu.cn]                        });
+[external][shana][shana@zju.edu.cn]                    }
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        };
+[external][shana][shana@zju.edu.cn]        XposedBridge.hookAllConstructors(activityClientRecordClass, activityHooker);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.O_MR1) {
+[external][shana][shana@zju.edu.cn]            XposedBridge.hookAllMethods(XposedHelpers.findClass("android.app.ActivityThread$ApplicationThread", ActivityThread.class.getClassLoader()), "scheduleLaunchActivity", activityHooker);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        XposedBridge.hookAllMethods(ActivityThread.class, "handleReceiver", new XC_MethodReplacement() {
+[external][shana][shana@zju.edu.cn]            @Override
+[external][shana][shana@zju.edu.cn]            protected Object replaceHookedMethod(MethodHookParam param) {
+[external][shana][shana@zju.edu.cn]                for (var arg : param.args) {
+[external][shana][shana@zju.edu.cn]                    if (arg instanceof BroadcastReceiver.PendingResult) {
+[external][shana][shana@zju.edu.cn]                        ((BroadcastReceiver.PendingResult) arg).finish();
+[external][shana][shana@zju.edu.cn]                    }
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]                return null;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        });
+[external][wanghan1995315][wanghan1995315@gmail.com]
+[external][shana][shana@zju.edu.cn]        XposedBridge.hookAllMethods(ActivityThread.class, "installProvider", new XC_MethodHook() {
+[external][shana][shana@zju.edu.cn]            private Context originalContext = null;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            @Override
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            protected void beforeHookedMethod(MethodHookParam param) {
+[external][shana][shana@zju.edu.cn]                Hookers.logD("before install provider");
+[external][shana][shana@zju.edu.cn]                Context ctx = null;
+[external][shana][shana@zju.edu.cn]                ProviderInfo info = null;
+[external][shana][shana@zju.edu.cn]                int ctxIdx = -1;
+[external][shana][shana@zju.edu.cn]                for (var i = 0; i < param.args.length; ++i) {
+[external][shana][shana@zju.edu.cn]                    var arg = param.args[i];
+[external][shana][shana@zju.edu.cn]                    if (arg instanceof Context) {
+[external][shana][shana@zju.edu.cn]                        ctx = (Context) arg;
+[external][shana][shana@zju.edu.cn]                        ctxIdx = i;
+[external][shana][shana@zju.edu.cn]                    } else if (arg instanceof ProviderInfo) info = (ProviderInfo) arg;
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]                var pkgInfo = getManagerPkgInfo(null);
+[external][shana][shana@zju.edu.cn]                if (ctx != null && info != null && pkgInfo != null) {
+[external][shana][shana@zju.edu.cn]                    var packageName = pkgInfo.applicationInfo.packageName;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    if (!info.applicationInfo.packageName.equals(packageName)) return;
+[external][shana][shana@zju.edu.cn]                    if (originalContext == null) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        info.applicationInfo.packageName = packageName + ".origin";
+[external][shana][shana@zju.edu.cn]                        var originalPkgInfo = ActivityThread.currentActivityThread().getPackageInfoNoCheck(info.applicationInfo, HiddenApiBridge.Resources_getCompatibilityInfo(ctx.getResources()));
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        XposedHelpers.setObjectField(originalPkgInfo, "mPackageName", packageName);
+[external][shana][shana@zju.edu.cn]                        originalContext = (Context) XposedHelpers.callStaticMethod(XposedHelpers.findClass("android.app.ContextImpl", null),
+[external][shana][shana@zju.edu.cn]                                "createAppContext", ActivityThread.currentActivityThread(), originalPkgInfo);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        info.applicationInfo.packageName = packageName;
+[external][shana][shana@zju.edu.cn]                    }
+[external][shana][shana@zju.edu.cn]                    param.args[ctxIdx] = originalContext;
+[external][shana][shana@zju.edu.cn]                } else {
+[external][shana][shana@zju.edu.cn]                    Hookers.logE("Failed to reload provider", new RuntimeException());
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        });
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        XposedHelpers.findAndHookMethod(ActivityThread.class, "deliverNewIntents", activityClientRecordClass, List.class, new XC_MethodHook() {
+[external][shana][shana@zju.edu.cn]            @Override
+[external][shana][shana@zju.edu.cn]            protected void beforeHookedMethod(MethodHookParam param) {
+[external][shana][shana@zju.edu.cn]                if (param.args[1] == null) return;
+[external][shana][shana@zju.edu.cn]                for (var intent : (List<?>) param.args[1]) {
+[external][shana][shana@zju.edu.cn]                    checkIntent(managerService, (Intent) intent);
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        });
+[external][shana][shana@zju.edu.cn]
+[external][wanghan1995315][wanghan1995315@gmail.com]        XposedHelpers.findAndHookMethod(WebViewFactory.class, "getProvider", new XC_MethodReplacement() {
+[external][wanghan1995315][wanghan1995315@gmail.com]            @Override
+[external][wanghan1995315][wanghan1995315@gmail.com]            protected Object replaceHookedMethod(MethodHookParam param) {
+[external][wanghan1995315][wanghan1995315@gmail.com]                var sProviderInstance = XposedHelpers.getStaticObjectField(WebViewFactory.class, "sProviderInstance");
+[external][wanghan1995315][wanghan1995315@gmail.com]                if (sProviderInstance != null) return sProviderInstance;
+[external][wanghan1995315][wanghan1995315@gmail.com]                //noinspection unchecked
+[external][wanghan1995315][wanghan1995315@gmail.com]                var providerClass = (Class<WebViewFactoryProvider>) XposedHelpers.callStaticMethod(WebViewFactory.class, "getProviderClass");
+[external][wanghan1995315][wanghan1995315@gmail.com]                Method staticFactory = null;
+[external][wanghan1995315][wanghan1995315@gmail.com]                try {
+[external][wanghan1995315][wanghan1995315@gmail.com]                    staticFactory = providerClass.getMethod(
+[external][wanghan1995315][wanghan1995315@gmail.com]                            CHROMIUM_WEBVIEW_FACTORY_METHOD, WebViewDelegate.class);
+[external][wanghan1995315][wanghan1995315@gmail.com]                } catch (Exception e) {
+[external][wanghan1995315][wanghan1995315@gmail.com]                    Hookers.logE("error instantiating provider with static factory method", e);
+[external][wanghan1995315][wanghan1995315@gmail.com]                }
+[external][shana][shana@zju.edu.cn]
+[external][wanghan1995315][wanghan1995315@gmail.com]                try {
+[external][wanghan1995315][wanghan1995315@gmail.com]                    var webViewDelegateConstructor = WebViewDelegate.class.getDeclaredConstructor();
+[external][wanghan1995315][wanghan1995315@gmail.com]                    webViewDelegateConstructor.setAccessible(true);
+[external][wanghan1995315][wanghan1995315@gmail.com]                    if (staticFactory != null) {
+[external][wanghan1995315][wanghan1995315@gmail.com]                        sProviderInstance = staticFactory.invoke(null, webViewDelegateConstructor.newInstance());
+[external][shana][shana@zju.edu.cn]                    }
+[external][wanghan1995315][wanghan1995315@gmail.com]                    XposedHelpers.setStaticObjectField(WebViewFactory.class, "sProviderInstance", sProviderInstance);
+[external][wanghan1995315][wanghan1995315@gmail.com]                    Hookers.logD("Loaded provider: " + sProviderInstance);
+[external][wanghan1995315][wanghan1995315@gmail.com]                    return sProviderInstance;
+[external][wanghan1995315][wanghan1995315@gmail.com]                } catch (Exception e) {
+[external][wanghan1995315][wanghan1995315@gmail.com]                    Hookers.logE("error instantiating provider", e);
+[external][wanghan1995315][wanghan1995315@gmail.com]                    throw new AndroidRuntimeException(e);
+[external][shana][shana@zju.edu.cn]                }
+[external][wanghan1995315][wanghan1995315@gmail.com]            }
+[external][wanghan1995315][wanghan1995315@gmail.com]        });
+[external][shana][shana@zju.edu.cn]        var stateHooker = new XC_MethodHook() {
+[external][shana][shana@zju.edu.cn]            @Override
+[external][shana][shana@zju.edu.cn]            protected void beforeHookedMethod(MethodHookParam param) {
+[external][shana][shana@zju.edu.cn]                try {
+[external][shana][shana@zju.edu.cn]                    var record = param.args[0];
+[external][shana][shana@zju.edu.cn]                    if (record instanceof IBinder) {
+[external][shana][shana@zju.edu.cn]                        record = ((ArrayMap<?, ?>) XposedHelpers.getObjectField(param.thisObject, "mActivities")).get(record);
+[external][shana][shana@zju.edu.cn]                        if (record == null) return;
+[external][shana][shana@zju.edu.cn]                    }
+[external][shana][shana@zju.edu.cn]                    XposedHelpers.callMethod(param.thisObject, Build.VERSION.SDK_INT >= Build.VERSION_CODES.P ? "callActivityOnSaveInstanceState" : "callCallActivityOnSaveInstanceState", record);
+[external][shana][shana@zju.edu.cn]                    var state = (Bundle) XposedHelpers.getObjectField(record, "state");
+[external][shana][shana@zju.edu.cn]                    var persistentState = (PersistableBundle) XposedHelpers.getObjectField(record, "persistentState");
+[external][shana][shana@zju.edu.cn]                    var aInfo = (ActivityInfo) XposedHelpers.getObjectField(record, "activityInfo");
+[external][shana][shana@zju.edu.cn]                    states.compute(aInfo.name, (k, v) -> state);
+[external][shana][shana@zju.edu.cn]                    persistentStates.compute(aInfo.name, (k, v) -> persistentState);
+[external][shana][shana@zju.edu.cn]                    Hookers.logD("saving state of " + aInfo.name);
+[external][shana][shana@zju.edu.cn]                } catch (Throwable e) {
+[external][shana][shana@zju.edu.cn]                    Hookers.logE("save state", e);
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        };
+[external][shana][shana@zju.edu.cn]        XposedBridge.hookAllMethods(ActivityThread.class, "performStopActivityInner", stateHooker);
+[external][shana][shana@zju.edu.cn]        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.O_MR1)
+[external][shana][shana@zju.edu.cn]            XposedHelpers.findAndHookMethod(ActivityThread.class, "performDestroyActivity", IBinder.class, boolean.class, int.class, boolean.class, stateHooker);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private static void checkIntent(ILSPManagerService managerService, Intent intent) {
+[external][shana][shana@zju.edu.cn]        if (managerService == null) return;
+[external][shana][shana@zju.edu.cn]        if (Process.myUid() != BuildConfig.MANAGER_INJECTED_UID) return;
+[external][shana][shana@zju.edu.cn]        if (intent.getCategories() == null || !intent.getCategories().contains("org.lsposed.manager.LAUNCH_MANAGER")) {
+[external][shana][shana@zju.edu.cn]            Hookers.logD("Launching the original app, restarting");
+[external][shana][shana@zju.edu.cn]            try {
+[external][shana][shana@zju.edu.cn]                managerService.restartFor(intent);
+[external][shana][shana@zju.edu.cn]            } catch (RemoteException e) {
+[external][shana][shana@zju.edu.cn]                Hookers.logE("restart failed", e);
+[external][shana][shana@zju.edu.cn]            } finally {
+[external][shana][shana@zju.edu.cn]                Process.killProcess(Process.myPid());
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    static public boolean start() {
+[internal][vvb2060][vvb2060@gmail.com]        List<IBinder> binder = new ArrayList<>(1);
+[internal][vvb2060][vvb2060@gmail.com]        try (var managerParcelFd = serviceClient.requestInjectedManagerBinder(binder)) {
+[external][shana][shana@zju.edu.cn]            if (binder.size() > 0 && binder.get(0) != null && managerParcelFd != null) {
+[external][shana][shana@zju.edu.cn]                managerFd = managerParcelFd.detachFd();
+[external][shana][shana@zju.edu.cn]                var managerService = ILSPManagerService.Stub.asInterface(binder.get(0));
+[external][shana][shana@zju.edu.cn]                hookForManager(managerService);
+[external][shana][shana@zju.edu.cn]                Utils.logD("injected manager");
+[external][shana][shana@zju.edu.cn]                return true;
+[external][shana][shana@zju.edu.cn]            } else {
+[external][shana][shana@zju.edu.cn]                // Not manager
+[external][shana][shana@zju.edu.cn]                return false;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        } catch (Throwable e) {
+[external][shana][shana@zju.edu.cn]            Utils.logE("failed to inject manager", e);
+[external][shana][shana@zju.edu.cn]            return false;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

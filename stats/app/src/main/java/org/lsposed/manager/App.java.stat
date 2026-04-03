@@ -1,0 +1,283 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.manager;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]import android.app.ActivityManager;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]import android.app.Application;
+[internal][vvb2060][vvb2060@gmail.com]import android.content.BroadcastReceiver;
+[internal][vvb2060][vvb2060@gmail.com]import android.content.ContentValues;
+[internal][vvb2060][vvb2060@gmail.com]import android.content.Context;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]import android.content.Intent;
+[internal][vvb2060][vvb2060@gmail.com]import android.content.IntentFilter;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]import android.content.SharedPreferences;
+[external][shana][shana@zju.edu.cn]import android.os.Build;
+[internal][vvb2060][vvb2060@gmail.com]import android.os.Environment;
+[internal][vvb2060][vvb2060@gmail.com]import android.os.Handler;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import android.os.Looper;
+[internal][vvb2060][vvb2060@gmail.com]import android.os.Process;
+[internal][vvb2060][vvb2060@gmail.com]import android.provider.MediaStore;
+[internal][vvb2060][vvb2060@gmail.com]import android.provider.Settings;
+[internal][vvb2060][vvb2060@gmail.com]import android.system.Os;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import android.text.TextUtils;
+[internal][vvb2060][vvb2060@gmail.com]import android.util.Log;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import androidx.annotation.NonNull;
+[external][shana][shana@zju.edu.cn]import androidx.appcompat.app.AppCompatDelegate;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]import androidx.preference.PreferenceManager;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]import org.lsposed.hiddenapibypass.HiddenApiBypass;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import org.lsposed.manager.adapters.AppHelper;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.receivers.LSPManagerServiceHolder;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.manager.repo.RepoLoader;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.util.CloudflareDNS;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.util.ModuleUtil;
+[external][shana][shana@zju.edu.cn]import org.lsposed.manager.util.Telemetry;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import org.lsposed.manager.util.ThemeUtil;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.util.UpdateUtil;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import java.io.ByteArrayOutputStream;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.io.File;
+[internal][vvb2060][vvb2060@gmail.com]import java.io.IOException;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.io.PrintWriter;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import java.nio.charset.StandardCharsets;
+[internal][vvb2060][vvb2060@gmail.com]import java.time.OffsetDateTime;
+[internal][vvb2060][vvb2060@gmail.com]import java.util.HashMap;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.util.Locale;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import java.util.concurrent.ExecutorService;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import java.util.concurrent.Executors;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import java.util.concurrent.FutureTask;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import okhttp3.Cache;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import okhttp3.OkHttpClient;
+[internal][vvb2060][vvb2060@gmail.com]import okhttp3.logging.HttpLoggingInterceptor;
+[external][shana][shana@zju.edu.cn]import rikka.core.os.FileUtils;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import rikka.material.app.LocaleDelegate;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]public class App extends Application {
+[external][shana][shana@zju.edu.cn]    public static final int PER_USER_RANGE = 100000;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    public static final FutureTask<String> HTML_TEMPLATE = new FutureTask<>(() -> readWebviewHTML("template.html"));
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    public static final FutureTask<String> HTML_TEMPLATE_DARK = new FutureTask<>(() -> readWebviewHTML("template_dark.html"));
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    private static String readWebviewHTML(String name) {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            var input = App.getInstance().getAssets().open("webview/" + name);
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            var result = new ByteArrayOutputStream(1024);
+[external][shana][shana@zju.edu.cn]            FileUtils.copy(input, result);
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            return result.toString(StandardCharsets.UTF_8.name());
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        } catch (IOException e) {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            Log.e(App.TAG, "read webview HTML", e);
+[external][shana][shana@zju.edu.cn]            return "<html dir\"@dir@\"><body>@body@</body></html>";
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    static {
+[external][shana][shana@zju.edu.cn]        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+[external][wanghan1995315][wanghan1995315@gmail.com]            HiddenApiBypass.addHiddenApiExemptions("");
+[external][shana][shana@zju.edu.cn]        }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        Looper.myQueue().addIdleHandler(() -> {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            if (App.getInstance() == null || App.getExecutorService() == null) return true;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            App.getExecutorService().submit(() -> {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                var list = AppHelper.getAppList(false);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                var pm = App.getInstance().getPackageManager();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                list.parallelStream().forEach(i -> AppHelper.getAppLabel(i, pm));
+[internal][vvb2060][vvb2060@gmail.com]                AppHelper.getDenyList(false);
+[internal][vvb2060][vvb2060@gmail.com]                ModuleUtil.getInstance();
+[internal][vvb2060][vvb2060@gmail.com]                RepoLoader.getInstance();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            });
+[internal][vvb2060][vvb2060@gmail.com]            App.getExecutorService().submit(HTML_TEMPLATE);
+[internal][vvb2060][vvb2060@gmail.com]            App.getExecutorService().submit(HTML_TEMPLATE_DARK);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            return false;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        });
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static final String TAG = "LSPosedManager";
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    private static final String ACTION_USER_ADDED = "android.intent.action.USER_ADDED";
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    private static final String ACTION_USER_REMOVED = "android.intent.action.USER_REMOVED";
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    private static final String ACTION_USER_INFO_CHANGED = "android.intent.action.USER_INFO_CHANGED";
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    private static final String EXTRA_REMOVED_FOR_ALL_USERS = "android.intent.extra.REMOVED_FOR_ALL_USERS";
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    private static App instance = null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private static OkHttpClient okHttpClient;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private static Cache okHttpCache;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    private SharedPreferences pref;
+[internal][vvb2060][vvb2060@gmail.com]    private static final ExecutorService executorService = Executors.newCachedThreadPool();
+[internal][vvb2060][vvb2060@gmail.com]    private static final Handler MainHandler = new Handler(Looper.getMainLooper());
+[external][shana][shana@zju.edu.cn]
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    public static App getInstance() {
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        return instance;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    public static SharedPreferences getPreferences() {
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        return instance.pref;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    public static ExecutorService getExecutorService() {
+[internal][vvb2060][vvb2060@gmail.com]        return executorService;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][howardwu20][HowardWu20@outlook.com]    public static final boolean isParasitic = !Process.isApplicationUid(Process.myUid());
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]    public static Handler getMainHandler() {
+[internal][vvb2060][vvb2060@gmail.com]        return MainHandler;
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    protected void attachBaseContext(Context base) {
+[external][shana][shana@zju.edu.cn]        super.attachBaseContext(base);
+[internal][vvb2060][vvb2060@gmail.com]        Telemetry.start(this);
+[internal][vvb2060][vvb2060@gmail.com]        var map = new HashMap<String, String>(1);
+[external][howardwu20][HowardWu20@outlook.com]        map.put("isParasitic", String.valueOf(isParasitic));
+[internal][vvb2060][vvb2060@gmail.com]        Telemetry.trackEvent("App start", map);
+[internal][vvb2060][vvb2060@gmail.com]        var am = getSystemService(ActivityManager.class);
+[internal][vvb2060][vvb2060@gmail.com]        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+[internal][vvb2060][vvb2060@gmail.com]            map.clear();
+[internal][vvb2060][vvb2060@gmail.com]            var reasons = am.getHistoricalProcessExitReasons(null, 0, 1);
+[internal][vvb2060][vvb2060@gmail.com]            if (reasons.size() == 1) {
+[internal][vvb2060][vvb2060@gmail.com]                map.put("description", reasons.get(0).getDescription());
+[internal][vvb2060][vvb2060@gmail.com]                map.put("importance", String.valueOf(reasons.get(0).getImportance()));
+[internal][vvb2060][vvb2060@gmail.com]                map.put("process", reasons.get(0).getProcessName());
+[internal][vvb2060][vvb2060@gmail.com]                map.put("reason", String.valueOf(reasons.get(0).getReason()));
+[internal][vvb2060][vvb2060@gmail.com]                map.put("status", String.valueOf(reasons.get(0).getStatus()));
+[internal][vvb2060][vvb2060@gmail.com]                Telemetry.trackEvent("Last exit reasons", map);
+[internal][vvb2060][vvb2060@gmail.com]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]    private void setCrashReport() {
+[internal][vvb2060][vvb2060@gmail.com]        var handler = Thread.getDefaultUncaughtExceptionHandler();
+[internal][vvb2060][vvb2060@gmail.com]        Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
+[internal][vvb2060][vvb2060@gmail.com]            var time = OffsetDateTime.now();
+[internal][vvb2060][vvb2060@gmail.com]            var dir = new File(getCacheDir(), "crash");
+[internal][vvb2060][vvb2060@gmail.com]            //noinspection ResultOfMethodCallIgnored
+[internal][vvb2060][vvb2060@gmail.com]            dir.mkdir();
+[internal][vvb2060][vvb2060@gmail.com]            var file = new File(dir, time.toEpochSecond() + ".log");
+[internal][vvb2060][vvb2060@gmail.com]            try (var pw = new PrintWriter(file)) {
+[internal][vvb2060][vvb2060@gmail.com]                pw.println(BuildConfig.VERSION_NAME + " (" + BuildConfig.VERSION_CODE + ")");
+[internal][vvb2060][vvb2060@gmail.com]                pw.println(time);
+[internal][vvb2060][vvb2060@gmail.com]                pw.println("pid: " + Os.getpid() + " uid: " + Os.getuid());
+[internal][vvb2060][vvb2060@gmail.com]                throwable.printStackTrace(pw);
+[internal][vvb2060][vvb2060@gmail.com]            } catch (IOException ignored) {
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+[internal][vvb2060][vvb2060@gmail.com]                var table = MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
+[internal][vvb2060][vvb2060@gmail.com]                var values = new ContentValues();
+[internal][vvb2060][vvb2060@gmail.com]                values.put(MediaStore.Downloads.DISPLAY_NAME, "LSPosed_crash_report" + time.toEpochSecond() + ".zip");
+[internal][vvb2060][vvb2060@gmail.com]                values.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOCUMENTS);
+[internal][vvb2060][vvb2060@gmail.com]                var cr = getContentResolver();
+[internal][vvb2060][vvb2060@gmail.com]                var uri = cr.insert(table, values);
+[internal][vvb2060][vvb2060@gmail.com]                if (uri == null) return;
+[internal][vvb2060][vvb2060@gmail.com]                try (var zipFd = cr.openFileDescriptor(uri, "wt")) {
+[internal][vvb2060][vvb2060@gmail.com]                    LSPManagerServiceHolder.getService().getLogs(zipFd);
+[internal][vvb2060][vvb2060@gmail.com]                } catch (Exception ignored) {
+[internal][vvb2060][vvb2060@gmail.com]                    cr.delete(uri, null, null);
+[internal][vvb2060][vvb2060@gmail.com]                }
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]            if (handler != null) {
+[internal][vvb2060][vvb2060@gmail.com]                handler.uncaughtException(thread, throwable);
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]        });
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    @Override
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    public void onCreate() {
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        super.onCreate();
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        instance = this;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]        setCrashReport();
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        pref = PreferenceManager.getDefaultSharedPreferences(this);
+[internal][vvb2060][vvb2060@gmail.com]        if (!pref.contains("doh")) {
+[internal][vvb2060][vvb2060@gmail.com]            var name = "private_dns_mode";
+[internal][vvb2060][vvb2060@gmail.com]            if ("hostname".equals(Settings.Global.getString(getContentResolver(), name))) {
+[internal][vvb2060][vvb2060@gmail.com]                pref.edit().putBoolean("doh", false).apply();
+[internal][vvb2060][vvb2060@gmail.com]            } else {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                pref.edit().putBoolean("doh", true).apply();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][shana][shana@zju.edu.cn]        AppCompatDelegate.setDefaultNightMode(ThemeUtil.getDarkTheme());
+[external][shana][shana@zju.edu.cn]        LocaleDelegate.setDefaultLocale(getLocale());
+[external][shana][shana@zju.edu.cn]        var res = getResources();
+[external][shana][shana@zju.edu.cn]        var config = res.getConfiguration();
+[external][shana][shana@zju.edu.cn]        config.setLocale(LocaleDelegate.getDefaultLocale());
+[external][shana][shana@zju.edu.cn]        //noinspection deprecation
+[external][shana][shana@zju.edu.cn]        res.updateConfiguration(config, res.getDisplayMetrics());
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        IntentFilter intentFilter = new IntentFilter();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        intentFilter.addAction("org.lsposed.manager.NOTIFICATION");
+[internal][vvb2060][vvb2060@gmail.com]        registerReceiver(new BroadcastReceiver() {
+[internal][vvb2060][vvb2060@gmail.com]            @Override
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            public void onReceive(Context context, Intent inIntent) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                var intent = (Intent) inIntent.getParcelableExtra(Intent.EXTRA_INTENT);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                Log.d(TAG, "onReceive: " + intent);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                switch (intent.getAction()) {
+[external][howardwu20][HowardWu20@outlook.com]                    case Intent.ACTION_PACKAGE_ADDED, Intent.ACTION_PACKAGE_CHANGED, Intent.ACTION_PACKAGE_FULLY_REMOVED, Intent.ACTION_UID_REMOVED -> {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        var userId = intent.getIntExtra(Intent.EXTRA_USER, 0);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        var packageName = intent.getStringExtra("android.intent.extra.PACKAGES");
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        var packageRemovedForAllUsers = intent.getBooleanExtra(EXTRA_REMOVED_FOR_ALL_USERS, false);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        var isXposedModule = intent.getBooleanExtra("isXposedModule", false);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        if (packageName != null) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                            if (isXposedModule)
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                                ModuleUtil.getInstance().reloadSingleModule(packageName, userId, packageRemovedForAllUsers);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                            else
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                                App.getExecutorService().submit(() -> AppHelper.getAppList(true));
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    }
+[external][howardwu20][HowardWu20@outlook.com]                    case ACTION_USER_ADDED, ACTION_USER_REMOVED, ACTION_USER_INFO_CHANGED -> App.getExecutorService().submit(() -> ModuleUtil.getInstance().reloadInstalledModules());
+[internal][vvb2060][vvb2060@gmail.com]                }
+[internal][vvb2060][vvb2060@gmail.com]            }
+[external][shana][shana@zju.edu.cn]        }, intentFilter, Context.RECEIVER_NOT_EXPORTED);
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]        UpdateUtil.loadRemoteVersion();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @NonNull
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static OkHttpClient getOkHttpClient() {
+[internal][vvb2060][vvb2060@gmail.com]        if (okHttpClient != null) return okHttpClient;
+[internal][vvb2060][vvb2060@gmail.com]        var builder = new OkHttpClient.Builder()
+[internal][vvb2060][vvb2060@gmail.com]            .cache(getOkHttpCache())
+[internal][vvb2060][vvb2060@gmail.com]            .dns(new CloudflareDNS());
+[internal][vvb2060][vvb2060@gmail.com]        if (BuildConfig.DEBUG) {
+[internal][vvb2060][vvb2060@gmail.com]            var log = new HttpLoggingInterceptor();
+[internal][vvb2060][vvb2060@gmail.com]            log.setLevel(HttpLoggingInterceptor.Level.HEADERS);
+[internal][vvb2060][vvb2060@gmail.com]            builder.addInterceptor(log);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[internal][vvb2060][vvb2060@gmail.com]        okHttpClient = builder.build();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return okHttpClient;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @NonNull
+[internal][vvb2060][vvb2060@gmail.com]    public static Cache getOkHttpCache() {
+[internal][vvb2060][vvb2060@gmail.com]        if (okHttpCache != null) return okHttpCache;
+[internal][vvb2060][vvb2060@gmail.com]        long size50MiB = 50 * 1024 * 1024;
+[internal][vvb2060][vvb2060@gmail.com]        okHttpCache = new Cache(new File(instance.getCacheDir(), "http_cache"), size50MiB);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return okHttpCache;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]    public static Locale getLocale(String tag) {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        if (TextUtils.isEmpty(tag) || "SYSTEM".equals(tag)) {
+[external][shana][shana@zju.edu.cn]            return LocaleDelegate.getSystemLocale();
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        return Locale.forLanguageTag(tag);
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static Locale getLocale() {
+[external][shana][shana@zju.edu.cn]        String tag = getPreferences().getString("language", null);
+[external][shana][shana@zju.edu.cn]        return getLocale(tag);
+[external][shana][shana@zju.edu.cn]    }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]}

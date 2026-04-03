@@ -1,0 +1,43 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]//
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]// Created by kotori on 2/7/21.
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]//
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]#include "symbol_cache.h"
+[external][shana][shana@zju.edu.cn]#include "elf_util.h"
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]#include <dobby.h>
+[external][shana][shana@zju.edu.cn]#include "macros.h"
+[external][shana][shana@zju.edu.cn]#include "config.h"
+[external][shana][shana@zju.edu.cn]#include <vector>
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]#include <logging.h>
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]namespace lspd {
+[external][shana][shana@zju.edu.cn]    std::unique_ptr<const SandHook::ElfImg> &GetArt(bool release) {
+[external][shana][shana@zju.edu.cn]        static std::unique_ptr<const SandHook::ElfImg> kArtImg = nullptr;
+[external][shana][shana@zju.edu.cn]        if (release) {
+[external][shana][shana@zju.edu.cn]            kArtImg.reset();
+[external][shana][shana@zju.edu.cn]        } else if (!kArtImg) {
+[external][shana][shana@zju.edu.cn]            kArtImg = std::make_unique<SandHook::ElfImg>(kLibArtName);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return kArtImg;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}  // namespace lspd

@@ -1,0 +1,52 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]<?xml version="1.0" encoding="utf-8"?><!--
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  -->
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]<menu xmlns:android="http://schemas.android.com/apk/res/android"
+[external][shana][shana@zju.edu.cn]    xmlns:tools="http://schemas.android.com/tools">
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    <item
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        android:id="@+id/menu_search"
+[external][shana][shana@zju.edu.cn]        android:actionViewClass="androidx.appcompat.widget.SearchView"
+[external][shana][shana@zju.edu.cn]        android:icon="@drawable/ic_baseline_search_24"
+[external][howardwu20][HowardWu20@outlook.com]        android:showAsAction="ifRoom|collapseActionView"
+[external][howardwu20][HowardWu20@outlook.com]        android:title="@android:string/search_go" />
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    <item
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        android:id="@+id/item_list_sort"
+[external][shana][shana@zju.edu.cn]        android:showAsAction="never"
+[external][shana][shana@zju.edu.cn]        android:title="@string/menu_sort">
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <menu>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            <group android:checkableBehavior="single">
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                <item
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    android:id="@+id/item_sort_by_name"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    android:checked="true"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    android:title="@string/sort_by_name" />
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                <item
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    android:id="@+id/item_sort_by_update_time"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    android:title="@string/sort_by_update_time" />
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            </group>
+[external][shana][shana@zju.edu.cn]            <item
+[external][shana][shana@zju.edu.cn]                android:id="@+id/item_upgradable_first"
+[external][shana][shana@zju.edu.cn]                android:checkable="true"
+[external][shana][shana@zju.edu.cn]                android:title="@string/sort_upgradable_first" />
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        </menu>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    </item>
+[external][shana][shana@zju.edu.cn]</menu>

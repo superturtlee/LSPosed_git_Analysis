@@ -1,0 +1,7 @@
+[internal][vvb2060][vvb2060@gmail.com]package sun.net.www;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]public class ParseUtil {
+[internal][vvb2060][vvb2060@gmail.com]    public static String encodePath(String path, boolean flag) {
+[internal][vvb2060][vvb2060@gmail.com]        throw new RuntimeException("Stub!");
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]}

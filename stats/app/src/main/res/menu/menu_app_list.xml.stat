@@ -1,0 +1,104 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]<?xml version="1.0" encoding="utf-8"?><!--
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  -->
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]<menu xmlns:android="http://schemas.android.com/apk/res/android"
+[external][shana][shana@zju.edu.cn]    xmlns:tools="http://schemas.android.com/tools">
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    <item
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        android:id="@+id/menu_search"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        android:actionViewClass="androidx.appcompat.widget.SearchView"
+[external][shana][shana@zju.edu.cn]        android:icon="@drawable/ic_baseline_search_24"
+[external][howardwu20][HowardWu20@outlook.com]        android:showAsAction="ifRoom|collapseActionView"
+[external][howardwu20][HowardWu20@outlook.com]        android:title="@android:string/search_go" />
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    <item
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        android:id="@+id/use_recommended"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        android:title="@string/use_recommended" />
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    <item
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        android:showAsAction="never"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        android:title="@string/menu_hide">
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <menu>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            <item
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                android:id="@+id/item_filter_games"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                android:checkable="true"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                android:checked="true"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                android:title="@string/menu_show_games" />
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            <item
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                android:id="@+id/item_filter_modules"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                android:checkable="true"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                android:checked="true"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                android:title="@string/menu_show_modules" />
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            <item
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                android:id="@+id/item_filter_system"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                android:checkable="true"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                android:checked="true"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                android:title="@string/menu_show_system_apps" />
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            <item
+[external][shana][shana@zju.edu.cn]                android:id="@+id/item_filter_denylist"
+[external][shana][shana@zju.edu.cn]                android:checkable="true"
+[external][shana][shana@zju.edu.cn]                android:checked="true"
+[external][shana][shana@zju.edu.cn]                android:title="@string/menu_show_denylist" />
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        </menu>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    </item>
+[external][7741672-nekoinverter][7741672-NekoInverter@users.noreply.gitlab.com]
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    <item
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        android:showAsAction="never"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        android:title="@string/menu_sort">
+[external][7741672-nekoinverter][7741672-NekoInverter@users.noreply.gitlab.com]        <menu>
+[external][7741672-nekoinverter][7741672-NekoInverter@users.noreply.gitlab.com]            <group android:checkableBehavior="single">
+[external][7741672-nekoinverter][7741672-NekoInverter@users.noreply.gitlab.com]                <item
+[external][7741672-nekoinverter][7741672-NekoInverter@users.noreply.gitlab.com]                    android:id="@+id/item_sort_by_name"
+[external][7741672-nekoinverter][7741672-NekoInverter@users.noreply.gitlab.com]                    android:checked="true"
+[external][7741672-nekoinverter][7741672-NekoInverter@users.noreply.gitlab.com]                    android:title="@string/sort_by_name" />
+[external][7741672-nekoinverter][7741672-NekoInverter@users.noreply.gitlab.com]                <item
+[external][7741672-nekoinverter][7741672-NekoInverter@users.noreply.gitlab.com]                    android:id="@+id/item_sort_by_package_name"
+[external][7741672-nekoinverter][7741672-NekoInverter@users.noreply.gitlab.com]                    android:title="@string/sort_by_package_name" />
+[external][7741672-nekoinverter][7741672-NekoInverter@users.noreply.gitlab.com]                <item
+[external][7741672-nekoinverter][7741672-NekoInverter@users.noreply.gitlab.com]                    android:id="@+id/item_sort_by_install_time"
+[external][7741672-nekoinverter][7741672-NekoInverter@users.noreply.gitlab.com]                    android:title="@string/sort_by_install_time" />
+[external][7741672-nekoinverter][7741672-NekoInverter@users.noreply.gitlab.com]                <item
+[external][7741672-nekoinverter][7741672-NekoInverter@users.noreply.gitlab.com]                    android:id="@+id/item_sort_by_update_time"
+[external][7741672-nekoinverter][7741672-NekoInverter@users.noreply.gitlab.com]                    android:title="@string/sort_by_update_time" />
+[external][7741672-nekoinverter][7741672-NekoInverter@users.noreply.gitlab.com]            </group>
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            <item
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                android:id="@+id/reverse"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                android:checkable="true"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                android:title="@string/sort_reverse" />
+[external][7741672-nekoinverter][7741672-NekoInverter@users.noreply.gitlab.com]        </menu>
+[external][7741672-nekoinverter][7741672-NekoInverter@users.noreply.gitlab.com]    </item>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    <item
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        android:showAsAction="never"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        android:title="@string/menu_backup_and_restore">
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <menu>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            <item
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                android:id="@+id/backup"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                android:title="@string/menu_backup" />
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            <item
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                android:id="@+id/restore"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                android:title="@string/menu_restore" />
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        </menu>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    </item>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]</menu>

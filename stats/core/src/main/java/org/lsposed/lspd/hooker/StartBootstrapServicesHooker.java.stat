@@ -1,0 +1,67 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.lspd.hooker;
+[external][hsushulong][hsushulong@gmail.com]
+[external][416810799][416810799@qq.com]import static org.lsposed.lspd.util.Utils.logD;
+[external][416810799][416810799@qq.com]
+[external][shana][shana@zju.edu.cn]import androidx.annotation.NonNull;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import org.lsposed.lspd.impl.LSPosedContext;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.lspd.util.Hookers;
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]import de.robv.android.xposed.XposedBridge;
+[external][hsushulong][hsushulong@gmail.com]import de.robv.android.xposed.XposedInit;
+[external][hsushulong][hsushulong@gmail.com]import de.robv.android.xposed.callbacks.XC_LoadPackage;
+[external][noreply][noreply@nullptr.icu]import io.github.libxposed.api.XposedInterface;
+[external][noreply][noreply@nullptr.icu]import io.github.libxposed.api.XposedModuleInterface;
+[external][noreply][noreply@nullptr.icu]import io.github.libxposed.api.annotations.BeforeInvocation;
+[external][noreply][noreply@nullptr.icu]import io.github.libxposed.api.annotations.XposedHooker;
+[external][hsushulong][hsushulong@gmail.com]
+[external][noreply][noreply@nullptr.icu]@XposedHooker
+[external][noreply][noreply@nullptr.icu]public class StartBootstrapServicesHooker implements XposedInterface.Hooker {
+[external][hsushulong][hsushulong@gmail.com]
+[external][noreply][noreply@nullptr.icu]    @BeforeInvocation
+[external][noreply][noreply@nullptr.icu]    public static void beforeHookedMethod() {
+[external][hsushulong][hsushulong@gmail.com]        logD("SystemServer#startBootstrapServices() starts");
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]        try {
+[external][hsushulong][hsushulong@gmail.com]            XposedInit.loadedPackagesInProcess.add("android");
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]            XC_LoadPackage.LoadPackageParam lpparam = new XC_LoadPackage.LoadPackageParam(XposedBridge.sLoadedPackageCallbacks);
+[external][hsushulong][hsushulong@gmail.com]            lpparam.packageName = "android";
+[external][hsushulong][hsushulong@gmail.com]            lpparam.processName = "android"; // it's actually system_server, but other functions return this as well
+[external][shana][shana@zju.edu.cn]            lpparam.classLoader = HandleSystemServerProcessHooker.systemServerCL;
+[external][hsushulong][hsushulong@gmail.com]            lpparam.appInfo = null;
+[external][hsushulong][hsushulong@gmail.com]            lpparam.isFirstApplication = true;
+[external][hsushulong][hsushulong@gmail.com]            XC_LoadPackage.callAll(lpparam);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            LSPosedContext.callOnSystemServerLoaded(new XposedModuleInterface.SystemServerLoadedParam() {
+[external][shana][shana@zju.edu.cn]                @Override
+[external][shana][shana@zju.edu.cn]                @NonNull
+[external][shana][shana@zju.edu.cn]                public ClassLoader getClassLoader() {
+[external][shana][shana@zju.edu.cn]                    return HandleSystemServerProcessHooker.systemServerCL;
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            });
+[external][hsushulong][hsushulong@gmail.com]        } catch (Throwable t) {
+[external][hsushulong][hsushulong@gmail.com]            Hookers.logE("error when hooking startBootstrapServices", t);
+[external][hsushulong][hsushulong@gmail.com]        }
+[external][hsushulong][hsushulong@gmail.com]    }
+[external][hsushulong][hsushulong@gmail.com]}

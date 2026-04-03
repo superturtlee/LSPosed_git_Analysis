@@ -1,0 +1,5 @@
+[external][shana][shana@zju.edu.cn]package android.system;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public final class ErrnoException extends Exception {
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]}

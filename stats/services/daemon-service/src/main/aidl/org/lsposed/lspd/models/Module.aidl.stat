@@ -1,0 +1,12 @@
+[external][shana][shana@zju.edu.cn]package org.lsposed.lspd.models;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.lspd.models.PreLoadedApk;
+[external][shana][shana@zju.edu.cn]import org.lsposed.lspd.service.ILSPInjectedModuleService;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]parcelable Module {
+[internal][vvb2060][vvb2060@gmail.com]    String packageName;
+[external][shana][shana@zju.edu.cn]    int appId;
+[internal][vvb2060][vvb2060@gmail.com]    String apkPath;
+[internal][vvb2060][vvb2060@gmail.com]    PreLoadedApk file;
+[external][shana][shana@zju.edu.cn]    ApplicationInfo applicationInfo;
+[external][shana][shana@zju.edu.cn]    ILSPInjectedModuleService service;
+[external][shana][shana@zju.edu.cn]}

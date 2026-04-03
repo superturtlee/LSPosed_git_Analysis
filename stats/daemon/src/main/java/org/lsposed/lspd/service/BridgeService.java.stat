@@ -1,0 +1,181 @@
+[internal][dr-tsng][tsng.nullptr@outlook.com]package org.lsposed.lspd.service;
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[internal][dr-tsng][tsng.nullptr@outlook.com]import static org.lsposed.lspd.service.ServiceManager.TAG;
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[internal][5ec1cff][56485584+5ec1cff@users.noreply.github.com]import android.app.ActivityManager;
+[internal][dr-tsng][tsng.nullptr@outlook.com]import android.os.Handler;
+[internal][dr-tsng][tsng.nullptr@outlook.com]import android.os.IBinder;
+[internal][dr-tsng][tsng.nullptr@outlook.com]import android.os.Looper;
+[internal][dr-tsng][tsng.nullptr@outlook.com]import android.os.Parcel;
+[internal][dr-tsng][tsng.nullptr@outlook.com]import android.os.ServiceManager;
+[external][howardwu20][HowardWu20@outlook.com]import android.system.ErrnoException;
+[external][howardwu20][HowardWu20@outlook.com]import android.system.Os;
+[internal][dr-tsng][tsng.nullptr@outlook.com]import android.util.Log;
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.daemon.BuildConfig;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][dr-tsng][tsng.nullptr@outlook.com]import java.lang.reflect.Field;
+[internal][dr-tsng][tsng.nullptr@outlook.com]import java.util.Map;
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[internal][dr-tsng][tsng.nullptr@outlook.com]public class BridgeService {
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[external][admin][admin@0x.mk]    static final int TRANSACTION_CODE = ('_' << 24) | ('L' << 16) | ('S' << 8) | 'P'; // 1598837584
+[internal][dr-tsng][tsng.nullptr@outlook.com]    private static final String DESCRIPTOR = "LSPosed";
+[internal][dr-tsng][tsng.nullptr@outlook.com]    private static final String SERVICE_NAME = "activity";
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[internal][dr-tsng][tsng.nullptr@outlook.com]    enum ACTION {
+[internal][dr-tsng][tsng.nullptr@outlook.com]        ACTION_UNKNOWN,
+[internal][dr-tsng][tsng.nullptr@outlook.com]        ACTION_SEND_BINDER,
+[internal][dr-tsng][tsng.nullptr@outlook.com]        ACTION_GET_BINDER,
+[internal][dr-tsng][tsng.nullptr@outlook.com]    }
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[internal][dr-tsng][tsng.nullptr@outlook.com]    public interface Listener {
+[internal][dr-tsng][tsng.nullptr@outlook.com]        void onSystemServerRestarted();
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[internal][dr-tsng][tsng.nullptr@outlook.com]        void onResponseFromBridgeService(boolean response);
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[internal][dr-tsng][tsng.nullptr@outlook.com]        void onSystemServerDied();
+[internal][dr-tsng][tsng.nullptr@outlook.com]    }
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[internal][dr-tsng][tsng.nullptr@outlook.com]    private static IBinder serviceBinder = null;
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[internal][dr-tsng][tsng.nullptr@outlook.com]    private static Listener listener;
+[internal][dr-tsng][tsng.nullptr@outlook.com]    private static IBinder bridgeService;
+[internal][dr-tsng][tsng.nullptr@outlook.com]    private static final IBinder.DeathRecipient bridgeRecipient = new IBinder.DeathRecipient() {
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[internal][dr-tsng][tsng.nullptr@outlook.com]        @Override
+[internal][dr-tsng][tsng.nullptr@outlook.com]        public void binderDied() {
+[internal][dr-tsng][tsng.nullptr@outlook.com]            Log.i(TAG, "service " + SERVICE_NAME + " is dead. ");
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[internal][dr-tsng][tsng.nullptr@outlook.com]            try {
+[internal][dr-tsng][tsng.nullptr@outlook.com]                //noinspection JavaReflectionMemberAccess DiscouragedPrivateApi
+[internal][dr-tsng][tsng.nullptr@outlook.com]                Field field = ServiceManager.class.getDeclaredField("sServiceManager");
+[internal][dr-tsng][tsng.nullptr@outlook.com]                field.setAccessible(true);
+[internal][dr-tsng][tsng.nullptr@outlook.com]                field.set(null, null);
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[internal][dr-tsng][tsng.nullptr@outlook.com]                //noinspection JavaReflectionMemberAccess DiscouragedPrivateApi
+[internal][dr-tsng][tsng.nullptr@outlook.com]                field = ServiceManager.class.getDeclaredField("sCache");
+[internal][dr-tsng][tsng.nullptr@outlook.com]                field.setAccessible(true);
+[internal][dr-tsng][tsng.nullptr@outlook.com]                Object sCache = field.get(null);
+[internal][dr-tsng][tsng.nullptr@outlook.com]                if (sCache instanceof Map) {
+[internal][dr-tsng][tsng.nullptr@outlook.com]                    //noinspection rawtypes
+[internal][dr-tsng][tsng.nullptr@outlook.com]                    ((Map) sCache).clear();
+[internal][dr-tsng][tsng.nullptr@outlook.com]                }
+[internal][dr-tsng][tsng.nullptr@outlook.com]                Log.i(TAG, "clear ServiceManager");
+[internal][5ec1cff][56485584+5ec1cff@users.noreply.github.com]
+[internal][5ec1cff][56485584+5ec1cff@users.noreply.github.com]                //noinspection JavaReflectionMemberAccess DiscouragedPrivateApi
+[internal][5ec1cff][56485584+5ec1cff@users.noreply.github.com]                field = ActivityManager.class.getDeclaredField("IActivityManagerSingleton");
+[internal][5ec1cff][56485584+5ec1cff@users.noreply.github.com]                field.setAccessible(true);
+[internal][5ec1cff][56485584+5ec1cff@users.noreply.github.com]                Object singleton = field.get(null);
+[internal][5ec1cff][56485584+5ec1cff@users.noreply.github.com]                if (singleton != null) {
+[internal][5ec1cff][56485584+5ec1cff@users.noreply.github.com]                    //noinspection PrivateApi DiscouragedPrivateApi
+[internal][5ec1cff][56485584+5ec1cff@users.noreply.github.com]                    field = Class.forName("android.util.Singleton").getDeclaredField("mInstance");
+[internal][5ec1cff][56485584+5ec1cff@users.noreply.github.com]                    field.setAccessible(true);
+[internal][5ec1cff][56485584+5ec1cff@users.noreply.github.com]                    synchronized (singleton) {
+[internal][5ec1cff][56485584+5ec1cff@users.noreply.github.com]                        field.set(singleton, null);
+[internal][5ec1cff][56485584+5ec1cff@users.noreply.github.com]                    }
+[internal][5ec1cff][56485584+5ec1cff@users.noreply.github.com]                }
+[internal][5ec1cff][56485584+5ec1cff@users.noreply.github.com]                Log.i(TAG, "clear ActivityManager");
+[internal][dr-tsng][tsng.nullptr@outlook.com]            } catch (Throwable e) {
+[internal][dr-tsng][tsng.nullptr@outlook.com]                Log.w(TAG, "clear ServiceManager: " + Log.getStackTraceString(e));
+[internal][dr-tsng][tsng.nullptr@outlook.com]            }
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[internal][dr-tsng][tsng.nullptr@outlook.com]            bridgeService.unlinkToDeath(this, 0);
+[internal][dr-tsng][tsng.nullptr@outlook.com]            bridgeService = null;
+[internal][dr-tsng][tsng.nullptr@outlook.com]            listener.onSystemServerDied();
+[internal][dr-tsng][tsng.nullptr@outlook.com]            new Handler(Looper.getMainLooper()).post(() -> sendToBridge(serviceBinder, true));
+[internal][dr-tsng][tsng.nullptr@outlook.com]        }
+[internal][dr-tsng][tsng.nullptr@outlook.com]    };
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[internal][dr-tsng][tsng.nullptr@outlook.com]    // For service
+[external][howardwu20][HowardWu20@outlook.com]    // This MUST run in main thread
+[internal][dr-tsng][tsng.nullptr@outlook.com]    private static synchronized void sendToBridge(IBinder binder, boolean isRestart) {
+[external][howardwu20][HowardWu20@outlook.com]        assert Looper.myLooper() == Looper.getMainLooper();
+[external][howardwu20][HowardWu20@outlook.com]        try {
+[external][howardwu20][HowardWu20@outlook.com]            Os.seteuid(0);
+[external][howardwu20][HowardWu20@outlook.com]        } catch (ErrnoException e) {
+[external][howardwu20][HowardWu20@outlook.com]            Log.e(TAG, "seteuid 0", e);
+[external][howardwu20][HowardWu20@outlook.com]        }
+[external][howardwu20][HowardWu20@outlook.com]        try {
+[external][howardwu20][HowardWu20@outlook.com]            do {
+[external][howardwu20][HowardWu20@outlook.com]                bridgeService = ServiceManager.getService(SERVICE_NAME);
+[external][howardwu20][HowardWu20@outlook.com]                if (bridgeService != null && bridgeService.pingBinder()) {
+[external][howardwu20][HowardWu20@outlook.com]                    break;
+[external][howardwu20][HowardWu20@outlook.com]                }
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[external][howardwu20][HowardWu20@outlook.com]                Log.i(TAG, "service " + SERVICE_NAME + " is not started, wait 1s.");
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[external][howardwu20][HowardWu20@outlook.com]                try {
+[external][howardwu20][HowardWu20@outlook.com]                    //noinspection BusyWait
+[external][howardwu20][HowardWu20@outlook.com]                    Thread.sleep(1000);
+[external][howardwu20][HowardWu20@outlook.com]                } catch (Throwable e) {
+[external][howardwu20][HowardWu20@outlook.com]                    Log.w(TAG, "sleep" + Log.getStackTraceString(e));
+[external][howardwu20][HowardWu20@outlook.com]                }
+[external][howardwu20][HowardWu20@outlook.com]            } while (true);
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[external][howardwu20][HowardWu20@outlook.com]            if (isRestart && listener != null) {
+[external][howardwu20][HowardWu20@outlook.com]                listener.onSystemServerRestarted();
+[external][howardwu20][HowardWu20@outlook.com]            }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][dr-tsng][tsng.nullptr@outlook.com]            try {
+[external][howardwu20][HowardWu20@outlook.com]                bridgeService.linkToDeath(bridgeRecipient, 0);
+[internal][dr-tsng][tsng.nullptr@outlook.com]            } catch (Throwable e) {
+[external][howardwu20][HowardWu20@outlook.com]                Log.w(TAG, "linkToDeath " + Log.getStackTraceString(e));
+[internal][dr-tsng][tsng.nullptr@outlook.com]                var snapshot = bridgeService;
+[internal][dr-tsng][tsng.nullptr@outlook.com]                sendToBridge(binder, snapshot == null || !snapshot.isBinderAlive());
+[internal][dr-tsng][tsng.nullptr@outlook.com]                return;
+[internal][dr-tsng][tsng.nullptr@outlook.com]            }
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[external][howardwu20][HowardWu20@outlook.com]            Parcel data = Parcel.obtain();
+[external][howardwu20][HowardWu20@outlook.com]            Parcel reply = Parcel.obtain();
+[external][howardwu20][HowardWu20@outlook.com]            boolean res = false;
+[external][howardwu20][HowardWu20@outlook.com]            // try at most three times
+[external][howardwu20][HowardWu20@outlook.com]            for (int i = 0; i < 3; i++) {
+[external][howardwu20][HowardWu20@outlook.com]                try {
+[external][howardwu20][HowardWu20@outlook.com]                    data.writeInterfaceToken(DESCRIPTOR);
+[external][howardwu20][HowardWu20@outlook.com]                    data.writeInt(ACTION.ACTION_SEND_BINDER.ordinal());
+[external][howardwu20][HowardWu20@outlook.com]                    Log.v(TAG, "binder " + binder.toString());
+[external][howardwu20][HowardWu20@outlook.com]                    data.writeStrongBinder(binder);
+[external][howardwu20][HowardWu20@outlook.com]                    if (bridgeService == null) break;
+[external][howardwu20][HowardWu20@outlook.com]                    res = bridgeService.transact(TRANSACTION_CODE, data, reply, 0);
+[external][howardwu20][HowardWu20@outlook.com]                    reply.readException();
+[external][howardwu20][HowardWu20@outlook.com]                } catch (Throwable e) {
+[external][howardwu20][HowardWu20@outlook.com]                    Log.e(TAG, "send binder " + Log.getStackTraceString(e));
+[external][howardwu20][HowardWu20@outlook.com]                    var snapshot = bridgeService;
+[external][howardwu20][HowardWu20@outlook.com]                    sendToBridge(binder, snapshot == null || !snapshot.isBinderAlive());
+[external][howardwu20][HowardWu20@outlook.com]                    return;
+[external][howardwu20][HowardWu20@outlook.com]                } finally {
+[external][howardwu20][HowardWu20@outlook.com]                    data.recycle();
+[external][howardwu20][HowardWu20@outlook.com]                    reply.recycle();
+[external][howardwu20][HowardWu20@outlook.com]                }
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[external][howardwu20][HowardWu20@outlook.com]                if (res) break;
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[external][howardwu20][HowardWu20@outlook.com]                Log.w(TAG, "no response from bridge, retry in 1s");
+[external][howardwu20][HowardWu20@outlook.com]
+[external][howardwu20][HowardWu20@outlook.com]                try {
+[external][howardwu20][HowardWu20@outlook.com]                    Thread.sleep(1000);
+[external][howardwu20][HowardWu20@outlook.com]                } catch (InterruptedException ignored) {
+[external][howardwu20][HowardWu20@outlook.com]                }
+[internal][dr-tsng][tsng.nullptr@outlook.com]            }
+[internal][vvb2060][vvb2060@gmail.com]
+[external][howardwu20][HowardWu20@outlook.com]            if (listener != null) {
+[external][howardwu20][HowardWu20@outlook.com]                listener.onResponseFromBridgeService(res);
+[external][howardwu20][HowardWu20@outlook.com]            }
+[external][howardwu20][HowardWu20@outlook.com]        } finally {
+[external][howardwu20][HowardWu20@outlook.com]            try {
+[internal][vvb2060][vvb2060@gmail.com]                if (!BuildConfig.DEBUG) {
+[internal][vvb2060][vvb2060@gmail.com]                    Os.seteuid(1000);
+[internal][vvb2060][vvb2060@gmail.com]                }
+[external][howardwu20][HowardWu20@outlook.com]            } catch (ErrnoException e) {
+[external][howardwu20][HowardWu20@outlook.com]                Log.e(TAG, "seteuid 1000", e);
+[external][howardwu20][HowardWu20@outlook.com]            }
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][dr-tsng][tsng.nullptr@outlook.com]    }
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[internal][dr-tsng][tsng.nullptr@outlook.com]    public static void send(LSPosedService service, Listener listener) {
+[internal][dr-tsng][tsng.nullptr@outlook.com]        BridgeService.listener = listener;
+[internal][dr-tsng][tsng.nullptr@outlook.com]        BridgeService.serviceBinder = service.asBinder();
+[internal][dr-tsng][tsng.nullptr@outlook.com]        sendToBridge(serviceBinder, false);
+[internal][dr-tsng][tsng.nullptr@outlook.com]    }
+[internal][dr-tsng][tsng.nullptr@outlook.com]}

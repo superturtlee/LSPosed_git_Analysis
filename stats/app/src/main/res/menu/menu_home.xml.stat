@@ -1,0 +1,34 @@
+[internal][dr-tsng][tsng.nullptr@outlook.com]<?xml version="1.0" encoding="utf-8"?><!--
+[internal][dr-tsng][tsng.nullptr@outlook.com]  ~ This file is part of LSPosed.
+[internal][dr-tsng][tsng.nullptr@outlook.com]  ~
+[internal][dr-tsng][tsng.nullptr@outlook.com]  ~ LSPosed is free software: you can redistribute it and/or modify
+[internal][dr-tsng][tsng.nullptr@outlook.com]  ~ it under the terms of the GNU General Public License as published by
+[internal][dr-tsng][tsng.nullptr@outlook.com]  ~ the Free Software Foundation, either version 3 of the License, or
+[internal][dr-tsng][tsng.nullptr@outlook.com]  ~ (at your option) any later version.
+[internal][dr-tsng][tsng.nullptr@outlook.com]  ~
+[internal][dr-tsng][tsng.nullptr@outlook.com]  ~ LSPosed is distributed in the hope that it will be useful,
+[internal][dr-tsng][tsng.nullptr@outlook.com]  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+[internal][dr-tsng][tsng.nullptr@outlook.com]  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[internal][dr-tsng][tsng.nullptr@outlook.com]  ~ GNU General Public License for more details.
+[internal][dr-tsng][tsng.nullptr@outlook.com]  ~
+[internal][dr-tsng][tsng.nullptr@outlook.com]  ~ You should have received a copy of the GNU General Public License
+[internal][dr-tsng][tsng.nullptr@outlook.com]  ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[internal][dr-tsng][tsng.nullptr@outlook.com]  ~
+[internal][dr-tsng][tsng.nullptr@outlook.com]  ~ Copyright (C) 2021 LSPosed Contributors
+[internal][dr-tsng][tsng.nullptr@outlook.com]  -->
+[internal][dr-tsng][tsng.nullptr@outlook.com]
+[external][shana][shana@zju.edu.cn]<menu xmlns:android="http://schemas.android.com/apk/res/android">
+[external][shana][shana@zju.edu.cn]    <item
+[external][shana][shana@zju.edu.cn]        android:id="@+id/menu_issue"
+[external][shana][shana@zju.edu.cn]        android:actionViewClass="androidx.appcompat.widget.SearchView"
+[external][shana][shana@zju.edu.cn]        android:icon="@drawable/ic_baseline_chat_24"
+[external][shana][shana@zju.edu.cn]        android:showAsAction="never"
+[external][shana][shana@zju.edu.cn]        android:title="@string/feedback_or_suggestion" />
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    <item
+[external][shana][shana@zju.edu.cn]        android:id="@+id/menu_about"
+[external][shana][shana@zju.edu.cn]        android:actionViewClass="androidx.appcompat.widget.SearchView"
+[external][shana][shana@zju.edu.cn]        android:icon="@drawable/ic_baseline_info_24"
+[external][shana][shana@zju.edu.cn]        android:showAsAction="never"
+[external][shana][shana@zju.edu.cn]        android:title="@string/About" />
+[external][shana][shana@zju.edu.cn]</menu>

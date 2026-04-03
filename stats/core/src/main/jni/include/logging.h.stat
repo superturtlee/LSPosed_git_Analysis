@@ -1,0 +1,60 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][hsushulong][hsushulong@gmail.com]#ifndef _LOGGING_H
+[external][hsushulong][hsushulong@gmail.com]#define _LOGGING_H
+[external][hsushulong][hsushulong@gmail.com]
+[external][shana][shana@zju.edu.cn]#include <android/log.h>
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]#include <fmt/format.h>
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]#include <array>
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]#ifndef LOG_TAG
+[external][shana][shana@zju.edu.cn]#define LOG_TAG    "LSPosed"
+[external][hsushulong][hsushulong@gmail.com]#endif
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]#ifdef LOG_DISABLED
+[external][shana][shana@zju.edu.cn]#define LOGD(...) 0
+[external][shana][shana@zju.edu.cn]#define LOGV(...) 0
+[external][shana][shana@zju.edu.cn]#define LOGI(...) 0
+[external][shana][shana@zju.edu.cn]#define LOGW(...) 0
+[external][shana][shana@zju.edu.cn]#define LOGE(...) 0
+[external][hsushulong][hsushulong@gmail.com]#else
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]template <typename... T>
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]constexpr inline void LOG(int prio, const char* tag, fmt::format_string<T...> fmt, T&&... args) {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    std::array<char, 1024> buf{};
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    auto s = fmt::format_to_n(buf.data(), buf.size(), fmt, std::forward<T>(args)...).size;
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    buf[s] = '\0';
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    __android_log_write(prio, tag, buf.data());
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]}
+[external][shana][shana@zju.edu.cn]#ifndef NDEBUG
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]#define LOGD(fmt, ...) LOG(ANDROID_LOG_DEBUG, LOG_TAG, "{}:{}#{}" ": " fmt, __FILE_NAME__, __LINE__, __PRETTY_FUNCTION__ __VA_OPT__(,) __VA_ARGS__)
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]#define LOGV(fmt, ...) LOG(ANDROID_LOG_VERBOSE, LOG_TAG, "{}:{}#{}" ": " fmt, __FILE_NAME__, __LINE__, __PRETTY_FUNCTION__ __VA_OPT__(,) __VA_ARGS__)
+[external][hsushulong][hsushulong@gmail.com]#else
+[external][shana][shana@zju.edu.cn]#define LOGD(...) 0
+[external][shana][shana@zju.edu.cn]#define LOGV(...) 0
+[external][hsushulong][hsushulong@gmail.com]#endif
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]#define LOGI(...)  LOG(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]#define LOGW(...)  LOG(ANDROID_LOG_WARN, LOG_TAG, __VA_ARGS__)
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]#define LOGE(...)  LOG(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]#define LOGF(...)  LOG(ANDROID_LOG_FATAL, LOG_TAG, __VA_ARGS__)
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]#define PLOGE(fmt, args...) LOGE(fmt " failed with {}: {}", ##args, errno, strerror(errno))
+[external][hsushulong][hsushulong@gmail.com]#endif
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]#endif // _LOGGING_H

@@ -1,0 +1,109 @@
+[external][shana][shana@zju.edu.cn]project(external)
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]macro(SET_OPTION option value)
+[external][shana][shana@zju.edu.cn]    set(${option} ${value} CACHE INTERNAL "" FORCE)
+[external][shana][shana@zju.edu.cn]endmacro()
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]SET_OPTION(DOBBY_GENERATE_SHARED OFF)
+[external][shana][shana@zju.edu.cn]SET_OPTION(Plugin.SymbolResolver OFF)
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]set(LIBCXX_SOURCES
+[external][shana][shana@zju.edu.cn]        algorithm.cpp
+[external][shana][shana@zju.edu.cn]#        any.cpp
+[external][shana][shana@zju.edu.cn]        atomic.cpp
+[external][shana][shana@zju.edu.cn]        barrier.cpp
+[external][shana][shana@zju.edu.cn]#        bind.cpp
+[external][shana][shana@zju.edu.cn]        charconv.cpp
+[external][shana][shana@zju.edu.cn]        chrono.cpp
+[external][shana][shana@zju.edu.cn]        condition_variable.cpp
+[external][shana][shana@zju.edu.cn]        condition_variable_destructor.cpp
+[external][shana][shana@zju.edu.cn]#        debug.cpp
+[external][shana][shana@zju.edu.cn]        exception.cpp
+[external][shana][shana@zju.edu.cn]#        filesystem/directory_iterator.cpp
+[external][shana][shana@zju.edu.cn]#        filesystem/int128_builtins.cpp
+[external][shana][shana@zju.edu.cn]#        filesystem/operations.cpp
+[external][shana][shana@zju.edu.cn]        functional.cpp
+[external][shana][shana@zju.edu.cn]        future.cpp
+[external][shana][shana@zju.edu.cn]        hash.cpp
+[external][shana][shana@zju.edu.cn]#        ios.cpp
+[external][shana][shana@zju.edu.cn]#        ios.instantiations.cpp
+[external][shana][shana@zju.edu.cn]#        iostream.cpp
+[external][shana][shana@zju.edu.cn]#        locale.cpp
+[external][shana][shana@zju.edu.cn]        memory.cpp
+[external][shana][shana@zju.edu.cn]        mutex.cpp
+[external][shana][shana@zju.edu.cn]        mutex_destructor.cpp
+[external][shana][shana@zju.edu.cn]        new.cpp
+[external][shana][shana@zju.edu.cn]        optional.cpp
+[external][shana][shana@zju.edu.cn]        random.cpp
+[external][shana][shana@zju.edu.cn]#        regex.cpp
+[external][shana][shana@zju.edu.cn]#        ryu/d2fixed.cpp
+[external][shana][shana@zju.edu.cn]#        ryu/d2s.cpp
+[external][shana][shana@zju.edu.cn]#        ryu/f2s.cpp
+[external][shana][shana@zju.edu.cn]        shared_mutex.cpp
+[external][shana][shana@zju.edu.cn]        stdexcept.cpp
+[external][shana][shana@zju.edu.cn]        string.cpp
+[external][shana][shana@zju.edu.cn]#        strstream.cpp
+[external][shana][shana@zju.edu.cn]        system_error.cpp
+[external][shana][shana@zju.edu.cn]        thread.cpp
+[external][shana][shana@zju.edu.cn]#        typeinfo.cpp
+[external][shana][shana@zju.edu.cn]        utility.cpp
+[external][shana][shana@zju.edu.cn]        valarray.cpp
+[external][shana][shana@zju.edu.cn]        variant.cpp
+[external][shana][shana@zju.edu.cn]        vector.cpp
+[external][shana][shana@zju.edu.cn]        )
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]list(TRANSFORM LIBCXX_SOURCES PREPEND cxx/src/)
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]set(LIBCXX_EXPORT_FLAGS
+[external][shana][shana@zju.edu.cn]        -DLIBCXX_BUILDING_LIBCXXABI
+[external][shana][shana@zju.edu.cn]        -D_LIBCPP_NO_EXCEPTIONS
+[external][shana][shana@zju.edu.cn]        -D_LIBCPP_NO_RTTI
+[external][shana][shana@zju.edu.cn]        -D_LIBCPP_BUILDING_LIBRARY
+[external][shana][shana@zju.edu.cn]        -D_LIBCPP_DISABLE_VISIBILITY_ANNOTATIONS
+[external][shana][shana@zju.edu.cn]        -D_LIBCXXABI_NO_EXCEPTIONS
+[external][shana][shana@zju.edu.cn]        -D_LIBCPP_HAS_NO_LOCALIZATION
+[external][shana][shana@zju.edu.cn]        )
+[external][shana][shana@zju.edu.cn]set(LIBCXX_FLAGS
+[external][shana][shana@zju.edu.cn]        -fvisibility-global-new-delete-hidden
+[external][shana][shana@zju.edu.cn]        -fvisibility=hidden
+[external][shana][shana@zju.edu.cn]        -fvisibility-inlines-hidden
+[external][shana][shana@zju.edu.cn]        )
+[external][shana][shana@zju.edu.cn]set(LIBCXX_EXPORT_INCLUDES cxx/include)
+[external][shana][shana@zju.edu.cn]set(LIBCXX_INCLUDES cxx/src)
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]set(LIBCXXABI_SOURCES
+[external][shana][shana@zju.edu.cn]        abort_message.cpp
+[external][shana][shana@zju.edu.cn]        cxa_aux_runtime.cpp
+[external][shana][shana@zju.edu.cn]        cxa_default_handlers.cpp
+[external][shana][shana@zju.edu.cn]        cxa_exception_storage.cpp
+[external][shana][shana@zju.edu.cn]        cxa_guard.cpp
+[external][shana][shana@zju.edu.cn]        cxa_handlers.cpp
+[external][shana][shana@zju.edu.cn]        cxa_noexception.cpp
+[external][shana][shana@zju.edu.cn]        cxa_thread_atexit.cpp
+[external][shana][shana@zju.edu.cn]        cxa_vector.cpp
+[external][shana][shana@zju.edu.cn]        cxa_virtual.cpp
+[external][shana][shana@zju.edu.cn]        stdlib_exception.cpp
+[external][shana][shana@zju.edu.cn]        stdlib_new_delete.cpp
+[external][shana][shana@zju.edu.cn]        stdlib_stdexcept.cpp
+[external][shana][shana@zju.edu.cn]        stdlib_typeinfo.cpp
+[external][shana][shana@zju.edu.cn]        )
+[external][shana][shana@zju.edu.cn]list(TRANSFORM LIBCXXABI_SOURCES PREPEND cxx/src/abi/)
+[external][shana][shana@zju.edu.cn]set(LIBCXXABI_FLAGS
+[external][shana][shana@zju.edu.cn]        -Wno-macro-redefined
+[external][shana][shana@zju.edu.cn]        -Wno-unknown-attributes
+[external][shana][shana@zju.edu.cn]        -DHAS_THREAD_LOCAL)
+[external][shana][shana@zju.edu.cn]set(LIBCXXABI_INCLUDES cxx/include/abi)
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]add_library(cxx STATIC ${LIBCXX_SOURCES} ${LIBCXXABI_SOURCES})
+[external][shana][shana@zju.edu.cn]target_compile_options(cxx PUBLIC ${LIBCXX_EXPORT_FLAGS})
+[external][shana][shana@zju.edu.cn]target_compile_options(cxx PRIVATE ${LIBCXX_FLAGS} ${LIBCXXABI_FLAGS} -ffunction-sections -fdata-sections)
+[external][shana][shana@zju.edu.cn]target_include_directories(cxx PUBLIC ${LIBCXX_EXPORT_INCLUDES})
+[external][shana][shana@zju.edu.cn]target_include_directories(cxx PRIVATE ${LIBCXX_INCLUDES} ${LIBCXXABI_INCLUDES})
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]link_libraries(cxx)
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]OPTION(LSPLANT_BUILD_SHARED OFF)
+[external][shana][shana@zju.edu.cn]add_subdirectory(lsplant/lsplant/src/main/jni)
+[external][shana][shana@zju.edu.cn]add_subdirectory(dobby)
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]add_subdirectory(fmt)
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]target_compile_definitions(fmt-header-only INTERFACE FMT_STATIC_THOUSANDS_SEPARATOR=1 FMT_USE_FLOAT=0 FMT_USE_DOUBLE=0 FMT_USE_LONG_DOUBLE=0)

@@ -1,0 +1,347 @@
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]/*
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * This file is part of LSPosed.
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] *
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * (at your option) any later version.
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] *
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * GNU General Public License for more details.
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] *
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] *
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * Copyright (C) 2021 - 2022 LSPosed Contributors
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] */
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import org.apache.commons.codec.binary.Hex
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import org.apache.tools.ant.filters.FixCrLfFilter
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import org.apache.tools.ant.filters.ReplaceTokens
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import java.io.ByteArrayOutputStream
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import java.security.MessageDigest
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]plugins {
+[external][shana][shana@zju.edu.cn]    alias(libs.plugins.agp.app)
+[external][shana][shana@zju.edu.cn]    alias(libs.plugins.lsplugin.resopt)
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]}
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]val moduleName = "LSPosed"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]val moduleBaseId = "lsposed"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]val authors = "LSPosed Developers"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]val riruModuleId = "lsposed"
+[external][howardwu20][HowardWu20@outlook.com]val moduleMinRiruApiVersion = 26
+[external][howardwu20][HowardWu20@outlook.com]val moduleMinRiruVersionName = "26.1.7"
+[external][howardwu20][HowardWu20@outlook.com]val moduleMaxRiruApiVersion = 26
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]val injectedPackageName: String by rootProject.extra
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]val injectedPackageUid: Int by rootProject.extra
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]val defaultManagerPackageName: String by rootProject.extra
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]val verCode: Int by rootProject.extra
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]val verName: String by rootProject.extra
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]android {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    flavorDimensions += "api"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    buildFeatures {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        prefab = true
+[external][shana][shana@zju.edu.cn]        buildConfig = true
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    defaultConfig {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        applicationId = "org.lsposed.lspd"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        multiDexEnabled = false
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        buildConfigField(
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            "String",
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            "DEFAULT_MANAGER_PACKAGE_NAME",
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            """"$defaultManagerPackageName""""
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        )
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        buildConfigField("String", "MANAGER_INJECTED_PKG_NAME", """"$injectedPackageName"""")
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        buildConfigField("int", "MANAGER_INJECTED_UID", """$injectedPackageUid""")
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    buildTypes {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        release {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            isMinifyEnabled = true
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            proguardFiles("proguard-rules.pro")
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    externalNativeBuild {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        cmake {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            path("src/main/jni/CMakeLists.txt")
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    productFlavors {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        all {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            externalNativeBuild {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                cmake {
+[external][shana][shana@zju.edu.cn]                    arguments += "-DMODULE_NAME=${name.lowercase()}_$moduleBaseId"
+[external][shana][shana@zju.edu.cn]                    arguments += "-DAPI=${name.lowercase()}"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        create("Riru") {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            dimension = "api"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            externalNativeBuild {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                cmake {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                    arguments += "-DAPI_VERSION=$moduleMaxRiruApiVersion"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        create("Zygisk") {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            dimension = "api"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            externalNativeBuild {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                cmake {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                    arguments += "-DAPI_VERSION=1"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    }
+[external][shana][shana@zju.edu.cn]    namespace = "org.lsposed.lspd"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]}
+[external][shana][shana@zju.edu.cn]abstract class Injected @Inject constructor(val magiskDir: String) {
+[external][shana][shana@zju.edu.cn]    @get:Inject
+[external][shana][shana@zju.edu.cn]    abstract val factory: ObjectFactory
+[external][shana][shana@zju.edu.cn]}
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]dependencies {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    implementation(projects.core)
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    implementation(projects.hiddenapi.bridge)
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    implementation(projects.services.managerService)
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    implementation(projects.services.daemonService)
+[external][shana][shana@zju.edu.cn]    compileOnly(libs.androidx.annotation)
+[external][shana][shana@zju.edu.cn]    compileOnly(projects.hiddenapi.stubs)
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]}
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]val zipAll = task("zipAll") {
+[external][keta1][41381927+keta1@users.noreply.github.com]    group = "LSPosed"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]}
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]fun afterEval() = android.applicationVariants.forEach { variant ->
+[external][shana][shana@zju.edu.cn]    val variantCapped = variant.name.replaceFirstChar { it.uppercase() }
+[external][shana][shana@zju.edu.cn]    val variantLowered = variant.name.lowercase()
+[external][shana][shana@zju.edu.cn]    val buildTypeCapped = variant.buildType.name.replaceFirstChar { it.uppercase() }
+[external][shana][shana@zju.edu.cn]    val buildTypeLowered = variant.buildType.name.lowercase()
+[external][shana][shana@zju.edu.cn]    val flavorCapped = variant.flavorName!!.replaceFirstChar { it.uppercase() }
+[external][shana][shana@zju.edu.cn]    val flavorLowered = variant.flavorName!!.lowercase()
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[external][howardwu20][HowardWu20@outlook.com]    val magiskDir = layout.buildDirectory.dir("magisk/$variantLowered")
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    val moduleId = "${flavorLowered}_$moduleBaseId"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    val zipFileName = "$moduleName-v$verName-$verCode-${flavorLowered}-$buildTypeLowered.zip"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    val prepareMagiskFilesTask = task<Sync>("prepareMagiskFiles$variantCapped") {
+[external][keta1][41381927+keta1@users.noreply.github.com]        group = "LSPosed"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        dependsOn(
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            "assemble$variantCapped",
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            ":app:package$buildTypeCapped",
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            ":daemon:package$buildTypeCapped",
+[external][shana][shana@zju.edu.cn]            ":dex2oat:externalNativeBuild${buildTypeCapped}"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        )
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        into(magiskDir)
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        from("${rootProject.projectDir}/README.md")
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        from("$projectDir/magisk_module") {
+[internal][vvb2060][vvb2060@gmail.com]            exclude("riru.sh", "module.prop", "customize.sh", "daemon")
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        from("$projectDir/magisk_module") {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            include("module.prop")
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            expand(
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                "moduleId" to moduleId,
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                "versionName" to "v$verName",
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                "versionCode" to verCode,
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                "authorList" to authors,
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                "updateJson" to "https://lsposed.github.io/LSPosed/release/${flavorLowered}.json",
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                "requirement" to when (flavorLowered) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                    "riru" -> "Requires Riru $moduleMinRiruVersionName or above installed"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                    "zygisk" -> "Requires Magisk 24.0+ and Zygisk enabled"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                    else -> "No further requirements"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                },
+[external][shana][shana@zju.edu.cn]                "api" to flavorCapped,
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            )
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            filter<FixCrLfFilter>("eol" to FixCrLfFilter.CrLf.newInstance("lf"))
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        from("$projectDir/magisk_module") {
+[external][shana][shana@zju.edu.cn]            include("customize.sh", "daemon")
+[external][shana][shana@zju.edu.cn]            val tokens = mapOf(
+[external][shana][shana@zju.edu.cn]                "FLAVOR" to flavorLowered,
+[external][shana][shana@zju.edu.cn]                "DEBUG" to if (buildTypeLowered == "debug") "true" else "false"
+[external][shana][shana@zju.edu.cn]            )
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            filter<ReplaceTokens>("tokens" to tokens)
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            filter<FixCrLfFilter>("eol" to FixCrLfFilter.CrLf.newInstance("lf"))
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        if (flavorLowered == "riru") {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            from("${projectDir}/magisk_module") {
+[internal][vvb2060][vvb2060@gmail.com]                include("riru.sh")
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                val tokens = mapOf(
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                    "RIRU_MODULE_LIB_NAME" to "lspd",
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                    "RIRU_MODULE_API_VERSION" to moduleMaxRiruApiVersion.toString(),
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                    "RIRU_MODULE_MIN_API_VERSION" to moduleMinRiruApiVersion.toString(),
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                    "RIRU_MODULE_MIN_RIRU_VERSION_NAME" to moduleMinRiruVersionName,
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                )
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                filter<ReplaceTokens>("tokens" to tokens)
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                filter<FixCrLfFilter>("eol" to FixCrLfFilter.CrLf.newInstance("lf"))
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        from(project(":app").tasks.getByName("package$buildTypeCapped").outputs) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            include("*.apk")
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            rename(".*\\.apk", "manager.apk")
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        from(project(":daemon").tasks.getByName("package$buildTypeCapped").outputs) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            include("*.apk")
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            rename(".*\\.apk", "daemon.apk")
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        into("lib") {
+[external][howardwu20][HowardWu20@outlook.com]            from(layout.buildDirectory.dir("intermediates/stripped_native_libs/$variantCapped/out/lib")) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                include("**/liblspd.so")
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        into("bin") {
+[external][howardwu20][HowardWu20@outlook.com]            from(project(":dex2oat").layout.buildDirectory.dir("intermediates/cmake/$buildTypeLowered/obj")) {
+[external][noreply][noreply@nullptr.icu]                include("**/dex2oat")
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        val dexOutPath = if (buildTypeLowered == "release")
+[external][howardwu20][HowardWu20@outlook.com]            layout.buildDirectory.dir("intermediates/dex/$variantCapped/minify${variantCapped}WithR8")
+[external][howardwu20][HowardWu20@outlook.com]        else
+[external][howardwu20][HowardWu20@outlook.com]            layout.buildDirectory.dir("intermediates/dex/$variantCapped/mergeDex$variantCapped")
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        into("framework") {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            from(dexOutPath)
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            rename("classes.dex", "lspd.dex")
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        }
+[external][shana][shana@zju.edu.cn]
+[external][howardwu20][HowardWu20@outlook.com]        val injected = objects.newInstance<Injected>(magiskDir.get().asFile.path)
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        doLast {
+[external][shana][shana@zju.edu.cn]            injected.factory.fileTree().from(injected.magiskDir).visit {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                if (isDirectory) return@visit
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                val md = MessageDigest.getInstance("SHA-256")
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                file.forEachBlock(4096) { bytes, size ->
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                    md.update(bytes, 0, size)
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                }
+[external][shana][shana@zju.edu.cn]                File(file.path + ".sha256").writeText(Hex.encodeHexString(md.digest()))
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    val zipTask = task<Zip>("zip${variantCapped}") {
+[external][keta1][41381927+keta1@users.noreply.github.com]        group = "LSPosed"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        dependsOn(prepareMagiskFilesTask)
+[external][shana][shana@zju.edu.cn]        archiveFileName = zipFileName
+[external][shana][shana@zju.edu.cn]        destinationDirectory = file("$projectDir/release")
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        from(magiskDir)
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    zipAll.dependsOn(zipTask)
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    val adb: String = androidComponents.sdkComponents.adb.get().asFile.absolutePath
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    val pushTask = task<Exec>("push${variantCapped}") {
+[external][keta1][41381927+keta1@users.noreply.github.com]        group = "LSPosed"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        dependsOn(zipTask)
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        workingDir("${projectDir}/release")
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        commandLine(adb, "push", zipFileName, "/data/local/tmp/")
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    }
+[external][noreply][noreply@nullptr.icu]    val flashMagiskTask = task<Exec>("flashMagisk${variantCapped}") {
+[external][keta1][41381927+keta1@users.noreply.github.com]        group = "LSPosed"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        dependsOn(pushTask)
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        commandLine(
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            adb, "shell", "su", "-c",
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            "magisk --install-module /data/local/tmp/${zipFileName}"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        )
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    }
+[external][noreply][noreply@nullptr.icu]    task<Exec>("flashMagiskAndReboot${variantCapped}") {
+[external][keta1][41381927+keta1@users.noreply.github.com]        group = "LSPosed"
+[external][noreply][noreply@nullptr.icu]        dependsOn(flashMagiskTask)
+[external][rawer886][rawer886@qq.com]        commandLine(adb, "shell", "su", "-c", "/system/bin/svc", "power", "reboot")
+[external][noreply][noreply@nullptr.icu]    }
+[external][noreply][noreply@nullptr.icu]    val flashKsuTask = task<Exec>("flashKsu${variantCapped}") {
+[external][noreply][noreply@nullptr.icu]        group = "LSPosed"
+[external][noreply][noreply@nullptr.icu]        dependsOn(pushTask)
+[external][noreply][noreply@nullptr.icu]        commandLine(
+[external][noreply][noreply@nullptr.icu]            adb, "shell", "su", "-c",
+[external][noreply][noreply@nullptr.icu]            "ksud module install /data/local/tmp/${zipFileName}"
+[external][noreply][noreply@nullptr.icu]        )
+[external][noreply][noreply@nullptr.icu]    }
+[external][noreply][noreply@nullptr.icu]    task<Exec>("flashKsuAndReboot${variantCapped}") {
+[external][noreply][noreply@nullptr.icu]        group = "LSPosed"
+[external][noreply][noreply@nullptr.icu]        dependsOn(flashKsuTask)
+[external][rawer886][rawer886@qq.com]        commandLine(adb, "shell", "su", "-c", "/system/bin/svc", "power", "reboot")
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]}
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]afterEvaluate {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    afterEval()
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]}
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]val adb: String = androidComponents.sdkComponents.adb.get().asFile.absolutePath
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]val killLspd = task<Exec>("killLspd") {
+[external][keta1][41381927+keta1@users.noreply.github.com]    group = "LSPosed"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    commandLine(adb, "shell", "su", "-c", "killall", "lspd")
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    isIgnoreExitValue = true
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]}
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]val pushDaemon = task<Exec>("pushDaemon") {
+[external][keta1][41381927+keta1@users.noreply.github.com]    group = "LSPosed"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    dependsOn(":daemon:assembleDebug")
+[external][howardwu20][HowardWu20@outlook.com]    workingDir(project(":daemon").layout.buildDirectory.dir("outputs/apk/debug"))
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    commandLine(adb, "push", "daemon-debug.apk", "/data/local/tmp/daemon.apk")
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]}
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]val pushDaemonNative = task<Exec>("pushDaemonNative") {
+[external][keta1][41381927+keta1@users.noreply.github.com]    group = "LSPosed"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    dependsOn(":daemon:assembleDebug")
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    doFirst {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        val abi: String = ByteArrayOutputStream().use { outputStream ->
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            exec {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                commandLine(adb, "shell", "getprop", "ro.product.cpu.abi")
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                standardOutput = outputStream
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            outputStream.toString().trim()
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        }
+[external][howardwu20][HowardWu20@outlook.com]        workingDir(project(":daemon").layout.buildDirectory.dir("intermediates/stripped_native_libs/debug/out/lib/$abi"))
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    commandLine(adb, "push", "libdaemon.so", "/data/local/tmp/libdaemon.so")
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]}
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]val reRunDaemon = task<Exec>("reRunDaemon") {
+[external][keta1][41381927+keta1@users.noreply.github.com]    group = "LSPosed"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    dependsOn(pushDaemon, pushDaemonNative, killLspd)
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    // tricky to pass a minus number to avoid the injection warning
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    commandLine(
+[internal][vvb2060][vvb2060@gmail.com]        adb, "shell", "ASH_STANDALONE=1", "su", "-mm", "-pc",
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        "/data/adb/magisk/busybox sh /data/adb/modules/*_lsposed/service.sh --system-server-max-retry=-1&"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    )
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    isIgnoreExitValue = true
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]}
+[external][howardwu20][HowardWu20@outlook.com]val tmpApk = "/data/local/tmp/manager.apk"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]val pushApk = task<Exec>("pushApk") {
+[external][keta1][41381927+keta1@users.noreply.github.com]    group = "LSPosed"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    dependsOn(":app:assembleDebug")
+[external][howardwu20][HowardWu20@outlook.com]    doFirst {
+[external][howardwu20][HowardWu20@outlook.com]        exec {
+[external][howardwu20][HowardWu20@outlook.com]            commandLine(adb, "shell", "su", "-c", "rm", "-f", tmpApk)
+[external][howardwu20][HowardWu20@outlook.com]        }
+[external][howardwu20][HowardWu20@outlook.com]    }
+[external][howardwu20][HowardWu20@outlook.com]    workingDir(project(":app").layout.buildDirectory.dir("outputs/apk/debug"))
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    commandLine(adb, "push", "app-debug.apk", tmpApk)
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]}
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]val openApp = task<Exec>("openApp") {
+[external][keta1][41381927+keta1@users.noreply.github.com]    group = "LSPosed"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    commandLine(
+[internal][vvb2060][vvb2060@gmail.com]        adb, "shell",
+[internal][vvb2060][vvb2060@gmail.com]        "am", "start", "-c", "org.lsposed.manager.LAUNCH_MANAGER",
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        "com.android.shell/.BugreportWarningActivity"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    )
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]}
+[external][howardwu20][HowardWu20@outlook.com]task("reRunApp") {
+[external][keta1][41381927+keta1@users.noreply.github.com]    group = "LSPosed"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    dependsOn(pushApk)
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    finalizedBy(reRunDaemon)
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]}
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]evaluationDependsOn(":app")
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]evaluationDependsOn(":daemon")

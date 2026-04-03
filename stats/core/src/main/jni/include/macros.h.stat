@@ -1,0 +1,13 @@
+[external][shana][shana@zju.edu.cn]#pragma once
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]#include <stddef.h>  // for size_t
+[external][shana][shana@zju.edu.cn]#include <unistd.h>  // for TEMP_FAILURE_RETRY
+[external][shana][shana@zju.edu.cn]#include <utility>
+[external][shana][shana@zju.edu.cn]// The arraysize(arr) macro returns the # of elements in an array arr.
+[external][shana][shana@zju.edu.cn]// The expression is a compile-time constant, and therefore can be
+[external][shana][shana@zju.edu.cn]// used in defining new arrays, for example.  If you use arraysize on
+[external][shana][shana@zju.edu.cn]// a pointer by mistake, you will get a compile-time error.
+[external][shana][shana@zju.edu.cn]template<typename T, size_t N>
+[external][shana][shana@zju.edu.cn][[gnu::always_inline]] constexpr inline size_t arraysize(T(&)[N]) {
+[external][shana][shana@zju.edu.cn]  return N;
+[external][shana][shana@zju.edu.cn]}

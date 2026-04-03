@@ -1,0 +1,41 @@
+[internal][vvb2060][vvb2060@gmail.com]#!/system/bin/sh
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]dir=${0%/*}
+[internal][dr-tsng][tsng.nullptr@outlook.com]tmpLspdApk="/data/local/tmp/daemon.apk"
+[external][shana][shana@zju.edu.cn]debug=@DEBUG@
+[external][shana][shana@zju.edu.cn]flavor=@FLAVOR@
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][dr-tsng][tsng.nullptr@outlook.com]if [ -r $tmpLspdApk ]; then
+[internal][dr-tsng][tsng.nullptr@outlook.com]  java_options="-Djava.class.path=$tmpLspdApk"
+[internal][vvb2060][vvb2060@gmail.com]  debug="true"
+[internal][vvb2060][vvb2060@gmail.com]else
+[internal][dr-tsng][tsng.nullptr@outlook.com]  java_options="-Djava.class.path=$dir/daemon.apk"
+[internal][vvb2060][vvb2060@gmail.com]fi
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]if [ $debug = "true" ]; then
+[internal][vvb2060][vvb2060@gmail.com]  os_version=$(getprop ro.build.version.sdk)
+[internal][vvb2060][vvb2060@gmail.com]  if [ "$os_version" -eq "27" ]; then
+[internal][vvb2060][vvb2060@gmail.com]    java_options="$java_options -Xrunjdwp:transport=dt_android_adb,suspend=n,server=y -Xcompiler-option --debuggable"
+[internal][vvb2060][vvb2060@gmail.com]  elif [ "$os_version" -eq "28" ]; then
+[internal][vvb2060][vvb2060@gmail.com]    java_options="$java_options -XjdwpProvider:adbconnection -XjdwpOptions:suspend=n,server=y -Xcompiler-option --debuggable"
+[internal][vvb2060][vvb2060@gmail.com]  else
+[internal][vvb2060][vvb2060@gmail.com]    java_options="$java_options -XjdwpProvider:adbconnection -XjdwpOptions:suspend=n,server=y"
+[internal][vvb2060][vvb2060@gmail.com]  fi
+[internal][vvb2060][vvb2060@gmail.com]fi
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]mount tmpfs -t tmpfs /data/resource-cache
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]if [ ! -S "/dev/socket/zygote" ]; then
+[external][shana][shana@zju.edu.cn]  timeout 0.5 inotifyd - /dev/socket:near | while read -r line; do
+[external][shana][shana@zju.edu.cn]    $debug && log -p v -t "LSPosed" "inotify: $line"
+[external][shana][shana@zju.edu.cn]    if [ -S "/dev/socket/zygote" ]; then
+[external][shana][shana@zju.edu.cn]      $debug && log -p v -t "LSPosed" "zygote started"
+[external][shana][shana@zju.edu.cn]      touch /dev/socket&
+[external][shana][shana@zju.edu.cn]      exit
+[external][shana][shana@zju.edu.cn]    fi
+[external][shana][shana@zju.edu.cn]  done
+[external][shana][shana@zju.edu.cn]fi
+[external][shana][shana@zju.edu.cn]$debug && log -p d -t "LSPosed" "start $flavor daemon $*"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]# shellcheck disable=SC2086
+[internal][dr-tsng][tsng.nullptr@outlook.com]exec /system/bin/app_process $java_options /system/bin --nice-name=lspd org.lsposed.lspd.Main "$@" >/dev/null 2>&1

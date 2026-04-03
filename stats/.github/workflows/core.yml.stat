@@ -1,0 +1,160 @@
+[external][shana][shana@zju.edu.cn]name: Core
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]on:
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]  workflow_dispatch:
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    inputs:
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]      post_telegram:
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        description: 'Post to Telegram'
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        required: true
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        type: boolean
+[external][shana][shana@zju.edu.cn]  push:
+[external][shana][shana@zju.edu.cn]    branches: [ master ]
+[external][shana][shana@zju.edu.cn]    tags: [ v* ]
+[external][shana][shana@zju.edu.cn]  pull_request:
+[internal][vvb2060][vvb2060@gmail.com]  merge_group:
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]jobs:
+[external][shana][shana@zju.edu.cn]  build:
+[external][green1052][34261355+green1052@users.noreply.github.com]    runs-on: ubuntu-latest
+[external][shana][shana@zju.edu.cn]    env:
+[external][shana][shana@zju.edu.cn]      CCACHE_COMPILERCHECK: "%compiler% -dumpmachine; %compiler% -dumpversion"
+[external][shana][shana@zju.edu.cn]      CCACHE_NOHASHDIR: "true"
+[external][shana][shana@zju.edu.cn]      CCACHE_HARDLINK: "true"
+[external][shana][shana@zju.edu.cn]      CCACHE_BASEDIR: "${{ github.workspace }}"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    steps:
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]      - name: Checkout
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        uses: actions/checkout@v3
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        with:
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]          submodules: "recursive"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]          fetch-depth: 0
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]      - name: Write key
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        if: ${{ ( github.event_name != 'pull_request' && github.ref == 'refs/heads/master' ) || github.ref_type == 'tag' }}
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        run: |
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]          if [ ! -z "${{ secrets.KEY_STORE }}" ]; then
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            echo androidStorePassword='${{ secrets.KEY_STORE_PASSWORD }}' >> gradle.properties
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            echo androidKeyAlias='${{ secrets.ALIAS }}' >> gradle.properties
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            echo androidKeyPassword='${{ secrets.KEY_PASSWORD }}' >> gradle.properties
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            echo androidStoreFile='key.jks' >> gradle.properties
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            echo ${{ secrets.KEY_STORE }} | base64 --decode > key.jks
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]          fi
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]      - name: Checkout libxposed/api
+[external][shana][shana@zju.edu.cn]        uses: actions/checkout@v3
+[external][shana][shana@zju.edu.cn]        with:
+[external][shana][shana@zju.edu.cn]          repository: libxposed/api
+[external][shana][shana@zju.edu.cn]          path: libxposed/api
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]      - name: Checkout libxposed/service
+[external][shana][shana@zju.edu.cn]        uses: actions/checkout@v3
+[external][shana][shana@zju.edu.cn]        with:
+[external][shana][shana@zju.edu.cn]          repository: libxposed/service
+[external][shana][shana@zju.edu.cn]          path: libxposed/service
+[external][shana][shana@zju.edu.cn]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]      - name: Setup Java
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        uses: actions/setup-java@v3
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        with:
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]          distribution: "temurin"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]          java-version: "17"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]      - name: Setup Gradle
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        uses: gradle/gradle-build-action@v2
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        with:
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]          gradle-home-cache-cleanup: true
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]      - name: Set up ccache
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        uses: hendrikmuhs/ccache-action@v1.2
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        with:
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]          max-size: 2G
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]          key: ${{ runner.os }}
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]          restore-keys: ${{ runner.os }}
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]          save: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]      - name: Build dependencies
+[external][shana][shana@zju.edu.cn]        working-directory: libxposed
+[external][shana][shana@zju.edu.cn]        run: |
+[internal][vvb2060][vvb2060@gmail.com]          echo 'org.gradle.caching=true' >> ~/.gradle/gradle.properties
+[internal][vvb2060][vvb2060@gmail.com]          echo 'org.gradle.parallel=true' >> ~/.gradle/gradle.properties
+[internal][vvb2060][vvb2060@gmail.com]          echo 'org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8 -XX:+UseParallelGC' >> ~/.gradle/gradle.properties
+[internal][vvb2060][vvb2060@gmail.com]          echo 'android.native.buildOutput=verbose' >> ~/.gradle/gradle.properties
+[external][shana][shana@zju.edu.cn]          cd api
+[internal][vvb2060][vvb2060@gmail.com]          ./gradlew publishToMavenLocal
+[internal][vvb2060][vvb2060@gmail.com]          cd ../service
+[internal][vvb2060][vvb2060@gmail.com]          ./gradlew publishToMavenLocal
+[external][shana][shana@zju.edu.cn]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]      - name: Build with Gradle
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        run: |
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]          ./gradlew zipAll
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]      - name: Prepare artifact
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        if: success()
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        id: prepareArtifact
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        run: |
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]          riruReleaseName=`ls magisk-loader/release/LSPosed-v*-riru-release.zip | awk -F '(/|.zip)' '{print $3}'` && echo "riruReleaseName=$riruReleaseName" >> $GITHUB_OUTPUT
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]          riruDebugName=`ls magisk-loader/release/LSPosed-v*-riru-debug.zip | awk -F '(/|.zip)' '{print $3}'` && echo "riruDebugName=$riruDebugName" >> $GITHUB_OUTPUT
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]          zygiskReleaseName=`ls magisk-loader/release/LSPosed-v*-zygisk-release.zip | awk -F '(/|.zip)' '{print $3}'` && echo "zygiskReleaseName=$zygiskReleaseName" >> $GITHUB_OUTPUT
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]          zygiskDebugName=`ls magisk-loader/release/LSPosed-v*-zygisk-debug.zip | awk -F '(/|.zip)' '{print $3}'` && echo "zygiskDebugName=$zygiskDebugName" >> $GITHUB_OUTPUT
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]          unzip magisk-loader/release/LSPosed-v*-riru-release.zip -d LSPosed-riru-release
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]          unzip magisk-loader/release/LSPosed-v*-riru-debug.zip -d LSPosed-riru-debug
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]          unzip magisk-loader/release/LSPosed-v*-zygisk-release.zip -d LSPosed-zygisk-release
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]          unzip magisk-loader/release/LSPosed-v*-zygisk-debug.zip -d LSPosed-zygisk-debug
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]      - name: Upload riru release
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        uses: actions/upload-artifact@v3
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        with:
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]          name: ${{ steps.prepareArtifact.outputs.riruReleaseName }}
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]          path: "./LSPosed-riru-release/*"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]      - name: Upload riru debug
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        uses: actions/upload-artifact@v3
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        with:
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]          name: ${{ steps.prepareArtifact.outputs.riruDebugName }}
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]          path: "./LSPosed-riru-debug/*"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]      - name: Upload zygisk release
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        uses: actions/upload-artifact@v3
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        with:
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]          name: ${{ steps.prepareArtifact.outputs.zygiskReleaseName }}
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]          path: "./LSPosed-zygisk-release/*"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]      - name: Upload zygisk debug
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        uses: actions/upload-artifact@v3
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        with:
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]          name: ${{ steps.prepareArtifact.outputs.zygiskDebugName }}
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]          path: "./LSPosed-zygisk-debug/*"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]      - name: Upload mappings
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        uses: actions/upload-artifact@v3
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        with:
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]          name: mappings
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]          path: |
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            magisk-loader/build/outputs/mapping
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            app/build/outputs/mapping
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]      - name: Upload symbols
+[external][shana][shana@zju.edu.cn]        uses: actions/upload-artifact@v3
+[external][shana][shana@zju.edu.cn]        with:
+[external][shana][shana@zju.edu.cn]          name: symbols
+[external][shana][shana@zju.edu.cn]          path: build/symbols
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]      - name: Post to channel
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        if: ${{ success() && github.event_name != 'pull_request' && github.ref == 'refs/heads/master' && github.ref_type != 'tag' && inputs.post_telegram != 'false' }}
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        env:
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]          CHANNEL_ID: ${{ secrets.CHANNEL_ID }}
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]          DISCUSSION_ID: ${{ secrets.DISCUSSION_ID }}
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]          TOPIC_ID: ${{ secrets.TOPIC_ID }}
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]          COMMIT_URL: ${{ github.event.head_commit.url }}
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        run: |
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]          if [ ! -z "${{ secrets.BOT_TOKEN }}" ]; then
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            OUTPUT="magisk-loader/release/"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            export riruRelease=$(find $OUTPUT -name "LSPosed-v*-riru-release.zip")
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            export riruDebug=$(find $OUTPUT -name "LSPosed-v*-riru-debug.zip")
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            export zygiskRelease=$(find $OUTPUT -name "LSPosed-v*-zygisk-release.zip")
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            export zygiskDebug=$(find $OUTPUT -name "LSPosed-v*-zygisk-debug.zip")
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            ESCAPED=`python3 -c 'import json,os,urllib.parse; msg = json.dumps(os.environ["COMMIT_MESSAGE"]); print(urllib.parse.quote(msg if len(msg) <= 1024 else json.dumps(os.environ["COMMIT_URL"])))'`
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            curl -v "https://api.telegram.org/bot${BOT_TOKEN}/sendMediaGroup?chat_id=${CHANNEL_ID}&media=%5B%7B%22type%22%3A%22document%22%2C%20%22media%22%3A%22attach%3A%2F%2FriruRelease%22%7D%2C%7B%22type%22%3A%22document%22%2C%20%22media%22%3A%22attach%3A%2F%2FzygiskRelease%22%7D%2C%7B%22type%22%3A%22document%22%2C%20%22media%22%3A%22attach%3A%2F%2FriruDebug%22%7D%2C%7B%22type%22%3A%22document%22%2C%20%22media%22%3A%22attach%3A%2F%2FzygiskDebug%22%2C%22caption%22:${ESCAPED}%7D%5D" -F riruRelease="@$riruRelease" -F riruDebug="@$riruDebug" -F zygiskRelease="@$zygiskRelease" -F zygiskDebug="@$zygiskDebug"
+[external][howardwu20][HowardWu20@outlook.com]            # curl -v "https://api.telegram.org/bot${BOT_TOKEN}/sendMediaGroup?chat_id=${DISCUSSION_ID}&message_thread_id=${TOPIC_ID}&media=%5B%7B%22type%22%3A%22document%22%2C%20%22media%22%3A%22attach%3A%2F%2FriruRelease%22%7D%2C%7B%22type%22%3A%22document%22%2C%20%22media%22%3A%22attach%3A%2F%2FzygiskRelease%22%7D%2C%7B%22type%22%3A%22document%22%2C%20%22media%22%3A%22attach%3A%2F%2FriruDebug%22%7D%2C%7B%22type%22%3A%22document%22%2C%20%22media%22%3A%22attach%3A%2F%2FzygiskDebug%22%2C%22caption%22:${ESCAPED}%7D%5D" -F riruRelease="@$riruRelease" -F riruDebug="@$riruDebug" -F zygiskRelease="@$zygiskRelease" -F zygiskDebug="@$zygiskDebug"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]          fi

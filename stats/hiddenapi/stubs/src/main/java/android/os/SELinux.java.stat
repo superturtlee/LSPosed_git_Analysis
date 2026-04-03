@@ -1,0 +1,15 @@
+[external][shana][shana@zju.edu.cn]package android.os;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public class SELinux {
+[external][shana][shana@zju.edu.cn]    public static boolean checkSELinuxAccess(String scon, String tcon, String tclass, String perm) {
+[external][shana][shana@zju.edu.cn]        throw new UnsupportedOperationException("Stub");
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static boolean setFileContext(String path, String context) {
+[external][shana][shana@zju.edu.cn]        throw new UnsupportedOperationException("Stub");
+[external][shana][shana@zju.edu.cn]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    public static boolean setFSCreateContext(String context){
+[internal][vvb2060][vvb2060@gmail.com]        throw new UnsupportedOperationException("Stub");
+[internal][vvb2060][vvb2060@gmail.com]    }
+[external][shana][shana@zju.edu.cn]}

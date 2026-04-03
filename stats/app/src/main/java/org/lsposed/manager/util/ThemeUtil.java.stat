@@ -1,0 +1,130 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]package org.lsposed.manager.util;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.content.Context;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.content.SharedPreferences;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import androidx.annotation.StyleRes;
+[external][shana][shana@zju.edu.cn]import androidx.appcompat.app.AppCompatDelegate;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import com.google.android.material.color.DynamicColors;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.manager.App;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.manager.R;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.util.HashMap;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.util.Map;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import rikka.core.util.ResourceUtils;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]public class ThemeUtil {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private static final Map<String, Integer> colorThemeMap = new HashMap<>();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private static final SharedPreferences preferences;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static final String MODE_NIGHT_FOLLOW_SYSTEM = "MODE_NIGHT_FOLLOW_SYSTEM";
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static final String MODE_NIGHT_NO = "MODE_NIGHT_NO";
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static final String MODE_NIGHT_YES = "MODE_NIGHT_YES";
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    static {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        preferences = App.getPreferences();
+[external][shana][shana@zju.edu.cn]        colorThemeMap.put("SAKURA", R.style.ThemeOverlay_MaterialSakura);
+[external][shana][shana@zju.edu.cn]        colorThemeMap.put("MATERIAL_RED", R.style.ThemeOverlay_MaterialRed);
+[external][shana][shana@zju.edu.cn]        colorThemeMap.put("MATERIAL_PINK", R.style.ThemeOverlay_MaterialPink);
+[external][shana][shana@zju.edu.cn]        colorThemeMap.put("MATERIAL_PURPLE", R.style.ThemeOverlay_MaterialPurple);
+[external][shana][shana@zju.edu.cn]        colorThemeMap.put("MATERIAL_DEEP_PURPLE", R.style.ThemeOverlay_MaterialDeepPurple);
+[external][shana][shana@zju.edu.cn]        colorThemeMap.put("MATERIAL_INDIGO", R.style.ThemeOverlay_MaterialIndigo);
+[external][shana][shana@zju.edu.cn]        colorThemeMap.put("MATERIAL_BLUE", R.style.ThemeOverlay_MaterialBlue);
+[external][shana][shana@zju.edu.cn]        colorThemeMap.put("MATERIAL_LIGHT_BLUE", R.style.ThemeOverlay_MaterialLightBlue);
+[external][shana][shana@zju.edu.cn]        colorThemeMap.put("MATERIAL_CYAN", R.style.ThemeOverlay_MaterialCyan);
+[external][shana][shana@zju.edu.cn]        colorThemeMap.put("MATERIAL_TEAL", R.style.ThemeOverlay_MaterialTeal);
+[external][shana][shana@zju.edu.cn]        colorThemeMap.put("MATERIAL_GREEN", R.style.ThemeOverlay_MaterialGreen);
+[external][shana][shana@zju.edu.cn]        colorThemeMap.put("MATERIAL_LIGHT_GREEN", R.style.ThemeOverlay_MaterialLightGreen);
+[external][shana][shana@zju.edu.cn]        colorThemeMap.put("MATERIAL_LIME", R.style.ThemeOverlay_MaterialLime);
+[external][shana][shana@zju.edu.cn]        colorThemeMap.put("MATERIAL_YELLOW", R.style.ThemeOverlay_MaterialYellow);
+[external][shana][shana@zju.edu.cn]        colorThemeMap.put("MATERIAL_AMBER", R.style.ThemeOverlay_MaterialAmber);
+[external][shana][shana@zju.edu.cn]        colorThemeMap.put("MATERIAL_ORANGE", R.style.ThemeOverlay_MaterialOrange);
+[external][shana][shana@zju.edu.cn]        colorThemeMap.put("MATERIAL_DEEP_ORANGE", R.style.ThemeOverlay_MaterialDeepOrange);
+[external][shana][shana@zju.edu.cn]        colorThemeMap.put("MATERIAL_BROWN", R.style.ThemeOverlay_MaterialBrown);
+[external][shana][shana@zju.edu.cn]        colorThemeMap.put("MATERIAL_BLUE_GREY", R.style.ThemeOverlay_MaterialBlueGrey);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private static final String THEME_DEFAULT = "DEFAULT";
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private static final String THEME_BLACK = "BLACK";
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private static boolean isBlackNightTheme() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return preferences.getBoolean("black_dark_theme", false);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    public static boolean isSystemAccent() {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        return DynamicColors.isDynamicColorAvailable() && preferences.getBoolean("follow_system_accent", true);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static String getNightTheme(Context context) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (isBlackNightTheme()
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                && ResourceUtils.isNightMode(context.getResources().getConfiguration()))
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return THEME_BLACK;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return THEME_DEFAULT;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @StyleRes
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static int getNightThemeStyleRes(Context context) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        switch (getNightTheme(context)) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            case THEME_BLACK:
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                return R.style.ThemeOverlay_Black;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            case THEME_DEFAULT:
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            default:
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                return R.style.ThemeOverlay;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static String getColorTheme() {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        if (isSystemAccent()) {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            return "SYSTEM";
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][shana][shana@zju.edu.cn]        return preferences.getString("theme_color", "COLOR_BLUE");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @StyleRes
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static int getColorThemeStyleRes() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        Integer theme = colorThemeMap.get(getColorTheme());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (theme == null) {
+[external][shana][shana@zju.edu.cn]            return R.style.ThemeOverlay_MaterialBlue;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return theme;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static int getDarkTheme(String mode) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        switch (mode) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            case MODE_NIGHT_FOLLOW_SYSTEM:
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            default:
+[external][shana][shana@zju.edu.cn]                return AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            case MODE_NIGHT_YES:
+[external][shana][shana@zju.edu.cn]                return AppCompatDelegate.MODE_NIGHT_YES;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            case MODE_NIGHT_NO:
+[external][shana][shana@zju.edu.cn]                return AppCompatDelegate.MODE_NIGHT_NO;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static int getDarkTheme() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return getDarkTheme(preferences.getString("dark_theme", MODE_NIGHT_FOLLOW_SYSTEM));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]}

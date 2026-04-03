@@ -1,0 +1,92 @@
+[internal][vvb2060][vvb2060@gmail.com]@rem
+[internal][vvb2060][vvb2060@gmail.com]@rem Copyright 2015 the original author or authors.
+[internal][vvb2060][vvb2060@gmail.com]@rem
+[internal][vvb2060][vvb2060@gmail.com]@rem Licensed under the Apache License, Version 2.0 (the "License");
+[internal][vvb2060][vvb2060@gmail.com]@rem you may not use this file except in compliance with the License.
+[internal][vvb2060][vvb2060@gmail.com]@rem You may obtain a copy of the License at
+[internal][vvb2060][vvb2060@gmail.com]@rem
+[internal][vvb2060][vvb2060@gmail.com]@rem      https://www.apache.org/licenses/LICENSE-2.0
+[internal][vvb2060][vvb2060@gmail.com]@rem
+[internal][vvb2060][vvb2060@gmail.com]@rem Unless required by applicable law or agreed to in writing, software
+[internal][vvb2060][vvb2060@gmail.com]@rem distributed under the License is distributed on an "AS IS" BASIS,
+[internal][vvb2060][vvb2060@gmail.com]@rem WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+[internal][vvb2060][vvb2060@gmail.com]@rem See the License for the specific language governing permissions and
+[internal][vvb2060][vvb2060@gmail.com]@rem limitations under the License.
+[internal][vvb2060][vvb2060@gmail.com]@rem
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]@if "%DEBUG%"=="" @echo off
+[external][hsushulong][hsushulong@gmail.com]@rem ##########################################################################
+[external][hsushulong][hsushulong@gmail.com]@rem
+[external][hsushulong][hsushulong@gmail.com]@rem  Gradle startup script for Windows
+[external][hsushulong][hsushulong@gmail.com]@rem
+[external][hsushulong][hsushulong@gmail.com]@rem ##########################################################################
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]@rem Set local scope for the variables with windows NT shell
+[external][hsushulong][hsushulong@gmail.com]if "%OS%"=="Windows_NT" setlocal
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]set DIRNAME=%~dp0
+[external][shana][shana@zju.edu.cn]if "%DIRNAME%"=="" set DIRNAME=.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]@rem This is normally unused
+[external][hsushulong][hsushulong@gmail.com]set APP_BASE_NAME=%~n0
+[external][hsushulong][hsushulong@gmail.com]set APP_HOME=%DIRNAME%
+[external][hsushulong][hsushulong@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]@rem Resolve any "." and ".." in APP_HOME to make it shorter.
+[internal][vvb2060][vvb2060@gmail.com]for %%i in ("%APP_HOME%") do set APP_HOME=%%~fi
+[internal][vvb2060][vvb2060@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]@rem Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
+[internal][vvb2060][vvb2060@gmail.com]set DEFAULT_JVM_OPTS="-Xmx64m" "-Xms64m"
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]@rem Find java.exe
+[external][hsushulong][hsushulong@gmail.com]if defined JAVA_HOME goto findJavaFromJavaHome
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]set JAVA_EXE=java.exe
+[external][hsushulong][hsushulong@gmail.com]%JAVA_EXE% -version >NUL 2>&1
+[external][shana][shana@zju.edu.cn]if %ERRORLEVEL% equ 0 goto execute
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]echo.
+[external][hsushulong][hsushulong@gmail.com]echo ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH.
+[external][hsushulong][hsushulong@gmail.com]echo.
+[external][hsushulong][hsushulong@gmail.com]echo Please set the JAVA_HOME variable in your environment to match the
+[external][hsushulong][hsushulong@gmail.com]echo location of your Java installation.
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]goto fail
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]:findJavaFromJavaHome
+[external][hsushulong][hsushulong@gmail.com]set JAVA_HOME=%JAVA_HOME:"=%
+[external][hsushulong][hsushulong@gmail.com]set JAVA_EXE=%JAVA_HOME%/bin/java.exe
+[external][hsushulong][hsushulong@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]if exist "%JAVA_EXE%" goto execute
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]echo.
+[external][hsushulong][hsushulong@gmail.com]echo ERROR: JAVA_HOME is set to an invalid directory: %JAVA_HOME%
+[external][hsushulong][hsushulong@gmail.com]echo.
+[external][hsushulong][hsushulong@gmail.com]echo Please set the JAVA_HOME variable in your environment to match the
+[external][hsushulong][hsushulong@gmail.com]echo location of your Java installation.
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]goto fail
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]:execute
+[external][hsushulong][hsushulong@gmail.com]@rem Setup the command line
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]set CLASSPATH=%APP_HOME%\gradle\wrapper\gradle-wrapper.jar
+[external][hsushulong][hsushulong@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]@rem Execute Gradle
+[internal][vvb2060][vvb2060@gmail.com]"%JAVA_EXE%" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %GRADLE_OPTS% "-Dorg.gradle.appname=%APP_BASE_NAME%" -classpath "%CLASSPATH%" org.gradle.wrapper.GradleWrapperMain %*
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]:end
+[external][hsushulong][hsushulong@gmail.com]@rem End local scope for the variables with windows NT shell
+[external][shana][shana@zju.edu.cn]if %ERRORLEVEL% equ 0 goto mainEnd
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]:fail
+[external][hsushulong][hsushulong@gmail.com]rem Set variable GRADLE_EXIT_CONSOLE if you need the _script_ return code instead of
+[external][hsushulong][hsushulong@gmail.com]rem the _cmd.exe /c_ return code!
+[external][shana][shana@zju.edu.cn]set EXIT_CODE=%ERRORLEVEL%
+[external][shana][shana@zju.edu.cn]if %EXIT_CODE% equ 0 set EXIT_CODE=1
+[external][shana][shana@zju.edu.cn]if not ""=="%GRADLE_EXIT_CONSOLE%" exit %EXIT_CODE%
+[external][shana][shana@zju.edu.cn]exit /b %EXIT_CODE%
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]:mainEnd
+[external][hsushulong][hsushulong@gmail.com]if "%OS%"=="Windows_NT" endlocal
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]:omega

@@ -1,0 +1,662 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * <!--This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors-->
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]package org.lsposed.manager.ui.fragment;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]import android.annotation.SuppressLint;
+[external][shana][shana@zju.edu.cn]import android.app.Activity;
+[external][shana][shana@zju.edu.cn]import android.app.Dialog;
+[internal][vvb2060][vvb2060@gmail.com]import android.content.res.Resources;
+[external][shana][shana@zju.edu.cn]import android.graphics.Color;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.os.Bundle;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.text.Spannable;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.text.SpannableStringBuilder;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.text.TextUtils;
+[external][shana][shana@zju.edu.cn]import android.text.format.Formatter;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.text.style.ClickableSpan;
+[external][shana][shana@zju.edu.cn]import android.text.style.ForegroundColorSpan;
+[external][shana][shana@zju.edu.cn]import android.text.style.RelativeSizeSpan;
+[internal][vvb2060][vvb2060@gmail.com]import android.util.Log;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.view.LayoutInflater;
+[external][shana][shana@zju.edu.cn]import android.view.Menu;
+[external][shana][shana@zju.edu.cn]import android.view.MenuInflater;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.view.MenuItem;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.view.View;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.view.ViewGroup;
+[external][shana][shana@zju.edu.cn]import android.webkit.WebResourceRequest;
+[external][shana][shana@zju.edu.cn]import android.webkit.WebResourceResponse;
+[external][shana][shana@zju.edu.cn]import android.webkit.WebSettings;
+[external][shana][shana@zju.edu.cn]import android.webkit.WebView;
+[external][shana][shana@zju.edu.cn]import android.webkit.WebViewClient;
+[external][shana][shana@zju.edu.cn]import android.widget.ArrayAdapter;
+[external][shana][shana@zju.edu.cn]import android.widget.ScrollView;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.widget.TextView;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import androidx.annotation.NonNull;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import androidx.annotation.Nullable;
+[external][shana][shana@zju.edu.cn]import androidx.core.view.MenuProvider;
+[external][shana][shana@zju.edu.cn]import androidx.fragment.app.DialogFragment;
+[external][shana][shana@zju.edu.cn]import androidx.fragment.app.Fragment;
+[external][shana][shana@zju.edu.cn]import androidx.fragment.app.FragmentManager;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import androidx.recyclerview.widget.LinearLayoutManager;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import androidx.recyclerview.widget.RecyclerView;
+[external][shana][shana@zju.edu.cn]import androidx.viewpager2.adapter.FragmentStateAdapter;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]import com.google.android.material.button.MaterialButton;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import com.google.android.material.progressindicator.CircularProgressIndicator;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import com.google.android.material.tabs.TabLayout;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import com.google.android.material.tabs.TabLayoutMediator;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]import org.lsposed.manager.App;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.R;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.manager.databinding.FragmentPagerBinding;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.databinding.ItemRepoLoadmoreBinding;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.databinding.ItemRepoReadmeBinding;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.databinding.ItemRepoRecyclerviewBinding;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.databinding.ItemRepoReleaseBinding;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.databinding.ItemRepoTitleDescriptionBinding;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.repo.RepoLoader;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.repo.model.Collaborator;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.repo.model.OnlineModule;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.repo.model.Release;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.repo.model.ReleaseAsset;
+[external][shana][shana@zju.edu.cn]import org.lsposed.manager.ui.dialog.BlurBehindDialogBuilder;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import org.lsposed.manager.ui.widget.EmptyStateRecyclerView;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.ui.widget.LinkifyTextView;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.util.NavUtil;
+[external][shana][shana@zju.edu.cn]import org.lsposed.manager.util.SimpleStatefulAdaptor;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.util.chrome.CustomTabsURLSpan;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]import java.io.ByteArrayInputStream;
+[internal][vvb2060][vvb2060@gmail.com]import java.nio.charset.StandardCharsets;
+[external][tigerbeanst][3889846+TigerBeanst@users.noreply.github.com]import java.time.Instant;
+[external][tigerbeanst][3889846+TigerBeanst@users.noreply.github.com]import java.time.ZoneId;
+[external][tigerbeanst][3889846+TigerBeanst@users.noreply.github.com]import java.time.format.DateTimeFormatter;
+[external][tigerbeanst][3889846+TigerBeanst@users.noreply.github.com]import java.time.format.FormatStyle;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.util.ArrayList;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.util.List;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.util.ListIterator;
+[internal][vvb2060][vvb2060@gmail.com]import java.util.stream.Collectors;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import java.util.stream.IntStream;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]import okhttp3.Headers;
+[external][shana][shana@zju.edu.cn]import okhttp3.Request;
+[external][shana][shana@zju.edu.cn]import okhttp3.Response;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import rikka.core.util.ResourceUtils;
+[external][shana][shana@zju.edu.cn]import rikka.material.app.LocaleDelegate;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import rikka.recyclerview.RecyclerViewKt;
+[external][shana][shana@zju.edu.cn]import rikka.widget.borderview.BorderView;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]public class RepoItemFragment extends BaseFragment implements RepoLoader.RepoListener, MenuProvider {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    FragmentPagerBinding binding;
+[external][shana][shana@zju.edu.cn]    OnlineModule module;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private ReleaseAdapter releaseAdapter;
+[external][shana][shana@zju.edu.cn]    private InformationAdapter informationAdapter;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Nullable
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        binding = FragmentPagerBinding.inflate(getLayoutInflater(), container, false);
+[external][shana][shana@zju.edu.cn]        if (module == null) return binding.getRoot();
+[external][shana][shana@zju.edu.cn]        String modulePackageName = module.getName();
+[external][shana][shana@zju.edu.cn]        String moduleName = module.getDescription();
+[external][shana][shana@zju.edu.cn]        binding.appBar.setLiftable(true);
+[external][shana][shana@zju.edu.cn]        setupToolbar(binding.toolbar, binding.clickView, moduleName, R.menu.menu_repo_item);
+[external][shana][shana@zju.edu.cn]        binding.clickView.setTooltipText(moduleName);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        binding.toolbar.setSubtitle(modulePackageName);
+[external][shana][shana@zju.edu.cn]        binding.viewPager.setAdapter(new PagerAdapter(this));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        int[] titles = new int[]{R.string.module_readme, R.string.module_releases, R.string.module_information};
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        new TabLayoutMediator(binding.tabLayout, binding.viewPager, (tab, position) -> tab.setText(titles[position])).attach();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        binding.tabLayout.addOnLayoutChangeListener((view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            ViewGroup vg = (ViewGroup) binding.tabLayout.getChildAt(0);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            int tabLayoutWidth = IntStream.range(0, binding.tabLayout.getTabCount()).map(i -> vg.getChildAt(i).getWidth()).sum();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            if (tabLayoutWidth <= binding.getRoot().getWidth()) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                binding.tabLayout.setTabMode(TabLayout.MODE_FIXED);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                binding.tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        });
+[external][shana][shana@zju.edu.cn]        binding.toolbar.setOnClickListener(v -> binding.appBar.setExpanded(true, true));
+[external][shana][shana@zju.edu.cn]        releaseAdapter = new ReleaseAdapter();
+[external][shana][shana@zju.edu.cn]        informationAdapter = new InformationAdapter();
+[external][shana][shana@zju.edu.cn]        RepoLoader.getInstance().addListener(this);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return binding.getRoot();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public void onCreate(@Nullable Bundle savedInstanceState) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        RepoLoader.getInstance().addListener(this);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        super.onCreate(savedInstanceState);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]        String modulePackageName = getArguments() == null ? null : getArguments().getString("modulePackageName");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        module = RepoLoader.getInstance().getOnlineModule(modulePackageName);
+[external][shana][shana@zju.edu.cn]        if (module == null) {
+[external][shana][shana@zju.edu.cn]            if (!safeNavigate(R.id.action_repo_item_fragment_to_repo_fragment)) {
+[external][shana][shana@zju.edu.cn]                safeNavigate(R.id.repo_nav);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    private void renderGithubMarkdown(WebView view, @Nullable String text) {
+[external][shana][shana@zju.edu.cn]        try {
+[external][shana][shana@zju.edu.cn]            view.setBackgroundColor(Color.TRANSPARENT);
+[external][shana][shana@zju.edu.cn]            var setting = view.getSettings();
+[internal][vvb2060][vvb2060@gmail.com]            setting.setOffscreenPreRaster(true);
+[external][shana][shana@zju.edu.cn]            setting.setDomStorageEnabled(true);
+[external][shana][shana@zju.edu.cn]            setting.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+[external][shana][shana@zju.edu.cn]            setting.setAllowContentAccess(false);
+[internal][vvb2060][vvb2060@gmail.com]            setting.setAllowFileAccessFromFileURLs(true);
+[external][shana][shana@zju.edu.cn]            setting.setAllowFileAccess(false);
+[external][shana][shana@zju.edu.cn]            setting.setGeolocationEnabled(false);
+[external][shana][shana@zju.edu.cn]            setting.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+[external][shana][shana@zju.edu.cn]            setting.setTextZoom(80);
+[internal][vvb2060][vvb2060@gmail.com]            String body;
+[external][shana][shana@zju.edu.cn]            String direction;
+[external][shana][shana@zju.edu.cn]            if (getResources().getConfiguration().getLayoutDirection() == View.LAYOUT_DIRECTION_RTL) {
+[external][shana][shana@zju.edu.cn]                direction = "rtl";
+[external][shana][shana@zju.edu.cn]            } else {
+[external][shana][shana@zju.edu.cn]                direction = "ltr";
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            if (text == null) {
+[external][shana][shana@zju.edu.cn]                text = "<center>" + App.getInstance().getString(R.string.list_empty) + "</center>";
+[external][shana][shana@zju.edu.cn]            }
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            if (ResourceUtils.isNightMode(getResources().getConfiguration())) {
+[external][shana][shana@zju.edu.cn]                body = App.HTML_TEMPLATE_DARK.get().replace("@dir@", direction).replace("@body@", text);
+[internal][vvb2060][vvb2060@gmail.com]            } else {
+[external][shana][shana@zju.edu.cn]                body = App.HTML_TEMPLATE.get().replace("@dir@", direction).replace("@body@", text);
+[internal][vvb2060][vvb2060@gmail.com]            }
+[external][shana][shana@zju.edu.cn]            view.setWebViewClient(new WebViewClient() {
+[external][shana][shana@zju.edu.cn]                @Override
+[external][shana][shana@zju.edu.cn]                public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                    NavUtil.startURL(requireActivity(), request.getUrl());
+[external][shana][shana@zju.edu.cn]                    return true;
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]                @Nullable
+[external][shana][shana@zju.edu.cn]                @Override
+[external][shana][shana@zju.edu.cn]                public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+[external][shana][shana@zju.edu.cn]                    if (!request.getUrl().getScheme().startsWith("http")) return null;
+[external][shana][shana@zju.edu.cn]                    var client = App.getOkHttpClient();
+[external][shana][shana@zju.edu.cn]                    var call = client.newCall(
+[external][shana][shana@zju.edu.cn]                            new Request.Builder()
+[external][shana][shana@zju.edu.cn]                                    .url(request.getUrl().toString())
+[external][shana][shana@zju.edu.cn]                                    .method(request.getMethod(), null)
+[external][shana][shana@zju.edu.cn]                                    .headers(Headers.of(request.getRequestHeaders()))
+[external][shana][shana@zju.edu.cn]                                    .build());
+[external][shana][shana@zju.edu.cn]                    try {
+[external][shana][shana@zju.edu.cn]                        Response reply = call.execute();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        var header = reply.header("content-type", "image/*;charset=utf-8");
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        String[] contentTypes = new String[0];
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        if (header != null) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                            contentTypes = header.split(";\\s*");
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        }
+[external][shana][shana@zju.edu.cn]                        var mimeType = contentTypes.length > 0 ? contentTypes[0] : "image/*";
+[external][shana][shana@zju.edu.cn]                        var charset = contentTypes.length > 1 ? contentTypes[1].split("=\\s*")[1] : "utf-8";
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        var body = reply.body();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        if (body == null) return null;
+[external][shana][shana@zju.edu.cn]                        return new WebResourceResponse(
+[external][shana][shana@zju.edu.cn]                                mimeType,
+[external][shana][shana@zju.edu.cn]                                charset,
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                                body.byteStream()
+[external][shana][shana@zju.edu.cn]                        );
+[external][shana][shana@zju.edu.cn]                    } catch (Throwable e) {
+[external][shana][shana@zju.edu.cn]                        return new WebResourceResponse("text/html", "utf-8", new ByteArrayInputStream(Log.getStackTraceString(e).getBytes(StandardCharsets.UTF_8)));
+[external][shana][shana@zju.edu.cn]                    }
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            });
+[internal][vvb2060][vvb2060@gmail.com]            view.loadDataWithBaseURL("https://github.com", body, "text/html",
+[internal][vvb2060][vvb2060@gmail.com]                    StandardCharsets.UTF_8.name(), null);
+[external][shana][shana@zju.edu.cn]        } catch (Throwable e) {
+[internal][vvb2060][vvb2060@gmail.com]            Log.e(App.TAG, "render readme", e);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][shana][shana@zju.edu.cn]    public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public boolean onMenuItemSelected(@NonNull MenuItem item) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        int id = item.getItemId();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (id == R.id.menu_open_in_browser) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            NavUtil.startURL(requireActivity(), "https://modules.lsposed.org/module/" + module.getName());
+[external][shana][shana@zju.edu.cn]            return true;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][shana][shana@zju.edu.cn]        return false;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][shana][shana@zju.edu.cn]    public void onDestroyView() {
+[external][shana][shana@zju.edu.cn]        super.onDestroyView();
+[external][shana][shana@zju.edu.cn]        RepoLoader.getInstance().removeListener(this);
+[external][shana][shana@zju.edu.cn]        binding = null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][shana][shana@zju.edu.cn]    public void onModuleReleasesLoaded(OnlineModule module) {
+[external][shana][shana@zju.edu.cn]        this.module = module;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        var repoLoader = RepoLoader.getInstance();
+[external][shana][shana@zju.edu.cn]        if (releaseAdapter != null) {
+[external][shana][shana@zju.edu.cn]            runAsync(releaseAdapter::loadItems);
+[external][shana][shana@zju.edu.cn]        }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        if ((repoLoader.getReleases(module.getName()) != null ? repoLoader.getReleases(module.getName()).size() : 1) == 1) {
+[external][shana][shana@zju.edu.cn]            showHint(R.string.module_release_no_more, true);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][shana][shana@zju.edu.cn]    public void onThrowable(Throwable t) {
+[external][shana][shana@zju.edu.cn]        if (releaseAdapter != null) {
+[external][shana][shana@zju.edu.cn]            runAsync(releaseAdapter::loadItems);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        showHint(getString(R.string.repo_load_failed, t.getLocalizedMessage()), true);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    private class InformationAdapter extends SimpleStatefulAdaptor<InformationAdapter.ViewHolder> {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        private int rowCount = 0;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        private int homepageRow = -1;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        private int collaboratorsRow = -1;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        private int sourceUrlRow = -1;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]        public InformationAdapter() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (!TextUtils.isEmpty(module.getHomepageUrl())) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                homepageRow = rowCount++;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (module.getCollaborators() != null && !module.getCollaborators().isEmpty()) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                collaboratorsRow = rowCount++;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (!TextUtils.isEmpty(module.getSourceUrl())) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                sourceUrlRow = rowCount++;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        @NonNull
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public InformationAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+[external][shana][shana@zju.edu.cn]            return new ViewHolder(ItemRepoTitleDescriptionBinding.inflate(getLayoutInflater(), parent, false));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public void onBindViewHolder(@NonNull InformationAdapter.ViewHolder holder, int position) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (position == homepageRow) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                holder.title.setText(R.string.module_information_homepage);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                holder.description.setText(module.getHomepageUrl());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            } else if (position == collaboratorsRow) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                List<Collaborator> collaborators = module.getCollaborators();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                if (collaborators == null) return;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                holder.title.setText(R.string.module_information_collaborators);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                SpannableStringBuilder sb = new SpannableStringBuilder();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                ListIterator<Collaborator> iterator = collaborators.listIterator();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                while (iterator.hasNext()) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    Collaborator collaborator = iterator.next();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    var collaboratorLogin = collaborator.getLogin();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    if (collaboratorLogin == null) continue;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    String name = collaborator.getName() == null ? collaboratorLogin : collaborator.getName();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    sb.append(name);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    CustomTabsURLSpan span = new CustomTabsURLSpan(requireActivity(), String.format("https://github.com/%s", collaborator.getLogin()));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    sb.setSpan(span, sb.length() - name.length(), sb.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    if (iterator.hasNext()) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        sb.append(", ");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                holder.description.setText(sb);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            } else if (position == sourceUrlRow) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                holder.title.setText(R.string.module_information_source_url);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                holder.description.setText(module.getSourceUrl());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            holder.itemView.setOnClickListener(v -> {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                if (position == homepageRow) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    NavUtil.startURL(requireActivity(), module.getHomepageUrl());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                } else if (position == collaboratorsRow) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    ClickableSpan span = holder.description.getCurrentSpan();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    holder.description.clearCurrentSpan();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    if (span instanceof CustomTabsURLSpan) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        span.onClick(v);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                } else if (position == sourceUrlRow) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    NavUtil.startURL(requireActivity(), module.getSourceUrl());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            });
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public int getItemCount() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return rowCount;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        class ViewHolder extends RecyclerView.ViewHolder {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            TextView title;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            LinkifyTextView description;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            public ViewHolder(ItemRepoTitleDescriptionBinding binding) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                super(binding.getRoot());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                title = binding.title;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                description = binding.description;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    public static class DownloadDialog extends DialogFragment {
+[external][shana][shana@zju.edu.cn]        @NonNull
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+[external][shana][shana@zju.edu.cn]            var args = getArguments();
+[external][shana][shana@zju.edu.cn]            if (args == null) throw new IllegalArgumentException();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            return new BlurBehindDialogBuilder(requireActivity(), R.style.ThemeOverlay_MaterialAlertDialog_Centered_FullWidthButtons)
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    .setTitle(R.string.module_release_view_assets)
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    .setPositiveButton(android.R.string.cancel, null)
+[external][shana][shana@zju.edu.cn]                    .setAdapter(new ArrayAdapter<>(requireActivity(), R.layout.dialog_item, args.getCharSequenceArray("names")),
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                            (dialog, which) -> NavUtil.startURL(requireActivity(), args.getStringArrayList("urls").get(which)))
+[external][shana][shana@zju.edu.cn]                    .create();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        static void create(Activity activity, FragmentManager fm, List<ReleaseAsset> assets) {
+[external][shana][shana@zju.edu.cn]            var f = new DownloadDialog();
+[external][shana][shana@zju.edu.cn]            var bundle = new Bundle();
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            var displayNames = new CharSequence[assets.size()];
+[external][shana][shana@zju.edu.cn]            for (int i = 0; i < assets.size(); i++) {
+[external][shana][shana@zju.edu.cn]                var sb = new SpannableStringBuilder(assets.get(i).getName());
+[external][shana][shana@zju.edu.cn]                var count = assets.get(i).getDownloadCount();
+[external][shana][shana@zju.edu.cn]                var countStr = activity.getResources().getQuantityString(R.plurals.module_release_assets_download_count, count, count);
+[external][shana][shana@zju.edu.cn]                var sizeStr = Formatter.formatShortFileSize(activity, assets.get(i).getSize());
+[external][shana][shana@zju.edu.cn]                sb.append('\n').append(sizeStr).append('/').append(countStr);
+[external][shana][shana@zju.edu.cn]                final ForegroundColorSpan foregroundColorSpan = new ForegroundColorSpan(ResourceUtils.resolveColor(activity.getTheme(), android.R.attr.textColorSecondary));
+[external][shana][shana@zju.edu.cn]                final RelativeSizeSpan relativeSizeSpan = new RelativeSizeSpan(0.8f);
+[external][shana][shana@zju.edu.cn]                sb.setSpan(foregroundColorSpan, sb.length() - sizeStr.length() - countStr.length() - 1, sb.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+[external][shana][shana@zju.edu.cn]                sb.setSpan(relativeSizeSpan, sb.length() - sizeStr.length() - countStr.length() - 1, sb.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+[external][shana][shana@zju.edu.cn]                displayNames[i] = sb;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            bundle.putCharSequenceArray("names", displayNames);
+[external][shana][shana@zju.edu.cn]            bundle.putStringArrayList("urls", assets.stream().map(ReleaseAsset::getDownloadUrl).collect(Collectors.toCollection(ArrayList::new)));
+[external][shana][shana@zju.edu.cn]            f.setArguments(bundle);
+[external][shana][shana@zju.edu.cn]            f.show(fm, "download");
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    private class ReleaseAdapter extends EmptyStateRecyclerView.EmptyStateAdapter<ReleaseAdapter.ViewHolder> {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        private List<Release> items = new ArrayList<>();
+[internal][vvb2060][vvb2060@gmail.com]        private final Resources resources = App.getInstance().getResources();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public ReleaseAdapter() {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            runAsync(this::loadItems);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]        @SuppressLint("NotifyDataSetChanged")
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public void loadItems() {
+[internal][vvb2060][vvb2060@gmail.com]            var channels = resources.getStringArray(R.array.update_channel_values);
+[internal][vvb2060][vvb2060@gmail.com]            var channel = App.getPreferences().getString("update_channel", channels[0]);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            var releases = RepoLoader.getInstance().getReleases(module.getName());
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            if (releases == null) releases = module.getReleases();
+[external][shana][shana@zju.edu.cn]            List<Release> tmpList;
+[internal][vvb2060][vvb2060@gmail.com]            if (channel.equals(channels[0])) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                tmpList = releases != null ? releases.parallelStream().filter(t -> {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    if (Boolean.TRUE.equals(t.getIsPrerelease())) return false;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    var name = t.getName() != null ? t.getName().toLowerCase(LocaleDelegate.getDefaultLocale()) : null;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    return !(name != null && name.startsWith("snapshot")) && !(name != null && name.startsWith("nightly"));
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                }).collect(Collectors.toList()) : null;
+[internal][vvb2060][vvb2060@gmail.com]            } else if (channel.equals(channels[1])) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                tmpList = releases != null ? releases.parallelStream().filter(t -> {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    var name = t.getName() != null ? t.getName().toLowerCase(LocaleDelegate.getDefaultLocale()) : null;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    return !(name != null && name.startsWith("snapshot")) && !(name != null && name.startsWith("nightly"));
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                }).collect(Collectors.toList()) : null;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            } else tmpList = releases;
+[external][shana][shana@zju.edu.cn]            runOnUiThread(() -> {
+[external][shana][shana@zju.edu.cn]                items = tmpList;
+[external][shana][shana@zju.edu.cn]                notifyDataSetChanged();
+[external][shana][shana@zju.edu.cn]            });
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        @NonNull
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public ReleaseAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (viewType == 0) {
+[external][shana][shana@zju.edu.cn]                return new ReleaseViewHolder(ItemRepoReleaseBinding.inflate(getLayoutInflater(), parent, false));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            } else {
+[external][shana][shana@zju.edu.cn]                return new LoadmoreViewHolder(ItemRepoLoadmoreBinding.inflate(getLayoutInflater(), parent, false));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public void onBindViewHolder(@NonNull ReleaseAdapter.ViewHolder holder, int position) {
+[external][shana][shana@zju.edu.cn]            if (holder.getItemViewType() == 1) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                holder.progress.setVisibility(View.GONE);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                holder.title.setVisibility(View.VISIBLE);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                holder.itemView.setOnClickListener(v -> {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    if (holder.progress.getVisibility() == View.GONE) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        holder.title.setVisibility(View.GONE);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        holder.progress.show();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        RepoLoader.getInstance().loadRemoteReleases(module.getName());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                });
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            } else {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                Release release = items.get(position);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                holder.title.setText(release.getName());
+[external][tigerbeanst][3889846+TigerBeanst@users.noreply.github.com]                var instant = Instant.parse(release.getPublishedAt());
+[external][tigerbeanst][3889846+TigerBeanst@users.noreply.github.com]                var formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
+[external][tigerbeanst][3889846+TigerBeanst@users.noreply.github.com]                        .withLocale(App.getLocale()).withZone(ZoneId.systemDefault());
+[external][tigerbeanst][3889846+TigerBeanst@users.noreply.github.com]                holder.publishedTime.setText(String.format(getString(R.string.module_repo_published_time), formatter.format(instant)));
+[external][shana][shana@zju.edu.cn]                renderGithubMarkdown(holder.description, release.getDescriptionHTML());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                holder.openInBrowser.setOnClickListener(v -> NavUtil.startURL(requireActivity(), release.getUrl()));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                List<ReleaseAsset> assets = release.getReleaseAssets();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                if (assets != null && !assets.isEmpty()) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    holder.viewAssets.setOnClickListener(v -> DownloadDialog.create(requireActivity(), getParentFragmentManager(), assets));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                } else {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    holder.viewAssets.setVisibility(View.GONE);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public int getItemCount() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return items.size() + (module.releasesLoaded ? 0 : 1);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public int getItemViewType(int position) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return !module.releasesLoaded && position == getItemCount() - 1 ? 1 : 0;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        @Override
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        public boolean isLoaded() {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            return module.releasesLoaded;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        class ViewHolder extends RecyclerView.ViewHolder {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            TextView title;
+[external][tigerbeanst][3889846+TigerBeanst@users.noreply.github.com]            TextView publishedTime;
+[external][shana][shana@zju.edu.cn]            WebView description;
+[external][shana][shana@zju.edu.cn]            MaterialButton openInBrowser;
+[external][shana][shana@zju.edu.cn]            MaterialButton viewAssets;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            CircularProgressIndicator progress;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]            public ViewHolder(@NonNull View itemView) {
+[external][shana][shana@zju.edu.cn]                super(itemView);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        class ReleaseViewHolder extends ReleaseAdapter.ViewHolder {
+[external][shana][shana@zju.edu.cn]            public ReleaseViewHolder(ItemRepoReleaseBinding binding) {
+[external][shana][shana@zju.edu.cn]                super(binding.getRoot());
+[external][shana][shana@zju.edu.cn]                title = binding.title;
+[external][tigerbeanst][3889846+TigerBeanst@users.noreply.github.com]                publishedTime = binding.publishedTime;
+[external][shana][shana@zju.edu.cn]                description = binding.description;
+[external][shana][shana@zju.edu.cn]                openInBrowser = binding.openInBrowser;
+[external][shana][shana@zju.edu.cn]                viewAssets = binding.viewAssets;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        class LoadmoreViewHolder extends ReleaseAdapter.ViewHolder {
+[external][shana][shana@zju.edu.cn]            public LoadmoreViewHolder(ItemRepoLoadmoreBinding binding) {
+[external][shana][shana@zju.edu.cn]                super(binding.getRoot());
+[external][shana][shana@zju.edu.cn]                title = binding.title;
+[external][shana][shana@zju.edu.cn]                progress = binding.progress;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    private static class PagerAdapter extends FragmentStateAdapter {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]        public PagerAdapter(@NonNull Fragment fragment) {
+[external][shana][shana@zju.edu.cn]            super(fragment);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]        @NonNull
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        @Override
+[external][shana][shana@zju.edu.cn]        public Fragment createFragment(int position) {
+[external][shana][shana@zju.edu.cn]            Bundle bundle = new Bundle();
+[external][shana][shana@zju.edu.cn]            bundle.putInt("position", position);
+[external][shana][shana@zju.edu.cn]            Fragment f;
+[external][shana][shana@zju.edu.cn]            if (position == 0) {
+[external][shana][shana@zju.edu.cn]                f = new ReadmeFragment();
+[external][shana][shana@zju.edu.cn]            } else if (position == 1) {
+[external][shana][shana@zju.edu.cn]                f = new RecyclerviewFragment();
+[external][shana][shana@zju.edu.cn]            } else {
+[external][shana][shana@zju.edu.cn]                f = new RecyclerviewFragment();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][shana][shana@zju.edu.cn]            f.setArguments(bundle);
+[external][shana][shana@zju.edu.cn]            return f;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public int getItemCount() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return 3;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public int getItemViewType(int position) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return position == 0 ? 0 : 1;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public long getItemId(int position) {
+[external][shana][shana@zju.edu.cn]            return position;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    public static abstract class BorderFragment extends BaseFragment {
+[external][shana][shana@zju.edu.cn]        BorderView borderView;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        void attachListeners() {
+[external][shana][shana@zju.edu.cn]            var parent = getParentFragment();
+[external][shana][shana@zju.edu.cn]            if (parent instanceof RepoItemFragment) {
+[external][shana][shana@zju.edu.cn]                var repoItemFragment = (RepoItemFragment) parent;
+[external][shana][shana@zju.edu.cn]                borderView.getBorderViewDelegate().setBorderVisibilityChangedListener((top, oldTop, bottom, oldBottom) -> repoItemFragment.binding.appBar.setLifted(!top));
+[external][shana][shana@zju.edu.cn]                repoItemFragment.binding.appBar.setLifted(!borderView.getBorderViewDelegate().isShowingTopBorder());
+[external][shana][shana@zju.edu.cn]                repoItemFragment.binding.toolbar.setOnClickListener(v -> {
+[external][shana][shana@zju.edu.cn]                    repoItemFragment.binding.appBar.setExpanded(true, true);
+[external][shana][shana@zju.edu.cn]                    scrollToTop();
+[external][shana][shana@zju.edu.cn]                });
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        abstract void scrollToTop();
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        void detachListeners() {
+[external][shana][shana@zju.edu.cn]            borderView.getBorderViewDelegate().setBorderVisibilityChangedListener(null);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public void onResume() {
+[external][shana][shana@zju.edu.cn]            super.onResume();
+[external][shana][shana@zju.edu.cn]            attachListeners();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public void onStart() {
+[external][shana][shana@zju.edu.cn]            super.onStart();
+[external][shana][shana@zju.edu.cn]            attachListeners();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public void onStop() {
+[external][shana][shana@zju.edu.cn]            super.onStop();
+[external][shana][shana@zju.edu.cn]            detachListeners();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public void onPause() {
+[external][shana][shana@zju.edu.cn]            super.onPause();
+[external][shana][shana@zju.edu.cn]            detachListeners();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static class ReadmeFragment extends BorderFragment {
+[external][shana][shana@zju.edu.cn]        ItemRepoReadmeBinding binding;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @Nullable
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+[external][shana][shana@zju.edu.cn]            var parent = getParentFragment();
+[external][shana][shana@zju.edu.cn]            if (!(parent instanceof RepoItemFragment)) {
+[external][shana][shana@zju.edu.cn]                if (!safeNavigate(R.id.action_repo_item_fragment_to_repo_fragment)) {
+[external][shana][shana@zju.edu.cn]                    safeNavigate(R.id.repo_nav);
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]                return null;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            var repoItemFragment = (RepoItemFragment) parent;
+[external][shana][shana@zju.edu.cn]            binding = ItemRepoReadmeBinding.inflate(getLayoutInflater(), container, false);
+[external][shana][shana@zju.edu.cn]            repoItemFragment.renderGithubMarkdown(binding.readme, repoItemFragment.module.getReadmeHTML());
+[external][shana][shana@zju.edu.cn]            borderView = binding.scrollView;
+[external][shana][shana@zju.edu.cn]            return binding.getRoot();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        void scrollToTop() {
+[external][shana][shana@zju.edu.cn]            binding.scrollView.fullScroll(ScrollView.FOCUS_UP);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static class RecyclerviewFragment extends BorderFragment {
+[external][shana][shana@zju.edu.cn]        ItemRepoRecyclerviewBinding binding;
+[external][shana][shana@zju.edu.cn]        RecyclerView.Adapter<?> adapter;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        void scrollToTop() {
+[external][shana][shana@zju.edu.cn]            binding.recyclerView.smoothScrollToPosition(0);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+[external][shana][shana@zju.edu.cn]            var arguments = getArguments();
+[external][shana][shana@zju.edu.cn]            var parent = getParentFragment();
+[external][shana][shana@zju.edu.cn]            if (arguments == null || !(parent instanceof RepoItemFragment)) {
+[external][shana][shana@zju.edu.cn]                if (!safeNavigate(R.id.action_repo_item_fragment_to_repo_fragment)) {
+[external][shana][shana@zju.edu.cn]                    safeNavigate(R.id.repo_nav);
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]                return null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][shana][shana@zju.edu.cn]            var repoItemFragment = (RepoItemFragment) parent;
+[external][shana][shana@zju.edu.cn]            var position = arguments.getInt("position", 0);
+[external][shana][shana@zju.edu.cn]            if (position == 1)
+[external][shana][shana@zju.edu.cn]                adapter = repoItemFragment.releaseAdapter;
+[external][shana][shana@zju.edu.cn]            else if (position == 2)
+[external][shana][shana@zju.edu.cn]                adapter = repoItemFragment.informationAdapter;
+[external][shana][shana@zju.edu.cn]            else return null;
+[external][shana][shana@zju.edu.cn]            binding = ItemRepoRecyclerviewBinding.inflate(getLayoutInflater(), container, false);
+[external][shana][shana@zju.edu.cn]            binding.recyclerView.setAdapter(adapter);
+[external][shana][shana@zju.edu.cn]            binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireActivity()));
+[external][shana][shana@zju.edu.cn]            RecyclerViewKt.fixEdgeEffect(binding.recyclerView, false, true);
+[external][shana][shana@zju.edu.cn]            borderView = binding.recyclerView;
+[external][shana][shana@zju.edu.cn]            return binding.getRoot();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]}

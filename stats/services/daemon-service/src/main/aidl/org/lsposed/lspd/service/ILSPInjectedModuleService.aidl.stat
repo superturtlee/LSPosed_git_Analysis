@@ -1,0 +1,13 @@
+[external][shana][shana@zju.edu.cn]package org.lsposed.lspd.service;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import org.lsposed.lspd.service.IRemotePreferenceCallback;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]interface ILSPInjectedModuleService {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    int getFrameworkPrivilege();
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    Bundle requestRemotePreferences(String group, IRemotePreferenceCallback callback);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    ParcelFileDescriptor openRemoteFile(String path);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    String[] getRemoteFileList();
+[external][shana][shana@zju.edu.cn]}

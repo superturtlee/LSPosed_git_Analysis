@@ -1,0 +1,70 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]<?xml version="1.0" encoding="utf-8"?><!--
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  -->
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]<resources>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    <style name="Base.AppTheme.Light" parent="Theme.Material3.DynamicColors.Light.Rikka">
+[external][shana][shana@zju.edu.cn]        <item name="android:windowLightStatusBar">true</item>
+[external][shana][shana@zju.edu.cn]        <item name="colorPrimaryVariant">@color/primary_dark_light_light_status_bar</item>
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <item name="android:statusBarColor">?android:colorBackground</item>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <item name="android:windowActionBar">false</item>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <item name="android:windowNoTitle">true</item>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <item name="windowActionBar">false</item>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <item name="windowNoTitle">true</item>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <!-- Preference title -->
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <item name="android:textAppearanceListItem">?textAppearanceSubtitle1</item>
+[external][shana][shana@zju.edu.cn]        <!-- Preference category title -->
+[external][shana][shana@zju.edu.cn]        <item name="android:colorAccent">?colorPrimary</item>
+[external][shana][shana@zju.edu.cn]        <!-- Preference switch -->
+[external][shana][shana@zju.edu.cn]        <item name="android:colorControlActivated">?colorPrimary</item>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    </style>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <style name="Theme.Light" parent="Base.AppTheme.Light" />
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    <style name="Base.AppTheme" parent="Theme.Material3.DynamicColors.Dark.Rikka">
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <item name="android:windowActionBar">false</item>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <item name="android:windowNoTitle">true</item>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <item name="windowActionBar">false</item>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <item name="windowNoTitle">true</item>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <!-- Preference title -->
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <item name="android:textAppearanceListItem">?textAppearanceSubtitle1</item>
+[external][shana][shana@zju.edu.cn]        <!-- Preference category title -->
+[external][shana][shana@zju.edu.cn]        <item name="android:colorAccent">?colorPrimary</item>
+[external][shana][shana@zju.edu.cn]        <!-- Preference switch -->
+[external][shana][shana@zju.edu.cn]        <item name="android:colorControlActivated">?colorPrimary</item>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    </style>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <style name="Theme" parent="Base.AppTheme" />
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    <style name="DeviceInfoDialogLabel">
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <item name="android:textAlignment">viewStart</item>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Body1</item>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <item name="android:textColor">?android:attr/textColorSecondary</item>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    </style>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    <style name="DeviceInfoDialogValue">
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <item name="android:textAlignment">viewStart</item>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Body2</item>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <item name="android:paddingBottom">24dp</item>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    </style>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]</resources>

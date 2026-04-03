@@ -1,0 +1,149 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][admin][admin@0x.mk]package de.robv.android.xposed.callbacks;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]import android.content.res.XResources;
+[external][admin][admin@0x.mk]import android.content.res.XResources.ResourceNames;
+[external][admin][admin@0x.mk]import android.view.View;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]import de.robv.android.xposed.XposedBridge.CopyOnWriteSortedSet;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]/**
+[external][admin][admin@0x.mk] * Callback for hooking layouts. Such callbacks can be passed to {@link XResources#hookLayout}
+[external][admin][admin@0x.mk] * and its variants.
+[external][admin][admin@0x.mk] */
+[external][shana][shana@zju.edu.cn]public abstract class XC_LayoutInflated extends XCallback implements Comparable<XC_LayoutInflated> {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Creates a new callback with default priority.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @SuppressWarnings("deprecation")
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public XC_LayoutInflated() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        super();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Creates a new callback with a specific priority.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param priority See {@link XCallback#priority}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public XC_LayoutInflated(int priority) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        super(priority);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Wraps information about the inflated layout.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static final class LayoutInflatedParam extends XCallback.Param {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         * @hide
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public LayoutInflatedParam(CopyOnWriteSortedSet<XC_LayoutInflated> callbacks) {
+[external][shana][shana@zju.edu.cn]            super(callbacks.getSnapshot(new XCallback[0]));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         * The view that has been created from the layout.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public View view;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         * Container with the ID and name of the underlying resource.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public ResourceNames resNames;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         * Directory from which the layout was actually loaded (e.g. "layout-sw600dp").
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public String variant;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         * Resources containing the layout.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public XResources res;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    /** @hide */
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public int compareTo(XC_LayoutInflated other) {
+[external][shana][shana@zju.edu.cn]        if (this == other)
+[external][shana][shana@zju.edu.cn]            return 0;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // order descending by priority
+[external][shana][shana@zju.edu.cn]        if (other.priority != this.priority)
+[external][shana][shana@zju.edu.cn]            return other.priority - this.priority;
+[external][shana][shana@zju.edu.cn]            // then randomly
+[external][shana][shana@zju.edu.cn]        else if (System.identityHashCode(this) < System.identityHashCode(other))
+[external][shana][shana@zju.edu.cn]            return -1;
+[external][shana][shana@zju.edu.cn]        else
+[external][shana][shana@zju.edu.cn]            return 1;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @hide
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    protected void call(Param param) throws Throwable {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (param instanceof LayoutInflatedParam)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            handleLayoutInflated((LayoutInflatedParam) param);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * This method is called when the hooked layout has been inflated.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param liparam Information about the layout and the inflated view.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @throws Throwable Everything the callback throws is caught and logged.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public abstract void handleLayoutInflated(LayoutInflatedParam liparam) throws Throwable;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * An object with which the callback can be removed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public class Unhook implements IXUnhook<XC_LayoutInflated> {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        private final String resDir;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        private final int id;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         * @hide
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public Unhook(String resDir, int id) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            this.resDir = resDir;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            this.id = id;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         * Returns the resource ID of the hooked layout.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public int getId() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return id;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public XC_LayoutInflated getCallback() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return XC_LayoutInflated.this;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public void unhook() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XResources.unhookLayout(resDir, id, XC_LayoutInflated.this);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][admin][admin@0x.mk]}

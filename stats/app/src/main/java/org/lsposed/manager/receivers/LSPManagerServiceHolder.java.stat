@@ -1,0 +1,61 @@
+[internal][vvb2060][vvb2060@gmail.com]/*
+[internal][vvb2060][vvb2060@gmail.com] * This file is part of LSPosed.
+[internal][vvb2060][vvb2060@gmail.com] *
+[internal][vvb2060][vvb2060@gmail.com] * LSPosed is free software: you can redistribute it and/or modify
+[internal][vvb2060][vvb2060@gmail.com] * it under the terms of the GNU General Public License as published by
+[internal][vvb2060][vvb2060@gmail.com] * the Free Software Foundation, either version 3 of the License, or
+[internal][vvb2060][vvb2060@gmail.com] * (at your option) any later version.
+[internal][vvb2060][vvb2060@gmail.com] *
+[internal][vvb2060][vvb2060@gmail.com] * LSPosed is distributed in the hope that it will be useful,
+[internal][vvb2060][vvb2060@gmail.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[internal][vvb2060][vvb2060@gmail.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[internal][vvb2060][vvb2060@gmail.com] * GNU General Public License for more details.
+[internal][vvb2060][vvb2060@gmail.com] *
+[internal][vvb2060][vvb2060@gmail.com] * You should have received a copy of the GNU General Public License
+[internal][vvb2060][vvb2060@gmail.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[internal][vvb2060][vvb2060@gmail.com] *
+[internal][vvb2060][vvb2060@gmail.com] * Copyright (C) 2021 LSPosed Contributors
+[internal][vvb2060][vvb2060@gmail.com] */
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.manager.receivers;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import android.os.IBinder;
+[internal][vvb2060][vvb2060@gmail.com]import android.os.Process;
+[internal][vvb2060][vvb2060@gmail.com]import android.os.RemoteException;
+[internal][vvb2060][vvb2060@gmail.com]import android.system.Os;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.lspd.ILSPManagerService;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]public class LSPManagerServiceHolder implements IBinder.DeathRecipient {
+[internal][vvb2060][vvb2060@gmail.com]    private static LSPManagerServiceHolder holder = null;
+[internal][vvb2060][vvb2060@gmail.com]    private static ILSPManagerService service = null;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    public static void init(IBinder binder) {
+[internal][vvb2060][vvb2060@gmail.com]        if (holder == null) {
+[internal][vvb2060][vvb2060@gmail.com]            holder = new LSPManagerServiceHolder(binder);
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    public static ILSPManagerService getService() {
+[internal][vvb2060][vvb2060@gmail.com]        return service;
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    private LSPManagerServiceHolder(IBinder binder) {
+[internal][vvb2060][vvb2060@gmail.com]        linkToDeath(binder);
+[internal][vvb2060][vvb2060@gmail.com]        service = ILSPManagerService.Stub.asInterface(binder);
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    private void linkToDeath(IBinder binder) {
+[internal][vvb2060][vvb2060@gmail.com]        try {
+[internal][vvb2060][vvb2060@gmail.com]            binder.linkToDeath(this, 0);
+[internal][vvb2060][vvb2060@gmail.com]        } catch (RemoteException e) {
+[internal][vvb2060][vvb2060@gmail.com]            binderDied();
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    @Override
+[internal][vvb2060][vvb2060@gmail.com]    public void binderDied() {
+[internal][vvb2060][vvb2060@gmail.com]        System.exit(0);
+[internal][vvb2060][vvb2060@gmail.com]        Process.killProcess(Os.getpid());
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]}

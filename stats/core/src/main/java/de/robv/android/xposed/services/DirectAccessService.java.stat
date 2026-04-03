@@ -1,0 +1,135 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][admin][admin@0x.mk]package de.robv.android.xposed.services;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]import java.io.BufferedInputStream;
+[external][admin][admin@0x.mk]import java.io.File;
+[external][admin][admin@0x.mk]import java.io.FileInputStream;
+[external][admin][admin@0x.mk]import java.io.IOException;
+[external][admin][admin@0x.mk]import java.io.InputStream;
+[external][admin][admin@0x.mk]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * @hide
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][admin][admin@0x.mk]public final class DirectAccessService extends BaseService {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public boolean hasDirectFileAccess() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return true;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][admin][admin@0x.mk]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @SuppressWarnings("RedundantIfStatement")
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public boolean checkFileAccess(String filename, int mode) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        File file = new File(filename);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (mode == F_OK && !file.exists()) return false;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if ((mode & R_OK) != 0 && !file.canRead()) return false;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if ((mode & W_OK) != 0 && !file.canWrite()) return false;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if ((mode & X_OK) != 0 && !file.canExecute()) return false;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return true;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][admin][admin@0x.mk]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public boolean checkFileExists(String filename) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return new File(filename).exists();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][admin][admin@0x.mk]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public FileResult statFile(String filename) throws IOException {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        File file = new File(filename);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return new FileResult(file.length(), file.lastModified());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][admin][admin@0x.mk]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public byte[] readFile(String filename) throws IOException {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        File file = new File(filename);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        byte content[] = new byte[(int) file.length()];
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        FileInputStream fis = new FileInputStream(file);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        fis.read(content);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        fis.close();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return content;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][admin][admin@0x.mk]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public FileResult readFile(String filename, long previousSize, long previousTime) throws IOException {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        File file = new File(filename);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        long size = file.length();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        long time = file.lastModified();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (previousSize == size && previousTime == time)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return new FileResult(size, time);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return new FileResult(readFile(filename), size, time);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][admin][admin@0x.mk]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public FileResult readFile(String filename, int offset, int length, long previousSize, long previousTime) throws IOException {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        File file = new File(filename);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        long size = file.length();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        long time = file.lastModified();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (previousSize == size && previousTime == time)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return new FileResult(size, time);
+[external][admin][admin@0x.mk]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        // Shortcut for the simple case
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (offset <= 0 && length <= 0)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return new FileResult(readFile(filename), size, time);
+[external][admin][admin@0x.mk]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        // Check range
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (offset > 0 && offset >= size) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalArgumentException("Offset " + offset + " is out of range for " + filename);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } else if (offset < 0) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            offset = 0;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][admin][admin@0x.mk]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (length > 0 && (offset + length) > size) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalArgumentException("Length " + length + " is out of range for " + filename);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } else if (length <= 0) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            length = (int) (size - offset);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][admin][admin@0x.mk]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        byte content[] = new byte[length];
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        FileInputStream fis = new FileInputStream(file);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        fis.skip(offset);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        fis.read(content);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        fis.close();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return new FileResult(content, size, time);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][admin][admin@0x.mk]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * {@inheritDoc}
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * <p>This implementation returns a BufferedInputStream instead of loading the file into memory.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public InputStream getFileInputStream(String filename) throws IOException {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return new BufferedInputStream(new FileInputStream(filename), 16 * 1024);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][admin][admin@0x.mk]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * {@inheritDoc}
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * <p>This implementation returns a BufferedInputStream instead of loading the file into memory.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public FileResult getFileInputStream(String filename, long previousSize, long previousTime) throws IOException {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        File file = new File(filename);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        long size = file.length();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        long time = file.lastModified();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (previousSize == size && previousTime == time)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return new FileResult(size, time);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return new FileResult(new BufferedInputStream(new FileInputStream(filename), 16 * 1024), size, time);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][admin][admin@0x.mk]}

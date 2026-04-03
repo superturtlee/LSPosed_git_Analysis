@@ -1,0 +1,232 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * <!--This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors-->
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]package org.lsposed.manager.ui.fragment;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]import android.content.Intent;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]import android.os.Bundle;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.view.LayoutInflater;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]import android.view.Menu;
+[external][shana][shana@zju.edu.cn]import android.view.MenuInflater;
+[external][7741672-nekoinverter][7741672-NekoInverter@users.noreply.gitlab.com]import android.view.MenuItem;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.view.View;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.view.ViewGroup;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import androidx.activity.OnBackPressedCallback;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import androidx.activity.result.ActivityResultLauncher;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import androidx.activity.result.contract.ActivityResultContracts;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]import androidx.annotation.NonNull;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]import androidx.annotation.Nullable;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]import androidx.appcompat.widget.SearchView;
+[external][shana][shana@zju.edu.cn]import androidx.core.view.MenuProvider;
+[external][shana][shana@zju.edu.cn]import androidx.recyclerview.widget.ConcatAdapter;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import androidx.recyclerview.widget.LinearLayoutManager;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import androidx.recyclerview.widget.RecyclerView;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import org.lsposed.manager.App;
+[external][shana][shana@zju.edu.cn]import org.lsposed.manager.ConfigManager;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.R;
+[external][shana][shana@zju.edu.cn]import org.lsposed.manager.adapters.AppHelper;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.adapters.ScopeAdapter;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.manager.databinding.FragmentAppListBinding;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.util.BackupUtils;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.manager.util.ModuleUtil;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]import rikka.material.app.LocaleDelegate;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import rikka.recyclerview.RecyclerViewKt;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]public class AppListFragment extends BaseFragment implements MenuProvider {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public SearchView searchView;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private ScopeAdapter scopeAdapter;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private ModuleUtil.InstalledModule module;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    private SearchView.OnQueryTextListener searchListener;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public FragmentAppListBinding binding;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public ActivityResultLauncher<String> backupLauncher;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public ActivityResultLauncher<String[]> restoreLauncher;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    private final RecyclerView.AdapterDataObserver observer = new RecyclerView.AdapterDataObserver() {
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public void onChanged() {
+[external][shana][shana@zju.edu.cn]            if (binding != null && scopeAdapter != null) {
+[external][shana][shana@zju.edu.cn]                binding.swipeRefreshLayout.setRefreshing(!scopeAdapter.isLoaded());
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    };
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Nullable
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        binding = FragmentAppListBinding.inflate(getLayoutInflater(), container, false);
+[external][shana][shana@zju.edu.cn]        if (module == null) {
+[external][shana][shana@zju.edu.cn]            return binding.getRoot();
+[external][shana][shana@zju.edu.cn]        }
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        binding.appBar.setLiftable(true);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        String title;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (module.userId != 0) {
+[external][shana][shana@zju.edu.cn]            title = String.format(LocaleDelegate.getDefaultLocale(), "%s (%d)", module.getAppName(), module.userId);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } else {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            title = module.getAppName();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        binding.toolbar.setSubtitle(module.packageName);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        scopeAdapter = new ScopeAdapter(this, module);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        scopeAdapter.setHasStableIds(true);
+[external][shana][shana@zju.edu.cn]        scopeAdapter.registerAdapterDataObserver(observer);
+[external][shana][shana@zju.edu.cn]        var concatAdapter = new ConcatAdapter();
+[external][shana][shana@zju.edu.cn]        concatAdapter.addAdapter(scopeAdapter.switchAdaptor);
+[external][shana][shana@zju.edu.cn]        concatAdapter.addAdapter(scopeAdapter);
+[external][shana][shana@zju.edu.cn]        binding.recyclerView.setAdapter(concatAdapter);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        binding.recyclerView.setHasFixedSize(true);
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireActivity()));
+[external][shana][shana@zju.edu.cn]        binding.recyclerView.getBorderViewDelegate().setBorderVisibilityChangedListener((top, oldTop, bottom, oldBottom) -> binding.appBar.setLifted(!top));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        RecyclerViewKt.fixEdgeEffect(binding.recyclerView, false, true);
+[external][shana][shana@zju.edu.cn]        binding.swipeRefreshLayout.setOnRefreshListener(() -> scopeAdapter.refresh(true));
+[external][shana][shana@zju.edu.cn]        binding.swipeRefreshLayout.setProgressViewEndTarget(true, binding.swipeRefreshLayout.getProgressViewEndOffset());
+[external][shana][shana@zju.edu.cn]        Intent intent = AppHelper.getSettingsIntent(module.packageName, module.userId);
+[external][shana][shana@zju.edu.cn]        if (intent == null) {
+[external][shana][shana@zju.edu.cn]            binding.fab.setVisibility(View.GONE);
+[external][shana][shana@zju.edu.cn]        } else {
+[external][shana][shana@zju.edu.cn]            binding.fab.setVisibility(View.VISIBLE);
+[external][shana][shana@zju.edu.cn]            binding.fab.setOnClickListener(v -> ConfigManager.startActivityAsUserWithFeature(intent, module.userId));
+[external][shana][shana@zju.edu.cn]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        searchListener = scopeAdapter.getSearchListener();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]        setupToolbar(binding.toolbar, binding.clickView, title, R.menu.menu_app_list, view -> requireActivity().getOnBackPressedDispatcher().onBackPressed());
+[external][shana][shana@zju.edu.cn]        View.OnClickListener l = v -> {
+[external][shana][shana@zju.edu.cn]            if (searchView.isIconified()) {
+[external][shana][shana@zju.edu.cn]                binding.recyclerView.smoothScrollToPosition(0);
+[external][shana][shana@zju.edu.cn]                binding.appBar.setExpanded(true, true);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        };
+[external][shana][shana@zju.edu.cn]        binding.toolbar.setOnClickListener(l);
+[external][shana][shana@zju.edu.cn]        binding.clickView.setOnClickListener(l);
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return binding.getRoot();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][wanghan1995315][wanghan1995315@gmail.com]    @Override
+[external][wanghan1995315][wanghan1995315@gmail.com]    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+[external][wanghan1995315][wanghan1995315@gmail.com]        super.onViewCreated(view, savedInstanceState);
+[external][wanghan1995315][wanghan1995315@gmail.com]        if (module == null) {
+[external][shana][shana@zju.edu.cn]            if (!safeNavigate(R.id.action_app_list_fragment_to_modules_fragment)) {
+[external][shana][shana@zju.edu.cn]                safeNavigate(R.id.modules_nav);
+[external][shana][shana@zju.edu.cn]            }
+[external][wanghan1995315][wanghan1995315@gmail.com]        }
+[external][wanghan1995315][wanghan1995315@gmail.com]    }
+[external][wanghan1995315][wanghan1995315@gmail.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public void onCreate(@Nullable Bundle savedInstanceState) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        super.onCreate(savedInstanceState);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        AppListFragmentArgs args = AppListFragmentArgs.fromBundle(getArguments());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        String modulePackageName = args.getModulePackageName();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        int moduleUserId = args.getModuleUserId();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        module = ModuleUtil.getInstance().getModule(modulePackageName, moduleUserId);
+[external][shana][shana@zju.edu.cn]        if (module == null) {
+[external][shana][shana@zju.edu.cn]            if (!safeNavigate(R.id.action_app_list_fragment_to_modules_fragment)) {
+[external][shana][shana@zju.edu.cn]                safeNavigate(R.id.modules_nav);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]        backupLauncher = registerForActivityResult(new ActivityResultContracts.CreateDocument("application/gzip"),
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                uri -> {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                    if (uri == null) return;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                    runAsync(() -> {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        try {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                            BackupUtils.backup(uri, modulePackageName);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        } catch (Exception e) {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                            var text = App.getInstance().getString(R.string.settings_backup_failed2, e.getMessage());
+[external][shana][shana@zju.edu.cn]                            showHint(text, false);
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                        }
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                    });
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                });
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        restoreLauncher = registerForActivityResult(new ActivityResultContracts.OpenDocument(),
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                uri -> {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                    if (uri == null) return;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                    runAsync(() -> {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        try {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                            BackupUtils.restore(uri, modulePackageName);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        } catch (Exception e) {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                            var text = App.getInstance().getString(R.string.settings_restore_failed2, e.getMessage());
+[external][shana][shana@zju.edu.cn]                            showHint(text, false);
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                        }
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                    });
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                });
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        requireActivity().getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            public void handleOnBackPressed() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                scopeAdapter.onBackPressed();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        });
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public void onResume() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        super.onResume();
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        if (scopeAdapter != null) scopeAdapter.refresh();
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public void onDestroyView() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        super.onDestroyView();
+[external][shana][shana@zju.edu.cn]        if (scopeAdapter != null) scopeAdapter.unregisterAdapterDataObserver(observer);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        binding = null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][7741672-nekoinverter][7741672-NekoInverter@users.noreply.gitlab.com]    @Override
+[external][shana][shana@zju.edu.cn]    public boolean onMenuItemSelected(@NonNull MenuItem item) {
+[external][shana][shana@zju.edu.cn]        return scopeAdapter.onOptionsItemSelected(item);
+[external][7741672-nekoinverter][7741672-NekoInverter@users.noreply.gitlab.com]    }
+[external][7741672-nekoinverter][7741672-NekoInverter@users.noreply.gitlab.com]
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    @Override
+[external][shana][shana@zju.edu.cn]    public void onPrepareMenu(@NonNull Menu menu) {
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        searchView.setOnQueryTextListener(searchListener);
+[external][shana][shana@zju.edu.cn]        searchView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+[external][shana][shana@zju.edu.cn]            @Override
+[external][shana][shana@zju.edu.cn]            public void onViewAttachedToWindow(View arg0) {
+[external][shana][shana@zju.edu.cn]                binding.appBar.setExpanded(false, true);
+[external][shana][shana@zju.edu.cn]                binding.recyclerView.setNestedScrollingEnabled(false);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            @Override
+[external][shana][shana@zju.edu.cn]            public void onViewDetachedFromWindow(View v) {
+[external][shana][shana@zju.edu.cn]                binding.recyclerView.setNestedScrollingEnabled(true);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        });
+[external][shana][shana@zju.edu.cn]        searchView.findViewById(androidx.appcompat.R.id.search_edit_frame).setLayoutDirection(View.LAYOUT_DIRECTION_INHERIT);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        scopeAdapter.onPrepareOptionsMenu(menu);
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public boolean onContextItemSelected(@NonNull MenuItem item) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (scopeAdapter.onContextItemSelected(item)) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return true;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return super.onContextItemSelected(item);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]}

@@ -1,0 +1,332 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][admin][admin@0x.mk]package de.robv.android.xposed;
+[external][admin][admin@0x.mk]
+[external][shana][shana@zju.edu.cn]import static org.lsposed.lspd.core.ApplicationServiceClient.serviceClient;
+[external][shana][shana@zju.edu.cn]import static org.lsposed.lspd.deopt.PrebuiltMethodsDeopter.deoptResourceMethods;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import static de.robv.android.xposed.XposedBridge.hookAllMethods;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import static de.robv.android.xposed.XposedHelpers.callMethod;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import static de.robv.android.xposed.XposedHelpers.getObjectField;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import static de.robv.android.xposed.XposedHelpers.getParameterIndexByType;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import static de.robv.android.xposed.XposedHelpers.setStaticObjectField;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]import android.app.ActivityThread;
+[external][admin][admin@0x.mk]import android.content.pm.ApplicationInfo;
+[external][admin][admin@0x.mk]import android.content.res.Resources;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.content.res.ResourcesImpl;
+[external][admin][admin@0x.mk]import android.content.res.TypedArray;
+[external][admin][admin@0x.mk]import android.content.res.XResources;
+[external][admin][admin@0x.mk]import android.os.Build;
+[external][admin][admin@0x.mk]import android.os.IBinder;
+[external][admin][admin@0x.mk]import android.os.Process;
+[external][shana][shana@zju.edu.cn]import android.util.ArrayMap;
+[external][admin][admin@0x.mk]import android.util.Log;
+[external][admin][admin@0x.mk]
+[external][shana][shana@zju.edu.cn]import org.lsposed.lspd.impl.LSPosedContext;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.lspd.models.PreLoadedApk;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.lspd.nativebridge.NativeAPI;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.lspd.nativebridge.ResourcesHook;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.lspd.util.LspModuleClassLoader;
+[external][shana][shana@zju.edu.cn]
+[external][admin][admin@0x.mk]import java.io.File;
+[external][admin][admin@0x.mk]import java.lang.ref.WeakReference;
+[external][admin][admin@0x.mk]import java.lang.reflect.Method;
+[external][admin][admin@0x.mk]import java.util.ArrayList;
+[internal][vvb2060][vvb2060@gmail.com]import java.util.List;
+[external][shana][shana@zju.edu.cn]import java.util.Map;
+[external][shana][shana@zju.edu.cn]import java.util.Optional;
+[external][shana][shana@zju.edu.cn]import java.util.Set;
+[external][shana][shana@zju.edu.cn]import java.util.concurrent.ConcurrentHashMap;
+[external][admin][admin@0x.mk]import java.util.concurrent.atomic.AtomicBoolean;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]import de.robv.android.xposed.callbacks.XC_InitPackageResources;
+[external][admin][admin@0x.mk]import de.robv.android.xposed.callbacks.XCallback;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import hidden.HiddenApiBridge;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]public final class XposedInit {
+[external][admin][admin@0x.mk]    private static final String TAG = XposedBridge.TAG;
+[external][admin][admin@0x.mk]    public static boolean startsSystemServer = false;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    public static volatile boolean disableResources = false;
+[external][shana][shana@zju.edu.cn]    public static AtomicBoolean resourceInit = new AtomicBoolean(false);
+[external][admin][admin@0x.mk]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static void hookResources() throws Throwable {
+[external][shana][shana@zju.edu.cn]        if (disableResources || !resourceInit.compareAndSet(false, true)) {
+[external][admin][admin@0x.mk]            return;
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]
+[external][shana][shana@zju.edu.cn]        deoptResourceMethods();
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        if (!ResourcesHook.initXResourcesNative()) {
+[external][admin][admin@0x.mk]            Log.e(TAG, "Cannot hook resources");
+[external][admin][admin@0x.mk]            disableResources = true;
+[external][admin][admin@0x.mk]            return;
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]        findAndHookMethod("android.app.ApplicationPackageManager", null, "getResourcesForApplication",
+[external][admin][admin@0x.mk]                ApplicationInfo.class, new XC_MethodHook() {
+[external][admin][admin@0x.mk]                    @Override
+[external][shana][shana@zju.edu.cn]                    protected void beforeHookedMethod(MethodHookParam<?> param) {
+[external][admin][admin@0x.mk]                        ApplicationInfo app = (ApplicationInfo) param.args[0];
+[external][admin][admin@0x.mk]                        XResources.setPackageNameForResDir(app.packageName,
+[external][admin][admin@0x.mk]                                app.uid == Process.myUid() ? app.sourceDir : app.publicSourceDir);
+[external][admin][admin@0x.mk]                    }
+[external][admin][admin@0x.mk]                });
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]        /*
+[external][admin][admin@0x.mk]         * getTopLevelResources(a)
+[external][admin][admin@0x.mk]         *   -> getTopLevelResources(b)
+[external][admin][admin@0x.mk]         *     -> key = new ResourcesKey()
+[external][admin][admin@0x.mk]         *     -> r = new Resources()
+[external][admin][admin@0x.mk]         *     -> mActiveResources.put(key, r)
+[external][admin][admin@0x.mk]         *     -> return r
+[external][admin][admin@0x.mk]         */
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]        final Class<?> classGTLR;
+[external][admin][admin@0x.mk]        final Class<?> classResKey;
+[external][admin][admin@0x.mk]        final ThreadLocal<Object> latestResKey = new ThreadLocal<>();
+[external][shana][shana@zju.edu.cn]        final ArrayList<String> createResourceMethods = new ArrayList<>();
+[external][admin][admin@0x.mk]
+[external][shana][shana@zju.edu.cn]        classGTLR = android.app.ResourcesManager.class;
+[external][shana][shana@zju.edu.cn]        classResKey = android.content.res.ResourcesKey.class;
+[external][shana][shana@zju.edu.cn]        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+[external][shana][shana@zju.edu.cn]            createResourceMethods.add("createResources");
+[external][shana][shana@zju.edu.cn]            createResourceMethods.add("createResourcesForActivity");
+[external][shana][shana@zju.edu.cn]        } else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R) {
+[external][shana][shana@zju.edu.cn]            createResourceMethods.add("createResources");
+[external][admin][admin@0x.mk]        } else {
+[external][shana][shana@zju.edu.cn]            createResourceMethods.add("getOrCreateResources");
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]
+[internal][canyie][31466456+canyie@users.noreply.github.com]        final Class<?> classActivityRes = XposedHelpers.findClassIfExists("android.app.ResourcesManager$ActivityResource", classGTLR.getClassLoader());
+[external][shana][shana@zju.edu.cn]        var hooker = new XC_MethodHook() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            @Override
+[external][shana][shana@zju.edu.cn]            protected void afterHookedMethod(MethodHookParam<?> param) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                // At least on OnePlus 5, the method has an additional parameter compared to AOSP.
+[external][shana][shana@zju.edu.cn]                Object activityToken = null;
+[external][shana][shana@zju.edu.cn]                try {
+[external][shana][shana@zju.edu.cn]                    final int activityTokenIdx = getParameterIndexByType(param.method, IBinder.class);
+[external][shana][shana@zju.edu.cn]                    activityToken = param.args[activityTokenIdx];
+[external][shana][shana@zju.edu.cn]                } catch (NoSuchFieldError ignored) {
+[external][shana][shana@zju.edu.cn]                }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                final int resKeyIdx = getParameterIndexByType(param.method, classResKey);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                String resDir = (String) getObjectField(param.args[resKeyIdx], "mResDir");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                XResources newRes = cloneToXResources(param, resDir);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                if (newRes == null) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    return;
+[external][admin][admin@0x.mk]                }
+[external][admin][admin@0x.mk]
+[internal][vvb2060][vvb2060@gmail.com]                //noinspection SynchronizeOnNonFinalField
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                synchronized (param.thisObject) {
+[external][shana][shana@zju.edu.cn]                    ArrayList<Object> resourceReferences;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    if (activityToken != null) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        Object activityResources = callMethod(param.thisObject, "getOrCreateActivityResourcesStructLocked", activityToken);
+[internal][vvb2060][vvb2060@gmail.com]                        //noinspection unchecked
+[external][shana][shana@zju.edu.cn]                        resourceReferences = (ArrayList<Object>) getObjectField(activityResources, "activityResources");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    } else {
+[internal][vvb2060][vvb2060@gmail.com]                        //noinspection unchecked
+[external][shana][shana@zju.edu.cn]                        resourceReferences = (ArrayList<Object>) getObjectField(param.thisObject, "mResourceReferences");
+[external][shana][shana@zju.edu.cn]                    }
+[internal][canyie][31466456+canyie@users.noreply.github.com]                    if (activityToken == null || classActivityRes == null) {
+[external][shana][shana@zju.edu.cn]                        resourceReferences.add(new WeakReference<>(newRes));
+[external][shana][shana@zju.edu.cn]                    } else {
+[internal][canyie][31466456+canyie@users.noreply.github.com]                        // Android S createResourcesForActivity()
+[external][shana][shana@zju.edu.cn]                        var activityRes = XposedHelpers.newInstance(classActivityRes);
+[external][shana][shana@zju.edu.cn]                        XposedHelpers.setObjectField(activityRes, "resources", new WeakReference<>(newRes));
+[internal][canyie][31466456+canyie@users.noreply.github.com]                        resourceReferences.add(activityRes);
+[external][admin][admin@0x.mk]                    }
+[external][admin][admin@0x.mk]                }
+[external][admin][admin@0x.mk]            }
+[external][shana][shana@zju.edu.cn]        };
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        for (var createResourceMethod : createResourceMethods) {
+[external][shana][shana@zju.edu.cn]            hookAllMethods(classGTLR, createResourceMethod, hooker);
+[external][shana][shana@zju.edu.cn]        }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]        findAndHookMethod(TypedArray.class, "obtain", Resources.class, int.class,
+[external][admin][admin@0x.mk]                new XC_MethodHook() {
+[external][admin][admin@0x.mk]                    @Override
+[external][shana][shana@zju.edu.cn]                    protected void afterHookedMethod(MethodHookParam<?> param) throws Throwable {
+[external][admin][admin@0x.mk]                        if (param.getResult() instanceof XResources.XTypedArray) {
+[external][admin][admin@0x.mk]                            return;
+[external][admin][admin@0x.mk]                        }
+[external][admin][admin@0x.mk]                        if (!(param.args[0] instanceof XResources)) {
+[external][admin][admin@0x.mk]                            return;
+[external][admin][admin@0x.mk]                        }
+[external][admin][admin@0x.mk]                        XResources.XTypedArray newResult =
+[external][admin][admin@0x.mk]                                new XResources.XTypedArray((Resources) param.args[0]);
+[external][admin][admin@0x.mk]                        int len = (int) param.args[1];
+[external][admin][admin@0x.mk]                        Method resizeMethod = XposedHelpers.findMethodBestMatch(
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                                TypedArray.class, "resize", int.class);
+[external][admin][admin@0x.mk]                        resizeMethod.setAccessible(true);
+[external][admin][admin@0x.mk]                        resizeMethod.invoke(newResult, len);
+[external][admin][admin@0x.mk]                        param.setResult(newResult);
+[external][admin][admin@0x.mk]                    }
+[external][admin][admin@0x.mk]                });
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]        // Replace system resources
+[external][admin][admin@0x.mk]        XResources systemRes = new XResources(
+[external][shana][shana@zju.edu.cn]                (ClassLoader) XposedHelpers.getObjectField(Resources.getSystem(), "mClassLoader"), null);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        HiddenApiBridge.Resources_setImpl(systemRes, (ResourcesImpl) XposedHelpers.getObjectField(Resources.getSystem(), "mResourcesImpl"));
+[external][admin][admin@0x.mk]        setStaticObjectField(Resources.class, "mSystem", systemRes);
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]        XResources.init(latestResKey);
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]
+[external][shana][shana@zju.edu.cn]    private static XResources cloneToXResources(XC_MethodHook.MethodHookParam<?> param, String resDir) {
+[external][admin][admin@0x.mk]        Object result = param.getResult();
+[external][416810799][416810799@qq.com]        if (result == null || result instanceof XResources) {
+[external][admin][admin@0x.mk]            return null;
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]        // Replace the returned resources with our subclass.
+[external][shana][shana@zju.edu.cn]        var newRes = new XResources(
+[external][shana][shana@zju.edu.cn]                (ClassLoader) XposedHelpers.getObjectField(param.getResult(), "mClassLoader"), resDir);
+[external][shana][shana@zju.edu.cn]        HiddenApiBridge.Resources_setImpl(newRes, (ResourcesImpl) XposedHelpers.getObjectField(param.getResult(), "mResourcesImpl"));
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]        // Invoke handleInitPackageResources().
+[external][admin][admin@0x.mk]        if (newRes.isFirstLoad()) {
+[external][admin][admin@0x.mk]            String packageName = newRes.getPackageName();
+[external][admin][admin@0x.mk]            XC_InitPackageResources.InitPackageResourcesParam resparam = new XC_InitPackageResources.InitPackageResourcesParam(XposedBridge.sInitPackageResourcesCallbacks);
+[external][admin][admin@0x.mk]            resparam.packageName = packageName;
+[external][admin][admin@0x.mk]            resparam.res = newRes;
+[external][admin][admin@0x.mk]            XCallback.callAll(resparam);
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]        param.setResult(newRes);
+[external][admin][admin@0x.mk]        return newRes;
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]
+[external][shana][shana@zju.edu.cn]    // only legacy modules have non-empty value
+[external][shana][shana@zju.edu.cn]    private static final Map<String, Optional<String>> loadedModules = new ConcurrentHashMap<>();
+[external][admin][admin@0x.mk]
+[external][shana][shana@zju.edu.cn]    public static Map<String, Optional<String>> getLoadedModules() {
+[external][shana][shana@zju.edu.cn]        return loadedModules;
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]
+[external][shana][shana@zju.edu.cn]    public static void loadLegacyModules() {
+[external][shana][shana@zju.edu.cn]        var moduleList = serviceClient.getLegacyModulesList();
+[external][shana][shana@zju.edu.cn]        moduleList.forEach(module -> {
+[external][shana][shana@zju.edu.cn]            var apk = module.apkPath;
+[external][shana][shana@zju.edu.cn]            var name = module.packageName;
+[external][shana][shana@zju.edu.cn]            var file = module.file;
+[external][shana][shana@zju.edu.cn]            loadedModules.put(name, Optional.of(apk)); // temporarily add it for XSharedPreference
+[external][shana][shana@zju.edu.cn]            if (!loadModule(name, apk, file)) {
+[external][shana][shana@zju.edu.cn]                loadedModules.remove(name);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        });
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static void loadModules(ActivityThread at) {
+[external][shana][shana@zju.edu.cn]        var packages = (ArrayMap<?, ?>) XposedHelpers.getObjectField(at, "mPackages");
+[external][shana][shana@zju.edu.cn]        serviceClient.getModulesList().forEach(module -> {
+[external][shana][shana@zju.edu.cn]            loadedModules.put(module.packageName, Optional.empty());
+[external][shana][shana@zju.edu.cn]            if (!LSPosedContext.loadModule(at, module)) {
+[external][shana][shana@zju.edu.cn]                loadedModules.remove(module.packageName);
+[external][shana][shana@zju.edu.cn]            } else {
+[external][shana][shana@zju.edu.cn]                packages.remove(module.packageName);
+[external][admin][admin@0x.mk]            }
+[external][shana][shana@zju.edu.cn]        });
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    /**
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]     * Load all so from an APK by reading <code>assets/native_init</code>.
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]     * It will only store the so names but not doing anything.
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]     */
+[internal][vvb2060][vvb2060@gmail.com]    private static void initNativeModule(List<String> moduleLibraryNames) {
+[internal][vvb2060][vvb2060@gmail.com]        moduleLibraryNames.forEach(NativeAPI::recordNativeEntrypoint);
+[external][shana][shana@zju.edu.cn]    }
+[external][admin][admin@0x.mk]
+[internal][vvb2060][vvb2060@gmail.com]    private static boolean initModule(ClassLoader mcl, String apk, List<String> moduleClassNames) {
+[internal][vvb2060][vvb2060@gmail.com]        var count = 0;
+[internal][vvb2060][vvb2060@gmail.com]        for (var moduleClassName : moduleClassNames) {
+[internal][vvb2060][vvb2060@gmail.com]            try {
+[internal][vvb2060][vvb2060@gmail.com]                Log.i(TAG, "  Loading class " + moduleClassName);
+[external][admin][admin@0x.mk]
+[internal][vvb2060][vvb2060@gmail.com]                Class<?> moduleClass = mcl.loadClass(moduleClassName);
+[external][admin][admin@0x.mk]
+[internal][vvb2060][vvb2060@gmail.com]                if (!IXposedMod.class.isAssignableFrom(moduleClass)) {
+[internal][vvb2060][vvb2060@gmail.com]                    Log.e(TAG, "    This class doesn't implement any sub-interface of IXposedMod, skipping it");
+[internal][vvb2060][vvb2060@gmail.com]                    continue;
+[internal][vvb2060][vvb2060@gmail.com]                }
+[external][admin][admin@0x.mk]
+[internal][vvb2060][vvb2060@gmail.com]                final Object moduleInstance = moduleClass.newInstance();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]                if (moduleInstance instanceof IXposedHookZygoteInit) {
+[internal][vvb2060][vvb2060@gmail.com]                    IXposedHookZygoteInit.StartupParam param = new IXposedHookZygoteInit.StartupParam();
+[internal][vvb2060][vvb2060@gmail.com]                    param.modulePath = apk;
+[internal][vvb2060][vvb2060@gmail.com]                    param.startsSystemServer = startsSystemServer;
+[internal][vvb2060][vvb2060@gmail.com]                    ((IXposedHookZygoteInit) moduleInstance).initZygote(param);
+[internal][vvb2060][vvb2060@gmail.com]                    count++;
+[internal][vvb2060][vvb2060@gmail.com]                }
+[external][admin][admin@0x.mk]
+[internal][vvb2060][vvb2060@gmail.com]                if (moduleInstance instanceof IXposedHookLoadPackage) {
+[external][shana][shana@zju.edu.cn]                    XposedBridge.hookLoadPackage(new IXposedHookLoadPackage.Wrapper((IXposedHookLoadPackage) moduleInstance));
+[internal][vvb2060][vvb2060@gmail.com]                    count++;
+[internal][vvb2060][vvb2060@gmail.com]                }
+[external][admin][admin@0x.mk]
+[internal][vvb2060][vvb2060@gmail.com]                if (moduleInstance instanceof IXposedHookInitPackageResources) {
+[external][shana][shana@zju.edu.cn]                    hookResources();
+[external][shana][shana@zju.edu.cn]                    XposedBridge.hookInitPackageResources(new IXposedHookInitPackageResources.Wrapper((IXposedHookInitPackageResources) moduleInstance));
+[internal][vvb2060][vvb2060@gmail.com]                    count++;
+[external][admin][admin@0x.mk]                }
+[internal][vvb2060][vvb2060@gmail.com]            } catch (Throwable t) {
+[internal][vvb2060][vvb2060@gmail.com]                Log.e(TAG, "    Failed to load class " + moduleClassName, t);
+[external][admin][admin@0x.mk]            }
+[external][admin][admin@0x.mk]        }
+[internal][vvb2060][vvb2060@gmail.com]        return count > 0;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Load a module from an APK by calling the init(String) method for all classes defined
+[external][shana][shana@zju.edu.cn]     * in <code>assets/xposed_init</code>.
+[external][shana][shana@zju.edu.cn]     */
+[internal][vvb2060][vvb2060@gmail.com]    private static boolean loadModule(String name, String apk, PreLoadedApk file) {
+[external][shana][shana@zju.edu.cn]        Log.i(TAG, "Loading legacy module " + name + " from " + apk);
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]        var sb = new StringBuilder();
+[internal][vvb2060][vvb2060@gmail.com]        var abis = Process.is64Bit() ? Build.SUPPORTED_64_BIT_ABIS : Build.SUPPORTED_32_BIT_ABIS;
+[internal][vvb2060][vvb2060@gmail.com]        for (String abi : abis) {
+[internal][vvb2060][vvb2060@gmail.com]            sb.append(apk).append("!/lib/").append(abi).append(File.pathSeparator);
+[external][shana][shana@zju.edu.cn]        }
+[internal][vvb2060][vvb2060@gmail.com]        var librarySearchPath = sb.toString();
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]        var initLoader = XposedInit.class.getClassLoader();
+[internal][vvb2060][vvb2060@gmail.com]        var mcl = LspModuleClassLoader.loadApk(apk, file.preLoadedDexes, librarySearchPath, initLoader);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (mcl.loadClass(XposedBridge.class.getName()).getClassLoader() != initLoader) {
+[external][shana][shana@zju.edu.cn]                Log.e(TAG, "  Cannot load module: " + name);
+[external][shana][shana@zju.edu.cn]                Log.e(TAG, "  The Xposed API classes are compiled into the module's APK.");
+[external][shana][shana@zju.edu.cn]                Log.e(TAG, "  This may cause strange issues and must be fixed by the module developer.");
+[internal][vvb2060][vvb2060@gmail.com]                Log.e(TAG, "  For details, see: https://api.xposed.info/using.html");
+[external][shana][shana@zju.edu.cn]                return false;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        } catch (ClassNotFoundException ignored) {
+[internal][vvb2060][vvb2060@gmail.com]            return false;
+[external][shana][shana@zju.edu.cn]        }
+[internal][vvb2060][vvb2060@gmail.com]        initNativeModule(file.moduleLibraryNames);
+[internal][vvb2060][vvb2060@gmail.com]        return initModule(mcl, apk, file.moduleClassNames);
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]
+[external][shana][shana@zju.edu.cn]    public final static Set<String> loadedPackagesInProcess = ConcurrentHashMap.newKeySet(1);
+[external][admin][admin@0x.mk]}

@@ -1,0 +1,7 @@
+[external][shana][shana@zju.edu.cn]package com.android.internal.os;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import android.os.IBinder;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public class BinderInternal {
+[external][shana][shana@zju.edu.cn]    public static final native IBinder getContextObject();
+[external][shana][shana@zju.edu.cn]}

@@ -1,0 +1,17 @@
+[external][shana][shana@zju.edu.cn]package android.view;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import android.app.IActivityManager;
+[external][shana][shana@zju.edu.cn]import android.os.Binder;
+[external][shana][shana@zju.edu.cn]import android.os.Bundle;
+[external][shana][shana@zju.edu.cn]import android.os.IBinder;
+[external][shana][shana@zju.edu.cn]import android.os.IInterface;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public interface IWindowManager extends IInterface {
+[external][shana][shana@zju.edu.cn]    void lockNow(Bundle options);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    abstract class Stub extends Binder implements IWindowManager {
+[external][shana][shana@zju.edu.cn]        public static IWindowManager asInterface(IBinder obj) {
+[external][shana][shana@zju.edu.cn]            throw new UnsupportedOperationException();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

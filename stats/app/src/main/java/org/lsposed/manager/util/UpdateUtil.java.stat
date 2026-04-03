@@ -1,0 +1,149 @@
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]/*
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * This file is part of LSPosed.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] *
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * (at your option) any later version.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] *
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * GNU General Public License for more details.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] *
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] *
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * Copyright (C) 2022 LSPosed Contributors
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] */
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.manager.util;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import android.util.Log;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import androidx.annotation.NonNull;
+[internal][vvb2060][vvb2060@gmail.com]import androidx.annotation.Nullable;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import com.google.gson.JsonObject;
+[internal][vvb2060][vvb2060@gmail.com]import com.google.gson.JsonParser;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.App;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.BuildConfig;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.ConfigManager;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import java.io.File;
+[internal][vvb2060][vvb2060@gmail.com]import java.io.IOException;
+[internal][vvb2060][vvb2060@gmail.com]import java.time.Instant;
+[internal][vvb2060][vvb2060@gmail.com]import java.time.ZoneOffset;
+[internal][vvb2060][vvb2060@gmail.com]import java.util.Locale;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import okhttp3.Call;
+[internal][vvb2060][vvb2060@gmail.com]import okhttp3.Callback;
+[internal][vvb2060][vvb2060@gmail.com]import okhttp3.Request;
+[internal][vvb2060][vvb2060@gmail.com]import okhttp3.Response;
+[internal][vvb2060][vvb2060@gmail.com]import okio.Okio;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]public class UpdateUtil {
+[internal][vvb2060][vvb2060@gmail.com]    public static void loadRemoteVersion() {
+[internal][vvb2060][vvb2060@gmail.com]        var request = new Request.Builder()
+[internal][vvb2060][vvb2060@gmail.com]                .url("https://api.github.com/repos/LSPosed/LSPosed/releases/latest")
+[internal][vvb2060][vvb2060@gmail.com]                .addHeader("Accept", "application/vnd.github.v3+json")
+[internal][vvb2060][vvb2060@gmail.com]                .build();
+[internal][vvb2060][vvb2060@gmail.com]        var callback = new Callback() {
+[internal][vvb2060][vvb2060@gmail.com]            @Override
+[internal][vvb2060][vvb2060@gmail.com]            public void onResponse(@NonNull Call call, @NonNull Response response) {
+[internal][vvb2060][vvb2060@gmail.com]                if (!response.isSuccessful()) return;
+[internal][vvb2060][vvb2060@gmail.com]                var body = response.body();
+[internal][vvb2060][vvb2060@gmail.com]                if (body == null) return;
+[internal][vvb2060][vvb2060@gmail.com]                String api = ConfigManager.isBinderAlive() ? ConfigManager.getApi() : "riru";
+[internal][vvb2060][vvb2060@gmail.com]                try {
+[internal][vvb2060][vvb2060@gmail.com]                    var info = JsonParser.parseReader(body.charStream()).getAsJsonObject();
+[internal][vvb2060][vvb2060@gmail.com]                    var notes = info.get("body").getAsString();
+[internal][vvb2060][vvb2060@gmail.com]                    var assetsArray = info.getAsJsonArray("assets");
+[internal][vvb2060][vvb2060@gmail.com]                    for (var assets : assetsArray) {
+[internal][vvb2060][vvb2060@gmail.com]                        checkAssets(assets.getAsJsonObject(), notes, api.toLowerCase(Locale.ROOT));
+[internal][vvb2060][vvb2060@gmail.com]                    }
+[internal][vvb2060][vvb2060@gmail.com]                } catch (Throwable t) {
+[internal][vvb2060][vvb2060@gmail.com]                    Log.e(App.TAG, t.getMessage(), t);
+[internal][vvb2060][vvb2060@gmail.com]                }
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]            @Override
+[internal][vvb2060][vvb2060@gmail.com]            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+[internal][vvb2060][vvb2060@gmail.com]                Log.e(App.TAG, "loadRemoteVersion: " + e.getMessage());
+[internal][vvb2060][vvb2060@gmail.com]                var pref = App.getPreferences();
+[internal][vvb2060][vvb2060@gmail.com]                if (pref.getBoolean("checked", false)) return;
+[internal][vvb2060][vvb2060@gmail.com]                pref.edit().putBoolean("checked", true).apply();
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]        };
+[internal][vvb2060][vvb2060@gmail.com]        App.getOkHttpClient().newCall(request).enqueue(callback);
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    private static void checkAssets(JsonObject assets, String releaseNotes, String api) {
+[internal][vvb2060][vvb2060@gmail.com]        var pref = App.getPreferences();
+[internal][vvb2060][vvb2060@gmail.com]        var name = assets.get("name").getAsString();
+[internal][vvb2060][vvb2060@gmail.com]        var splitName = name.split("-");
+[internal][vvb2060][vvb2060@gmail.com]        if (!splitName[3].equals(api)) return;
+[internal][vvb2060][vvb2060@gmail.com]        pref.edit()
+[internal][vvb2060][vvb2060@gmail.com]                .putInt("latest_version", Integer.parseInt(splitName[2]))
+[internal][vvb2060][vvb2060@gmail.com]                .putLong("latest_check", Instant.now().getEpochSecond())
+[internal][vvb2060][vvb2060@gmail.com]                .putString("release_notes", releaseNotes)
+[internal][vvb2060][vvb2060@gmail.com]                .putString("zip_file", null)
+[internal][vvb2060][vvb2060@gmail.com]                .putBoolean("checked", true)
+[internal][vvb2060][vvb2060@gmail.com]                .apply();
+[internal][vvb2060][vvb2060@gmail.com]        var updatedAt = Instant.parse(assets.get("updated_at").getAsString());
+[internal][vvb2060][vvb2060@gmail.com]        var downloadUrl = assets.get("browser_download_url").getAsString();
+[internal][vvb2060][vvb2060@gmail.com]        var zipTime = pref.getLong("zip_time", 0);
+[internal][vvb2060][vvb2060@gmail.com]        if (!updatedAt.equals(Instant.ofEpochSecond(zipTime))) {
+[internal][vvb2060][vvb2060@gmail.com]            var zip = downloadNewZipSync(downloadUrl, name);
+[internal][vvb2060][vvb2060@gmail.com]            var size = assets.get("size").getAsLong();
+[internal][vvb2060][vvb2060@gmail.com]            if (zip != null && zip.length() == size) {
+[internal][vvb2060][vvb2060@gmail.com]                pref.edit()
+[internal][vvb2060][vvb2060@gmail.com]                        .putLong("zip_time", updatedAt.getEpochSecond())
+[internal][vvb2060][vvb2060@gmail.com]                        .putString("zip_file", zip.getAbsolutePath())
+[internal][vvb2060][vvb2060@gmail.com]                        .apply();
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    public static boolean needUpdate() {
+[internal][vvb2060][vvb2060@gmail.com]        var pref = App.getPreferences();
+[internal][vvb2060][vvb2060@gmail.com]        if (!pref.getBoolean("checked", false)) return false;
+[internal][vvb2060][vvb2060@gmail.com]        var now = Instant.now();
+[internal][vvb2060][vvb2060@gmail.com]        var buildTime = Instant.ofEpochSecond(BuildConfig.BUILD_TIME);
+[internal][vvb2060][vvb2060@gmail.com]        var check = pref.getLong("latest_check", 0);
+[internal][vvb2060][vvb2060@gmail.com]        if (check > 0) {
+[internal][vvb2060][vvb2060@gmail.com]            var checkTime = Instant.ofEpochSecond(check);
+[internal][vvb2060][vvb2060@gmail.com]            if (checkTime.atOffset(ZoneOffset.UTC).plusDays(30).toInstant().isBefore(now))
+[internal][vvb2060][vvb2060@gmail.com]                return true;
+[internal][vvb2060][vvb2060@gmail.com]            var code = pref.getInt("latest_version", 0);
+[internal][vvb2060][vvb2060@gmail.com]            return code > BuildConfig.VERSION_CODE;
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]        return buildTime.atOffset(ZoneOffset.UTC).plusDays(30).toInstant().isBefore(now);
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    @Nullable
+[internal][vvb2060][vvb2060@gmail.com]    private static File downloadNewZipSync(String url, String name) {
+[internal][vvb2060][vvb2060@gmail.com]        var request = new Request.Builder().url(url).build();
+[internal][vvb2060][vvb2060@gmail.com]        var zip = new File(App.getInstance().getCacheDir(), name);
+[internal][vvb2060][vvb2060@gmail.com]        try (Response response = App.getOkHttpClient().newCall(request).execute()) {
+[internal][vvb2060][vvb2060@gmail.com]            var body = response.body();
+[internal][vvb2060][vvb2060@gmail.com]            if (!response.isSuccessful() || body == null) return null;
+[internal][vvb2060][vvb2060@gmail.com]            try (var source = body.source();
+[internal][vvb2060][vvb2060@gmail.com]                 var sink = Okio.buffer(Okio.sink(zip))) {
+[internal][vvb2060][vvb2060@gmail.com]                sink.writeAll(source);
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]        } catch (IOException e) {
+[internal][vvb2060][vvb2060@gmail.com]            Log.e(App.TAG, "downloadNewZipSync: " + e.getMessage());
+[internal][vvb2060][vvb2060@gmail.com]            return null;
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]        return zip;
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    public static boolean canInstall() {
+[internal][vvb2060][vvb2060@gmail.com]        if (!ConfigManager.isBinderAlive()) return false;
+[internal][vvb2060][vvb2060@gmail.com]        var pref = App.getPreferences();
+[internal][vvb2060][vvb2060@gmail.com]        var zip = pref.getString("zip_file", null);
+[internal][vvb2060][vvb2060@gmail.com]        return zip != null && new File(zip).isFile();
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]}

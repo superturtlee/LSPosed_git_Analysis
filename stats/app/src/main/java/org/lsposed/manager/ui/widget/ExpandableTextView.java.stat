@@ -1,0 +1,173 @@
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]/*
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * <!--This file is part of LSPosed.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] *
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * (at your option) any later version.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] *
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * GNU General Public License for more details.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] *
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] *
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors-->
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] */
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]package org.lsposed.manager.ui.widget;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import android.annotation.SuppressLint;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import android.content.Context;
+[internal][vvb2060][vvb2060@gmail.com]import android.graphics.Typeface;
+[external][shana][shana@zju.edu.cn]import android.os.Bundle;
+[external][shana][shana@zju.edu.cn]import android.os.Parcelable;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import android.text.Layout;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import android.text.SpannableString;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import android.text.SpannableStringBuilder;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import android.text.Spanned;
+[internal][vvb2060][vvb2060@gmail.com]import android.text.TextPaint;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import android.text.method.LinkMovementMethod;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import android.text.style.ClickableSpan;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import android.transition.TransitionManager;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import android.util.AttributeSet;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import android.view.MotionEvent;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import android.view.View;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import android.view.ViewGroup;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import androidx.annotation.NonNull;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]import com.google.android.material.textview.MaterialTextView;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import org.lsposed.manager.R;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]public class ExpandableTextView extends MaterialTextView {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    private CharSequence text = null;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    private int nextLines = 0;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    private final int maxLines;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    private final SpannableString collapse;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    private final SpannableString expand;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    private final SpannableStringBuilder sb = new SpannableStringBuilder();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    private int lineCount = 0;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    public ExpandableTextView(Context context) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        this(context, null);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    public ExpandableTextView(Context context, AttributeSet attrs) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        this(context, attrs, 0);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    public ExpandableTextView(Context context, AttributeSet attrs, int defStyle) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        super(context, attrs, defStyle);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        maxLines = getMaxLines();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        collapse = new SpannableString(context.getString(R.string.collapse));
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        ClickableSpan span = new ClickableSpan() {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            @Override
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            public void onClick(@NonNull View widget) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                TransitionManager.beginDelayedTransition((ViewGroup) getParent());
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                setMaxLines(nextLines);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                ExpandableTextView.super.setText(text);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]            @Override
+[internal][vvb2060][vvb2060@gmail.com]            public void updateDrawState(@NonNull TextPaint ds) {
+[internal][vvb2060][vvb2060@gmail.com]                ds.setTypeface(Typeface.DEFAULT_BOLD);
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        };
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        collapse.setSpan(span, 0, collapse.length(), 0);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        expand = new SpannableString(context.getString(R.string.expand));
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        expand.setSpan(span, 0, expand.length(), 0);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        setMovementMethod(LinkMovementMethod.getInstance());
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    @Override
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    public void setText(CharSequence text, BufferType type) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        this.text = text;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        super.setText(text, type);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    @Override
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    public boolean onPreDraw() {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        this.getViewTreeObserver().removeOnPreDrawListener(this);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        if (lineCount == 0) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            lineCount = getLayout().getLineCount();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        if (lineCount > maxLines) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            int hintTextOffsetEnd;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            if (maxLines == getMaxLines()) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                nextLines = lineCount + 1;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                hintTextOffsetEnd = getLayout().getLineStart(getMaxLines() - 1);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                setTextWithSpan(text, hintTextOffsetEnd - 1, expand);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            } else if (nextLines == getMaxLines()) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                nextLines = maxLines;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                hintTextOffsetEnd = getLayout().getLineStart(getMaxLines() - 1);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                setTextWithSpan(text, hintTextOffsetEnd, collapse);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        return super.onPreDraw();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    private void setTextWithSpan(CharSequence text, int textOffsetEnd,
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                                 SpannableString sbStr) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        sb.clearSpans();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        sb.clear();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        sb.append(text, 0, textOffsetEnd);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        sb.append("\n");
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        sb.append(sbStr);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        super.setText(sb, BufferType.NORMAL);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    @Override
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        super.onLayout(changed, left, top, right, bottom);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        if (getLayout() != null) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            lineCount = getLayout().getLineCount();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    @SuppressLint("ClickableViewAccessibility")
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    @Override
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    public boolean onTouchEvent(@NonNull MotionEvent event) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        Layout layout = this.getLayout();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        if (layout != null) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            int line = layout.getLineForVertical((int) event.getY());
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            int offset = layout.getOffsetForHorizontal(line, event.getX());
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            if (getText() instanceof Spanned) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                Spanned spanned = (Spanned) getText();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                ClickableSpan[] links = spanned.getSpans(offset, offset, ClickableSpan.class);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                if (links.length == 0) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    return false;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                } else {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                    return super.onTouchEvent(event);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        return false;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public Parcelable onSaveInstanceState() {
+[external][shana][shana@zju.edu.cn]        Bundle bundle = new Bundle();
+[external][shana][shana@zju.edu.cn]        bundle.putParcelable("superState", super.onSaveInstanceState());
+[external][shana][shana@zju.edu.cn]        bundle.putInt("maxLines", getMaxLines());
+[external][shana][shana@zju.edu.cn]        return bundle;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public void onRestoreInstanceState(Parcelable state) {
+[external][shana][shana@zju.edu.cn]        if (state instanceof Bundle) {
+[external][shana][shana@zju.edu.cn]            Bundle bundle = (Bundle) state;
+[external][shana][shana@zju.edu.cn]            setMaxLines(bundle.getInt("maxLines"));
+[external][shana][shana@zju.edu.cn]            state = bundle.getParcelable("superState");
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        super.onRestoreInstanceState(state);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]}

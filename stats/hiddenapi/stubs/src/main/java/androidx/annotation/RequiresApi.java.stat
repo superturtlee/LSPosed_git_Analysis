@@ -1,0 +1,51 @@
+[external][shana][shana@zju.edu.cn]/*
+[external][shana][shana@zju.edu.cn] * Copyright (C) 2016 The Android Open Source Project
+[external][shana][shana@zju.edu.cn] *
+[external][shana][shana@zju.edu.cn] * Licensed under the Apache License, Version 2.0 (the "License");
+[external][shana][shana@zju.edu.cn] * you may not use this file except in compliance with the License.
+[external][shana][shana@zju.edu.cn] * You may obtain a copy of the License at
+[external][shana][shana@zju.edu.cn] *
+[external][shana][shana@zju.edu.cn] *      http://www.apache.org/licenses/LICENSE-2.0
+[external][shana][shana@zju.edu.cn] *
+[external][shana][shana@zju.edu.cn] * Unless required by applicable law or agreed to in writing, software
+[external][shana][shana@zju.edu.cn] * distributed under the License is distributed on an "AS IS" BASIS,
+[external][shana][shana@zju.edu.cn] * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+[external][shana][shana@zju.edu.cn] * See the License for the specific language governing permissions and
+[external][shana][shana@zju.edu.cn] * limitations under the License.
+[external][shana][shana@zju.edu.cn] */
+[external][shana][shana@zju.edu.cn]package androidx.annotation;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import java.lang.annotation.Retention;
+[external][shana][shana@zju.edu.cn]import java.lang.annotation.Target;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import static java.lang.annotation.ElementType.CONSTRUCTOR;
+[external][shana][shana@zju.edu.cn]import static java.lang.annotation.ElementType.FIELD;
+[external][shana][shana@zju.edu.cn]import static java.lang.annotation.ElementType.METHOD;
+[external][shana][shana@zju.edu.cn]import static java.lang.annotation.ElementType.TYPE;
+[external][shana][shana@zju.edu.cn]import static java.lang.annotation.RetentionPolicy.SOURCE;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]/**
+[external][shana][shana@zju.edu.cn] * Denotes that the annotated element should only be called on the given API level
+[external][shana][shana@zju.edu.cn] * or higher.
+[external][shana][shana@zju.edu.cn] * <p>
+[external][shana][shana@zju.edu.cn] * This is similar in purpose to the older {@code @TargetApi} annotation, but more
+[external][shana][shana@zju.edu.cn] * clearly expresses that this is a requirement on the caller, rather than being
+[external][shana][shana@zju.edu.cn] * used to "suppress" warnings within the method that exceed the {@code minSdkVersion}.
+[external][shana][shana@zju.edu.cn] */
+[external][shana][shana@zju.edu.cn]@Retention(SOURCE)
+[external][shana][shana@zju.edu.cn]@Target({TYPE, METHOD, CONSTRUCTOR, FIELD})
+[external][shana][shana@zju.edu.cn]public @interface RequiresApi {
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * The API level to require. Alias for {@link #api} which allows you to leave out the
+[external][shana][shana@zju.edu.cn]     * {@code api=} part.
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    @IntRange(from = 1)
+[external][shana][shana@zju.edu.cn]    int value() default 1;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * The API level to require
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    @IntRange(from = 1)
+[external][shana][shana@zju.edu.cn]    int api() default 1;
+[external][shana][shana@zju.edu.cn]}

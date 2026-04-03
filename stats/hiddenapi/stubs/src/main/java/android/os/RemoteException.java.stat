@@ -1,0 +1,8 @@
+[external][shana][shana@zju.edu.cn]package android.os;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public class RemoteException extends Exception {
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public RemoteException(String message) {
+[external][shana][shana@zju.edu.cn]        throw new RuntimeException("STUB");
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

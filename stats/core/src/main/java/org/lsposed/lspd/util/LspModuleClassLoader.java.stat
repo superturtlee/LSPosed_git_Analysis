@@ -1,0 +1,206 @@
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.lspd.util;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import static de.robv.android.xposed.XposedBridge.TAG;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import android.os.Build;
+[internal][vvb2060][vvb2060@gmail.com]import android.os.SharedMemory;
+[internal][vvb2060][vvb2060@gmail.com]import android.system.ErrnoException;
+[internal][vvb2060][vvb2060@gmail.com]import android.system.Os;
+[internal][vvb2060][vvb2060@gmail.com]import android.system.OsConstants;
+[internal][vvb2060][vvb2060@gmail.com]import android.util.Log;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import androidx.annotation.NonNull;
+[internal][vvb2060][vvb2060@gmail.com]import androidx.annotation.RequiresApi;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import java.io.File;
+[internal][vvb2060][vvb2060@gmail.com]import java.io.IOException;
+[internal][vvb2060][vvb2060@gmail.com]import java.net.URL;
+[internal][vvb2060][vvb2060@gmail.com]import java.nio.ByteBuffer;
+[internal][vvb2060][vvb2060@gmail.com]import java.util.ArrayList;
+[internal][vvb2060][vvb2060@gmail.com]import java.util.Arrays;
+[internal][vvb2060][vvb2060@gmail.com]import java.util.Collections;
+[internal][vvb2060][vvb2060@gmail.com]import java.util.Enumeration;
+[internal][vvb2060][vvb2060@gmail.com]import java.util.List;
+[internal][vvb2060][vvb2060@gmail.com]import java.util.Objects;
+[internal][vvb2060][vvb2060@gmail.com]import java.util.jar.JarFile;
+[internal][vvb2060][vvb2060@gmail.com]import java.util.zip.ZipEntry;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import hidden.ByteBufferDexClassLoader;
+[internal][vvb2060][vvb2060@gmail.com]import sun.misc.CompoundEnumeration;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]@SuppressWarnings("ConstantConditions")
+[internal][vvb2060][vvb2060@gmail.com]public final class LspModuleClassLoader extends ByteBufferDexClassLoader {
+[internal][vvb2060][vvb2060@gmail.com]    private static final String zipSeparator = "!/";
+[internal][vvb2060][vvb2060@gmail.com]    private static final List<File> systemNativeLibraryDirs =
+[internal][vvb2060][vvb2060@gmail.com]            splitPaths(System.getProperty("java.library.path"));
+[internal][vvb2060][vvb2060@gmail.com]    private final String apk;
+[internal][vvb2060][vvb2060@gmail.com]    private final List<File> nativeLibraryDirs = new ArrayList<>();
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    private static List<File> splitPaths(String searchPath) {
+[internal][vvb2060][vvb2060@gmail.com]        var result = new ArrayList<File>();
+[internal][vvb2060][vvb2060@gmail.com]        if (searchPath == null) return result;
+[internal][vvb2060][vvb2060@gmail.com]        for (var path : searchPath.split(File.pathSeparator)) {
+[internal][vvb2060][vvb2060@gmail.com]            result.add(new File(path));
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]        return result;
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    private LspModuleClassLoader(ByteBuffer[] dexBuffers,
+[internal][vvb2060][vvb2060@gmail.com]                                 ClassLoader parent,
+[internal][vvb2060][vvb2060@gmail.com]                                 String apk) {
+[internal][vvb2060][vvb2060@gmail.com]        super(dexBuffers, parent);
+[internal][vvb2060][vvb2060@gmail.com]        this.apk = apk;
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    @RequiresApi(Build.VERSION_CODES.Q)
+[internal][vvb2060][vvb2060@gmail.com]    private LspModuleClassLoader(ByteBuffer[] dexBuffers,
+[internal][vvb2060][vvb2060@gmail.com]                                 String librarySearchPath,
+[internal][vvb2060][vvb2060@gmail.com]                                 ClassLoader parent,
+[internal][vvb2060][vvb2060@gmail.com]                                 String apk) {
+[internal][vvb2060][vvb2060@gmail.com]        super(dexBuffers, librarySearchPath, parent);
+[internal][vvb2060][vvb2060@gmail.com]        initNativeLibraryDirs(librarySearchPath);
+[internal][vvb2060][vvb2060@gmail.com]        this.apk = apk;
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    private void initNativeLibraryDirs(String librarySearchPath) {
+[internal][vvb2060][vvb2060@gmail.com]        nativeLibraryDirs.addAll(splitPaths(librarySearchPath));
+[internal][vvb2060][vvb2060@gmail.com]        nativeLibraryDirs.addAll(systemNativeLibraryDirs);
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    @Override
+[internal][vvb2060][vvb2060@gmail.com]    protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+[internal][vvb2060][vvb2060@gmail.com]        var cl = findLoadedClass(name);
+[internal][vvb2060][vvb2060@gmail.com]        if (cl != null) {
+[internal][vvb2060][vvb2060@gmail.com]            return cl;
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]        try {
+[internal][vvb2060][vvb2060@gmail.com]            return Object.class.getClassLoader().loadClass(name);
+[internal][vvb2060][vvb2060@gmail.com]        } catch (ClassNotFoundException ignored) {
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]        ClassNotFoundException fromSuper;
+[internal][vvb2060][vvb2060@gmail.com]        try {
+[internal][vvb2060][vvb2060@gmail.com]            return findClass(name);
+[internal][vvb2060][vvb2060@gmail.com]        } catch (ClassNotFoundException ex) {
+[internal][vvb2060][vvb2060@gmail.com]            fromSuper = ex;
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]        try {
+[internal][vvb2060][vvb2060@gmail.com]            return getParent().loadClass(name);
+[internal][vvb2060][vvb2060@gmail.com]        } catch (ClassNotFoundException cnfe) {
+[internal][vvb2060][vvb2060@gmail.com]            throw fromSuper;
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    @Override
+[internal][vvb2060][vvb2060@gmail.com]    public String findLibrary(String libraryName) {
+[internal][vvb2060][vvb2060@gmail.com]        var fileName = System.mapLibraryName(libraryName);
+[internal][vvb2060][vvb2060@gmail.com]        for (var file : nativeLibraryDirs) {
+[internal][vvb2060][vvb2060@gmail.com]            var path = file.getPath();
+[internal][vvb2060][vvb2060@gmail.com]            if (path.contains(zipSeparator)) {
+[internal][vvb2060][vvb2060@gmail.com]                var split = path.split(zipSeparator, 2);
+[internal][vvb2060][vvb2060@gmail.com]                try (var jarFile = new JarFile(split[0])) {
+[internal][vvb2060][vvb2060@gmail.com]                    var entryName = split[1] + '/' + fileName;
+[internal][vvb2060][vvb2060@gmail.com]                    var entry = jarFile.getEntry(entryName);
+[internal][vvb2060][vvb2060@gmail.com]                    if (entry != null && entry.getMethod() == ZipEntry.STORED) {
+[internal][vvb2060][vvb2060@gmail.com]                        return split[0] + zipSeparator + entryName;
+[internal][vvb2060][vvb2060@gmail.com]                    }
+[internal][vvb2060][vvb2060@gmail.com]                } catch (IOException e) {
+[internal][vvb2060][vvb2060@gmail.com]                    Log.e(TAG, "Can not open " + split[0], e);
+[internal][vvb2060][vvb2060@gmail.com]                }
+[internal][vvb2060][vvb2060@gmail.com]            } else if (file.isDirectory()) {
+[internal][vvb2060][vvb2060@gmail.com]                var entryPath = new File(file, fileName).getPath();
+[internal][vvb2060][vvb2060@gmail.com]                try {
+[internal][vvb2060][vvb2060@gmail.com]                    var fd = Os.open(entryPath, OsConstants.O_RDONLY, 0);
+[internal][vvb2060][vvb2060@gmail.com]                    Os.close(fd);
+[internal][vvb2060][vvb2060@gmail.com]                    return entryPath;
+[internal][vvb2060][vvb2060@gmail.com]                } catch (ErrnoException ignored) {
+[internal][vvb2060][vvb2060@gmail.com]                }
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]        return null;
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    @Override
+[internal][vvb2060][vvb2060@gmail.com]    public String getLdLibraryPath() {
+[internal][vvb2060][vvb2060@gmail.com]        var result = new StringBuilder();
+[internal][vvb2060][vvb2060@gmail.com]        for (var directory : nativeLibraryDirs) {
+[internal][vvb2060][vvb2060@gmail.com]            if (result.length() > 0) {
+[internal][vvb2060][vvb2060@gmail.com]                result.append(':');
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]            result.append(directory);
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]        return result.toString();
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    @Override
+[internal][vvb2060][vvb2060@gmail.com]    protected URL findResource(String name) {
+[internal][vvb2060][vvb2060@gmail.com]        try {
+[internal][vvb2060][vvb2060@gmail.com]            var urlHandler = new ClassPathURLStreamHandler(apk);
+[internal][vvb2060][vvb2060@gmail.com]            var url = urlHandler.getEntryUrlOrNull(name);
+[internal][vvb2060][vvb2060@gmail.com]            if (url == null) {
+[internal][vvb2060][vvb2060@gmail.com]                // noinspection FinalizeCalledExplicitly
+[internal][vvb2060][vvb2060@gmail.com]                urlHandler.finalize();
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]            return url;
+[internal][vvb2060][vvb2060@gmail.com]        } catch (IOException e) {
+[internal][vvb2060][vvb2060@gmail.com]            return null;
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    @Override
+[internal][vvb2060][vvb2060@gmail.com]    protected Enumeration<URL> findResources(String name) {
+[internal][vvb2060][vvb2060@gmail.com]        var result = new ArrayList<URL>();
+[internal][vvb2060][vvb2060@gmail.com]        var url = findResource(name);
+[internal][vvb2060][vvb2060@gmail.com]        if (url != null) result.add(url);
+[internal][vvb2060][vvb2060@gmail.com]        return Collections.enumeration(result);
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    @Override
+[internal][vvb2060][vvb2060@gmail.com]    public URL getResource(String name) {
+[internal][vvb2060][vvb2060@gmail.com]        var resource = Object.class.getClassLoader().getResource(name);
+[internal][vvb2060][vvb2060@gmail.com]        if (resource != null) return resource;
+[internal][vvb2060][vvb2060@gmail.com]        resource = findResource(name);
+[internal][vvb2060][vvb2060@gmail.com]        if (resource != null) return resource;
+[internal][vvb2060][vvb2060@gmail.com]        final var cl = getParent();
+[internal][vvb2060][vvb2060@gmail.com]        return (cl == null) ? null : cl.getResource(name);
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    @Override
+[internal][vvb2060][vvb2060@gmail.com]    public Enumeration<URL> getResources(String name) throws IOException {
+[external][shana][shana@zju.edu.cn]        @SuppressWarnings("unchecked") final var resources = (Enumeration<URL>[]) new Enumeration<?>[]{
+[internal][vvb2060][vvb2060@gmail.com]                Object.class.getClassLoader().getResources(name),
+[internal][vvb2060][vvb2060@gmail.com]                findResources(name),
+[internal][vvb2060][vvb2060@gmail.com]                getParent() == null ? null : getParent().getResources(name)};
+[internal][vvb2060][vvb2060@gmail.com]        return new CompoundEnumeration<>(resources);
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    @NonNull
+[internal][vvb2060][vvb2060@gmail.com]    @Override
+[internal][vvb2060][vvb2060@gmail.com]    public String toString() {
+[internal][vvb2060][vvb2060@gmail.com]        if (apk == null) return "LspModuleClassLoader[instantiating]";
+[internal][vvb2060][vvb2060@gmail.com]        return "LspModuleClassLoader[module=" + apk + ", " + super.toString() + "]";
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]    public static ClassLoader loadApk(String apk,
+[external][shana][shana@zju.edu.cn]                                      List<SharedMemory> dexes,
+[external][shana][shana@zju.edu.cn]                                      String librarySearchPath,
+[external][shana][shana@zju.edu.cn]                                      ClassLoader parent) {
+[internal][vvb2060][vvb2060@gmail.com]        var dexBuffers = dexes.stream().parallel().map(dex -> {
+[internal][vvb2060][vvb2060@gmail.com]            try {
+[internal][vvb2060][vvb2060@gmail.com]                return dex.mapReadOnly();
+[internal][vvb2060][vvb2060@gmail.com]            } catch (ErrnoException e) {
+[internal][vvb2060][vvb2060@gmail.com]                Log.w(TAG, "Can not map " + dex, e);
+[internal][vvb2060][vvb2060@gmail.com]                return null;
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]        }).filter(Objects::nonNull).toArray(ByteBuffer[]::new);
+[internal][vvb2060][vvb2060@gmail.com]        LspModuleClassLoader cl;
+[internal][vvb2060][vvb2060@gmail.com]        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+[internal][vvb2060][vvb2060@gmail.com]            cl = new LspModuleClassLoader(dexBuffers, librarySearchPath, parent, apk);
+[internal][vvb2060][vvb2060@gmail.com]        } else {
+[internal][vvb2060][vvb2060@gmail.com]            cl = new LspModuleClassLoader(dexBuffers, parent, apk);
+[internal][vvb2060][vvb2060@gmail.com]            cl.initNativeLibraryDirs(librarySearchPath);
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]        Arrays.stream(dexBuffers).parallel().forEach(SharedMemory::unmap);
+[internal][vvb2060][vvb2060@gmail.com]        dexes.stream().parallel().forEach(SharedMemory::close);
+[internal][vvb2060][vvb2060@gmail.com]        return cl;
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]}

@@ -1,0 +1,299 @@
+[external][noreply][noreply@nullptr.icu]package org.lsposed.lspd.impl;
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]import android.util.Log;
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]import androidx.annotation.NonNull;
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]import org.lsposed.lspd.nativebridge.HookBridge;
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]import java.lang.reflect.Executable;
+[external][noreply][noreply@nullptr.icu]import java.lang.reflect.InvocationTargetException;
+[external][noreply][noreply@nullptr.icu]import java.lang.reflect.Method;
+[external][noreply][noreply@nullptr.icu]import java.lang.reflect.Modifier;
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]import de.robv.android.xposed.XposedBridge;
+[external][noreply][noreply@nullptr.icu]import io.github.libxposed.api.XposedInterface;
+[external][noreply][noreply@nullptr.icu]import io.github.libxposed.api.annotations.AfterInvocation;
+[external][noreply][noreply@nullptr.icu]import io.github.libxposed.api.annotations.BeforeInvocation;
+[external][noreply][noreply@nullptr.icu]import io.github.libxposed.api.annotations.XposedHooker;
+[external][noreply][noreply@nullptr.icu]import io.github.libxposed.api.errors.HookFailedError;
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]public class LSPosedBridge {
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]    private static final String TAG = "LSPosed-Bridge";
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]    private static final String castException = "Return value's type from hook callback does not match the hooked method";
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]    private static final Method getCause;
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]    static {
+[external][noreply][noreply@nullptr.icu]        Method tmp;
+[external][noreply][noreply@nullptr.icu]        try {
+[external][noreply][noreply@nullptr.icu]            tmp = InvocationTargetException.class.getMethod("getCause");
+[external][noreply][noreply@nullptr.icu]        } catch (Throwable e) {
+[external][noreply][noreply@nullptr.icu]            tmp = null;
+[external][noreply][noreply@nullptr.icu]        }
+[external][noreply][noreply@nullptr.icu]        getCause = tmp;
+[external][noreply][noreply@nullptr.icu]    }
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]    public static class HookerCallback {
+[external][noreply][noreply@nullptr.icu]        @NonNull
+[external][noreply][noreply@nullptr.icu]        final Method beforeInvocation;
+[external][noreply][noreply@nullptr.icu]        @NonNull
+[external][noreply][noreply@nullptr.icu]        final Method afterInvocation;
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]        final int beforeParams;
+[external][noreply][noreply@nullptr.icu]        final int afterParams;
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]        public HookerCallback(@NonNull Method beforeInvocation, @NonNull Method afterInvocation) {
+[external][noreply][noreply@nullptr.icu]            this.beforeInvocation = beforeInvocation;
+[external][noreply][noreply@nullptr.icu]            this.afterInvocation = afterInvocation;
+[external][noreply][noreply@nullptr.icu]            this.beforeParams = beforeInvocation.getParameterCount();
+[external][noreply][noreply@nullptr.icu]            this.afterParams = afterInvocation.getParameterCount();
+[external][noreply][noreply@nullptr.icu]        }
+[external][noreply][noreply@nullptr.icu]    }
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]    public static void log(String text) {
+[external][noreply][noreply@nullptr.icu]        Log.i(TAG, text);
+[external][noreply][noreply@nullptr.icu]    }
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]    public static void log(Throwable t) {
+[external][noreply][noreply@nullptr.icu]        String logStr = Log.getStackTraceString(t);
+[external][noreply][noreply@nullptr.icu]        Log.e(TAG, logStr);
+[external][noreply][noreply@nullptr.icu]    }
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]    public static class NativeHooker<T extends Executable> {
+[external][noreply][noreply@nullptr.icu]        private final Object params;
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]        private NativeHooker(Executable method) {
+[external][noreply][noreply@nullptr.icu]            var isStatic = Modifier.isStatic(method.getModifiers());
+[external][noreply][noreply@nullptr.icu]            Object returnType;
+[external][noreply][noreply@nullptr.icu]            if (method instanceof Method) {
+[external][noreply][noreply@nullptr.icu]                returnType = ((Method) method).getReturnType();
+[external][noreply][noreply@nullptr.icu]            } else {
+[external][noreply][noreply@nullptr.icu]                returnType = null;
+[external][noreply][noreply@nullptr.icu]            }
+[external][noreply][noreply@nullptr.icu]            params = new Object[]{
+[external][noreply][noreply@nullptr.icu]                    method,
+[external][noreply][noreply@nullptr.icu]                    returnType,
+[external][noreply][noreply@nullptr.icu]                    isStatic,
+[external][noreply][noreply@nullptr.icu]            };
+[external][noreply][noreply@nullptr.icu]        }
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]        // This method is quite critical. We should try not to use system methods to avoid
+[external][noreply][noreply@nullptr.icu]        // endless recursive
+[external][noreply][noreply@nullptr.icu]        public Object callback(Object[] args) throws Throwable {
+[external][noreply][noreply@nullptr.icu]            LSPosedHookCallback<T> callback = new LSPosedHookCallback<>();
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]            var array = ((Object[]) params);
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]            var method = (T) array[0];
+[external][noreply][noreply@nullptr.icu]            var returnType = (Class<?>) array[1];
+[external][noreply][noreply@nullptr.icu]            var isStatic = (Boolean) array[2];
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]            callback.method = method;
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]            if (isStatic) {
+[external][noreply][noreply@nullptr.icu]                callback.thisObject = null;
+[external][noreply][noreply@nullptr.icu]                callback.args = args;
+[external][noreply][noreply@nullptr.icu]            } else {
+[external][noreply][noreply@nullptr.icu]                callback.thisObject = args[0];
+[external][noreply][noreply@nullptr.icu]                callback.args = new Object[args.length - 1];
+[external][noreply][noreply@nullptr.icu]                //noinspection ManualArrayCopy
+[external][noreply][noreply@nullptr.icu]                for (int i = 0; i < args.length - 1; ++i) {
+[external][noreply][noreply@nullptr.icu]                    callback.args[i] = args[i + 1];
+[external][noreply][noreply@nullptr.icu]                }
+[external][noreply][noreply@nullptr.icu]            }
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]            Object[][] callbacksSnapshot = HookBridge.callbackSnapshot(HookerCallback.class, method);
+[external][noreply][noreply@nullptr.icu]            Object[] modernSnapshot = callbacksSnapshot[0];
+[external][noreply][noreply@nullptr.icu]            Object[] legacySnapshot = callbacksSnapshot[1];
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]            if (modernSnapshot.length == 0 && legacySnapshot.length == 0) {
+[external][noreply][noreply@nullptr.icu]                try {
+[external][noreply][noreply@nullptr.icu]                    return HookBridge.invokeOriginalMethod(method, callback.thisObject, callback.args);
+[external][noreply][noreply@nullptr.icu]                } catch (InvocationTargetException ite) {
+[external][noreply][noreply@nullptr.icu]                    throw (Throwable) HookBridge.invokeOriginalMethod(getCause, ite);
+[external][noreply][noreply@nullptr.icu]                }
+[external][noreply][noreply@nullptr.icu]            }
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]            Object[] ctxArray = new Object[modernSnapshot.length];
+[external][noreply][noreply@nullptr.icu]            XposedBridge.LegacyApiSupport<T> legacy = null;
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]            // call "before method" callbacks
+[external][noreply][noreply@nullptr.icu]            int beforeIdx;
+[external][noreply][noreply@nullptr.icu]            for (beforeIdx = 0; beforeIdx < modernSnapshot.length; beforeIdx++) {
+[external][noreply][noreply@nullptr.icu]                try {
+[external][noreply][noreply@nullptr.icu]                    var hooker = (HookerCallback) modernSnapshot[beforeIdx];
+[external][noreply][noreply@nullptr.icu]                    if (hooker.beforeParams == 0) {
+[external][noreply][noreply@nullptr.icu]                        ctxArray[beforeIdx] = hooker.beforeInvocation.invoke(null);
+[external][noreply][noreply@nullptr.icu]                    } else {
+[external][noreply][noreply@nullptr.icu]                        ctxArray[beforeIdx] = hooker.beforeInvocation.invoke(null, callback);
+[external][noreply][noreply@nullptr.icu]                    }
+[external][noreply][noreply@nullptr.icu]                } catch (Throwable t) {
+[external][noreply][noreply@nullptr.icu]                    LSPosedBridge.log(t);
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]                    // reset result (ignoring what the unexpectedly exiting callback did)
+[external][noreply][noreply@nullptr.icu]                    callback.setResult(null);
+[external][noreply][noreply@nullptr.icu]                    callback.isSkipped = false;
+[external][noreply][noreply@nullptr.icu]                    continue;
+[external][noreply][noreply@nullptr.icu]                }
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]                if (callback.isSkipped) {
+[external][noreply][noreply@nullptr.icu]                    // skip remaining "before" callbacks and corresponding "after" callbacks
+[external][noreply][noreply@nullptr.icu]                    beforeIdx++;
+[external][noreply][noreply@nullptr.icu]                    break;
+[external][noreply][noreply@nullptr.icu]                }
+[external][noreply][noreply@nullptr.icu]            }
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]            if (!callback.isSkipped && legacySnapshot.length != 0) {
+[external][noreply][noreply@nullptr.icu]                // TODO: Separate classloader
+[external][noreply][noreply@nullptr.icu]                legacy = new XposedBridge.LegacyApiSupport<>(callback, legacySnapshot);
+[external][noreply][noreply@nullptr.icu]                legacy.handleBefore();
+[external][noreply][noreply@nullptr.icu]            }
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]            // call original method if not requested otherwise
+[external][noreply][noreply@nullptr.icu]            if (!callback.isSkipped) {
+[external][noreply][noreply@nullptr.icu]                try {
+[external][noreply][noreply@nullptr.icu]                    var result = HookBridge.invokeOriginalMethod(method, callback.thisObject, callback.args);
+[external][noreply][noreply@nullptr.icu]                    callback.setResult(result);
+[external][noreply][noreply@nullptr.icu]                } catch (InvocationTargetException e) {
+[external][noreply][noreply@nullptr.icu]                    var throwable = (Throwable) HookBridge.invokeOriginalMethod(getCause, e);
+[external][noreply][noreply@nullptr.icu]                    callback.setThrowable(throwable);
+[external][noreply][noreply@nullptr.icu]                }
+[external][noreply][noreply@nullptr.icu]            }
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]            // call "after method" callbacks
+[external][noreply][noreply@nullptr.icu]            for (int afterIdx = beforeIdx - 1; afterIdx >= 0; afterIdx--) {
+[external][noreply][noreply@nullptr.icu]                Object lastResult = callback.getResult();
+[external][noreply][noreply@nullptr.icu]                Throwable lastThrowable = callback.getThrowable();
+[external][noreply][noreply@nullptr.icu]                var hooker = (HookerCallback) modernSnapshot[afterIdx];
+[external][noreply][noreply@nullptr.icu]                try {
+[external][noreply][noreply@nullptr.icu]                    if (hooker.afterParams == 0) {
+[external][noreply][noreply@nullptr.icu]                        hooker.afterInvocation.invoke(null);
+[external][noreply][noreply@nullptr.icu]                    } else if (hooker.afterParams == 1) {
+[external][noreply][noreply@nullptr.icu]                        hooker.afterInvocation.invoke(null, callback);
+[external][noreply][noreply@nullptr.icu]                    } else {
+[external][noreply][noreply@nullptr.icu]                        hooker.afterInvocation.invoke(null, callback, ctxArray[afterIdx]);
+[external][noreply][noreply@nullptr.icu]                    }
+[external][noreply][noreply@nullptr.icu]                } catch (Throwable t) {
+[external][noreply][noreply@nullptr.icu]                    LSPosedBridge.log(t);
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]                    // reset to last result (ignoring what the unexpectedly exiting callback did)
+[external][noreply][noreply@nullptr.icu]                    if (lastThrowable == null) {
+[external][noreply][noreply@nullptr.icu]                        callback.setResult(lastResult);
+[external][noreply][noreply@nullptr.icu]                    } else {
+[external][noreply][noreply@nullptr.icu]                        callback.setThrowable(lastThrowable);
+[external][noreply][noreply@nullptr.icu]                    }
+[external][noreply][noreply@nullptr.icu]                }
+[external][noreply][noreply@nullptr.icu]            }
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]            if (legacy != null) {
+[external][noreply][noreply@nullptr.icu]                legacy.handleAfter();
+[external][noreply][noreply@nullptr.icu]            }
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]            // return
+[external][noreply][noreply@nullptr.icu]            var t = callback.getThrowable();
+[external][noreply][noreply@nullptr.icu]            if (t != null) {
+[external][noreply][noreply@nullptr.icu]                throw t;
+[external][noreply][noreply@nullptr.icu]            } else {
+[external][noreply][noreply@nullptr.icu]                var result = callback.getResult();
+[external][noreply][noreply@nullptr.icu]                if (returnType != null && !returnType.isPrimitive() && !HookBridge.instanceOf(result, returnType)) {
+[external][noreply][noreply@nullptr.icu]                    throw new ClassCastException(castException);
+[external][noreply][noreply@nullptr.icu]                }
+[external][noreply][noreply@nullptr.icu]                return result;
+[external][noreply][noreply@nullptr.icu]            }
+[external][noreply][noreply@nullptr.icu]        }
+[external][noreply][noreply@nullptr.icu]    }
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]    public static void dummyCallback() {
+[external][noreply][noreply@nullptr.icu]    }
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]    public static <T extends Executable> XposedInterface.MethodUnhooker<T>
+[external][noreply][noreply@nullptr.icu]    doHook(T hookMethod, int priority, Class<? extends XposedInterface.Hooker> hooker) {
+[external][noreply][noreply@nullptr.icu]        if (Modifier.isAbstract(hookMethod.getModifiers())) {
+[external][noreply][noreply@nullptr.icu]            throw new IllegalArgumentException("Cannot hook abstract methods: " + hookMethod);
+[external][noreply][noreply@nullptr.icu]        } else if (hookMethod.getDeclaringClass().getClassLoader() == LSPosedContext.class.getClassLoader()) {
+[external][noreply][noreply@nullptr.icu]            throw new IllegalArgumentException("Do not allow hooking inner methods");
+[external][noreply][noreply@nullptr.icu]        } else if (hookMethod.getDeclaringClass() == Method.class && hookMethod.getName().equals("invoke")) {
+[external][noreply][noreply@nullptr.icu]            throw new IllegalArgumentException("Cannot hook Method.invoke");
+[external][noreply][noreply@nullptr.icu]        } else if (hooker == null) {
+[external][noreply][noreply@nullptr.icu]            throw new IllegalArgumentException("hooker should not be null!");
+[external][noreply][noreply@nullptr.icu]        } else if (hooker.getAnnotation(XposedHooker.class) == null) {
+[external][noreply][noreply@nullptr.icu]            throw new IllegalArgumentException("Hooker should be annotated with @XposedHooker");
+[external][noreply][noreply@nullptr.icu]        }
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]        Method beforeInvocation = null, afterInvocation = null;
+[external][noreply][noreply@nullptr.icu]        var modifiers = Modifier.PUBLIC | Modifier.STATIC;
+[external][noreply][noreply@nullptr.icu]        for (var method : hooker.getDeclaredMethods()) {
+[external][noreply][noreply@nullptr.icu]            if (method.getAnnotation(BeforeInvocation.class) != null) {
+[external][noreply][noreply@nullptr.icu]                if (beforeInvocation != null) {
+[external][noreply][noreply@nullptr.icu]                    throw new IllegalArgumentException("More than one method annotated with @BeforeInvocation");
+[external][noreply][noreply@nullptr.icu]                }
+[external][noreply][noreply@nullptr.icu]                boolean valid = (method.getModifiers() & modifiers) == modifiers;
+[external][noreply][noreply@nullptr.icu]                var params = method.getParameterTypes();
+[external][noreply][noreply@nullptr.icu]                if (params.length == 1) {
+[external][noreply][noreply@nullptr.icu]                    valid &= params[0].equals(XposedInterface.BeforeHookCallback.class);
+[external][noreply][noreply@nullptr.icu]                } else if (params.length != 0) {
+[external][noreply][noreply@nullptr.icu]                    valid = false;
+[external][noreply][noreply@nullptr.icu]                }
+[external][noreply][noreply@nullptr.icu]                if (!valid) {
+[external][noreply][noreply@nullptr.icu]                    throw new IllegalArgumentException("BeforeInvocation method format is invalid");
+[external][noreply][noreply@nullptr.icu]                }
+[external][noreply][noreply@nullptr.icu]                beforeInvocation = method;
+[external][noreply][noreply@nullptr.icu]            }
+[external][noreply][noreply@nullptr.icu]            if (method.getAnnotation(AfterInvocation.class) != null) {
+[external][noreply][noreply@nullptr.icu]                if (afterInvocation != null) {
+[external][noreply][noreply@nullptr.icu]                    throw new IllegalArgumentException("More than one method annotated with @AfterInvocation");
+[external][noreply][noreply@nullptr.icu]                }
+[external][noreply][noreply@nullptr.icu]                boolean valid = (method.getModifiers() & modifiers) == modifiers;
+[external][noreply][noreply@nullptr.icu]                valid &= method.getReturnType().equals(void.class);
+[external][noreply][noreply@nullptr.icu]                var params = method.getParameterTypes();
+[external][noreply][noreply@nullptr.icu]                if (params.length == 1 || params.length == 2) {
+[external][noreply][noreply@nullptr.icu]                    valid &= params[0].equals(XposedInterface.AfterHookCallback.class);
+[external][noreply][noreply@nullptr.icu]                } else if (params.length != 0) {
+[external][noreply][noreply@nullptr.icu]                    valid = false;
+[external][noreply][noreply@nullptr.icu]                }
+[external][noreply][noreply@nullptr.icu]                if (!valid) {
+[external][noreply][noreply@nullptr.icu]                    throw new IllegalArgumentException("AfterInvocation method format is invalid");
+[external][noreply][noreply@nullptr.icu]                }
+[external][noreply][noreply@nullptr.icu]                afterInvocation = method;
+[external][noreply][noreply@nullptr.icu]            }
+[external][noreply][noreply@nullptr.icu]        }
+[external][noreply][noreply@nullptr.icu]        if (beforeInvocation == null && afterInvocation == null) {
+[external][noreply][noreply@nullptr.icu]            throw new IllegalArgumentException("No method annotated with @BeforeInvocation or @AfterInvocation");
+[external][noreply][noreply@nullptr.icu]        }
+[external][noreply][noreply@nullptr.icu]        try {
+[external][noreply][noreply@nullptr.icu]            if (beforeInvocation == null) {
+[external][noreply][noreply@nullptr.icu]                beforeInvocation = LSPosedBridge.class.getMethod("dummyCallback");
+[external][noreply][noreply@nullptr.icu]            } else if (afterInvocation == null) {
+[external][noreply][noreply@nullptr.icu]                afterInvocation = LSPosedBridge.class.getMethod("dummyCallback");
+[external][noreply][noreply@nullptr.icu]            } else {
+[external][noreply][noreply@nullptr.icu]                var ret = beforeInvocation.getReturnType();
+[external][noreply][noreply@nullptr.icu]                var params = afterInvocation.getParameterTypes();
+[external][noreply][noreply@nullptr.icu]                if (ret != void.class && params.length == 2 && !ret.equals(params[1])) {
+[external][noreply][noreply@nullptr.icu]                    throw new IllegalArgumentException("BeforeInvocation and AfterInvocation method format is invalid");
+[external][noreply][noreply@nullptr.icu]                }
+[external][noreply][noreply@nullptr.icu]            }
+[external][noreply][noreply@nullptr.icu]        } catch (NoSuchMethodException e) {
+[external][noreply][noreply@nullptr.icu]            throw new HookFailedError(e);
+[external][noreply][noreply@nullptr.icu]        }
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]        var callback = new LSPosedBridge.HookerCallback(beforeInvocation, afterInvocation);
+[external][noreply][noreply@nullptr.icu]        if (HookBridge.hookMethod(true, hookMethod, LSPosedBridge.NativeHooker.class, priority, callback)) {
+[external][noreply][noreply@nullptr.icu]            return new XposedInterface.MethodUnhooker<>() {
+[external][noreply][noreply@nullptr.icu]                @NonNull
+[external][noreply][noreply@nullptr.icu]                @Override
+[external][noreply][noreply@nullptr.icu]                public T getOrigin() {
+[external][noreply][noreply@nullptr.icu]                    return hookMethod;
+[external][noreply][noreply@nullptr.icu]                }
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]                @Override
+[external][noreply][noreply@nullptr.icu]                public void unhook() {
+[external][noreply][noreply@nullptr.icu]                    HookBridge.unhookMethod(true, hookMethod, callback);
+[external][noreply][noreply@nullptr.icu]                }
+[external][noreply][noreply@nullptr.icu]            };
+[external][noreply][noreply@nullptr.icu]        }
+[external][noreply][noreply@nullptr.icu]        throw new HookFailedError("Cannot hook " + hookMethod);
+[external][noreply][noreply@nullptr.icu]    }
+[external][noreply][noreply@nullptr.icu]}

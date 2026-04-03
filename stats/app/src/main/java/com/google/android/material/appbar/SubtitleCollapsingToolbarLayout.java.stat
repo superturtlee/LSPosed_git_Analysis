@@ -1,0 +1,1263 @@
+[external][shana][shana@zju.edu.cn]package com.google.android.material.appbar;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import android.animation.ValueAnimator;
+[external][shana][shana@zju.edu.cn]import android.content.Context;
+[external][shana][shana@zju.edu.cn]import android.content.res.ColorStateList;
+[external][shana][shana@zju.edu.cn]import android.content.res.TypedArray;
+[external][shana][shana@zju.edu.cn]import android.graphics.Canvas;
+[external][shana][shana@zju.edu.cn]import android.graphics.Rect;
+[external][shana][shana@zju.edu.cn]import android.graphics.Typeface;
+[external][shana][shana@zju.edu.cn]import android.graphics.drawable.ColorDrawable;
+[external][shana][shana@zju.edu.cn]import android.graphics.drawable.Drawable;
+[external][shana][shana@zju.edu.cn]import android.text.TextUtils;
+[external][shana][shana@zju.edu.cn]import android.util.AttributeSet;
+[external][shana][shana@zju.edu.cn]import android.view.Gravity;
+[external][shana][shana@zju.edu.cn]import android.view.View;
+[external][shana][shana@zju.edu.cn]import android.view.ViewGroup;
+[external][shana][shana@zju.edu.cn]import android.view.ViewParent;
+[external][shana][shana@zju.edu.cn]import android.widget.FrameLayout;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import androidx.annotation.ColorInt;
+[external][shana][shana@zju.edu.cn]import androidx.annotation.DrawableRes;
+[external][shana][shana@zju.edu.cn]import androidx.annotation.IntRange;
+[external][shana][shana@zju.edu.cn]import androidx.annotation.NonNull;
+[external][shana][shana@zju.edu.cn]import androidx.annotation.Nullable;
+[external][shana][shana@zju.edu.cn]import androidx.annotation.RequiresApi;
+[external][shana][shana@zju.edu.cn]import androidx.annotation.StyleRes;
+[external][shana][shana@zju.edu.cn]import androidx.appcompat.widget.Toolbar;
+[external][shana][shana@zju.edu.cn]import androidx.core.content.ContextCompat;
+[external][shana][shana@zju.edu.cn]import androidx.core.graphics.drawable.DrawableCompat;
+[external][shana][shana@zju.edu.cn]import androidx.core.math.MathUtils;
+[external][shana][shana@zju.edu.cn]import androidx.core.view.GravityCompat;
+[external][shana][shana@zju.edu.cn]import androidx.core.view.ViewCompat;
+[external][shana][shana@zju.edu.cn]import androidx.core.view.WindowInsetsCompat;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import com.google.android.material.animation.AnimationUtils;
+[external][shana][shana@zju.edu.cn]import com.google.android.material.internal.DescendantOffsetUtils;
+[external][shana][shana@zju.edu.cn]import com.google.android.material.internal.SubtitleCollapsingTextHelper;
+[external][shana][shana@zju.edu.cn]import com.google.android.material.internal.ThemeEnforcement;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import org.lsposed.manager.R;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]/**
+[external][shana][shana@zju.edu.cn] * @see CollapsingToolbarLayout
+[external][shana][shana@zju.edu.cn] */
+[external][shana][shana@zju.edu.cn]public class SubtitleCollapsingToolbarLayout extends FrameLayout {
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private static final int DEFAULT_SCRIM_ANIMATION_DURATION = 600;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private boolean refreshToolbar = true;
+[external][shana][shana@zju.edu.cn]    private int toolbarId;
+[external][shana][shana@zju.edu.cn]    @Nullable
+[external][shana][shana@zju.edu.cn]    private Toolbar toolbar;
+[external][shana][shana@zju.edu.cn]    @Nullable
+[external][shana][shana@zju.edu.cn]    private View toolbarDirectChild;
+[external][shana][shana@zju.edu.cn]    private View dummyView;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private int expandedMarginStart;
+[external][shana][shana@zju.edu.cn]    private int expandedMarginTop;
+[external][shana][shana@zju.edu.cn]    private int expandedMarginEnd;
+[external][shana][shana@zju.edu.cn]    private int expandedMarginBottom;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private final Rect tmpRect = new Rect();
+[external][shana][shana@zju.edu.cn]    @NonNull
+[external][shana][shana@zju.edu.cn]    final SubtitleCollapsingTextHelper collapsingTextHelper;
+[external][shana][shana@zju.edu.cn]    private boolean collapsingTitleEnabled;
+[external][shana][shana@zju.edu.cn]    private boolean drawCollapsingTitle;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Nullable
+[external][shana][shana@zju.edu.cn]    private Drawable contentScrim;
+[external][shana][shana@zju.edu.cn]    @Nullable
+[external][shana][shana@zju.edu.cn]    Drawable statusBarScrim;
+[external][shana][shana@zju.edu.cn]    private int scrimAlpha;
+[external][shana][shana@zju.edu.cn]    private boolean scrimsAreShown;
+[external][shana][shana@zju.edu.cn]    private ValueAnimator scrimAnimator;
+[external][shana][shana@zju.edu.cn]    private long scrimAnimationDuration;
+[external][shana][shana@zju.edu.cn]    private int scrimVisibleHeightTrigger = -1;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private AppBarLayout.OnOffsetChangedListener onOffsetChangedListener;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    int currentOffset;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Nullable
+[external][shana][shana@zju.edu.cn]    WindowInsetsCompat lastInsets;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public SubtitleCollapsingToolbarLayout(@NonNull Context context) {
+[external][shana][shana@zju.edu.cn]        this(context, null);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public SubtitleCollapsingToolbarLayout(@NonNull Context context, @Nullable AttributeSet attrs) {
+[external][shana][shana@zju.edu.cn]        this(context, attrs, 0);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public SubtitleCollapsingToolbarLayout(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+[external][shana][shana@zju.edu.cn]        super(context, attrs, defStyleAttr);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        collapsingTextHelper = new SubtitleCollapsingTextHelper(this);
+[external][shana][shana@zju.edu.cn]        collapsingTextHelper.setTextSizeInterpolator(AnimationUtils.DECELERATE_INTERPOLATOR);
+[external][shana][shana@zju.edu.cn]        collapsingTextHelper.setRtlTextDirectionHeuristicsEnabled(false);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        TypedArray a = ThemeEnforcement.obtainStyledAttributes(
+[external][shana][shana@zju.edu.cn]                context,
+[external][shana][shana@zju.edu.cn]                attrs,
+[external][shana][shana@zju.edu.cn]                R.styleable.SubtitleCollapsingToolbarLayout,
+[external][shana][shana@zju.edu.cn]                defStyleAttr,
+[external][shana][shana@zju.edu.cn]                R.style.Widget_Design_SubtitleCollapsingToolbar);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        collapsingTextHelper.setExpandedTextGravity(a.getInt(
+[external][shana][shana@zju.edu.cn]                R.styleable.SubtitleCollapsingToolbarLayout_expandedTitleGravity,
+[external][shana][shana@zju.edu.cn]                GravityCompat.START | Gravity.BOTTOM));
+[external][shana][shana@zju.edu.cn]        collapsingTextHelper.setCollapsedTextGravity(a.getInt(
+[external][shana][shana@zju.edu.cn]                R.styleable.SubtitleCollapsingToolbarLayout_collapsedTitleGravity,
+[external][shana][shana@zju.edu.cn]                GravityCompat.START | Gravity.CENTER_VERTICAL));
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        expandedMarginStart = expandedMarginTop = expandedMarginEnd = expandedMarginBottom =
+[external][shana][shana@zju.edu.cn]                a.getDimensionPixelSize(R.styleable.SubtitleCollapsingToolbarLayout_expandedTitleMargin, 0);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        if (a.hasValue(R.styleable.SubtitleCollapsingToolbarLayout_expandedTitleMarginStart)) {
+[external][shana][shana@zju.edu.cn]            expandedMarginStart =
+[external][shana][shana@zju.edu.cn]                    a.getDimensionPixelSize(R.styleable.SubtitleCollapsingToolbarLayout_expandedTitleMarginStart, 0);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        if (a.hasValue(R.styleable.SubtitleCollapsingToolbarLayout_expandedTitleMarginEnd)) {
+[external][shana][shana@zju.edu.cn]            expandedMarginEnd =
+[external][shana][shana@zju.edu.cn]                    a.getDimensionPixelSize(R.styleable.SubtitleCollapsingToolbarLayout_expandedTitleMarginEnd, 0);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        if (a.hasValue(R.styleable.SubtitleCollapsingToolbarLayout_expandedTitleMarginTop)) {
+[external][shana][shana@zju.edu.cn]            expandedMarginTop =
+[external][shana][shana@zju.edu.cn]                    a.getDimensionPixelSize(R.styleable.SubtitleCollapsingToolbarLayout_expandedTitleMarginTop, 0);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        if (a.hasValue(R.styleable.SubtitleCollapsingToolbarLayout_expandedTitleMarginBottom)) {
+[external][shana][shana@zju.edu.cn]            expandedMarginBottom =
+[external][shana][shana@zju.edu.cn]                    a.getDimensionPixelSize(R.styleable.SubtitleCollapsingToolbarLayout_expandedTitleMarginBottom, 0);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        collapsingTitleEnabled = a.getBoolean(R.styleable.SubtitleCollapsingToolbarLayout_titleEnabled, true);
+[external][shana][shana@zju.edu.cn]        setTitle(a.getText(R.styleable.SubtitleCollapsingToolbarLayout_title));
+[external][shana][shana@zju.edu.cn]        setSubtitle(a.getText(R.styleable.SubtitleCollapsingToolbarLayout_subtitle));
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // First load the default text appearances
+[external][shana][shana@zju.edu.cn]        collapsingTextHelper.setExpandedTitleTextAppearance(
+[external][shana][shana@zju.edu.cn]                R.style.TextAppearance_Design_SubtitleCollapsingToolbar_ExpandedTitle);
+[external][shana][shana@zju.edu.cn]        collapsingTextHelper.setCollapsedTitleTextAppearance(
+[external][shana][shana@zju.edu.cn]                androidx.appcompat.R.style.TextAppearance_AppCompat_Widget_ActionBar_Title);
+[external][shana][shana@zju.edu.cn]        collapsingTextHelper.setExpandedSubtitleTextAppearance(
+[external][shana][shana@zju.edu.cn]                R.style.TextAppearance_Design_SubtitleCollapsingToolbar_ExpandedSubtitle);
+[external][shana][shana@zju.edu.cn]        collapsingTextHelper.setCollapsedSubtitleTextAppearance(
+[external][shana][shana@zju.edu.cn]                androidx.appcompat.R.style.TextAppearance_AppCompat_Widget_ActionBar_Subtitle);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // Now overlay any custom text appearances
+[external][shana][shana@zju.edu.cn]        if (a.hasValue(R.styleable.SubtitleCollapsingToolbarLayout_expandedTitleTextAppearance)) {
+[external][shana][shana@zju.edu.cn]            collapsingTextHelper.setExpandedTitleTextAppearance(
+[external][shana][shana@zju.edu.cn]                    a.getResourceId(R.styleable.SubtitleCollapsingToolbarLayout_expandedTitleTextAppearance, 0));
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        if (a.hasValue(R.styleable.SubtitleCollapsingToolbarLayout_collapsedTitleTextAppearance)) {
+[external][shana][shana@zju.edu.cn]            collapsingTextHelper.setCollapsedTitleTextAppearance(
+[external][shana][shana@zju.edu.cn]                    a.getResourceId(R.styleable.SubtitleCollapsingToolbarLayout_collapsedTitleTextAppearance, 0));
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        if (a.hasValue(R.styleable.SubtitleCollapsingToolbarLayout_expandedSubtitleTextAppearance)) {
+[external][shana][shana@zju.edu.cn]            collapsingTextHelper.setExpandedSubtitleTextAppearance(
+[external][shana][shana@zju.edu.cn]                    a.getResourceId(R.styleable.SubtitleCollapsingToolbarLayout_expandedSubtitleTextAppearance, 0));
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        if (a.hasValue(R.styleable.SubtitleCollapsingToolbarLayout_collapsedSubtitleTextAppearance)) {
+[external][shana][shana@zju.edu.cn]            collapsingTextHelper.setCollapsedSubtitleTextAppearance(
+[external][shana][shana@zju.edu.cn]                    a.getResourceId(R.styleable.SubtitleCollapsingToolbarLayout_collapsedSubtitleTextAppearance, 0));
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        scrimVisibleHeightTrigger = a
+[external][shana][shana@zju.edu.cn]                .getDimensionPixelSize(R.styleable.SubtitleCollapsingToolbarLayout_scrimVisibleHeightTrigger, -1);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        scrimAnimationDuration = a.getInt(
+[external][shana][shana@zju.edu.cn]                R.styleable.SubtitleCollapsingToolbarLayout_scrimAnimationDuration,
+[external][shana][shana@zju.edu.cn]                DEFAULT_SCRIM_ANIMATION_DURATION);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        setContentScrim(a.getDrawable(R.styleable.SubtitleCollapsingToolbarLayout_contentScrim));
+[external][shana][shana@zju.edu.cn]        setStatusBarScrim(a.getDrawable(R.styleable.SubtitleCollapsingToolbarLayout_statusBarScrim));
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        toolbarId = a.getResourceId(R.styleable.SubtitleCollapsingToolbarLayout_toolbarId, -1);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        a.recycle();
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        setWillNotDraw(false);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    protected void onAttachedToWindow() {
+[external][shana][shana@zju.edu.cn]        super.onAttachedToWindow();
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // Add an OnOffsetChangedListener if possible
+[external][shana][shana@zju.edu.cn]        final ViewParent parent = getParent();
+[external][shana][shana@zju.edu.cn]        if (parent instanceof AppBarLayout) {
+[external][shana][shana@zju.edu.cn]            // Copy over from the ABL whether we should fit system windows
+[external][shana][shana@zju.edu.cn]            ViewCompat.setFitsSystemWindows(this, ViewCompat.getFitsSystemWindows((View) parent));
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            if (onOffsetChangedListener == null) {
+[external][shana][shana@zju.edu.cn]                onOffsetChangedListener = new OffsetUpdateListener();
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            ((AppBarLayout) parent).addOnOffsetChangedListener(onOffsetChangedListener);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            // We're attached, so lets request an inset dispatch
+[external][shana][shana@zju.edu.cn]            ViewCompat.requestApplyInsets(this);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    protected void onDetachedFromWindow() {
+[external][shana][shana@zju.edu.cn]        // Remove our OnOffsetChangedListener if possible and it exists
+[external][shana][shana@zju.edu.cn]        final ViewParent parent = getParent();
+[external][shana][shana@zju.edu.cn]        if (onOffsetChangedListener != null && parent instanceof AppBarLayout) {
+[external][shana][shana@zju.edu.cn]            ((AppBarLayout) parent).removeOnOffsetChangedListener(onOffsetChangedListener);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        super.onDetachedFromWindow();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public void draw(@NonNull Canvas canvas) {
+[external][shana][shana@zju.edu.cn]        super.draw(canvas);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // If we don't have a toolbar, the scrim will be not be drawn in drawChild() below.
+[external][shana][shana@zju.edu.cn]        // Instead, we draw it here, before our collapsing text.
+[external][shana][shana@zju.edu.cn]        ensureToolbar();
+[external][shana][shana@zju.edu.cn]        if (toolbar == null && contentScrim != null && scrimAlpha > 0) {
+[external][shana][shana@zju.edu.cn]            contentScrim.mutate().setAlpha(scrimAlpha);
+[external][shana][shana@zju.edu.cn]            contentScrim.draw(canvas);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // Let the collapsing text helper draw its text
+[external][shana][shana@zju.edu.cn]        if (collapsingTitleEnabled && drawCollapsingTitle) {
+[external][shana][shana@zju.edu.cn]            collapsingTextHelper.draw(canvas);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // Now draw the status bar scrim
+[external][shana][shana@zju.edu.cn]        if (statusBarScrim != null && scrimAlpha > 0) {
+[external][shana][shana@zju.edu.cn]            final int topInset = lastInsets != null ? lastInsets.getSystemWindowInsetTop() : 0;
+[external][shana][shana@zju.edu.cn]            if (topInset > 0) {
+[external][shana][shana@zju.edu.cn]                statusBarScrim.setBounds(0, -currentOffset, getWidth(), topInset - currentOffset);
+[external][shana][shana@zju.edu.cn]                statusBarScrim.mutate().setAlpha(scrimAlpha);
+[external][shana][shana@zju.edu.cn]                statusBarScrim.draw(canvas);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    protected boolean drawChild(Canvas canvas, View child, long drawingTime) {
+[external][shana][shana@zju.edu.cn]        // This is a little weird. Our scrim needs to be behind the Toolbar (if it is present),
+[external][shana][shana@zju.edu.cn]        // but in front of any other children which are behind it. To do this we intercept the
+[external][shana][shana@zju.edu.cn]        // drawChild() call, and draw our scrim just before the Toolbar is drawn
+[external][shana][shana@zju.edu.cn]        boolean invalidated = false;
+[external][shana][shana@zju.edu.cn]        if (contentScrim != null && scrimAlpha > 0 && isToolbarChild(child)) {
+[external][shana][shana@zju.edu.cn]            contentScrim.mutate().setAlpha(scrimAlpha);
+[external][shana][shana@zju.edu.cn]            contentScrim.draw(canvas);
+[external][shana][shana@zju.edu.cn]            invalidated = true;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return super.drawChild(canvas, child, drawingTime) || invalidated;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+[external][shana][shana@zju.edu.cn]        super.onSizeChanged(w, h, oldw, oldh);
+[external][shana][shana@zju.edu.cn]        if (contentScrim != null) {
+[external][shana][shana@zju.edu.cn]            contentScrim.setBounds(0, 0, w, h);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private void ensureToolbar() {
+[external][shana][shana@zju.edu.cn]        if (!refreshToolbar) {
+[external][shana][shana@zju.edu.cn]            return;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // First clear out the current Toolbar
+[external][shana][shana@zju.edu.cn]        this.toolbar = null;
+[external][shana][shana@zju.edu.cn]        toolbarDirectChild = null;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        if (toolbarId != -1) {
+[external][shana][shana@zju.edu.cn]            // If we have an ID set, try and find it and it's direct parent to us
+[external][shana][shana@zju.edu.cn]            this.toolbar = findViewById(toolbarId);
+[external][shana][shana@zju.edu.cn]            if (this.toolbar != null) {
+[external][shana][shana@zju.edu.cn]                toolbarDirectChild = findDirectChild(this.toolbar);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        if (this.toolbar == null) {
+[external][shana][shana@zju.edu.cn]            // If we don't have an ID, or couldn't find a Toolbar with the correct ID, try and find
+[external][shana][shana@zju.edu.cn]            // one from our direct children
+[external][shana][shana@zju.edu.cn]            Toolbar toolbar = null;
+[external][shana][shana@zju.edu.cn]            for (int i = 0, count = getChildCount(); i < count; i++) {
+[external][shana][shana@zju.edu.cn]                final View child = getChildAt(i);
+[external][shana][shana@zju.edu.cn]                if (child instanceof Toolbar) {
+[external][shana][shana@zju.edu.cn]                    toolbar = (Toolbar) child;
+[external][shana][shana@zju.edu.cn]                    break;
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            this.toolbar = toolbar;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        updateDummyView();
+[external][shana][shana@zju.edu.cn]        refreshToolbar = false;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private boolean isToolbarChild(View child) {
+[external][shana][shana@zju.edu.cn]        return (toolbarDirectChild == null || toolbarDirectChild == this)
+[external][shana][shana@zju.edu.cn]                ? child == toolbar
+[external][shana][shana@zju.edu.cn]                : child == toolbarDirectChild;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Returns the direct child of this layout, which itself is the ancestor of the given view.
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    @NonNull
+[external][shana][shana@zju.edu.cn]    private View findDirectChild(@NonNull final View descendant) {
+[external][shana][shana@zju.edu.cn]        View directChild = descendant;
+[external][shana][shana@zju.edu.cn]        for (ViewParent p = descendant.getParent(); p != this && p != null; p = p.getParent()) {
+[external][shana][shana@zju.edu.cn]            if (p instanceof View) {
+[external][shana][shana@zju.edu.cn]                directChild = (View) p;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return directChild;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private void updateDummyView() {
+[external][shana][shana@zju.edu.cn]        if (!collapsingTitleEnabled && dummyView != null) {
+[external][shana][shana@zju.edu.cn]            // If we have a dummy view and we have our title disabled, remove it from its parent
+[external][shana][shana@zju.edu.cn]            final ViewParent parent = dummyView.getParent();
+[external][shana][shana@zju.edu.cn]            if (parent instanceof ViewGroup) {
+[external][shana][shana@zju.edu.cn]                ((ViewGroup) parent).removeView(dummyView);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        if (collapsingTitleEnabled && toolbar != null) {
+[external][shana][shana@zju.edu.cn]            if (dummyView == null) {
+[external][shana][shana@zju.edu.cn]                dummyView = new View(getContext());
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            if (dummyView.getParent() == null) {
+[external][shana][shana@zju.edu.cn]                toolbar.addView(dummyView, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+[external][shana][shana@zju.edu.cn]        ensureToolbar();
+[external][shana][shana@zju.edu.cn]        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        final int mode = MeasureSpec.getMode(heightMeasureSpec);
+[external][shana][shana@zju.edu.cn]        final int topInset = lastInsets != null ? lastInsets.getSystemWindowInsetTop() : 0;
+[external][shana][shana@zju.edu.cn]        if (mode == MeasureSpec.UNSPECIFIED && topInset > 0) {
+[external][shana][shana@zju.edu.cn]            // If we have a top inset and we're set to wrap_content height we need to make sure
+[external][shana][shana@zju.edu.cn]            // we add the top inset to our height, therefore we re-measure
+[external][shana][shana@zju.edu.cn]            heightMeasureSpec = MeasureSpec.makeMeasureSpec(getMeasuredHeight() + topInset, MeasureSpec.EXACTLY);
+[external][shana][shana@zju.edu.cn]            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // Set our minimum height to enable proper AppBarLayout collapsing
+[external][shana][shana@zju.edu.cn]        if (toolbar != null) {
+[external][shana][shana@zju.edu.cn]            if (toolbarDirectChild == null || toolbarDirectChild == this) {
+[external][shana][shana@zju.edu.cn]                setMinimumHeight(getHeightWithMargins(toolbar));
+[external][shana][shana@zju.edu.cn]            } else {
+[external][shana][shana@zju.edu.cn]                setMinimumHeight(getHeightWithMargins(toolbarDirectChild));
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+[external][shana][shana@zju.edu.cn]        super.onLayout(changed, left, top, right, bottom);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        if (lastInsets != null) {
+[external][shana][shana@zju.edu.cn]            // Shift down any views which are not set to fit system windows
+[external][shana][shana@zju.edu.cn]            final int insetTop = lastInsets.getSystemWindowInsetTop();
+[external][shana][shana@zju.edu.cn]            for (int i = 0, z = getChildCount(); i < z; i++) {
+[external][shana][shana@zju.edu.cn]                final View child = getChildAt(i);
+[external][shana][shana@zju.edu.cn]                if (!ViewCompat.getFitsSystemWindows(child)) {
+[external][shana][shana@zju.edu.cn]                    if (child.getTop() < insetTop) {
+[external][shana][shana@zju.edu.cn]                        // If the child isn't set to fit system windows but is drawing within
+[external][shana][shana@zju.edu.cn]                        // the inset offset it down
+[external][shana][shana@zju.edu.cn]                        ViewCompat.offsetTopAndBottom(child, insetTop);
+[external][shana][shana@zju.edu.cn]                    }
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // Update our child view offset helpers so that they track the correct layout coordinates
+[external][shana][shana@zju.edu.cn]        for (int i = 0, z = getChildCount(); i < z; i++) {
+[external][shana][shana@zju.edu.cn]            getViewOffsetHelper(getChildAt(i)).onViewLayout();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // Update the collapsed bounds by getting its transformed bounds
+[external][shana][shana@zju.edu.cn]        if (collapsingTitleEnabled && dummyView != null) {
+[external][shana][shana@zju.edu.cn]            // We only draw the title if the dummy view is being displayed (Toolbar removes
+[external][shana][shana@zju.edu.cn]            // views if there is no space)
+[external][shana][shana@zju.edu.cn]            drawCollapsingTitle = ViewCompat.isAttachedToWindow(dummyView) && dummyView.getVisibility() == VISIBLE;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            if (drawCollapsingTitle) {
+[external][shana][shana@zju.edu.cn]                final boolean isRtl = ViewCompat.getLayoutDirection(this) == ViewCompat.LAYOUT_DIRECTION_RTL;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]                // Update the collapsed bounds
+[external][shana][shana@zju.edu.cn]                final int maxOffset =
+[external][shana][shana@zju.edu.cn]                        getMaxOffsetForPinChild(toolbarDirectChild != null ? toolbarDirectChild : toolbar);
+[external][shana][shana@zju.edu.cn]                DescendantOffsetUtils.getDescendantRect(this, dummyView, tmpRect);
+[external][shana][shana@zju.edu.cn]                collapsingTextHelper.setCollapsedBounds(
+[external][shana][shana@zju.edu.cn]                        tmpRect.left + (isRtl ? toolbar.getTitleMarginEnd() : toolbar.getTitleMarginStart()),
+[external][shana][shana@zju.edu.cn]                        tmpRect.top + maxOffset + toolbar.getTitleMarginTop(),
+[external][shana][shana@zju.edu.cn]                        tmpRect.right - (isRtl ? toolbar.getTitleMarginStart() : toolbar.getTitleMarginEnd()),
+[external][shana][shana@zju.edu.cn]                        tmpRect.bottom + maxOffset - toolbar.getTitleMarginBottom());
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]                // Update the expanded bounds
+[external][shana][shana@zju.edu.cn]                collapsingTextHelper.setExpandedBounds(
+[external][shana][shana@zju.edu.cn]                        isRtl ? expandedMarginEnd : expandedMarginStart,
+[external][shana][shana@zju.edu.cn]                        tmpRect.top + expandedMarginTop,
+[external][shana][shana@zju.edu.cn]                        right - left - (isRtl ? expandedMarginStart : expandedMarginEnd),
+[external][shana][shana@zju.edu.cn]                        bottom - top - expandedMarginBottom);
+[external][shana][shana@zju.edu.cn]                // Now recalculate using the new bounds
+[external][shana][shana@zju.edu.cn]                collapsingTextHelper.recalculate();
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        if (toolbar != null) {
+[external][shana][shana@zju.edu.cn]            if (collapsingTitleEnabled && TextUtils.isEmpty(collapsingTextHelper.getTitle())) {
+[external][shana][shana@zju.edu.cn]                // If we do not currently have a title, try and grab it from the Toolbar
+[external][shana][shana@zju.edu.cn]                setTitle(toolbar.getTitle());
+[external][shana][shana@zju.edu.cn]                setSubtitle(toolbar.getSubtitle());
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        updateScrimVisibility();
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // Apply any view offsets, this should be done at the very end of layout
+[external][shana][shana@zju.edu.cn]        for (int i = 0, z = getChildCount(); i < z; i++) {
+[external][shana][shana@zju.edu.cn]            getViewOffsetHelper(getChildAt(i)).applyOffsets();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private static int getHeightWithMargins(@NonNull final View view) {
+[external][shana][shana@zju.edu.cn]        final ViewGroup.LayoutParams lp = view.getLayoutParams();
+[external][shana][shana@zju.edu.cn]        if (lp instanceof MarginLayoutParams) {
+[external][shana][shana@zju.edu.cn]            final MarginLayoutParams mlp = (MarginLayoutParams) lp;
+[external][shana][shana@zju.edu.cn]            return view.getMeasuredHeight() + mlp.topMargin + mlp.bottomMargin;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return view.getMeasuredHeight();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    static ViewOffsetHelper getViewOffsetHelper(View view) {
+[external][shana][shana@zju.edu.cn]        ViewOffsetHelper offsetHelper = (ViewOffsetHelper) view.getTag(com.google.android.material.R.id.view_offset_helper);
+[external][shana][shana@zju.edu.cn]        if (offsetHelper == null) {
+[external][shana][shana@zju.edu.cn]            offsetHelper = new ViewOffsetHelper(view);
+[external][shana][shana@zju.edu.cn]            view.setTag(com.google.android.material.R.id.view_offset_helper, offsetHelper);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return offsetHelper;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Sets the title to be displayed by this view, if enabled.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @attr ref R.styleable#SubtitleCollapsingToolbarLayout_title
+[external][shana][shana@zju.edu.cn]     * @see #setTitleEnabled(boolean)
+[external][shana][shana@zju.edu.cn]     * @see #getTitle()
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public void setTitle(@Nullable CharSequence title) {
+[external][shana][shana@zju.edu.cn]        collapsingTextHelper.setTitle(title);
+[external][shana][shana@zju.edu.cn]        updateContentDescriptionFromTitle();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Returns the title currently being displayed by this view. If the title is not enabled, then
+[external][shana][shana@zju.edu.cn]     * this will return {@code null}.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @attr ref R.styleable#SubtitleCollapsingToolbarLayout_title
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    @Nullable
+[external][shana][shana@zju.edu.cn]    public CharSequence getTitle() {
+[external][shana][shana@zju.edu.cn]        return collapsingTitleEnabled ? collapsingTextHelper.getTitle() : null;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Sets the subtitle to be displayed by this view, if enabled.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @attr ref R.styleable#SubtitleCollapsingToolbarLayout_subtitle
+[external][shana][shana@zju.edu.cn]     * @see #setTitleEnabled(boolean)
+[external][shana][shana@zju.edu.cn]     * @see #getSubtitle()
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public void setSubtitle(@Nullable CharSequence subtitle) {
+[external][shana][shana@zju.edu.cn]        collapsingTextHelper.setSubtitle(subtitle);
+[external][shana][shana@zju.edu.cn]        updateContentDescriptionFromTitle();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Returns the subtitle currently being displayed by this view. If the title is not enabled, then
+[external][shana][shana@zju.edu.cn]     * this will return {@code null}.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @attr ref R.styleable#SubtitleCollapsingToolbarLayout_subtitle
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    @Nullable
+[external][shana][shana@zju.edu.cn]    public CharSequence getSubtitle() {
+[external][shana][shana@zju.edu.cn]        return collapsingTitleEnabled ? collapsingTextHelper.getSubtitle() : null;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Sets whether this view should display its own title and subtitle.
+[external][shana][shana@zju.edu.cn]     * <p>
+[external][shana][shana@zju.edu.cn]     * <p>The title and subtitle displayed by this view will shrink and grow based on the scroll offset.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @attr ref R.styleable#SubtitleCollapsingToolbarLayout_titleEnabled
+[external][shana][shana@zju.edu.cn]     * @see #setTitle(CharSequence)
+[external][shana][shana@zju.edu.cn]     * @see #setSubtitle(CharSequence)
+[external][shana][shana@zju.edu.cn]     * @see #isTitleEnabled()
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public void setTitleEnabled(boolean enabled) {
+[external][shana][shana@zju.edu.cn]        if (enabled != collapsingTitleEnabled) {
+[external][shana][shana@zju.edu.cn]            collapsingTitleEnabled = enabled;
+[external][shana][shana@zju.edu.cn]            updateContentDescriptionFromTitle();
+[external][shana][shana@zju.edu.cn]            updateDummyView();
+[external][shana][shana@zju.edu.cn]            requestLayout();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Returns whether this view is currently displaying its own title and subtitle.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @attr ref R.styleable#SubtitleCollapsingToolbarLayout_titleEnabled
+[external][shana][shana@zju.edu.cn]     * @see #setTitleEnabled(boolean)
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public boolean isTitleEnabled() {
+[external][shana][shana@zju.edu.cn]        return collapsingTitleEnabled;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Set whether the content scrim and/or status bar scrim should be shown or not. Any change in the
+[external][shana][shana@zju.edu.cn]     * vertical scroll may overwrite this value. Any visibility change will be animated if this view
+[external][shana][shana@zju.edu.cn]     * has already been laid out.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @param shown whether the scrims should be shown
+[external][shana][shana@zju.edu.cn]     * @see #getStatusBarScrim()
+[external][shana][shana@zju.edu.cn]     * @see #getContentScrim()
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public void setScrimsShown(boolean shown) {
+[external][shana][shana@zju.edu.cn]        setScrimsShown(shown, ViewCompat.isLaidOut(this) && !isInEditMode());
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Set whether the content scrim and/or status bar scrim should be shown or not. Any change in the
+[external][shana][shana@zju.edu.cn]     * vertical scroll may overwrite this value.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @param shown   whether the scrims should be shown
+[external][shana][shana@zju.edu.cn]     * @param animate whether to animate the visibility change
+[external][shana][shana@zju.edu.cn]     * @see #getStatusBarScrim()
+[external][shana][shana@zju.edu.cn]     * @see #getContentScrim()
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public void setScrimsShown(boolean shown, boolean animate) {
+[external][shana][shana@zju.edu.cn]        if (scrimsAreShown != shown) {
+[external][shana][shana@zju.edu.cn]            if (animate) {
+[external][shana][shana@zju.edu.cn]                animateScrim(shown ? 0xFF : 0x0);
+[external][shana][shana@zju.edu.cn]            } else {
+[external][shana][shana@zju.edu.cn]                setScrimAlpha(shown ? 0xFF : 0x0);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            scrimsAreShown = shown;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private void animateScrim(int targetAlpha) {
+[external][shana][shana@zju.edu.cn]        ensureToolbar();
+[external][shana][shana@zju.edu.cn]        if (scrimAnimator == null) {
+[external][shana][shana@zju.edu.cn]            scrimAnimator = new ValueAnimator();
+[external][shana][shana@zju.edu.cn]            scrimAnimator.setDuration(scrimAnimationDuration);
+[external][shana][shana@zju.edu.cn]            scrimAnimator.setInterpolator(targetAlpha > scrimAlpha
+[external][shana][shana@zju.edu.cn]                    ? AnimationUtils.FAST_OUT_LINEAR_IN_INTERPOLATOR
+[external][shana][shana@zju.edu.cn]                    : AnimationUtils.LINEAR_OUT_SLOW_IN_INTERPOLATOR);
+[external][shana][shana@zju.edu.cn]            scrimAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+[external][shana][shana@zju.edu.cn]                @Override
+[external][shana][shana@zju.edu.cn]                public void onAnimationUpdate(ValueAnimator animator) {
+[external][shana][shana@zju.edu.cn]                    setScrimAlpha((int) animator.getAnimatedValue());
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            });
+[external][shana][shana@zju.edu.cn]        } else if (scrimAnimator.isRunning()) {
+[external][shana][shana@zju.edu.cn]            scrimAnimator.cancel();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        scrimAnimator.setIntValues(scrimAlpha, targetAlpha);
+[external][shana][shana@zju.edu.cn]        scrimAnimator.start();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    void setScrimAlpha(int alpha) {
+[external][shana][shana@zju.edu.cn]        if (alpha != scrimAlpha) {
+[external][shana][shana@zju.edu.cn]            final Drawable contentScrim = this.contentScrim;
+[external][shana][shana@zju.edu.cn]            if (contentScrim != null && toolbar != null) {
+[external][shana][shana@zju.edu.cn]                ViewCompat.postInvalidateOnAnimation(toolbar);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            scrimAlpha = alpha;
+[external][shana][shana@zju.edu.cn]            ViewCompat.postInvalidateOnAnimation(SubtitleCollapsingToolbarLayout.this);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    int getScrimAlpha() {
+[external][shana][shana@zju.edu.cn]        return scrimAlpha;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Set the drawable to use for the content scrim from resources. Providing null will disable the
+[external][shana][shana@zju.edu.cn]     * scrim functionality.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @param drawable the drawable to display
+[external][shana][shana@zju.edu.cn]     * @attr ref R.styleable#SubtitleCollapsingToolbarLayout_contentScrim
+[external][shana][shana@zju.edu.cn]     * @see #getContentScrim()
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public void setContentScrim(@Nullable Drawable drawable) {
+[external][shana][shana@zju.edu.cn]        if (contentScrim != drawable) {
+[external][shana][shana@zju.edu.cn]            if (contentScrim != null) {
+[external][shana][shana@zju.edu.cn]                contentScrim.setCallback(null);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            contentScrim = drawable != null ? drawable.mutate() : null;
+[external][shana][shana@zju.edu.cn]            if (contentScrim != null) {
+[external][shana][shana@zju.edu.cn]                contentScrim.setBounds(0, 0, getWidth(), getHeight());
+[external][shana][shana@zju.edu.cn]                contentScrim.setCallback(this);
+[external][shana][shana@zju.edu.cn]                contentScrim.setAlpha(scrimAlpha);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            ViewCompat.postInvalidateOnAnimation(this);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Set the color to use for the content scrim.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @param color the color to display
+[external][shana][shana@zju.edu.cn]     * @attr ref R.styleable#SubtitleCollapsingToolbarLayout_contentScrim
+[external][shana][shana@zju.edu.cn]     * @see #getContentScrim()
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public void setContentScrimColor(@ColorInt int color) {
+[external][shana][shana@zju.edu.cn]        setContentScrim(new ColorDrawable(color));
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Set the drawable to use for the content scrim from resources.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @param resId drawable resource id
+[external][shana][shana@zju.edu.cn]     * @attr ref R.styleable#SubtitleCollapsingToolbarLayout_contentScrim
+[external][shana][shana@zju.edu.cn]     * @see #getContentScrim()
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public void setContentScrimResource(@DrawableRes int resId) {
+[external][shana][shana@zju.edu.cn]        setContentScrim(ContextCompat.getDrawable(getContext(), resId));
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Returns the drawable which is used for the foreground scrim.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @attr ref R.styleable#SubtitleCollapsingToolbarLayout_contentScrim
+[external][shana][shana@zju.edu.cn]     * @see #setContentScrim(Drawable)
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    @Nullable
+[external][shana][shana@zju.edu.cn]    public Drawable getContentScrim() {
+[external][shana][shana@zju.edu.cn]        return contentScrim;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Set the drawable to use for the status bar scrim from resources. Providing null will disable
+[external][shana][shana@zju.edu.cn]     * the scrim functionality.
+[external][shana][shana@zju.edu.cn]     * <p>
+[external][shana][shana@zju.edu.cn]     * <p>This scrim is only shown when we have been given a top system inset.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @param drawable the drawable to display
+[external][shana][shana@zju.edu.cn]     * @attr ref R.styleable#SubtitleCollapsingToolbarLayout_statusBarScrim
+[external][shana][shana@zju.edu.cn]     * @see #getStatusBarScrim()
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public void setStatusBarScrim(@Nullable Drawable drawable) {
+[external][shana][shana@zju.edu.cn]        if (statusBarScrim != drawable) {
+[external][shana][shana@zju.edu.cn]            if (statusBarScrim != null) {
+[external][shana][shana@zju.edu.cn]                statusBarScrim.setCallback(null);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            statusBarScrim = drawable != null ? drawable.mutate() : null;
+[external][shana][shana@zju.edu.cn]            if (statusBarScrim != null) {
+[external][shana][shana@zju.edu.cn]                if (statusBarScrim.isStateful()) {
+[external][shana][shana@zju.edu.cn]                    statusBarScrim.setState(getDrawableState());
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]                DrawableCompat.setLayoutDirection(statusBarScrim, ViewCompat.getLayoutDirection(this));
+[external][shana][shana@zju.edu.cn]                statusBarScrim.setVisible(getVisibility() == VISIBLE, false);
+[external][shana][shana@zju.edu.cn]                statusBarScrim.setCallback(this);
+[external][shana][shana@zju.edu.cn]                statusBarScrim.setAlpha(scrimAlpha);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            ViewCompat.postInvalidateOnAnimation(this);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    protected void drawableStateChanged() {
+[external][shana][shana@zju.edu.cn]        super.drawableStateChanged();
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        final int[] state = getDrawableState();
+[external][shana][shana@zju.edu.cn]        boolean changed = false;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        Drawable d = statusBarScrim;
+[external][shana][shana@zju.edu.cn]        if (d != null && d.isStateful()) {
+[external][shana][shana@zju.edu.cn]            changed |= d.setState(state);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        d = contentScrim;
+[external][shana][shana@zju.edu.cn]        if (d != null && d.isStateful()) {
+[external][shana][shana@zju.edu.cn]            changed |= d.setState(state);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        if (collapsingTextHelper != null) {
+[external][shana][shana@zju.edu.cn]            changed |= collapsingTextHelper.setState(state);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        if (changed) {
+[external][shana][shana@zju.edu.cn]            invalidate();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    protected boolean verifyDrawable(Drawable who) {
+[external][shana][shana@zju.edu.cn]        return super.verifyDrawable(who) || who == contentScrim || who == statusBarScrim;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public void setVisibility(int visibility) {
+[external][shana][shana@zju.edu.cn]        super.setVisibility(visibility);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        final boolean visible = visibility == VISIBLE;
+[external][shana][shana@zju.edu.cn]        if (statusBarScrim != null && statusBarScrim.isVisible() != visible) {
+[external][shana][shana@zju.edu.cn]            statusBarScrim.setVisible(visible, false);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        if (contentScrim != null && contentScrim.isVisible() != visible) {
+[external][shana][shana@zju.edu.cn]            contentScrim.setVisible(visible, false);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Set the color to use for the status bar scrim.
+[external][shana][shana@zju.edu.cn]     * <p>
+[external][shana][shana@zju.edu.cn]     * <p>This scrim is only shown when we have been given a top system inset.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @param color the color to display
+[external][shana][shana@zju.edu.cn]     * @attr ref R.styleable#SubtitleCollapsingToolbarLayout_statusBarScrim
+[external][shana][shana@zju.edu.cn]     * @see #getStatusBarScrim()
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public void setStatusBarScrimColor(@ColorInt int color) {
+[external][shana][shana@zju.edu.cn]        setStatusBarScrim(new ColorDrawable(color));
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Set the drawable to use for the content scrim from resources.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @param resId drawable resource id
+[external][shana][shana@zju.edu.cn]     * @attr ref R.styleable#SubtitleCollapsingToolbarLayout_statusBarScrim
+[external][shana][shana@zju.edu.cn]     * @see #getStatusBarScrim()
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public void setStatusBarScrimResource(@DrawableRes int resId) {
+[external][shana][shana@zju.edu.cn]        setStatusBarScrim(ContextCompat.getDrawable(getContext(), resId));
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Returns the drawable which is used for the status bar scrim.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @attr ref R.styleable#SubtitleCollapsingToolbarLayout_statusBarScrim
+[external][shana][shana@zju.edu.cn]     * @see #setStatusBarScrim(Drawable)
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    @Nullable
+[external][shana][shana@zju.edu.cn]    public Drawable getStatusBarScrim() {
+[external][shana][shana@zju.edu.cn]        return statusBarScrim;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Sets the text color and size for the collapsed title from the specified TextAppearance
+[external][shana][shana@zju.edu.cn]     * resource.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @attr ref com.google.android.material.R.styleable#SubtitleCollapsingToolbarLayout_collapsedTitleTextAppearance
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public void setCollapsedTitleTextAppearance(@StyleRes int resId) {
+[external][shana][shana@zju.edu.cn]        collapsingTextHelper.setCollapsedTitleTextAppearance(resId);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Sets the text color of the collapsed title.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @param color The new text color in ARGB format
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public void setCollapsedTitleTextColor(@ColorInt int color) {
+[external][shana][shana@zju.edu.cn]        setCollapsedTitleTextColor(ColorStateList.valueOf(color));
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Sets the text colors of the collapsed title.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @param colors ColorStateList containing the new text colors
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public void setCollapsedTitleTextColor(@NonNull ColorStateList colors) {
+[external][shana][shana@zju.edu.cn]        collapsingTextHelper.setCollapsedTitleTextColor(colors);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Sets the text color and size for the collapsed subtitle from the specified TextAppearance
+[external][shana][shana@zju.edu.cn]     * resource.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @attr ref com.google.android.material.R.styleable#SubtitleCollapsingToolbarLayout_collapsedSubtitleTextAppearance
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public void setCollapsedSubtitleTextAppearance(@StyleRes int resId) {
+[external][shana][shana@zju.edu.cn]        collapsingTextHelper.setCollapsedSubtitleTextAppearance(resId);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Sets the text color of the collapsed subtitle.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @param color The new text color in ARGB format
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public void setCollapsedSubtitleTextColor(@ColorInt int color) {
+[external][shana][shana@zju.edu.cn]        setCollapsedSubtitleTextColor(ColorStateList.valueOf(color));
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Sets the text colors of the collapsed subtitle.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @param colors ColorStateList containing the new text colors
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public void setCollapsedSubtitleTextColor(@NonNull ColorStateList colors) {
+[external][shana][shana@zju.edu.cn]        collapsingTextHelper.setCollapsedSubtitleTextColor(colors);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Sets the horizontal alignment of the collapsed title and the vertical gravity that will be used
+[external][shana][shana@zju.edu.cn]     * when there is extra space in the collapsed bounds beyond what is required for the title itself.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @attr ref com.google.android.material.R.styleable#SubtitleCollapsingToolbarLayout_collapsedTitleGravity
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public void setCollapsedTitleGravity(int gravity) {
+[external][shana][shana@zju.edu.cn]        collapsingTextHelper.setCollapsedTextGravity(gravity);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Returns the horizontal and vertical alignment for title when collapsed.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @attr ref com.google.android.material.R.styleable#SubtitleCollapsingToolbarLayout_collapsedTitleGravity
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public int getCollapsedTitleGravity() {
+[external][shana][shana@zju.edu.cn]        return collapsingTextHelper.getCollapsedTextGravity();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Sets the text color and size for the expanded title from the specified TextAppearance resource.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @attr ref com.google.android.material.R.styleable#SubtitleCollapsingToolbarLayout_expandedTitleTextAppearance
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public void setExpandedTitleTextAppearance(@StyleRes int resId) {
+[external][shana][shana@zju.edu.cn]        collapsingTextHelper.setExpandedTitleTextAppearance(resId);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Sets the text color of the expanded title.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @param color The new text color in ARGB format
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public void setExpandedTitleTextColor(@ColorInt int color) {
+[external][shana][shana@zju.edu.cn]        setExpandedTitleTextColor(ColorStateList.valueOf(color));
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Sets the text colors of the expanded title.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @param colors ColorStateList containing the new text colors
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public void setExpandedTitleTextColor(@NonNull ColorStateList colors) {
+[external][shana][shana@zju.edu.cn]        collapsingTextHelper.setExpandedTitleTextColor(colors);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Sets the text color and size for the expanded subtitle from the specified TextAppearance resource.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @attr ref com.google.android.material.R.styleable#SubtitleCollapsingToolbarLayout_expandedSubtitleTextAppearance
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public void setExpandedSubtitleTextAppearance(@StyleRes int resId) {
+[external][shana][shana@zju.edu.cn]        collapsingTextHelper.setExpandedSubtitleTextAppearance(resId);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Sets the text color of the expanded subtitle.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @param color The new text color in ARGB format
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public void setExpandedSubtitleTextColor(@ColorInt int color) {
+[external][shana][shana@zju.edu.cn]        setExpandedSubtitleTextColor(ColorStateList.valueOf(color));
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Sets the text colors of the expanded subtitle.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @param colors ColorStateList containing the new text colors
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public void setExpandedSubtitleTextColor(@NonNull ColorStateList colors) {
+[external][shana][shana@zju.edu.cn]        collapsingTextHelper.setExpandedSubtitleTextColor(colors);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Sets the horizontal alignment of the expanded title and the vertical gravity that will be used
+[external][shana][shana@zju.edu.cn]     * when there is extra space in the expanded bounds beyond what is required for the title itself.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @attr ref com.google.android.material.R.styleable#SubtitleCollapsingToolbarLayout_expandedTitleGravity
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public void setExpandedTitleGravity(int gravity) {
+[external][shana][shana@zju.edu.cn]        collapsingTextHelper.setExpandedTextGravity(gravity);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Returns the horizontal and vertical alignment for title when expanded.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @attr ref com.google.android.material.R.styleable#SubtitleCollapsingToolbarLayout_expandedTitleGravity
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public int getExpandedTitleGravity() {
+[external][shana][shana@zju.edu.cn]        return collapsingTextHelper.getExpandedTextGravity();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Set the typeface to use for the collapsed title.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @param typeface typeface to use, or {@code null} to use the default.
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public void setCollapsedTitleTypeface(@Nullable Typeface typeface) {
+[external][shana][shana@zju.edu.cn]        collapsingTextHelper.setCollapsedTitleTypeface(typeface);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Returns the typeface used for the collapsed title.
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    @NonNull
+[external][shana][shana@zju.edu.cn]    public Typeface getCollapsedTitleTypeface() {
+[external][shana][shana@zju.edu.cn]        return collapsingTextHelper.getCollapsedTitleTypeface();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Set the typeface to use for the expanded title.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @param typeface typeface to use, or {@code null} to use the default.
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public void setExpandedTitleTypeface(@Nullable Typeface typeface) {
+[external][shana][shana@zju.edu.cn]        collapsingTextHelper.setExpandedTitleTypeface(typeface);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Returns the typeface used for the expanded title.
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    @NonNull
+[external][shana][shana@zju.edu.cn]    public Typeface getExpandedTitleTypeface() {
+[external][shana][shana@zju.edu.cn]        return collapsingTextHelper.getExpandedTitleTypeface();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Set the typeface to use for the collapsed title.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @param typeface typeface to use, or {@code null} to use the default.
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public void setCollapsedSubtitleTypeface(@Nullable Typeface typeface) {
+[external][shana][shana@zju.edu.cn]        collapsingTextHelper.setCollapsedSubtitleTypeface(typeface);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Returns the typeface used for the collapsed title.
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    @NonNull
+[external][shana][shana@zju.edu.cn]    public Typeface getCollapsedSubtitleTypeface() {
+[external][shana][shana@zju.edu.cn]        return collapsingTextHelper.getCollapsedSubtitleTypeface();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Set the typeface to use for the expanded title.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @param typeface typeface to use, or {@code null} to use the default.
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public void setExpandedSubtitleTypeface(@Nullable Typeface typeface) {
+[external][shana][shana@zju.edu.cn]        collapsingTextHelper.setExpandedSubtitleTypeface(typeface);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Returns the typeface used for the expanded title.
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    @NonNull
+[external][shana][shana@zju.edu.cn]    public Typeface getExpandedSubtitleTypeface() {
+[external][shana][shana@zju.edu.cn]        return collapsingTextHelper.getExpandedSubtitleTypeface();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Sets the expanded title margins.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @param start  the starting title margin in pixels
+[external][shana][shana@zju.edu.cn]     * @param top    the top title margin in pixels
+[external][shana][shana@zju.edu.cn]     * @param end    the ending title margin in pixels
+[external][shana][shana@zju.edu.cn]     * @param bottom the bottom title margin in pixels
+[external][shana][shana@zju.edu.cn]     * @attr ref com.google.android.material.R.styleable#SubtitleCollapsingToolbarLayout_expandedTitleMargin
+[external][shana][shana@zju.edu.cn]     * @see #getExpandedTitleMarginStart()
+[external][shana][shana@zju.edu.cn]     * @see #getExpandedTitleMarginTop()
+[external][shana][shana@zju.edu.cn]     * @see #getExpandedTitleMarginEnd()
+[external][shana][shana@zju.edu.cn]     * @see #getExpandedTitleMarginBottom()
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public void setExpandedTitleMargin(int start, int top, int end, int bottom) {
+[external][shana][shana@zju.edu.cn]        expandedMarginStart = start;
+[external][shana][shana@zju.edu.cn]        expandedMarginTop = top;
+[external][shana][shana@zju.edu.cn]        expandedMarginEnd = end;
+[external][shana][shana@zju.edu.cn]        expandedMarginBottom = bottom;
+[external][shana][shana@zju.edu.cn]        requestLayout();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * @return the starting expanded title margin in pixels
+[external][shana][shana@zju.edu.cn]     * @attr ref com.google.android.material.R.styleable#SubtitleCollapsingToolbarLayout_expandedTitleMarginStart
+[external][shana][shana@zju.edu.cn]     * @see #setExpandedTitleMarginStart(int)
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public int getExpandedTitleMarginStart() {
+[external][shana][shana@zju.edu.cn]        return expandedMarginStart;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Sets the starting expanded title margin in pixels.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @param margin the starting title margin in pixels
+[external][shana][shana@zju.edu.cn]     * @attr ref com.google.android.material.R.styleable#SubtitleCollapsingToolbarLayout_expandedTitleMarginStart
+[external][shana][shana@zju.edu.cn]     * @see #getExpandedTitleMarginStart()
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public void setExpandedTitleMarginStart(int margin) {
+[external][shana][shana@zju.edu.cn]        expandedMarginStart = margin;
+[external][shana][shana@zju.edu.cn]        requestLayout();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * @return the top expanded title margin in pixels
+[external][shana][shana@zju.edu.cn]     * @attr ref com.google.android.material.R.styleable#SubtitleCollapsingToolbarLayout_expandedTitleMarginTop
+[external][shana][shana@zju.edu.cn]     * @see #setExpandedTitleMarginTop(int)
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public int getExpandedTitleMarginTop() {
+[external][shana][shana@zju.edu.cn]        return expandedMarginTop;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Sets the top expanded title margin in pixels.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @param margin the top title margin in pixels
+[external][shana][shana@zju.edu.cn]     * @attr ref com.google.android.material.R.styleable#SubtitleCollapsingToolbarLayout_expandedTitleMarginTop
+[external][shana][shana@zju.edu.cn]     * @see #getExpandedTitleMarginTop()
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public void setExpandedTitleMarginTop(int margin) {
+[external][shana][shana@zju.edu.cn]        expandedMarginTop = margin;
+[external][shana][shana@zju.edu.cn]        requestLayout();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * @return the ending expanded title margin in pixels
+[external][shana][shana@zju.edu.cn]     * @attr ref com.google.android.material.R.styleable#SubtitleCollapsingToolbarLayout_expandedTitleMarginEnd
+[external][shana][shana@zju.edu.cn]     * @see #setExpandedTitleMarginEnd(int)
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public int getExpandedTitleMarginEnd() {
+[external][shana][shana@zju.edu.cn]        return expandedMarginEnd;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Sets the ending expanded title margin in pixels.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @param margin the ending title margin in pixels
+[external][shana][shana@zju.edu.cn]     * @attr ref com.google.android.material.R.styleable#SubtitleCollapsingToolbarLayout_expandedTitleMarginEnd
+[external][shana][shana@zju.edu.cn]     * @see #getExpandedTitleMarginEnd()
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public void setExpandedTitleMarginEnd(int margin) {
+[external][shana][shana@zju.edu.cn]        expandedMarginEnd = margin;
+[external][shana][shana@zju.edu.cn]        requestLayout();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * @return the bottom expanded title margin in pixels
+[external][shana][shana@zju.edu.cn]     * @attr ref com.google.android.material.R.styleable#SubtitleCollapsingToolbarLayout_expandedTitleMarginBottom
+[external][shana][shana@zju.edu.cn]     * @see #setExpandedTitleMarginBottom(int)
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public int getExpandedTitleMarginBottom() {
+[external][shana][shana@zju.edu.cn]        return expandedMarginBottom;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Sets the bottom expanded title margin in pixels.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @param margin the bottom title margin in pixels
+[external][shana][shana@zju.edu.cn]     * @attr ref com.google.android.material.R.styleable#SubtitleCollapsingToolbarLayout_expandedTitleMarginBottom
+[external][shana][shana@zju.edu.cn]     * @see #getExpandedTitleMarginBottom()
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public void setExpandedTitleMarginBottom(int margin) {
+[external][shana][shana@zju.edu.cn]        expandedMarginBottom = margin;
+[external][shana][shana@zju.edu.cn]        requestLayout();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Sets whether {@code TextDirectionHeuristics} should be used to determine whether the title text
+[external][shana][shana@zju.edu.cn]     * is RTL. Experimental Feature.
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public void setRtlTextDirectionHeuristicsEnabled(boolean rtlTextDirectionHeuristicsEnabled) {
+[external][shana][shana@zju.edu.cn]        collapsingTextHelper.setRtlTextDirectionHeuristicsEnabled(rtlTextDirectionHeuristicsEnabled);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Gets whether {@code TextDirectionHeuristics} should be used to determine whether the title text
+[external][shana][shana@zju.edu.cn]     * is RTL. Experimental Feature.
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public boolean isRtlTextDirectionHeuristicsEnabled() {
+[external][shana][shana@zju.edu.cn]        return collapsingTextHelper.isRtlTextDirectionHeuristicsEnabled();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Set the amount of visible height in pixels used to define when to trigger a scrim visibility
+[external][shana][shana@zju.edu.cn]     * change.
+[external][shana][shana@zju.edu.cn]     * <p>
+[external][shana][shana@zju.edu.cn]     * <p>If the visible height of this view is less than the given value, the scrims will be made
+[external][shana][shana@zju.edu.cn]     * visible, otherwise they are hidden.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @param height value in pixels used to define when to trigger a scrim visibility change
+[external][shana][shana@zju.edu.cn]     * @attr ref com.google.android.material.R.styleable#SubtitleCollapsingToolbarLayout_expandedTitleMarginEnd
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public void setScrimVisibleHeightTrigger(@IntRange(from = 0) final int height) {
+[external][shana][shana@zju.edu.cn]        if (scrimVisibleHeightTrigger != height) {
+[external][shana][shana@zju.edu.cn]            scrimVisibleHeightTrigger = height;
+[external][shana][shana@zju.edu.cn]            // Update the scrim visibility
+[external][shana][shana@zju.edu.cn]            updateScrimVisibility();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Returns the amount of visible height in pixels used to define when to trigger a scrim
+[external][shana][shana@zju.edu.cn]     * visibility change.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @see #setScrimVisibleHeightTrigger(int)
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public int getScrimVisibleHeightTrigger() {
+[external][shana][shana@zju.edu.cn]        if (scrimVisibleHeightTrigger >= 0) {
+[external][shana][shana@zju.edu.cn]            // If we have one explicitly set, return it
+[external][shana][shana@zju.edu.cn]            return scrimVisibleHeightTrigger;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // Otherwise we'll use the default computed value
+[external][shana][shana@zju.edu.cn]        final int insetTop = lastInsets != null ? lastInsets.getSystemWindowInsetTop() : 0;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        final int minHeight = ViewCompat.getMinimumHeight(this);
+[external][shana][shana@zju.edu.cn]        if (minHeight > 0) {
+[external][shana][shana@zju.edu.cn]            // If we have a minHeight set, lets use 2 * minHeight (capped at our height)
+[external][shana][shana@zju.edu.cn]            return Math.min((minHeight * 2) + insetTop, getHeight());
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // If we reach here then we don't have a min height set. Instead we'll take a
+[external][shana][shana@zju.edu.cn]        // guess at 1/3 of our height being visible
+[external][shana][shana@zju.edu.cn]        return getHeight() / 3;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Set the duration used for scrim visibility animations.
+[external][shana][shana@zju.edu.cn]     *
+[external][shana][shana@zju.edu.cn]     * @param duration the duration to use in milliseconds
+[external][shana][shana@zju.edu.cn]     * @attr ref com.google.android.material.R.styleable#SubtitleCollapsingToolbarLayout_scrimAnimationDuration
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public void setScrimAnimationDuration(@IntRange(from = 0) final long duration) {
+[external][shana][shana@zju.edu.cn]        scrimAnimationDuration = duration;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Returns the duration in milliseconds used for scrim visibility animations.
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    public long getScrimAnimationDuration() {
+[external][shana][shana@zju.edu.cn]        return scrimAnimationDuration;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    protected boolean checkLayoutParams(ViewGroup.LayoutParams p) {
+[external][shana][shana@zju.edu.cn]        return p instanceof LayoutParams;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    protected LayoutParams generateDefaultLayoutParams() {
+[external][shana][shana@zju.edu.cn]        return new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public FrameLayout.LayoutParams generateLayoutParams(AttributeSet attrs) {
+[external][shana][shana@zju.edu.cn]        return new LayoutParams(getContext(), attrs);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    protected FrameLayout.LayoutParams generateLayoutParams(ViewGroup.LayoutParams p) {
+[external][shana][shana@zju.edu.cn]        return new LayoutParams(p);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static class LayoutParams extends CollapsingToolbarLayout.LayoutParams {
+[external][shana][shana@zju.edu.cn]        public LayoutParams(Context c, AttributeSet attrs) {
+[external][shana][shana@zju.edu.cn]            super(c, attrs);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        public LayoutParams(int width, int height) {
+[external][shana][shana@zju.edu.cn]            super(width, height);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        public LayoutParams(int width, int height, int gravity) {
+[external][shana][shana@zju.edu.cn]            super(width, height, gravity);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        public LayoutParams(ViewGroup.LayoutParams p) {
+[external][shana][shana@zju.edu.cn]            super(p);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        public LayoutParams(MarginLayoutParams source) {
+[external][shana][shana@zju.edu.cn]            super(source);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @RequiresApi(19)
+[external][shana][shana@zju.edu.cn]        public LayoutParams(FrameLayout.LayoutParams source) {
+[external][shana][shana@zju.edu.cn]            super(source);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Show or hide the scrims if needed
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    final void updateScrimVisibility() {
+[external][shana][shana@zju.edu.cn]        if (contentScrim != null || statusBarScrim != null) {
+[external][shana][shana@zju.edu.cn]            setScrimsShown(getHeight() + currentOffset < getScrimVisibleHeightTrigger());
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    final int getMaxOffsetForPinChild(View child) {
+[external][shana][shana@zju.edu.cn]        final ViewOffsetHelper offsetHelper = getViewOffsetHelper(child);
+[external][shana][shana@zju.edu.cn]        final LayoutParams lp = (LayoutParams) child.getLayoutParams();
+[external][shana][shana@zju.edu.cn]        return getHeight() - offsetHelper.getLayoutTop() - child.getHeight() - lp.bottomMargin;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private void updateContentDescriptionFromTitle() {
+[external][shana][shana@zju.edu.cn]        // Set this layout's contentDescription to match the title if it's shown by CollapsingTextHelper
+[external][shana][shana@zju.edu.cn]        setContentDescription(getTitle());
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private class OffsetUpdateListener implements AppBarLayout.OnOffsetChangedListener {
+[external][shana][shana@zju.edu.cn]        OffsetUpdateListener() {
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public void onOffsetChanged(AppBarLayout layout, int verticalOffset) {
+[external][shana][shana@zju.edu.cn]            currentOffset = verticalOffset;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            final int insetTop = lastInsets != null ? lastInsets.getSystemWindowInsetTop() : 0;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            for (int i = 0, z = getChildCount(); i < z; i++) {
+[external][shana][shana@zju.edu.cn]                final View child = getChildAt(i);
+[external][shana][shana@zju.edu.cn]                final LayoutParams lp = (LayoutParams) child.getLayoutParams();
+[external][shana][shana@zju.edu.cn]                final ViewOffsetHelper offsetHelper = getViewOffsetHelper(child);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]                switch (lp.collapseMode) {
+[external][shana][shana@zju.edu.cn]                    case LayoutParams.COLLAPSE_MODE_PIN:
+[external][shana][shana@zju.edu.cn]                        offsetHelper.setTopAndBottomOffset(
+[external][shana][shana@zju.edu.cn]                                MathUtils.clamp(-verticalOffset, 0, getMaxOffsetForPinChild(child)));
+[external][shana][shana@zju.edu.cn]                        break;
+[external][shana][shana@zju.edu.cn]                    case LayoutParams.COLLAPSE_MODE_PARALLAX:
+[external][shana][shana@zju.edu.cn]                        offsetHelper.setTopAndBottomOffset(Math.round(-verticalOffset * lp.parallaxMult));
+[external][shana][shana@zju.edu.cn]                        break;
+[external][shana][shana@zju.edu.cn]                    default:
+[external][shana][shana@zju.edu.cn]                        break;
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            // Show or hide the scrims if needed
+[external][shana][shana@zju.edu.cn]            updateScrimVisibility();
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            if (statusBarScrim != null && insetTop > 0) {
+[external][shana][shana@zju.edu.cn]                ViewCompat.postInvalidateOnAnimation(SubtitleCollapsingToolbarLayout.this);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            // Update the collapsing text's fraction
+[external][shana][shana@zju.edu.cn]            final int expandRange = getHeight()
+[external][shana][shana@zju.edu.cn]                    - ViewCompat.getMinimumHeight(SubtitleCollapsingToolbarLayout.this)
+[external][shana][shana@zju.edu.cn]                    - insetTop;
+[external][shana][shana@zju.edu.cn]            collapsingTextHelper.setExpansionFraction(Math.abs(verticalOffset) / (float) expandRange);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

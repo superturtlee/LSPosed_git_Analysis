@@ -1,0 +1,318 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * <!--This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors-->
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]package org.lsposed.manager.ui.fragment;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import android.app.Activity;
+[external][shana][shana@zju.edu.cn]import android.app.Dialog;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.os.Build;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.os.Bundle;
+[internal][vvb2060][vvb2060@gmail.com]import android.system.ErrnoException;
+[internal][vvb2060][vvb2060@gmail.com]import android.system.Os;
+[internal][vvb2060][vvb2060@gmail.com]import android.system.OsConstants;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.text.method.LinkMovementMethod;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.view.LayoutInflater;
+[external][shana][shana@zju.edu.cn]import android.view.Menu;
+[external][shana][shana@zju.edu.cn]import android.view.MenuInflater;
+[external][shana][shana@zju.edu.cn]import android.view.MenuItem;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.view.View;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.view.ViewGroup;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import androidx.annotation.NonNull;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import androidx.annotation.Nullable;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import androidx.core.text.HtmlCompat;
+[external][shana][shana@zju.edu.cn]import androidx.core.view.MenuProvider;
+[external][shana][shana@zju.edu.cn]import androidx.fragment.app.DialogFragment;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import org.lsposed.lspd.ILSPManagerService;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.manager.BuildConfig;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.manager.ConfigManager;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.manager.R;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.manager.databinding.DialogAboutBinding;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.manager.databinding.FragmentHomeBinding;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.manager.ui.dialog.BlurBehindDialogBuilder;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.ui.dialog.FlashDialogBuilder;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.ui.dialog.WelcomeDialog;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.manager.util.NavUtil;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.util.Telemetry;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.util.UpdateUtil;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.manager.util.chrome.LinkTransformationMethod;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]import java.io.IOException;
+[internal][vvb2060][vvb2060@gmail.com]import java.nio.file.Files;
+[internal][vvb2060][vvb2060@gmail.com]import java.nio.file.Paths;
+[internal][vvb2060][vvb2060@gmail.com]import java.util.Arrays;
+[internal][vvb2060][vvb2060@gmail.com]import java.util.HashMap;
+[internal][vvb2060][vvb2060@gmail.com]import java.util.concurrent.atomic.AtomicBoolean;
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]import rikka.core.util.ClipboardUtils;
+[external][shana][shana@zju.edu.cn]import rikka.material.app.LocaleDelegate;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]public class HomeFragment extends BaseFragment implements MenuProvider {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private FragmentHomeBinding binding;
+[internal][vvb2060][vvb2060@gmail.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    public void onCreate(@Nullable Bundle savedInstanceState) {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        super.onCreate(savedInstanceState);
+[internal][vvb2060][vvb2060@gmail.com]        WelcomeDialog.showIfNeed(getChildFragmentManager());
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public void onPrepareMenu(Menu menu) {
+[external][shana][shana@zju.edu.cn]        menu.findItem(R.id.menu_about).setOnMenuItemClickListener(v -> {
+[external][shana][shana@zju.edu.cn]            showAbout();
+[external][shana][shana@zju.edu.cn]            return true;
+[external][shana][shana@zju.edu.cn]        });
+[external][shana][shana@zju.edu.cn]        menu.findItem(R.id.menu_issue).setOnMenuItemClickListener(v -> {
+[external][shana][shana@zju.edu.cn]            NavUtil.startURL(requireActivity(), "https://github.com/LSPosed/LSPosed/issues/new/choose");
+[external][shana][shana@zju.edu.cn]            return true;
+[external][shana][shana@zju.edu.cn]        });
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+[external][shana][shana@zju.edu.cn]        return false;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        binding = FragmentHomeBinding.inflate(inflater, container, false);
+[external][shana][shana@zju.edu.cn]        setupToolbar(binding.toolbar, binding.clickView, R.string.app_name, R.menu.menu_home);
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        binding.toolbar.setNavigationIcon(null);
+[external][shana][shana@zju.edu.cn]        binding.toolbar.setOnClickListener(v -> showAbout());
+[external][shana][shana@zju.edu.cn]        binding.clickView.setOnClickListener(v -> showAbout());
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        binding.appBar.setLiftable(true);
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        binding.nestedScrollView.getBorderViewDelegate().setBorderVisibilityChangedListener((top, oldTop, bottom, oldBottom) -> binding.appBar.setLifted(!top));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]        updateStates(requireActivity(), ConfigManager.isBinderAlive(), UpdateUtil.needUpdate());
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        return binding.getRoot();
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    private void updateStates(Activity activity, boolean binderAlive, boolean needUpdate) {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        if (binderAlive) {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            if (needUpdate) {
+[external][shana][shana@zju.edu.cn]                binding.updateTitle.setText(R.string.need_update);
+[external][shana][shana@zju.edu.cn]                binding.updateSummary.setText(getString(R.string.please_update_summary));
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                binding.statusIcon.setImageResource(R.drawable.ic_round_update_24);
+[external][shana][shana@zju.edu.cn]                binding.updateBtn.setOnClickListener(v -> {
+[external][shana][shana@zju.edu.cn]                    if (UpdateUtil.canInstall()) {
+[external][shana][shana@zju.edu.cn]                        new FlashDialogBuilder(activity, null).show();
+[external][shana][shana@zju.edu.cn]                    } else {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        NavUtil.startURL(activity, getString(R.string.latest_url));
+[external][shana][shana@zju.edu.cn]                    }
+[external][shana][shana@zju.edu.cn]                });
+[external][shana][shana@zju.edu.cn]                binding.updateCard.setVisibility(View.VISIBLE);
+[external][shana][shana@zju.edu.cn]            } else {
+[external][shana][shana@zju.edu.cn]                binding.updateCard.setVisibility(View.GONE);
+[external][shana][shana@zju.edu.cn]            }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            boolean dex2oatAbnormal = ConfigManager.getDex2OatWrapperCompatibility() != ILSPManagerService.DEX2OAT_OK && !ConfigManager.dex2oatFlagsLoaded();
+[internal][vvb2060][vvb2060@gmail.com]            var sepolicyAbnormal = !ConfigManager.isSepolicyLoaded();
+[internal][vvb2060][vvb2060@gmail.com]            var systemServerAbnormal = !ConfigManager.systemServerRequested();
+[internal][vvb2060][vvb2060@gmail.com]            if (sepolicyAbnormal || systemServerAbnormal || dex2oatAbnormal) {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                binding.statusTitle.setText(R.string.partial_activated);
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                binding.statusIcon.setImageResource(R.drawable.ic_round_warning_24);
+[external][shana][shana@zju.edu.cn]                binding.warningCard.setVisibility(View.VISIBLE);
+[internal][vvb2060][vvb2060@gmail.com]                if (sepolicyAbnormal) {
+[external][shana][shana@zju.edu.cn]                    binding.warningTitle.setText(R.string.selinux_policy_not_loaded_summary);
+[external][shana][shana@zju.edu.cn]                    binding.warningSummary.setText(HtmlCompat.fromHtml(getString(R.string.selinux_policy_not_loaded), HtmlCompat.FROM_HTML_MODE_LEGACY));
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                }
+[internal][vvb2060][vvb2060@gmail.com]                if (systemServerAbnormal) {
+[external][shana][shana@zju.edu.cn]                    binding.warningTitle.setText(R.string.system_inject_fail_summary);
+[external][shana][shana@zju.edu.cn]                    binding.warningSummary.setText(HtmlCompat.fromHtml(getString(R.string.system_inject_fail), HtmlCompat.FROM_HTML_MODE_LEGACY));
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                if (dex2oatAbnormal) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                    binding.warningTitle.setText(R.string.system_prop_incorrect_summary);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                    binding.warningSummary.setText(HtmlCompat.fromHtml(getString(R.string.system_prop_incorrect), HtmlCompat.FROM_HTML_MODE_LEGACY));
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            } else {
+[external][shana][shana@zju.edu.cn]                binding.warningCard.setVisibility(View.GONE);
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                binding.statusTitle.setText(R.string.activated);
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                binding.statusIcon.setImageResource(R.drawable.ic_round_check_circle_24);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][shana][shana@zju.edu.cn]            binding.statusSummary.setText(String.format(LocaleDelegate.getDefaultLocale(), "%s (%d) - %s",
+[external][shana][shana@zju.edu.cn]                    ConfigManager.getXposedVersionName(), ConfigManager.getXposedVersionCode(), ConfigManager.getApi()));
+[internal][vvb2060][vvb2060@gmail.com]            binding.developerWarningCard.setVisibility(isDeveloper() ? View.VISIBLE : View.GONE);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } else {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            boolean isMagiskInstalled = ConfigManager.isMagiskInstalled();
+[external][shana][shana@zju.edu.cn]            if (isMagiskInstalled) {
+[external][shana][shana@zju.edu.cn]                binding.updateTitle.setText(R.string.install);
+[external][shana][shana@zju.edu.cn]                binding.updateSummary.setText(R.string.install_summary);
+[external][shana][shana@zju.edu.cn]                binding.statusIcon.setImageResource(R.drawable.ic_round_error_outline_24);
+[external][shana][shana@zju.edu.cn]                binding.updateBtn.setOnClickListener(v -> {
+[external][shana][shana@zju.edu.cn]                    if (UpdateUtil.canInstall()) {
+[external][shana][shana@zju.edu.cn]                        new FlashDialogBuilder(activity, null).show();
+[external][shana][shana@zju.edu.cn]                    } else {
+[external][shana][shana@zju.edu.cn]                        NavUtil.startURL(activity, getString(R.string.install_url));
+[external][shana][shana@zju.edu.cn]                    }
+[external][shana][shana@zju.edu.cn]                });
+[external][shana][shana@zju.edu.cn]                binding.updateCard.setVisibility(View.VISIBLE);
+[external][shana][shana@zju.edu.cn]            } else {
+[external][shana][shana@zju.edu.cn]                binding.updateCard.setVisibility(View.GONE);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][shana][shana@zju.edu.cn]            binding.warningCard.setVisibility(View.GONE);
+[external][shana][shana@zju.edu.cn]            binding.statusTitle.setText(R.string.not_installed);
+[external][shana][shana@zju.edu.cn]            binding.statusSummary.setText(R.string.not_install_summary);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        if (ConfigManager.isBinderAlive()) {
+[external][shana][shana@zju.edu.cn]            binding.apiVersion.setText(String.valueOf(ConfigManager.getXposedApiVersion()));
+[internal][vvb2060][vvb2060@gmail.com]            binding.api.setText(ConfigManager.isDexObfuscateEnabled() ? R.string.enabled : R.string.not_enabled);
+[external][shana][shana@zju.edu.cn]            binding.frameworkVersion.setText(String.format(LocaleDelegate.getDefaultLocale(), "%1$s (%2$d)", ConfigManager.getXposedVersionName(), ConfigManager.getXposedVersionCode()));
+[external][howardwu20][HowardWu20@outlook.com]            binding.managerPackageName.setText(activity.getPackageName());
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                binding.dex2oatWrapper.setText(String.format(LocaleDelegate.getDefaultLocale(), "%s (%s)", getString(R.string.unsupported), getString(R.string.android_version_unsatisfied)));
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            } else switch (ConfigManager.getDex2OatWrapperCompatibility()) {
+[internal][vvb2060][vvb2060@gmail.com]                case ILSPManagerService.DEX2OAT_OK ->
+[internal][vvb2060][vvb2060@gmail.com]                        binding.dex2oatWrapper.setText(R.string.supported);
+[internal][vvb2060][vvb2060@gmail.com]                case ILSPManagerService.DEX2OAT_CRASHED ->
+[internal][vvb2060][vvb2060@gmail.com]                        binding.dex2oatWrapper.setText(String.format(LocaleDelegate.getDefaultLocale(), "%s (%s)", getString(R.string.unsupported), getString(R.string.crashed)));
+[internal][vvb2060][vvb2060@gmail.com]                case ILSPManagerService.DEX2OAT_MOUNT_FAILED ->
+[internal][vvb2060][vvb2060@gmail.com]                        binding.dex2oatWrapper.setText(String.format(LocaleDelegate.getDefaultLocale(), "%s (%s)", getString(R.string.unsupported), getString(R.string.mount_failed)));
+[internal][vvb2060][vvb2060@gmail.com]                case ILSPManagerService.DEX2OAT_SELINUX_PERMISSIVE ->
+[internal][vvb2060][vvb2060@gmail.com]                        binding.dex2oatWrapper.setText(String.format(LocaleDelegate.getDefaultLocale(), "%s (%s)", getString(R.string.unsupported), getString(R.string.selinux_permissive)));
+[internal][vvb2060][vvb2060@gmail.com]                case ILSPManagerService.DEX2OAT_SEPOLICY_INCORRECT ->
+[internal][vvb2060][vvb2060@gmail.com]                        binding.dex2oatWrapper.setText(String.format(LocaleDelegate.getDefaultLocale(), "%s (%s)", getString(R.string.unsupported), getString(R.string.sepolicy_incorrect)));
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            }
+[external][shana][shana@zju.edu.cn]        } else {
+[external][shana][shana@zju.edu.cn]            binding.apiVersion.setText(R.string.not_installed);
+[external][shana][shana@zju.edu.cn]            binding.api.setText(R.string.not_installed);
+[external][shana][shana@zju.edu.cn]            binding.frameworkVersion.setText(R.string.not_installed);
+[external][howardwu20][HowardWu20@outlook.com]            binding.managerPackageName.setText(activity.getPackageName());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        if (Build.VERSION.PREVIEW_SDK_INT != 0) {
+[external][shana][shana@zju.edu.cn]            binding.systemVersion.setText(String.format(LocaleDelegate.getDefaultLocale(), "%1$s Preview (API %2$d)", Build.VERSION.CODENAME, Build.VERSION.SDK_INT));
+[external][shana][shana@zju.edu.cn]        } else {
+[external][shana][shana@zju.edu.cn]            binding.systemVersion.setText(String.format(LocaleDelegate.getDefaultLocale(), "%1$s (API %2$d)", Build.VERSION.RELEASE, Build.VERSION.SDK_INT));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        binding.device.setText(getDevice());
+[external][shana][shana@zju.edu.cn]        binding.systemAbi.setText(Build.SUPPORTED_ABIS[0]);
+[external][shana][shana@zju.edu.cn]        String info = activity.getString(R.string.info_api_version) +
+[external][shana][shana@zju.edu.cn]                "\n" +
+[external][shana][shana@zju.edu.cn]                binding.apiVersion.getText() +
+[external][shana][shana@zju.edu.cn]                "\n\n" +
+[internal][vvb2060][vvb2060@gmail.com]                activity.getString(R.string.settings_xposed_api_call_protection) +
+[external][shana][shana@zju.edu.cn]                "\n" +
+[external][shana][shana@zju.edu.cn]                binding.api.getText() +
+[external][shana][shana@zju.edu.cn]                "\n\n" +
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                activity.getString(R.string.info_dex2oat_wrapper) +
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                "\n" +
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                binding.dex2oatWrapper.getText() +
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                "\n\n" +
+[external][shana][shana@zju.edu.cn]                activity.getString(R.string.info_framework_version) +
+[external][shana][shana@zju.edu.cn]                "\n" +
+[external][shana][shana@zju.edu.cn]                binding.frameworkVersion.getText() +
+[external][shana][shana@zju.edu.cn]                "\n\n" +
+[external][howardwu20][HowardWu20@outlook.com]                activity.getString(R.string.info_manager_package_name) +
+[external][shana][shana@zju.edu.cn]                "\n" +
+[external][howardwu20][HowardWu20@outlook.com]                binding.managerPackageName.getText() +
+[external][shana][shana@zju.edu.cn]                "\n\n" +
+[external][shana][shana@zju.edu.cn]                activity.getString(R.string.info_system_version) +
+[external][shana][shana@zju.edu.cn]                "\n" +
+[external][shana][shana@zju.edu.cn]                binding.systemVersion.getText() +
+[external][shana][shana@zju.edu.cn]                "\n\n" +
+[external][shana][shana@zju.edu.cn]                activity.getString(R.string.info_device) +
+[external][shana][shana@zju.edu.cn]                "\n" +
+[external][shana][shana@zju.edu.cn]                binding.device.getText() +
+[external][shana][shana@zju.edu.cn]                "\n\n" +
+[external][shana][shana@zju.edu.cn]                activity.getString(R.string.info_system_abi) +
+[external][shana][shana@zju.edu.cn]                "\n" +
+[external][shana][shana@zju.edu.cn]                binding.systemAbi.getText();
+[internal][vvb2060][vvb2060@gmail.com]        var map = new HashMap<String, String>();
+[internal][vvb2060][vvb2060@gmail.com]        map.put("apiVersion", binding.apiVersion.getText().toString());
+[internal][vvb2060][vvb2060@gmail.com]        map.put("api", binding.api.getText().toString());
+[internal][vvb2060][vvb2060@gmail.com]        map.put("frameworkVersion", binding.frameworkVersion.getText().toString());
+[internal][vvb2060][vvb2060@gmail.com]        map.put("systemAbi", Arrays.toString(Build.SUPPORTED_ABIS));
+[internal][vvb2060][vvb2060@gmail.com]        Telemetry.trackEvent("HomeFragment", map);
+[external][shana][shana@zju.edu.cn]        binding.copyInfo.setOnClickListener(v -> {
+[external][shana][shana@zju.edu.cn]            ClipboardUtils.put(activity, info);
+[external][shana][shana@zju.edu.cn]            showHint(R.string.info_copied, false);
+[external][shana][shana@zju.edu.cn]        });
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private String getDevice() {
+[external][shana][shana@zju.edu.cn]        String manufacturer = Character.toUpperCase(Build.MANUFACTURER.charAt(0)) + Build.MANUFACTURER.substring(1);
+[external][shana][shana@zju.edu.cn]        if (!Build.BRAND.equals(Build.MANUFACTURER)) {
+[external][shana][shana@zju.edu.cn]            manufacturer += " " + Character.toUpperCase(Build.BRAND.charAt(0)) + Build.BRAND.substring(1);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        manufacturer += " " + Build.MODEL + " ";
+[external][shana][shana@zju.edu.cn]        return manufacturer;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]    private boolean isDeveloper() {
+[internal][vvb2060][vvb2060@gmail.com]        var developer = new AtomicBoolean(false);
+[internal][vvb2060][vvb2060@gmail.com]        var pids = Paths.get("/data/local/tmp/.studio/ipids");
+[internal][vvb2060][vvb2060@gmail.com]        try (var dir = Files.list(pids)) {
+[internal][vvb2060][vvb2060@gmail.com]            dir.findFirst().ifPresent(name -> {
+[internal][vvb2060][vvb2060@gmail.com]                var pid = Integer.parseInt(name.getFileName().toString());
+[internal][vvb2060][vvb2060@gmail.com]                try {
+[internal][vvb2060][vvb2060@gmail.com]                    Os.kill(pid, 0);
+[internal][vvb2060][vvb2060@gmail.com]                    developer.set(true);
+[internal][vvb2060][vvb2060@gmail.com]                } catch (ErrnoException e) {
+[internal][vvb2060][vvb2060@gmail.com]                    if (e.errno == OsConstants.ESRCH) {
+[internal][vvb2060][vvb2060@gmail.com]                        try {
+[internal][vvb2060][vvb2060@gmail.com]                            Files.delete(name);
+[internal][vvb2060][vvb2060@gmail.com]                        } catch (IOException ignored) {
+[internal][vvb2060][vvb2060@gmail.com]                        }
+[internal][vvb2060][vvb2060@gmail.com]                    } else {
+[internal][vvb2060][vvb2060@gmail.com]                        developer.set(true);
+[internal][vvb2060][vvb2060@gmail.com]                    }
+[internal][vvb2060][vvb2060@gmail.com]                }
+[internal][vvb2060][vvb2060@gmail.com]            });
+[internal][vvb2060][vvb2060@gmail.com]        } catch (IOException e) {
+[internal][vvb2060][vvb2060@gmail.com]            return false;
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]        return developer.get();
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]    public static class AboutDialog extends DialogFragment {
+[external][shana][shana@zju.edu.cn]        @NonNull
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            DialogAboutBinding binding = DialogAboutBinding.inflate(getLayoutInflater(), null, false);
+[external][shana][shana@zju.edu.cn]            binding.designAboutTitle.setText(R.string.app_name);
+[external][shana][shana@zju.edu.cn]            binding.designAboutInfo.setMovementMethod(LinkMovementMethod.getInstance());
+[external][shana][shana@zju.edu.cn]            binding.designAboutInfo.setTransformationMethod(new LinkTransformationMethod(requireActivity()));
+[external][shana][shana@zju.edu.cn]            binding.designAboutInfo.setText(HtmlCompat.fromHtml(getString(
+[external][shana][shana@zju.edu.cn]                    R.string.about_view_source_code,
+[external][shana][shana@zju.edu.cn]                    "<b><a href=\"https://github.com/LSPosed/LSPosed\">GitHub</a></b>",
+[external][shana][shana@zju.edu.cn]                    "<b><a href=\"https://t.me/LSPosed\">Telegram</a></b>"), HtmlCompat.FROM_HTML_MODE_LEGACY));
+[external][shana][shana@zju.edu.cn]            binding.designAboutVersion.setText(String.format(LocaleDelegate.getDefaultLocale(), "%s (%d)", BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE));
+[external][shana][shana@zju.edu.cn]            return new BlurBehindDialogBuilder(requireContext())
+[external][shana][shana@zju.edu.cn]                    .setView(binding.getRoot()).create();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private void showAbout() {
+[external][shana][shana@zju.edu.cn]        new AboutDialog().show(getChildFragmentManager(), "about");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public void onDestroyView() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        super.onDestroyView();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        binding = null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]}

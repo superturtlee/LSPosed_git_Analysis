@@ -1,0 +1,242 @@
+[bot][lsposed][lsposed@lsposed.org]<?xml version="1.0" encoding="utf-8"?>
+[bot][lsposed][lsposed@lsposed.org]<!--
+[bot][lsposed][lsposed@lsposed.org]  ~ This file is part of LSPosed.
+[bot][lsposed][lsposed@lsposed.org]  ~
+[bot][lsposed][lsposed@lsposed.org]  ~ LSPosed is free software: you can redistribute it and/or modify
+[bot][lsposed][lsposed@lsposed.org]  ~ it under the terms of the GNU General Public License as published by
+[bot][lsposed][lsposed@lsposed.org]  ~ the Free Software Foundation, either version 3 of the License, or
+[bot][lsposed][lsposed@lsposed.org]  ~ (at your option) any later version.
+[bot][lsposed][lsposed@lsposed.org]  ~
+[bot][lsposed][lsposed@lsposed.org]  ~ LSPosed is distributed in the hope that it will be useful,
+[bot][lsposed][lsposed@lsposed.org]  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+[bot][lsposed][lsposed@lsposed.org]  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[bot][lsposed][lsposed@lsposed.org]  ~ GNU General Public License for more details.
+[bot][lsposed][lsposed@lsposed.org]  ~
+[bot][lsposed][lsposed@lsposed.org]  ~ You should have received a copy of the GNU General Public License
+[bot][lsposed][lsposed@lsposed.org]  ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[bot][lsposed][lsposed@lsposed.org]  ~
+[bot][lsposed][lsposed@lsposed.org]  ~ Copyright (C) 2021 LSPosed Contributors
+[bot][lsposed][lsposed@lsposed.org]  -->
+[bot][lsposed][lsposed@lsposed.org]<resources xmlns:tools="http://schemas.android.com/tools" tools:keep="@string/xposed_module_updated_notification_*,@string/module_is_not_activated_*">
+[bot][lsposed][lsposed@lsposed.org]    <!-- MainActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="overview">کورتەی گشتی</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="Modules">مۆدیوولەکان</string>
+[bot][lsposed][lsposed@lsposed.org]    <plurals name="modules_enabled_count">
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="one">%d مۆدیول چالاک کراوە</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="other">%d مۆدیول چالاک کراوە</item>
+[bot][lsposed][lsposed@lsposed.org]    </plurals>
+[bot][lsposed][lsposed@lsposed.org]    <string name="Logs">لۆگەکان</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="Settings">ڕێکخستنەکان</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="feedback_or_suggestion">فیدباک یان پێشنیار</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="About">دەربارە</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="report_issue">پرسی ڕاپۆرت</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo">کۆگا</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo_up_to_date">Hemî modulên nûjen</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo_published_time">Di %sde hate weşandin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo_updated_time">Di %sde hate nûve kirin</string>
+[bot][lsposed][lsposed@lsposed.org]    <plurals name="module_repo_upgradable">
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="one">%d module nûvekirin</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="other">%d modulên nûvekirî</item>
+[bot][lsposed][lsposed@lsposed.org]    </plurals>
+[bot][lsposed][lsposed@lsposed.org]    <string name="about_view_source_code"><![CDATA[Koda çavkaniyê li %1$s<br/>bibînin Tevlî %2$s kanala me bibin]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="translators" comment="Dear translators, please add your home page here following the format. There can be more than one translator. So feel free to append yourself.">null</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install">Lêkirin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install_summary">Ji bo sazkirina LSPosed bikirtînin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="not_installed">Ne hatiye sazkirin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="not_install_summary">LSPosed nayê Sazkirin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="activated">Çalak kirin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="partial_activated">Qismî aktîf kirin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="selinux_policy_not_loaded_summary">SEPolicy bi rêkûpêk nayê barkirin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="selinux_policy_not_loaded"><![CDATA[Hin taybetmendî dê nexebitin.<br/>Ji kerema xwe vê yekê ji <a href="https://github.com/topjohnwu/Magisk/issues"><b>Magisk</b></a> pêşdebir re ragihînin.]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_inject_fail_summary">Derzkirina Çarçoveya Pergalê têk çû</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_inject_fail"><![CDATA[Ev kêm e û dibe ku ji hêla <b>Magisk</b> an hin modulên Magisk-a kêm-kalîteyê ve çêbibe.<br/>Ji kerema xwe hewl bidin ku modulên Magisk ji bilî Riru û LSPosed neçalak bikin an jî têketinek tevahî ji pêşdebiran re bişînin.]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_prop_incorrect_summary">Pêşniyara pergalê xelet e</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_prop_incorrect"><![CDATA[Hin taybetmendiyên pergalê yên pêwîst jêbirin an guherandin.<br/>Dibe ku modul carinan betal bibin.]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="need_update">Pêdivî ye ku nûve bike</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="please_update_summary">Ji kerema xwe guhertoya herî dawî ya LSPosed saz bikin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_api_version">Guhertoya API</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_framework_version">Guhertoya çarçoveyê</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_manager_package_name">Navê pakêta rêveberê</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_system_version">Guhertoya pergalê</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_device">Sazî</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_system_abi">Pergala ABI</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_dex2oat_wrapper">Dex Optimizer Wrapper</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enabled">Enabled</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="not_enabled">Ne çalak kirin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="supported">Piştgirî kirin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="unsupported">Piştgirî nekirin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="android_version_unsatisfied">Guhertoya Android-ê ne razî ye</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="crashed">Qeza kirin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="mount_failed">Çiya têk çû</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="selinux_permissive">SELinux destûr e</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sepolicy_incorrect">Siyaseta SELinux nerast e</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_lsposed">LSPosed nûve bikin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_lsposed_msg">Piştrast bike ku LSPosed nûve bike? Ev cîhaz dê piştî qedandina nûvekirinê ji nû ve dest pê bike</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_copied">Li clipboardê hate kopî kirin</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- WelcomeDialog -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="parasitic_welcome">Hûn bi xêr hatin LSPosed</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="parasitic_welcome_summary">Hûn rêveberê parazît bikar tînin, ku dikare kurtebirê biafirîne an hîn jî ji ragihandinê vebe.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="parasitic_welcome_summary_no_shortcut_support">Hûn rêveberê parazît bikar tînin, ku dikare ji ragihandinê vebe.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="create_shortcut">Kurtenivîsê çêbikin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="never_show">Qet nîşan nedin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_welcome">Rêvebirê Parazît Pêşniyar kirin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_welcome_summary">LSPosed naha parazîtkirina pergalê piştgirî dike da ku ji tespîtê dûr bixe, hûn dikarin rêveberê parazît ji ragihandinê vekin. Tê pêşniyar kirin ku serîlêdana heyî jêbirin.</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- LogsActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="menuSaveToSd">Rizgarkirin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="nav_item_logs_verbose">Têketinên Verbose</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="nav_item_logs_module">Têketinên Modulan</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_saving">پاشەکەوتکردنی لۆگ، تکایە چاوەڕوان بن</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_saved">Têketin xilas kirin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_save_failed2">Sazkirin bi ser neket:\n%s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menuClearLog">Naha têketinê paqij bike</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_cleared">Têketin bi serkeftî hate paqij kirin.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="scroll_top">Scroll to top</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="loading">Barkirin…</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="scroll_bottom">Scroll to bottom</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menuReload">Ji nû ve barkirin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_clear_failed_2">Paqijkirina têketinê bi ser neket</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_enable_word_wrap">Peyv Wrap</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enabled_verbose_log">Têketinê bi lêker vekir</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="disabled_verbose_log">Têketinê bi devkî neçalak bû</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- ModulesActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_empty_description">(bê şirove nehat dayîn)</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_xposed_min_version">Vê modulê guhertoyek nû ya Xposed (%d) hewce dike û ji ber vê yekê nayê çalak kirin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_target_version_higher">Ev modul ji bo guhertoyek nû ya Xposed (%d) hatî çêkirin û ji ber vê yekê dibe ku hin fonksiyon nexebitin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="no_min_version_specified">Ev modul guhertoya Xposed ya ku jê re hewce dike diyar nake.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_min_version_too_low">Ev modul ji bo guhertoya Xposed %1$dhate afirandin, lê ji ber guheztinên nelihev ên di guhertoya %2$d-ê de, ew hate asteng kirin.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_installed_on_external_storage">Ev modul nikare were barkirin ji ber ku ew li ser qerta SD-ê hatî saz kirin, ji kerema xwe wê biguhezînin hilana hundurîn</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstall">Rakirin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_settings">Mîhengên Modulê</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="view_in_repo">Di Repo de bibînin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstall_message">Ma hûn dixwazin vê modulê rakin?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstalled">Rakir %1$s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstall_failed">Rakirina neserketî ye</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="add_module_to_user">Modulê li bikarhênerê zêde bikin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_installed">%1$s ji bikarhêner %2$sre zêde kirin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_install_failed">Zêdekirina modulê têk çû</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install_to_user">Ji bikarhêner %sre saz bike</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install_to_user_message">Dixwazin %1$s ji bikarhêner %2$sre saz bikin? Tête pêşniyar kirin ku bi destan saz bikin, zordariya sazkirinê bi riya LSPosed dibe ku bibe sedema pirsgirêkan.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="expand">firehkirin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="collapse">jiberhevketin</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- AppListActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_speed">Ji nû ve xweşbîn bikin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_speed_msg">Optimîzekirin…</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_done">Optimîzasyon qediya</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_launch">Dest pê bike</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_failed">Optimîzasyon têk çû: nirxa vegerê vala ye</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_failed_with_info">Optimîzasyon têk çû: </string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_by_name">Navê serîlêdanê</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_by_package_name">Navê pakêtê</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_by_install_time">Dema sazkirinê</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_by_update_time">Wextê nûve bike</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_reverse">Gara paşî</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_system_apps">Sepanên pergalê</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_sort">Rêzkirin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enable_module">Modulê çalak bike</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="no_scope_selected">Te tu sepanê hilnebijart. Berdewamkirin?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_games">Games</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_modules">Modules</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_denylist">Denylist</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="failed_to_save_scope_list">Hilbijartina navnîşa çarçovê bi ser neket</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_version">Versiyon: %1$s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="use_recommended">Pêşniyar kirin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="no_scope_selected_has_recommended">Te tu sepanê hilnebijart. Serlêdanên pêşniyarkirî hilbijêrin?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="use_recommended_message">Serlêdanên pêşniyarkirî hilbijêrin?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_is_not_activated_yet">Modula Xposed hîn nehatiye çalak kirin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="requested_by_module">Pêşniyar kirin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_available">Nûvekirin heye: %1$s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_disabled_no_selection">Modula %s ji ber ku tu sepan nehat hilbijartî hate neçalak kirin.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="android_framework">Çarçoveya Sîstemê</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_backup_and_restore">Backup</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_backup">Backup</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_restore">Nûvdekirin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="force_stop">Bi zorê rawestandin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="force_stop_dlg_title">Rawestandina zorê?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="force_stop_dlg_text">Ger hûn bi zorê sepanek rawestînin, dibe ku ew xelet tevbigere.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="reboot_required">Ji bo sepandina vê guherînê ji nû ve destpêkirinê hewce ye</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="reboot">Reboot</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_hide">Veşartin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="deny_list">%s di lîsteya redkirinê de ye. Dibe ku bandor neke.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="deny_list_info">Li ser redkirina</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- ModulesActivity and AppListActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="modules_other_app">Di sepana din de bibînin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_app_info">Agahdariya Appê</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="list_empty">¯\\\\_(ツ)_\/¯\nLi vir tiştek tune</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- SettingsActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_group_framework">Çarçove</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_disable_verbose_log">Têketinên devkî neçalak bike</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_disable_verbose_log_summary">Daxwaza pirsgirêkan rapor bikin ku têketinên devkî tê de bin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="pure_black_dark_theme">Mijara reş reş</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="pure_black_dark_theme_summary">Ger mijara tarî çalak be, mijara reş a paqij bikar bînin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_group_theme">Mijad</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup_and_restore">Backup û restore</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup_summery">Lîsteya modulê paşvekêşîn û navnîşên çarçovê.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_restore_summery">Lîsteya modul û navnîşên çarçovê vegerînin.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup">Backup</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup_failed2">Piştgiriya bi ser neket:\n%s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enable_documentui">Ji kerema xwe DocumentUI çalak bike</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_restore">Nûvdekirin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_restore_failed2">Vegerandin bi ser neket:\n%s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="group_network">Network</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="dns_over_http">DNS li ser HTTPS</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="dns_over_http_summary">Li hin welatan jehrîkirina DNS-ê çareser bikin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="theme_color">Rengê mijarê</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="theme_color_system">Rengê mijara pergalê</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_show_hidden_icon_apps_enabled">Bi zorê serlêdanan bikin ku îkonên destpêker nîşan bidin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_show_hidden_icon_apps_enabled_summary">Piştî Android 10, serîlêdan destûr nayê dayîn ku îkonên xwe yên destpêker veşêrin. Ji bo neçalakkirina vê taybetmendiya pergalê, guheztinê vekin.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_group_system">Sîstem</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_language">Ziman</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_translation_contributors">Beşdarên wergerê</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_translation">Beşdarî wergerê bibin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_translation_summary">Alîkariya me bikin ku %s wergerînin zimanê we</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_create_shortcut_summary">Kurtenivîsek çêbikin ku dikare rêveberê parazît veke</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_shortcut_pinned_hint">Kurtenivîs pêçayî</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_unsupported_pin_shortcut_summary">Destpêkera xwerû ya heyî kurtebirên pin piştgirî nake</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_enable_status_notification">Notification Status</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_enable_status_notification_summary">Agahdariyek nîşan bide ku dikare rêveberê parazît veke</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="disable_status_notification_error">Ne kurtebir, nekare ragihandinê neçalak bike</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_update_channel">Kanalê nûve bikin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_channel_stable">Stewr</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_channel_bate">Beta</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_channel_nightly">Avakirina şevê</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_xposed_api_call_protection">Parastina banga Xposed API</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_xposed_api_call_protection_summary">Koda modulê ya bi dînamîk barkirî asteng bike ku Xposed API bikar bîne, ev dibe ku hin modulan bişkîne lê ji ewlehiyê sûd werdigire</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- Module Repo -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_readme">Readme</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_releases">Releases</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_information">Info</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_information_homepage">Homepage</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_information_source_url">Koda çavkaniyê</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_information_collaborators">Hevkar</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_release_view_assets">Tiştan</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_open_in_browser">Di gerokê de vekin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_release_load_more">Guhertoyên kevntir nîşan bide</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_release_no_more">Bêtir berdan</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="repo_load_failed">Barkirina depoya modulê têk çû: %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_upgradable_first">Pêşî nûvekirin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="installed">Saz kirin</string>
+[bot][lsposed][lsposed@lsposed.org]    <plurals name="module_release_assets_download_count">
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="one">%d download</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="other">%d downloads</item>
+[bot][lsposed][lsposed@lsposed.org]    </plurals>
+[bot][lsposed][lsposed@lsposed.org]    <!-- Colors -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_sakura">Sakura</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_red">sor</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_pink">Pembe</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_purple">Mor</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_deep_purple">binefşî ya kûr</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_indigo">Indigo</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_blue">Şîn</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_light_blue">Şînê vebûyî</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_cyan">Cyan</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_teal">Teal</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_green">Kesk</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_light_green">Kesk ronî</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_lime">Lime</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_yellow">Zer</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_amber">Aqût</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_orange">porteqalî</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_deep_orange">porteqala kûr</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_brown">qehweyî</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_blue_grey">Şîn gewr</string>
+[bot][lsposed][lsposed@lsposed.org]</resources>

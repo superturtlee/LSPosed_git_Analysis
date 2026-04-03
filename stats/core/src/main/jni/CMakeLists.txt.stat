@@ -1,0 +1,15 @@
+[external][shana][shana@zju.edu.cn]project(core)
+[external][shana][shana@zju.edu.cn]cmake_minimum_required(VERSION 3.4.1)
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]add_subdirectory(${EXTERNAL_ROOT} external)
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]aux_source_directory(src SRC_LIST)
+[external][shana][shana@zju.edu.cn]aux_source_directory(src/jni SRC_LIST)
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]add_library(${PROJECT_NAME} STATIC ${SRC_LIST})
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]target_include_directories(${PROJECT_NAME} PUBLIC include)
+[external][shana][shana@zju.edu.cn]target_include_directories(${PROJECT_NAME} PRIVATE src)
+[external][shana][shana@zju.edu.cn]
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]target_link_libraries(${PROJECT_NAME} PUBLIC dobby lsplant_static log fmt-header-only)
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]target_link_libraries(${PROJECT_NAME} PRIVATE dex_builder_static)

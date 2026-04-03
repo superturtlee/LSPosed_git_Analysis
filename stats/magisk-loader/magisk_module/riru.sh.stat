@@ -1,0 +1,86 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]#!/sbin/sh
+[internal][vvb2060][vvb2060@gmail.com]RIRU_MODULE_LIB_NAME="@RIRU_MODULE_LIB_NAME@"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]# Variables for customize.sh
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]RIRU_API=0
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]RIRU_MIN_COMPATIBLE_API=0
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]RIRU_VERSION_CODE=0
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]RIRU_VERSION_NAME=""
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]# Used by /data/adb/riru/util_functions.sh
+[internal][vvb2060][vvb2060@gmail.com]RIRU_MODULE_API_VERSION=@RIRU_MODULE_API_VERSION@
+[internal][vvb2060][vvb2060@gmail.com]RIRU_MODULE_MIN_API_VERSION=@RIRU_MODULE_MIN_API_VERSION@
+[internal][vvb2060][vvb2060@gmail.com]RIRU_MODULE_MIN_RIRU_VERSION_NAME="@RIRU_MODULE_MIN_RIRU_VERSION_NAME@"
+[internal][vvb2060][vvb2060@gmail.com]RIRU_MODULE_DEBUG=@RIRU_MODULE_DEBUG@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]if [ "$MAGISK_VER_CODE" -ge 21000 ]; then
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  MAGISK_CURRENT_RIRU_MODULE_PATH=$(magisk --path)/.magisk/modules/riru-core
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]else
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  MAGISK_CURRENT_RIRU_MODULE_PATH=/sbin/.magisk/modules/riru-core
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]fi
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]# This function will be used when util_functions.sh not exists
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]check_riru_version() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  if [ ! -f "$MAGISK_CURRENT_RIRU_MODULE_PATH/api_version" ] && [ ! -f "/data/adb/riru/api_version" ] && [ ! -f "/data/adb/riru/api_version.new" ]; then
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    ui_print "*********************************************************"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    ui_print "! Riru $RIRU_MODULE_MIN_RIRU_VERSION_NAME or above is required"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    ui_print "! Please install Riru from Magisk Manager or https://github.com/RikkaApps/Riru/releases"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    abort "*********************************************************"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  fi
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  RIRU_API=$(cat "$MAGISK_CURRENT_RIRU_MODULE_PATH/api_version") || RIRU_API=$(cat "/data/adb/riru/api_version.new") || RIRU_API=$(cat "/data/adb/riru/api_version") || RIRU_API=0
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  [ "$RIRU_API" -eq "$RIRU_API" ] || RIRU_API=0
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ui_print "- Riru API version: $RIRU_API"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  if [ "$RIRU_API" -lt $RIRU_MODULE_MIN_API_VERSION ]; then
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    ui_print "*********************************************************"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    ui_print "! Riru $RIRU_MODULE_MIN_RIRU_VERSION_NAME or above is required"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    ui_print "! Please upgrade Riru from Magisk Manager or https://github.com/RikkaApps/Riru/releases"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    abort "*********************************************************"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  fi
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]}
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]# This function will be used when util_functions.sh not exists
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]enforce_install_from_magisk_app() {
+[external][rikka][rikka@shizuku.moe]  if $BOOTMODE; then
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    ui_print "- Installing from Magisk app"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  else
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    ui_print "*********************************************************"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    ui_print "! Install from recovery is NOT supported"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    ui_print "! Some recovery has broken implementations, install with such recovery will finally cause Riru or Riru modules not working"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    ui_print "! Please install from Magisk app"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    abort "*********************************************************"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  fi
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]}
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][rikka][rikka@shizuku.moe]if [ ! -d $MAGISK_CURRENT_RIRU_MODULE_PATH ]; then
+[external][rikka][rikka@shizuku.moe]  ui_print "*********************************************************"
+[external][rikka][rikka@shizuku.moe]  ui_print "! Riru is not installed"
+[external][rikka][rikka@shizuku.moe]  ui_print "! Please install Riru from Magisk Manager or https://github.com/RikkaApps/Riru/releases"
+[external][rikka][rikka@shizuku.moe]  abort "*********************************************************"
+[external][rikka][rikka@shizuku.moe]fi
+[external][rikka][rikka@shizuku.moe]
+[external][rikka][rikka@shizuku.moe]if [ -f "$MAGISK_CURRENT_RIRU_MODULE_PATH/disable" ] || [ -f "$MAGISK_CURRENT_RIRU_MODULE_PATH/remove" ]; then
+[external][rikka][rikka@shizuku.moe]  ui_print "*********************************************************"
+[external][rikka][rikka@shizuku.moe]  ui_print "! Riru is not enabled or will be removed"
+[external][rikka][rikka@shizuku.moe]  ui_print "! Please enable Riru in Magisk first"
+[external][rikka][rikka@shizuku.moe]  abort "*********************************************************"
+[external][rikka][rikka@shizuku.moe]fi
+[external][rikka][rikka@shizuku.moe]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]if [ -f $MAGISK_CURRENT_RIRU_MODULE_PATH/util_functions.sh ]; then
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ui_print "- Load $MAGISK_CURRENT_RIRU_MODULE_PATH/util_functions.sh"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  # shellcheck disable=SC1090
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  . $MAGISK_CURRENT_RIRU_MODULE_PATH/util_functions.sh
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]else
+[external][rikka][rikka@shizuku.moe]  if [ "$RIRU_MODULE_MIN_API_VERSION" -ge 11 ]; then
+[external][rikka][rikka@shizuku.moe]    ui_print "*********************************************************"
+[external][rikka][rikka@shizuku.moe]    ui_print "! Riru $RIRU_MODULE_MIN_RIRU_VERSION_NAME or above is required"
+[external][rikka][rikka@shizuku.moe]    ui_print "! Please upgrade Riru from Magisk Manager or https://github.com/RikkaApps/Riru/releases"
+[external][rikka][rikka@shizuku.moe]    abort "*********************************************************"
+[external][rikka][rikka@shizuku.moe]  fi
+[external][rikka][rikka@shizuku.moe]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  if [ -f /data/adb/riru/util_functions.sh ]; then
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    ui_print "- Load /data/adb/riru/util_functions.sh"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    . /data/adb/riru/util_functions.sh
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  else
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    ui_print "- Can't find /data/adb/riru/util_functions.sh"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  fi
+[external][shana][shana@zju.edu.cn]fi

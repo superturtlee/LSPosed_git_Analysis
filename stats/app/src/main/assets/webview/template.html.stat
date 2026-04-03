@@ -1,0 +1,14 @@
+[internal][vvb2060][vvb2060@gmail.com]<!DOCTYPE html>
+[external][shana][shana@zju.edu.cn]<html dir="@dir@">
+[internal][vvb2060][vvb2060@gmail.com]<head>
+[internal][vvb2060][vvb2060@gmail.com]    <meta charset="utf-8">
+[internal][vvb2060][vvb2060@gmail.com]    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+[internal][vvb2060][vvb2060@gmail.com]    <meta name="HandheldFriendly" content="true">
+[internal][vvb2060][vvb2060@gmail.com]    <link rel="stylesheet" type="text/css" href="file:///android_asset/webview/colors_light.css"/>
+[internal][vvb2060][vvb2060@gmail.com]    <link rel="stylesheet" type="text/css" href="file:///android_asset/webview/markdown.css"/>
+[internal][vvb2060][vvb2060@gmail.com]    <link rel="stylesheet" type="text/css" href="file:///android_asset/webview/syntax.css"/>
+[internal][vvb2060][vvb2060@gmail.com]</head>
+[internal][vvb2060][vvb2060@gmail.com]<body>
+[internal][vvb2060][vvb2060@gmail.com]    <main id="content" class="markdown-body">@body@</main>
+[internal][vvb2060][vvb2060@gmail.com]</body>
+[internal][vvb2060][vvb2060@gmail.com]</html>

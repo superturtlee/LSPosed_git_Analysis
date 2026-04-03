@@ -1,0 +1,99 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.lspd.deopt;
+[external][hsushulong][hsushulong@gmail.com]
+[external][shana][shana@zju.edu.cn]import android.content.Context;
+[external][shana][shana@zju.edu.cn]import android.content.pm.ApplicationInfo;
+[external][shana][shana@zju.edu.cn]import android.content.res.AssetManager;
+[external][shana][shana@zju.edu.cn]import android.content.res.Configuration;
+[external][shana][shana@zju.edu.cn]import android.content.res.Resources;
+[external][shana][shana@zju.edu.cn]import android.util.DisplayMetrics;
+[external][shana][shana@zju.edu.cn]import android.util.TypedValue;
+[external][shana][shana@zju.edu.cn]
+[external][hsushulong][hsushulong@gmail.com]import java.util.HashMap;
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]/**
+[external][hsushulong][hsushulong@gmail.com] * Providing a whitelist of methods which are the callers of the target methods we want to hook.
+[external][hsushulong][hsushulong@gmail.com] * Because the target methods are inlined into the callers, we deoptimize the callers to
+[external][hsushulong][hsushulong@gmail.com] * run in intercept mode to make target methods hookable.
+[external][hsushulong][hsushulong@gmail.com] * <p>
+[external][hsushulong][hsushulong@gmail.com] * Only for methods which are included in pre-compiled framework codes.
+[external][hsushulong][hsushulong@gmail.com] * TODO recompile system apps and priv-apps since their original dex files are available
+[external][hsushulong][hsushulong@gmail.com] */
+[external][hsushulong][hsushulong@gmail.com]public class InlinedMethodCallers {
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]    public static final String KEY_BOOT_IMAGE = "boot_image";
+[external][hsushulong][hsushulong@gmail.com]    public static final String KEY_BOOT_IMAGE_MIUI_RES = "boot_image_miui_res";
+[external][hsushulong][hsushulong@gmail.com]    public static final String KEY_SYSTEM_SERVER = "system_server";
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]    /**
+[external][hsushulong][hsushulong@gmail.com]     * Key should be {@link #KEY_BOOT_IMAGE}, {@link #KEY_SYSTEM_SERVER}, or a package name
+[external][hsushulong][hsushulong@gmail.com]     * of system apps or priv-apps i.e. com.android.systemui
+[external][hsushulong][hsushulong@gmail.com]     */
+[external][shana][shana@zju.edu.cn]    private static final HashMap<String, Object[][]> CALLERS = new HashMap<>();
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]    /**
+[external][hsushulong][hsushulong@gmail.com]     * format for each row: {className, methodName, methodSig}
+[external][hsushulong][hsushulong@gmail.com]     */
+[external][shana][shana@zju.edu.cn]    private static final Object[][] BOOT_IMAGE = {
+[external][hsushulong][hsushulong@gmail.com]            // callers of Application#attach(Context)
+[external][shana][shana@zju.edu.cn]            {"android.app.Instrumentation", "newApplication", ClassLoader.class, String.class, Context.class},
+[external][shana][shana@zju.edu.cn]            {"android.app.Instrumentation", "newApplication", ClassLoader.class, Context.class},
+[external][shana][shana@zju.edu.cn]            {"android.app.ContextImpl", "getSharedPreferencesPath", String.class}
+[external][hsushulong][hsushulong@gmail.com]    };
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]    // TODO deprecate this
+[external][shana][shana@zju.edu.cn]    private static final Object[][] BOOT_IMAGE_FOR_MIUI_RES = {
+[external][hsushulong][hsushulong@gmail.com]            // for MIUI resources hooking
+[external][shana][shana@zju.edu.cn]            {"android.content.res.MiuiResources", "init", String.class},
+[external][shana][shana@zju.edu.cn]            {"android.content.res.MiuiResources", "updateMiuiImpl"},
+[external][shana][shana@zju.edu.cn]            {"android.content.res.MiuiResources", "setImpl", "android.content.res.ResourcesImpl"},
+[external][shana][shana@zju.edu.cn]            {"android.content.res.MiuiResources", "loadOverlayValue", TypedValue.class, int.class},
+[external][shana][shana@zju.edu.cn]            {"android.content.res.MiuiResources", "getThemeString", CharSequence.class},
+[external][shana][shana@zju.edu.cn]            {"android.content.res.MiuiResources", "<init>", ClassLoader.class},
+[external][shana][shana@zju.edu.cn]            {"android.content.res.MiuiResources", "<init>"},
+[external][shana][shana@zju.edu.cn]            {"android.content.res.MiuiResources", "<init>", AssetManager.class, DisplayMetrics.class, Configuration.class},
+[external][shana][shana@zju.edu.cn]            {"android.miui.ResourcesManager", "initMiuiResource", Resources.class, String.class},
+[external][shana][shana@zju.edu.cn]            {"android.app.LoadedApk", "getResources", Resources.class},
+[external][shana][shana@zju.edu.cn]            {"android.content.res.Resources", "getSystem", Resources.class},
+[external][shana][shana@zju.edu.cn]            {"android.app.ApplicationPackageManager", "getResourcesForApplication", ApplicationInfo.class},
+[external][shana][shana@zju.edu.cn]            {"android.app.ContextImpl", "setResources", Resources.class},
+[external][hsushulong][hsushulong@gmail.com]    };
+[external][hsushulong][hsushulong@gmail.com]
+[external][shana][shana@zju.edu.cn]    private static final Object[][] SYSTEM_SERVER = {};
+[external][hsushulong][hsushulong@gmail.com]
+[external][shana][shana@zju.edu.cn]    private static final Object[][] SYSTEM_UI = {};
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]    static {
+[external][hsushulong][hsushulong@gmail.com]        CALLERS.put(KEY_BOOT_IMAGE, BOOT_IMAGE);
+[external][hsushulong][hsushulong@gmail.com]        CALLERS.put(KEY_BOOT_IMAGE_MIUI_RES, BOOT_IMAGE_FOR_MIUI_RES);
+[external][hsushulong][hsushulong@gmail.com]        CALLERS.put(KEY_SYSTEM_SERVER, SYSTEM_SERVER);
+[external][hsushulong][hsushulong@gmail.com]        CALLERS.put("com.android.systemui", SYSTEM_UI);
+[external][hsushulong][hsushulong@gmail.com]    }
+[external][hsushulong][hsushulong@gmail.com]
+[external][shana][shana@zju.edu.cn]    public static HashMap<String, Object[][]> getAll() {
+[external][hsushulong][hsushulong@gmail.com]        return CALLERS;
+[external][hsushulong][hsushulong@gmail.com]    }
+[external][hsushulong][hsushulong@gmail.com]
+[external][shana][shana@zju.edu.cn]    public static Object[][] get(String where) {
+[external][hsushulong][hsushulong@gmail.com]        return CALLERS.get(where);
+[external][hsushulong][hsushulong@gmail.com]    }
+[external][hsushulong][hsushulong@gmail.com]}

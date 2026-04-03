@@ -1,0 +1,169 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.manager.adapters;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import android.annotation.SuppressLint;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]import android.content.Intent;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.content.SharedPreferences;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]import android.content.pm.ApplicationInfo;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.content.pm.PackageInfo;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.content.pm.PackageManager;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.content.pm.ResolveInfo;
+[external][shana][shana@zju.edu.cn]import android.os.Parcel;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.view.MenuItem;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.manager.ConfigManager;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.manager.R;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.util.Collections;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.util.Comparator;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]import java.util.List;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import java.util.concurrent.ConcurrentHashMap;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]public class AppHelper {
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static final String SETTINGS_CATEGORY = "de.robv.android.xposed.category.MODULE_SETTINGS";
+[external][shana][shana@zju.edu.cn]    public static final int FLAG_SHOW_FOR_ALL_USERS = 0x0400;
+[external][shana][shana@zju.edu.cn]    private static List<String> denyList;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private static List<PackageInfo> appList;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    private static final ConcurrentHashMap<PackageInfo, CharSequence> appLabel = new ConcurrentHashMap<>();
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    @SuppressLint("WrongConstant")
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Intent getSettingsIntent(String packageName, int userId) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        Intent intentToResolve = new Intent(Intent.ACTION_MAIN);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        intentToResolve.addCategory(SETTINGS_CATEGORY);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        intentToResolve.setPackage(packageName);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        List<ResolveInfo> ris = ConfigManager.queryIntentActivitiesAsUser(intentToResolve, 0, userId);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][howardwu20][HowardWu20@outlook.com]        if (ris.size() == 0) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return getLaunchIntentForPackage(packageName, userId);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        Intent intent = new Intent(intentToResolve);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        intent.setClassName(ris.get(0).activityInfo.packageName,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                ris.get(0).activityInfo.name);
+[external][shana][shana@zju.edu.cn]        intent.putExtra("lsp_no_switch_to_user", (ris.get(0).activityInfo.flags & FLAG_SHOW_FOR_ALL_USERS) != 0);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return intent;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    @SuppressLint("WrongConstant")
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Intent getLaunchIntentForPackage(String packageName, int userId) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        Intent intentToResolve = new Intent(Intent.ACTION_MAIN);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        intentToResolve.addCategory(Intent.CATEGORY_INFO);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        intentToResolve.setPackage(packageName);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        List<ResolveInfo> ris = ConfigManager.queryIntentActivitiesAsUser(intentToResolve, 0, userId);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][howardwu20][HowardWu20@outlook.com]        if (ris.size() == 0) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            intentToResolve.removeCategory(Intent.CATEGORY_INFO);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            intentToResolve.addCategory(Intent.CATEGORY_LAUNCHER);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            intentToResolve.setPackage(packageName);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            ris = ConfigManager.queryIntentActivitiesAsUser(intentToResolve, 0, userId);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][howardwu20][HowardWu20@outlook.com]        if (ris.size() == 0) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        Intent intent = new Intent(intentToResolve);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        intent.setClassName(ris.get(0).activityInfo.packageName,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                ris.get(0).activityInfo.name);
+[external][shana][shana@zju.edu.cn]        intent.putExtra("lsp_no_switch_to_user", (ris.get(0).activityInfo.flags & FLAG_SHOW_FOR_ALL_USERS) != 0);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return intent;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static boolean onOptionsItemSelected(MenuItem item, SharedPreferences preferences) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        int itemId = item.getItemId();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        int i = preferences.getInt("list_sort", 0);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (itemId == R.id.item_sort_by_name) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            i = (i % 2 == 0) ? 0 : 1;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } else if (itemId == R.id.item_sort_by_package_name) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            i = (i % 2 == 0) ? 2 : 3;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } else if (itemId == R.id.item_sort_by_install_time) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            i = (i % 2 == 0) ? 4 : 5;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } else if (itemId == R.id.item_sort_by_update_time) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            i = (i % 2 == 0) ? 6 : 7;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        } else if (itemId == R.id.reverse) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            if (i % 2 == 0) i++;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            else i--;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } else {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return false;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        preferences.edit().putInt("list_sort", i).apply();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        if (item.isCheckable())
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            item.setChecked(!item.isChecked());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return true;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Comparator<PackageInfo> getAppListComparator(int sort, PackageManager pm) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        ApplicationInfo.DisplayNameComparator displayNameComparator = new ApplicationInfo.DisplayNameComparator(pm);
+[external][howardwu20][HowardWu20@outlook.com]        return switch (sort) {
+[external][howardwu20][HowardWu20@outlook.com]            case 7 ->
+[external][howardwu20][HowardWu20@outlook.com]                    Collections.reverseOrder(Comparator.comparingLong((PackageInfo a) -> a.lastUpdateTime));
+[external][howardwu20][HowardWu20@outlook.com]            case 6 -> Comparator.comparingLong((PackageInfo a) -> a.lastUpdateTime);
+[external][howardwu20][HowardWu20@outlook.com]            case 5 ->
+[external][howardwu20][HowardWu20@outlook.com]                    Collections.reverseOrder(Comparator.comparingLong((PackageInfo a) -> a.firstInstallTime));
+[external][howardwu20][HowardWu20@outlook.com]            case 4 -> Comparator.comparingLong((PackageInfo a) -> a.firstInstallTime);
+[external][howardwu20][HowardWu20@outlook.com]            case 3 -> Collections.reverseOrder(Comparator.comparing(a -> a.packageName));
+[external][howardwu20][HowardWu20@outlook.com]            case 2 -> Comparator.comparing(a -> a.packageName);
+[external][howardwu20][HowardWu20@outlook.com]            case 1 ->
+[external][howardwu20][HowardWu20@outlook.com]                    Collections.reverseOrder((PackageInfo a, PackageInfo b) -> displayNameComparator.compare(a.applicationInfo, b.applicationInfo));
+[external][howardwu20][HowardWu20@outlook.com]            default ->
+[external][howardwu20][HowardWu20@outlook.com]                    (PackageInfo a, PackageInfo b) -> displayNameComparator.compare(a.applicationInfo, b.applicationInfo);
+[external][howardwu20][HowardWu20@outlook.com]        };
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    synchronized public static List<PackageInfo> getAppList(boolean force) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (appList == null || force) {
+[external][shana][shana@zju.edu.cn]            appList = ConfigManager.getInstalledPackagesFromAllUsers(PackageManager.GET_META_DATA | PackageManager.MATCH_UNINSTALLED_PACKAGES, true);
+[external][shana][shana@zju.edu.cn]            PackageInfo system = null;
+[external][shana][shana@zju.edu.cn]            for (var app : appList) {
+[external][shana][shana@zju.edu.cn]                if ("android".equals(app.packageName)) {
+[external][shana][shana@zju.edu.cn]                    var p = Parcel.obtain();
+[external][shana][shana@zju.edu.cn]                    app.writeToParcel(p, 0);
+[external][shana][shana@zju.edu.cn]                    p.setDataPosition(0);
+[external][shana][shana@zju.edu.cn]                    system = PackageInfo.CREATOR.createFromParcel(p);
+[external][shana][shana@zju.edu.cn]                    system.packageName = "system";
+[external][howardwu20][HowardWu20@outlook.com]                    system.applicationInfo.packageName = system.packageName;
+[external][shana][shana@zju.edu.cn]                    break;
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            if (system != null) {
+[external][shana][shana@zju.edu.cn]                appList.add(system);
+[external][shana][shana@zju.edu.cn]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return appList;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][shana][shana@zju.edu.cn]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    synchronized public static List<String> getDenyList(boolean force) {
+[external][shana][shana@zju.edu.cn]        if (denyList == null || force) {
+[external][shana][shana@zju.edu.cn]            denyList = ConfigManager.getDenyListPackages();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return denyList;
+[external][shana][shana@zju.edu.cn]    }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    public static CharSequence getAppLabel(PackageInfo info, PackageManager pm) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        if (info == null || info.applicationInfo == null) return null;
+[external][shana][shana@zju.edu.cn]        return appLabel.computeIfAbsent(info, i -> i.applicationInfo.loadLabel(pm));
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]}

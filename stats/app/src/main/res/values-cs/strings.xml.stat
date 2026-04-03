@@ -1,0 +1,248 @@
+[bot][lsposed][lsposed@lsposed.org]<?xml version="1.0" encoding="utf-8"?>
+[bot][lsposed][lsposed@lsposed.org]<!--
+[bot][lsposed][lsposed@lsposed.org]  ~ This file is part of LSPosed.
+[bot][lsposed][lsposed@lsposed.org]  ~
+[bot][lsposed][lsposed@lsposed.org]  ~ LSPosed is free software: you can redistribute it and/or modify
+[bot][lsposed][lsposed@lsposed.org]  ~ it under the terms of the GNU General Public License as published by
+[bot][lsposed][lsposed@lsposed.org]  ~ the Free Software Foundation, either version 3 of the License, or
+[bot][lsposed][lsposed@lsposed.org]  ~ (at your option) any later version.
+[bot][lsposed][lsposed@lsposed.org]  ~
+[bot][lsposed][lsposed@lsposed.org]  ~ LSPosed is distributed in the hope that it will be useful,
+[bot][lsposed][lsposed@lsposed.org]  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+[bot][lsposed][lsposed@lsposed.org]  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[bot][lsposed][lsposed@lsposed.org]  ~ GNU General Public License for more details.
+[bot][lsposed][lsposed@lsposed.org]  ~
+[bot][lsposed][lsposed@lsposed.org]  ~ You should have received a copy of the GNU General Public License
+[bot][lsposed][lsposed@lsposed.org]  ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[bot][lsposed][lsposed@lsposed.org]  ~
+[bot][lsposed][lsposed@lsposed.org]  ~ Copyright (C) 2021 LSPosed Contributors
+[bot][lsposed][lsposed@lsposed.org]  -->
+[bot][lsposed][lsposed@lsposed.org]<resources xmlns:tools="http://schemas.android.com/tools" tools:keep="@string/xposed_module_updated_notification_*,@string/module_is_not_activated_*">
+[bot][lsposed][lsposed@lsposed.org]    <!-- MainActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="overview">Přehled</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="Modules">Moduly</string>
+[bot][lsposed][lsposed@lsposed.org]    <plurals name="modules_enabled_count">
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="one">%d modul aktivován</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="few">%d modul povolen</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="many">%d Modul aktivován</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="other">%d Modul aktivován</item>
+[bot][lsposed][lsposed@lsposed.org]    </plurals>
+[bot][lsposed][lsposed@lsposed.org]    <string name="Logs">Protokoly</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="Settings">Nastavení</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="feedback_or_suggestion">Zpětná vazba nebo návrh</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="About">O aplikaci</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="report_issue">Nahlásit problém</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo">Repozitář</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo_up_to_date">Všechny moduly jsou aktuální</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo_published_time">Publikováno v %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo_updated_time">Aktualizováno v %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <plurals name="module_repo_upgradable">
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="one">%d modul je možné aktualizovat</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="few">%d moduly je možné aktualizovat</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="many">%d modolů je možné aktualizovat</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="other">%d modulů je možné aktualizovat</item>
+[bot][lsposed][lsposed@lsposed.org]    </plurals>
+[bot][lsposed][lsposed@lsposed.org]    <string name="about_view_source_code"><![CDATA[Zobrazit zdrojový kód na %1$s<br/>Připojte se k našemu kanálu %2$s]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="translators" comment="Dear translators, please add your home page here following the format. There can be more than one translator. So feel free to append yourself.">https://www.instagram.com/kasi33/</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install">Instalovat</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install_summary">Klepnutím nainstalujete LSPosed</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="not_installed">Není nainstalováno</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="not_install_summary">LSPosed není nainstalován</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="activated">Aktivováno</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="partial_activated">Částečně aktivováno</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="selinux_policy_not_loaded_summary">SEPolicy není správně načten</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="selinux_policy_not_loaded"><![CDATA[Některé funkce nebudou fungovat.<br/>Nahlaste to prosím vývojáři <a href="https://github.com/topjohnwu/Magisk/issues"><b>Magisk</b></a>.]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_inject_fail_summary">Načtení System Framework se nezdařilo</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_inject_fail"><![CDATA[Toto je vzácné a může to být způsobeno <b>Magisk</b>em nebo některými málo kvalitními moduly Magisku.<br/>Zkuste vypnout moduly Magisk jiné než Riru a LSPosed nebo odešlete kompletní log vývojářům.]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_prop_incorrect_summary">Nesprávné systémové prop</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_prop_incorrect"><![CDATA[Některé potřebné systémové vlastnosti byly odstraněny nebo změněny.<br/>Moduly mohou být někdy neplatné a tedy nefunkční.]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="need_update">Je třeba aktualizovat</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="please_update_summary">Nainstalujte si prosím nejnovější verzi LSPosed</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_api_version">Verze API</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_framework_version">Verze frameworku</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_manager_package_name">Název balíčku správce</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_system_version">Verze systému</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_device">Zařízení</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_system_abi">Systémové ABI (architektura)</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_dex2oat_wrapper">Dex Optimizer Wrapper</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enabled">Povoleno</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="not_enabled">Není povoleno</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="supported">Podporováno</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="unsupported">Nepodporováno</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="android_version_unsatisfied">Verze Androidu není spokojena</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="crashed">Havaroval</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="mount_failed">Připojení se nezdařilo</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="selinux_permissive">SELinux je permisivní</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sepolicy_incorrect">Zásady SELinuxu jsou nesprávné</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_lsposed">Aktualizovat LSPosed</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_lsposed_msg">Potvrdit aktualizaci LSPosed? Toto zařízení se restartuje po dokončení aktualizace</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_copied">Zkopírováno do schránky</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- WelcomeDialog -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="parasitic_welcome">Vítejte v LSPosed</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="parasitic_welcome_summary">Používáte parazitního správce, který může vytvořit zástupce nebo se stále otevírat z oznámení.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="parasitic_welcome_summary_no_shortcut_support">Používáte parazitního správce, který se může otevřít z oznámení.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="create_shortcut">Vytvořit zástupce</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="never_show">Nikdy nezobrazovat</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_welcome">Doporučený parazitický manažer</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_welcome_summary">LSPosed nyní podporuje parazitování systému. K zabránění detekce můžete správce parazitů otevřít z oznámení. Doporučuje se odinstalovat aktuální aplikaci.</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- LogsActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="menuSaveToSd">Uložit</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="nav_item_logs_verbose">Podrobné protokoly</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="nav_item_logs_module">Protokoly modulů</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_saving">Ukládání protokolu, čekejte prosím</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_saved">Protokoly uloženy</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_save_failed2">Nepodařilo se uložit:\n%s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menuClearLog">Vymazat log</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_cleared">Log byl úspěšně vymazán.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="scroll_top">Přejít na začátek</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="loading">Načítání…</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="scroll_bottom">Přejít na začátek</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menuReload">Znovu načíst</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_clear_failed_2">Nepodařilo se vymazat protokol</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_enable_word_wrap">Zalamování řádků</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enabled_verbose_log">Podrobný záznam povolen</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="disabled_verbose_log">Podrobný záznam zakázán</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- ModulesActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_empty_description">(žádný popis)</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_xposed_min_version">Tento modul vyžaduje novější Xposed verzi (%d) a proto nemůže být aktivován</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_target_version_higher">Tento modul je určen pro novější verzi Xposed (%d), a proto některé funkce nemusí fungovat</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="no_min_version_specified">Tento modul nespecifikuje potřebnou Xposed verzi.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_min_version_too_low">Tento modul byl vytvořen pro Xposed verzi %1$d, a tak z důvodu nekompatibilních změn ve verzi %2$dbyl zakázán</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_installed_on_external_storage">Tento modul nelze načíst, protože je nainstalován na SD kartě, přesuňte jej na interní úložiště</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstall">Odinstalovat</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_settings">Nastavení modulů</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="view_in_repo">Zobrazit v repozitáři</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstall_message">Chcete odinstalovat tento modul?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstalled">%1$s odinstalován</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstall_failed">Odinstalace nebyla úspěšná</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="add_module_to_user">Přidat modul k uživateli</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_installed">Modul %1$s přidán k uživateli %2$s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_install_failed">Přidání modulu se nezdařilo</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install_to_user">Instalovat uživateli %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install_to_user_message">Chcete nainstalovat %1$s uživateli %2$s.? Je doporučeno instalovat ručně, vynucení instalace přes LSPosed může způsobit problémy.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="expand">rozbalit</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="collapse">sbalit</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- AppListActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_speed">Znovu optimalizovat</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_speed_msg">Optimalizace…</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_done">Optimalizace dokončena</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_launch">Spustit</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_failed">Optimalizace selhala: návratová hodnota je prázdná</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_failed_with_info">Optimalizace selhala: </string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_by_name">Název aplikace</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_by_package_name">Název balíčku</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_by_install_time">Doba instalace</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_by_update_time">Čas aktualizace</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_reverse">Obrátit pořadí řazení </string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_system_apps">Systémové aplikace</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_sort">Řazení</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enable_module">Povolit modul</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="no_scope_selected">Nevybrali jste žádnou aplikaci. Pokračovat?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_games">Hry</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_modules">Moduly</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_denylist">Seznam zakázaných</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="failed_to_save_scope_list">Nepodařilo se uložit seznam</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_version">Verze: %1$s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="use_recommended">Zvolit doporučené</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="no_scope_selected_has_recommended">Nevybrali jste žádnou aplikaci. Vybrat doporučené aplikace?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="use_recommended_message">Vybrat doporučené aplikace?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_is_not_activated_yet">Xposed modul ještě není aktivován</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="requested_by_module">Doporučené</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_available">Je k dispozici aktualizace: %1$s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_disabled_no_selection">Modul %s byl zakázán, protože nebyla vybrána žádná aplikace.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="android_framework">Systémový Framework</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_backup_and_restore">Zálohování</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_backup">Zálohovat</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_restore">Obnovení</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="force_stop">Vynutit zastavení</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="force_stop_dlg_title">Vynutit zastavení?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="force_stop_dlg_text">Pokud vynutíte zastavení aplikace, může dojít k chybnému chování.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="reboot_required">Pro aplikaci této změny je vyžadován restart</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="reboot">Restartovat</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_hide">Skrýt</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="deny_list">%s je na seznamu zakázaných. Nemusí se projevit.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="deny_list_info">Na seznamu zakázaných</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- ModulesActivity and AppListActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="modules_other_app">Zobrazit v jiné aplikaci</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_app_info">Informace o aplikaci</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="list_empty">&lt;unk&gt; \\\\_(&lt;unk&gt; )_\/ &lt;unk&gt;\nTady nic není</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- SettingsActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_group_framework">Framework</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_disable_verbose_log">Zakázat podrobné protokoly</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_disable_verbose_log_summary">Nahlásit požadavek na problémy a zahrnout detailní záznamy</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="pure_black_dark_theme">Čistě černý motiv</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="pure_black_dark_theme_summary">Použít čistý černý motiv, pokud je tmavý motiv povolen</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_group_theme">Vzhled</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup_and_restore">Zálohování a obnovení</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup_summery">Zálohovat seznam modulů a nastavení.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_restore_summery">Obnovit seznam modulů a nastavení.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup">Zálohování</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup_failed2">Zálohování se nezdařilo:\n%s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enable_documentui">Prosím povolte DocumentUI</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_restore">Obnovení</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_restore_failed2">Nepodařilo se obnovit:\n%s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="group_network">Síť</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="dns_over_http">DNS over HTTPS</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="dns_over_http_summary">Řešení DNS oprav v některých zemích</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="theme_color">Barva motivu</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="theme_color_system">Barva systémového motivu</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_show_hidden_icon_apps_enabled">Vynutit aplikace k zobrazení ikon spouštěče</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_show_hidden_icon_apps_enabled_summary">Od Androidu 10 není aplikacím povoleno skrývat ikony spouštěče. Vypněte přepínač pro vypnutí této systémové funkce.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_group_system">Systém</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_language">Jazyk</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_translation_contributors">Přispěvatelé překladu</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_translation">Účast na překladu</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_translation_summary">Pomozte nám přeložit %s do vašeho jazyka</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_create_shortcut_summary">Vytvoření zástupce, který může otevřít parazitního správce</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_shortcut_pinned_hint">Připnutí zástupci</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_unsupported_pin_shortcut_summary">Současný výchozí spouštěč nepodporuje připnuté zkratky</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_enable_status_notification">Oznámení o stavu</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_enable_status_notification_summary">Zobrazení oznámení, které může otevřít parazitního správce</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="disable_status_notification_error">Žádný zástupce, nelze zakázat oznámení</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_update_channel">Kanál aktualizace</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_channel_stable">Stabilní</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_channel_bate">Beta</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_channel_nightly">Noční sestavení</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_xposed_api_call_protection">Ochrana volání rozhraní Xposed API</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_xposed_api_call_protection_summary">Blokování dynamicky načítaného kódu modulu pro použití rozhraní Xposed API, což může narušit některé moduly, ale prospěje bezpečnosti</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- Module Repo -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_readme">Přečti si mě</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_releases">Vydání</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_information">Informace</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_information_homepage">Domovská stránka</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_information_source_url">Zdrojový kód</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_information_collaborators">Spolupracovníci</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_release_view_assets">Assets</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_open_in_browser">Otevřít v prohlížeči</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_release_load_more">Zobrazit starší verze</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_release_no_more">Žádné další vydání</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="repo_load_failed">Nepodařilo se načíst repozitář modulu: %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_upgradable_first">Nejprve aktualizovatelný</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="installed">Instalováno</string>
+[bot][lsposed][lsposed@lsposed.org]    <plurals name="module_release_assets_download_count">
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="one">%d stažení</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="few">%d ke stažení</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="many">%d ke stažení</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="other">%d ke stažení</item>
+[bot][lsposed][lsposed@lsposed.org]    </plurals>
+[bot][lsposed][lsposed@lsposed.org]    <!-- Colors -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_sakura">Sakura</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_red">Červená</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_pink">Růžová</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_purple">Fialová</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_deep_purple">Tmavě fialová</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_indigo">Indigo</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_blue">Modrá</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_light_blue">Světle modrá</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_cyan">Azurová</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_teal">Modrozelená</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_green">Zelená</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_light_green">Světle zelená</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_lime">Limetková</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_yellow">Žlutá</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_amber">Jantarová</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_orange">Oranžová</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_deep_orange">Tmavě oranžová</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_brown">Hnědá</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_blue_grey">Modro-šedivá</string>
+[bot][lsposed][lsposed@lsposed.org]</resources>

@@ -1,0 +1,48 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]<?xml version="1.0" encoding="utf-8"?><!--
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  -->
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]<menu xmlns:android="http://schemas.android.com/apk/res/android">
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    <item
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        android:id="@+id/menu_save"
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        android:icon="@drawable/ic_save"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        android:showAsAction="ifRoom"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        android:title="@string/menuSaveToSd" />
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    <item
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        android:id="@+id/menu_scroll_top"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        android:showAsAction="never"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        android:title="@string/scroll_top" />
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    <item
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        android:id="@+id/menu_scroll_down"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        android:showAsAction="never"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        android:title="@string/scroll_bottom" />
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    <item
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        android:id="@+id/menu_clear"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        android:showAsAction="never"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        android:title="@string/menuClearLog" />
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    <item
+[external][shana][shana@zju.edu.cn]        android:id="@+id/menu_word_wrap"
+[external][shana][shana@zju.edu.cn]        android:checkable="true"
+[external][shana][shana@zju.edu.cn]        android:checked="false"
+[external][shana][shana@zju.edu.cn]        android:title="@string/menu_enable_word_wrap" />
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]</menu>

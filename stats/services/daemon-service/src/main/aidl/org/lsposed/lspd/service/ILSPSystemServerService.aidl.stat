@@ -1,0 +1,7 @@
+[external][shana][shana@zju.edu.cn]package org.lsposed.lspd.service;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import org.lsposed.lspd.service.ILSPApplicationService;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]interface ILSPSystemServerService {
+[internal][vvb2060][vvb2060@gmail.com]    ILSPApplicationService requestApplicationService(int uid, int pid, String processName, IBinder heartBeat);
+[external][shana][shana@zju.edu.cn]}

@@ -1,0 +1,13 @@
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.lspd.service;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import org.lsposed.lspd.models.Module;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]interface ILSPApplicationService {
+[external][shana][shana@zju.edu.cn]    List<Module> getLegacyModulesList();
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    List<Module> getModulesList();
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]    String getPrefsPath(String packageName);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    ParcelFileDescriptor requestInjectedManagerBinder(out List<IBinder> binder);
+[external][shana][shana@zju.edu.cn]}

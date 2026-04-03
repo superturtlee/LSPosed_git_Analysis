@@ -1,0 +1,18 @@
+[external][hsushulong][hsushulong@gmail.com]package android.content.res;
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]import java.io.IOException;
+[external][hsushulong][hsushulong@gmail.com]import java.io.InputStream;
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]public final class AssetManager {
+[external][hsushulong][hsushulong@gmail.com]	public final int addAssetPath(String path) {
+[external][hsushulong][hsushulong@gmail.com]		throw new UnsupportedOperationException("STUB");
+[external][hsushulong][hsushulong@gmail.com]	}
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]	public void close() {
+[external][hsushulong][hsushulong@gmail.com]		throw new UnsupportedOperationException("STUB");
+[external][hsushulong][hsushulong@gmail.com]	}
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]	public final InputStream open(String fileName) throws IOException {
+[external][hsushulong][hsushulong@gmail.com]		throw new UnsupportedOperationException("STUB");
+[external][hsushulong][hsushulong@gmail.com]	}
+[external][hsushulong][hsushulong@gmail.com]}

@@ -1,0 +1,29 @@
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]<!--
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~ This file is part of LSPosed.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~ LSPosed is free software: you can redistribute it and/or modify
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~ it under the terms of the GNU General Public License as published by
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~ the Free Software Foundation, either version 3 of the License, or
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~ (at your option) any later version.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~ LSPosed is distributed in the hope that it will be useful,
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~ GNU General Public License for more details.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~ You should have received a copy of the GNU General Public License
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ~ Copyright (C) 2022 LSPosed Contributors
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  -->
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]<vector xmlns:android="http://schemas.android.com/apk/res/android"
+[external][shana][shana@zju.edu.cn]    android:width="24dp"
+[external][shana][shana@zju.edu.cn]    android:height="24dp"
+[external][shana][shana@zju.edu.cn]    android:viewportWidth="24"
+[external][shana][shana@zju.edu.cn]    android:viewportHeight="24"
+[external][shana][shana@zju.edu.cn]    android:tint="?attr/colorControlNormal">
+[external][shana][shana@zju.edu.cn]  <path
+[external][shana][shana@zju.edu.cn]      android:fillColor="@android:color/white"
+[external][shana][shana@zju.edu.cn]      android:pathData="M17,20.41L18.41,19 15,15.59 13.59,17 17,20.41zM7.5,8H11v5.59L5.59,19 7,20.41l6,-6V8h3.5L12,3.5 7.5,8z"/>
+[external][shana][shana@zju.edu.cn]</vector>

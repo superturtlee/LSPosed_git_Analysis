@@ -1,0 +1,172 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][admin][admin@0x.mk] * Copyright (C) 2021 - 2022 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.lspd.service;
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import static org.lsposed.lspd.service.ServiceManager.TAG;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]import android.os.IBinder;
+[external][admin][admin@0x.mk]import android.os.Parcel;
+[external][shana][shana@zju.edu.cn]import android.os.ParcelFileDescriptor;
+[external][shana][shana@zju.edu.cn]import android.os.Process;
+[external][shana][shana@zju.edu.cn]import android.os.RemoteException;
+[external][shana][shana@zju.edu.cn]import android.util.Log;
+[external][shana][shana@zju.edu.cn]import android.util.Pair;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import androidx.annotation.NonNull;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import org.lsposed.lspd.models.Module;
+[external][wanghan1995315][wanghan1995315@gmail.com]
+[external][shana][shana@zju.edu.cn]import java.util.Collections;
+[internal][vvb2060][vvb2060@gmail.com]import java.util.List;
+[external][shana][shana@zju.edu.cn]import java.util.Map;
+[external][shana][shana@zju.edu.cn]import java.util.concurrent.ConcurrentHashMap;
+[external][shana][shana@zju.edu.cn]import java.util.stream.Collectors;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public class LSPApplicationService extends ILSPApplicationService.Stub {
+[external][admin][admin@0x.mk]    final static int DEX_TRANSACTION_CODE = 1310096052;
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    final static int OBFUSCATION_MAP_TRANSACTION_CODE = 724533732;
+[external][shana][shana@zju.edu.cn]    // key: <uid, pid>
+[external][shana][shana@zju.edu.cn]    private final static Map<Pair<Integer, Integer>, ProcessInfo> processes = new ConcurrentHashMap<>();
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    static class ProcessInfo implements DeathRecipient {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        final int uid;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        final int pid;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        final String processName;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        final IBinder heartBeat;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        ProcessInfo(int uid, int pid, String processName, IBinder heartBeat) throws RemoteException {
+[external][shana][shana@zju.edu.cn]            this.uid = uid;
+[external][shana][shana@zju.edu.cn]            this.pid = pid;
+[external][shana][shana@zju.edu.cn]            this.processName = processName;
+[external][shana][shana@zju.edu.cn]            this.heartBeat = heartBeat;
+[external][shana][shana@zju.edu.cn]            heartBeat.linkToDeath(this, 0);
+[external][shana][shana@zju.edu.cn]            Log.d(TAG, "register " + this);
+[external][shana][shana@zju.edu.cn]            processes.put(new Pair<>(uid, pid), this);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public void binderDied() {
+[external][shana][shana@zju.edu.cn]            Log.d(TAG, this + " is dead");
+[external][shana][shana@zju.edu.cn]            heartBeat.unlinkToDeath(this, 0);
+[external][shana][shana@zju.edu.cn]            processes.remove(new Pair<>(uid, pid), this);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @NonNull
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public String toString() {
+[external][shana][shana@zju.edu.cn]            return "ProcessInfo{" +
+[external][shana][shana@zju.edu.cn]                    "uid=" + uid +
+[external][shana][shana@zju.edu.cn]                    ", pid=" + pid +
+[external][shana][shana@zju.edu.cn]                    ", processName='" + processName + '\'' +
+[external][shana][shana@zju.edu.cn]                    ", heartBeat=" + heartBeat +
+[external][shana][shana@zju.edu.cn]                    '}';
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][admin][admin@0x.mk]    @Override
+[external][shana][shana@zju.edu.cn]    public boolean onTransact(int code, Parcel data, Parcel reply, int flags) throws RemoteException {
+[external][admin][admin@0x.mk]        Log.d(TAG, "LSPApplicationService.onTransact: code=" + code);
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        switch (code) {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]            case DEX_TRANSACTION_CODE: {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                var shm = ConfigManager.getInstance().getPreloadDex();
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                if (shm == null) return false;
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                // assume that write only a fd
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                shm.writeToParcel(reply, 0);
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                reply.writeLong(shm.getSize());
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                return true;
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]            }
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]            case OBFUSCATION_MAP_TRANSACTION_CODE: {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                var obfuscation = ConfigManager.getInstance().dexObfuscate();
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                var signatures = ObfuscationManager.getSignatures();
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                reply.writeInt(signatures.size() * 2);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                for (Map.Entry<String, String> entry : signatures.entrySet()) {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                    reply.writeString(entry.getKey());
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                    // return val = key if obfuscation disabled
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                    reply.writeString(obfuscation ? entry.getValue() : entry.getKey());
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                }
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                return true;
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]            }
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]        return super.onTransact(code, data, reply, flags);
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]
+[external][shana][shana@zju.edu.cn]    public boolean registerHeartBeat(int uid, int pid, String processName, IBinder heartBeat) {
+[external][shana][shana@zju.edu.cn]        try {
+[external][shana][shana@zju.edu.cn]            new ProcessInfo(uid, pid, processName, heartBeat);
+[external][shana][shana@zju.edu.cn]            return true;
+[external][shana][shana@zju.edu.cn]        } catch (RemoteException e) {
+[external][shana][shana@zju.edu.cn]            return false;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private List<Module> getAllModulesList() throws RemoteException {
+[external][shana][shana@zju.edu.cn]        var processInfo = ensureRegistered();
+[external][shana][shana@zju.edu.cn]        if (processInfo.uid == Process.SYSTEM_UID && processInfo.processName.equals("system")) {
+[external][shana][shana@zju.edu.cn]            return ConfigManager.getInstance().getModulesForSystemServer();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        if (ServiceManager.getManagerService().isRunningManager(processInfo.pid, processInfo.uid))
+[external][shana][shana@zju.edu.cn]            return Collections.emptyList();
+[external][shana][shana@zju.edu.cn]        return ConfigManager.getInstance().getModulesForProcess(processInfo.processName, processInfo.uid);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public List<Module> getLegacyModulesList() throws RemoteException {
+[external][shana][shana@zju.edu.cn]        return getAllModulesList().stream().filter(m -> m.file.legacy).collect(Collectors.toList());
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public List<Module> getModulesList() throws RemoteException {
+[external][shana][shana@zju.edu.cn]        return getAllModulesList().stream().filter(m -> !m.file.legacy).collect(Collectors.toList());
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public String getPrefsPath(String packageName) throws RemoteException {
+[external][shana][shana@zju.edu.cn]        ensureRegistered();
+[external][shana][shana@zju.edu.cn]        return ConfigManager.getInstance().getPrefsPath(packageName, getCallingUid());
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public ParcelFileDescriptor requestInjectedManagerBinder(List<IBinder> binder) throws RemoteException {
+[external][shana][shana@zju.edu.cn]        var processInfo = ensureRegistered();
+[external][shana][shana@zju.edu.cn]        if (ServiceManager.getManagerService().postStartManager(processInfo.pid, processInfo.uid) ||
+[external][shana][shana@zju.edu.cn]                ConfigManager.getInstance().isManager(processInfo.uid)) {
+[external][shana][shana@zju.edu.cn]            binder.add(ServiceManager.getManagerService().obtainManagerBinder(processInfo.heartBeat, processInfo.pid, processInfo.uid));
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return ConfigManager.getInstance().getManagerApk();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public boolean hasRegister(int uid, int pid) {
+[external][shana][shana@zju.edu.cn]        return processes.containsKey(new Pair<>(uid, pid));
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @NonNull
+[external][shana][shana@zju.edu.cn]    private ProcessInfo ensureRegistered() throws RemoteException {
+[external][shana][shana@zju.edu.cn]        var uid = getCallingUid();
+[external][shana][shana@zju.edu.cn]        var pid = getCallingPid();
+[external][shana][shana@zju.edu.cn]        var key = new Pair<>(uid, pid);
+[external][shana][shana@zju.edu.cn]        ProcessInfo processInfo = processes.getOrDefault(key, null);
+[external][shana][shana@zju.edu.cn]        if (processInfo == null || uid != processInfo.uid || pid != processInfo.pid) {
+[external][shana][shana@zju.edu.cn]            processes.remove(key, processInfo);
+[external][shana][shana@zju.edu.cn]            Log.w(TAG, "non-authorized: info=" + processInfo + " uid=" + uid + " pid=" + pid);
+[external][shana][shana@zju.edu.cn]            throw new RemoteException("Not registered");
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return processInfo;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

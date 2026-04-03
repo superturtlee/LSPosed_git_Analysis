@@ -1,0 +1,823 @@
+[external][shana][shana@zju.edu.cn]/*
+[external][shana][shana@zju.edu.cn] * This file is part of LSPosed.
+[external][shana][shana@zju.edu.cn] *
+[external][shana][shana@zju.edu.cn] * LSPosed is free software: you can redistribute it and/or modify
+[external][shana][shana@zju.edu.cn] * it under the terms of the GNU General Public License as published by
+[external][shana][shana@zju.edu.cn] * the Free Software Foundation, either version 3 of the License, or
+[external][shana][shana@zju.edu.cn] * (at your option) any later version.
+[external][shana][shana@zju.edu.cn] *
+[external][shana][shana@zju.edu.cn] * LSPosed is distributed in the hope that it will be useful,
+[external][shana][shana@zju.edu.cn] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][shana][shana@zju.edu.cn] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][shana][shana@zju.edu.cn] * GNU General Public License for more details.
+[external][shana][shana@zju.edu.cn] *
+[external][shana][shana@zju.edu.cn] * You should have received a copy of the GNU General Public License
+[external][shana][shana@zju.edu.cn] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][shana][shana@zju.edu.cn] *
+[external][shana][shana@zju.edu.cn] * Copyright (C) 2023 LSPosed Contributors
+[external][shana][shana@zju.edu.cn] */
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]#include "dex_parser.h"
+[external][shana][shana@zju.edu.cn]#include "native_util.h"
+[external][shana][shana@zju.edu.cn]#include "slicer/reader.h"
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]#include <list>
+[external][shana][shana@zju.edu.cn]#include <set>
+[external][shana][shana@zju.edu.cn]#include <parallel_hashmap/phmap.h>
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]namespace {
+[external][shana][shana@zju.edu.cn]    using Value = std::tuple<jint /*type*/, std::vector<jbyte> /*data*/>;
+[external][shana][shana@zju.edu.cn]    using Array = std::vector<Value>;
+[external][shana][shana@zju.edu.cn]    using ArrayList = std::list<Array>;
+[external][shana][shana@zju.edu.cn]    using Element = std::tuple<jint /*name*/, Value>;
+[external][shana][shana@zju.edu.cn]    using ElementList = std::vector<Element>;
+[external][shana][shana@zju.edu.cn]    using Annotation = std::tuple<jint/*vis*/, jint /*type*/, ElementList>;
+[external][shana][shana@zju.edu.cn]    using AnnotationList = std::vector<Annotation>;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    class DexParser : public dex::Reader {
+[external][shana][shana@zju.edu.cn]    public:
+[external][shana][shana@zju.edu.cn]        DexParser(const dex::u1 *data, size_t size) : dex::Reader(data, size, nullptr, 0) {}
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        struct ClassData {
+[external][shana][shana@zju.edu.cn]            std::vector<jint> interfaces;
+[external][shana][shana@zju.edu.cn]            std::vector<jint> static_fields;
+[external][shana][shana@zju.edu.cn]            std::vector<jint> static_fields_access_flags;
+[external][shana][shana@zju.edu.cn]            std::vector<jint> instance_fields;
+[external][shana][shana@zju.edu.cn]            std::vector<jint> instance_fields_access_flags;
+[external][shana][shana@zju.edu.cn]            std::vector<jint> direct_methods;
+[external][shana][shana@zju.edu.cn]            std::vector<jint> direct_methods_access_flags;
+[external][shana][shana@zju.edu.cn]            std::vector<const dex::Code *> direct_methods_code;
+[external][shana][shana@zju.edu.cn]            std::vector<jint> virtual_methods;
+[external][shana][shana@zju.edu.cn]            std::vector<jint> virtual_methods_access_flags;
+[external][shana][shana@zju.edu.cn]            std::vector<const dex::Code *> virtual_methods_code;
+[external][shana][shana@zju.edu.cn]            std::vector<jint> annotations;
+[external][shana][shana@zju.edu.cn]        };
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        struct MethodBody {
+[external][shana][shana@zju.edu.cn]            bool loaded;
+[external][shana][shana@zju.edu.cn]            std::vector<jint> referred_strings;
+[external][shana][shana@zju.edu.cn]            std::vector<jint> accessed_fields;
+[external][shana][shana@zju.edu.cn]            std::vector<jint> assigned_fields;
+[external][shana][shana@zju.edu.cn]            std::vector<jint> invoked_methods;
+[external][shana][shana@zju.edu.cn]            std::vector<jbyte> opcodes;
+[external][shana][shana@zju.edu.cn]        };
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        std::vector<ClassData> class_data;
+[external][shana][shana@zju.edu.cn]        phmap::flat_hash_map<jint, std::vector<jint>> field_annotations;
+[external][shana][shana@zju.edu.cn]        phmap::flat_hash_map<jint, std::vector<jint>> method_annotations;
+[external][shana][shana@zju.edu.cn]        phmap::flat_hash_map<jint, std::vector<jint>> parameter_annotations;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        phmap::flat_hash_map<jint, MethodBody> method_bodies;
+[external][shana][shana@zju.edu.cn]    };
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    template<class T>
+[external][shana][shana@zju.edu.cn]    static std::vector<jbyte> ParseIntValue(const dex::u1 **pptr, size_t size) {
+[external][shana][shana@zju.edu.cn]        static_assert(std::is_integral<T>::value, "must be an integral type");
+[external][shana][shana@zju.edu.cn]        std::vector<jbyte> ret(sizeof(T));
+[external][shana][shana@zju.edu.cn]        T &value = *reinterpret_cast<T *>(ret.data());
+[external][shana][shana@zju.edu.cn]        for (size_t i = 0; i < size; ++i) {
+[external][shana][shana@zju.edu.cn]            value |= T(*(*pptr)++) << (i * 8);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // sign-extend?
+[external][shana][shana@zju.edu.cn]        if constexpr (std::is_signed_v<T>) {
+[external][shana][shana@zju.edu.cn]            size_t shift = (sizeof(T) - size) * 8;
+[external][shana][shana@zju.edu.cn]            value = T(value << shift) >> shift;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return ret;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    template<class T>
+[external][shana][shana@zju.edu.cn]    static std::vector<jbyte> ParseFloatValue(const dex::u1 **pptr, size_t size) {
+[external][shana][shana@zju.edu.cn]        std::vector<jbyte> ret(sizeof(T));
+[external][shana][shana@zju.edu.cn]        T &value = *reinterpret_cast<T *>(ret.data());
+[external][shana][shana@zju.edu.cn]        int start_byte = sizeof(T) - size;
+[external][shana][shana@zju.edu.cn]        for (dex::u1 *p = reinterpret_cast<dex::u1 *>(&value) + start_byte; size > 0;
+[external][shana][shana@zju.edu.cn]             --size) {
+[external][shana][shana@zju.edu.cn]            *p++ = *(*pptr)++;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return ret;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    Annotation
+[external][shana][shana@zju.edu.cn]    ParseAnnotation(const dex::u1 **annotation, AnnotationList &annotation_list,
+[external][shana][shana@zju.edu.cn]                    ArrayList &array_list);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    Array
+[external][shana][shana@zju.edu.cn]    ParseArray(const dex::u1 **array, AnnotationList &annotation_list, ArrayList &array_list);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    Value
+[external][shana][shana@zju.edu.cn]    ParseValue(const dex::u1 **value, AnnotationList &annotation_list, ArrayList &array_list) {
+[external][shana][shana@zju.edu.cn]        Value res;
+[external][shana][shana@zju.edu.cn]        auto &[type, value_content] = res;
+[external][shana][shana@zju.edu.cn]        auto header = *(*value)++;
+[external][shana][shana@zju.edu.cn]        type = header & dex::kEncodedValueTypeMask;
+[external][shana][shana@zju.edu.cn]        dex::u1 arg = header >> dex::kEncodedValueArgShift;
+[external][shana][shana@zju.edu.cn]        switch (type) {
+[external][shana][shana@zju.edu.cn]            case dex::kEncodedByte:
+[external][shana][shana@zju.edu.cn]                value_content = ParseIntValue<int8_t>(value, arg + 1);
+[external][shana][shana@zju.edu.cn]                break;
+[external][shana][shana@zju.edu.cn]            case dex::kEncodedShort:
+[external][shana][shana@zju.edu.cn]                value_content = ParseIntValue<int16_t>(value, arg + 1);
+[external][shana][shana@zju.edu.cn]                break;
+[external][shana][shana@zju.edu.cn]            case dex::kEncodedChar:
+[external][shana][shana@zju.edu.cn]                value_content = ParseIntValue<uint16_t>(value, arg + 1);
+[external][shana][shana@zju.edu.cn]                break;
+[external][shana][shana@zju.edu.cn]            case dex::kEncodedInt:
+[external][shana][shana@zju.edu.cn]                value_content = ParseIntValue<int32_t>(value, arg + 1);
+[external][shana][shana@zju.edu.cn]                break;
+[external][shana][shana@zju.edu.cn]            case dex::kEncodedLong:
+[external][shana][shana@zju.edu.cn]                value_content = ParseIntValue<int64_t>(value, arg + 1);
+[external][shana][shana@zju.edu.cn]                break;
+[external][shana][shana@zju.edu.cn]            case dex::kEncodedFloat:
+[external][shana][shana@zju.edu.cn]                value_content = ParseFloatValue<float>(value, arg + 1);
+[external][shana][shana@zju.edu.cn]                break;
+[external][shana][shana@zju.edu.cn]            case dex::kEncodedDouble:
+[external][shana][shana@zju.edu.cn]                value_content = ParseFloatValue<double>(value, arg + 1);
+[external][shana][shana@zju.edu.cn]                break;
+[external][shana][shana@zju.edu.cn]            case dex::kEncodedMethodType:
+[external][shana][shana@zju.edu.cn]            case dex::kEncodedMethodHandle:
+[external][shana][shana@zju.edu.cn]            case dex::kEncodedString:
+[external][shana][shana@zju.edu.cn]            case dex::kEncodedType:
+[external][shana][shana@zju.edu.cn]            case dex::kEncodedField:
+[external][shana][shana@zju.edu.cn]            case dex::kEncodedMethod:
+[external][shana][shana@zju.edu.cn]            case dex::kEncodedEnum:
+[external][shana][shana@zju.edu.cn]                value_content = ParseIntValue<uint32_t>(value, arg + 1);
+[external][shana][shana@zju.edu.cn]                break;
+[external][shana][shana@zju.edu.cn]            case dex::kEncodedArray:
+[external][shana][shana@zju.edu.cn]                value_content.resize(sizeof(jint));
+[external][shana][shana@zju.edu.cn]                *reinterpret_cast<jint *>(value_content.data()) = static_cast<jint>(array_list.size());
+[external][shana][shana@zju.edu.cn]                array_list.emplace_back(ParseArray(value, annotation_list, array_list));
+[external][shana][shana@zju.edu.cn]                break;
+[external][shana][shana@zju.edu.cn]            case dex::kEncodedAnnotation:
+[external][shana][shana@zju.edu.cn]                value_content.resize(sizeof(jint));
+[external][shana][shana@zju.edu.cn]                *reinterpret_cast<jint *>(value_content.data()) = static_cast<jint>(annotation_list.size());
+[external][shana][shana@zju.edu.cn]                annotation_list.emplace_back(ParseAnnotation(value, annotation_list, array_list));
+[external][shana][shana@zju.edu.cn]                break;
+[external][shana][shana@zju.edu.cn]            case dex::kEncodedNull:
+[external][shana][shana@zju.edu.cn]                break;
+[external][shana][shana@zju.edu.cn]            case dex::kEncodedBoolean:
+[external][shana][shana@zju.edu.cn]                value_content = {static_cast<jbyte>(arg == 1)};
+[external][shana][shana@zju.edu.cn]                break;
+[external][shana][shana@zju.edu.cn]            default:
+[external][shana][shana@zju.edu.cn]                __builtin_unreachable();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return res;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    Annotation
+[external][shana][shana@zju.edu.cn]    ParseAnnotation(const dex::u1 **annotation, AnnotationList &annotation_list,
+[external][shana][shana@zju.edu.cn]                    ArrayList &array_list) {
+[external][shana][shana@zju.edu.cn]        Annotation ret = {dex::kVisibilityEncoded,
+[external][shana][shana@zju.edu.cn]                          dex::ReadULeb128(annotation),
+[external][shana][shana@zju.edu.cn]                          ElementList{}};
+[external][shana][shana@zju.edu.cn]        auto &[vis, type, element_list] = ret;
+[external][shana][shana@zju.edu.cn]        auto size = dex::ReadULeb128(annotation);
+[external][shana][shana@zju.edu.cn]        element_list.resize(size);
+[external][shana][shana@zju.edu.cn]        for (size_t j = 0; j < size; ++j) {
+[external][shana][shana@zju.edu.cn]            auto &[name, value] = element_list[j];
+[external][shana][shana@zju.edu.cn]            name = static_cast<jint>(dex::ReadULeb128(annotation));
+[external][shana][shana@zju.edu.cn]            value = ParseValue(annotation, annotation_list, array_list);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return ret;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    Array
+[external][shana][shana@zju.edu.cn]    ParseArray(const dex::u1 **array, AnnotationList &annotation_list, ArrayList &array_list) {
+[external][shana][shana@zju.edu.cn]        auto size = dex::ReadULeb128(array);
+[external][shana][shana@zju.edu.cn]        Array ret;
+[external][shana][shana@zju.edu.cn]        ret.reserve(size);
+[external][shana][shana@zju.edu.cn]        for (size_t i = 0; i < size; ++i) {
+[external][shana][shana@zju.edu.cn]            ret.emplace_back(ParseValue(array, annotation_list, array_list));
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return ret;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    void ParseAnnotationSet(dex::Reader &dex, AnnotationList &annotation_list,
+[external][shana][shana@zju.edu.cn]                            ArrayList &array_list, std::vector<jint> &indices,
+[external][shana][shana@zju.edu.cn]                            const dex::AnnotationSetItem *annotation_set) {
+[external][shana][shana@zju.edu.cn]        if (annotation_set == nullptr) {
+[external][shana][shana@zju.edu.cn]            return;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        for (size_t i = 0; i < annotation_set->size; ++i) {
+[external][shana][shana@zju.edu.cn]            auto *item = dex.dataPtr<dex::AnnotationItem>(annotation_set->entries[i]);
+[external][shana][shana@zju.edu.cn]            auto *annotation_data = item->annotation;
+[external][shana][shana@zju.edu.cn]            indices.emplace_back(annotation_list.size());
+[external][shana][shana@zju.edu.cn]            auto &[visibility, type, element_list] = annotation_list.emplace_back(
+[external][shana][shana@zju.edu.cn]                    ParseAnnotation(&annotation_data, annotation_list, array_list));
+[external][shana][shana@zju.edu.cn]            visibility = item->visibility;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]namespace lspd {
+[external][shana][shana@zju.edu.cn]    LSP_DEF_NATIVE_METHOD(jobject, DexParserBridge, openDex, jobject data, jlongArray args) {
+[external][shana][shana@zju.edu.cn]        auto dex_size = env->GetDirectBufferCapacity(data);
+[external][shana][shana@zju.edu.cn]        if (dex_size == -1) {
+[external][shana][shana@zju.edu.cn]            env->ThrowNew(env->FindClass("java/io/IOException"), "Invalid dex data");
+[external][shana][shana@zju.edu.cn]            return nullptr;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        auto *dex_data = env->GetDirectBufferAddress(data);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        auto *dex_reader = new DexParser(reinterpret_cast<dex::u1 *>(dex_data), dex_size);
+[external][shana][shana@zju.edu.cn]        auto *args_ptr = env->GetLongArrayElements(args, nullptr);
+[external][shana][shana@zju.edu.cn]        auto include_annotations = args_ptr[1];
+[external][shana][shana@zju.edu.cn]        env->ReleaseLongArrayElements(args, args_ptr, JNI_ABORT);
+[external][shana][shana@zju.edu.cn]        env->SetLongArrayRegion(args, 0, 1, reinterpret_cast<const jlong *>(&dex_reader));
+[external][shana][shana@zju.edu.cn]        auto &dex = *dex_reader;
+[external][shana][shana@zju.edu.cn]        if (dex.IsCompact()) {
+[external][shana][shana@zju.edu.cn]            env->ThrowNew(env->FindClass("java/io/IOException"), "Compact dex is not supported");
+[external][shana][shana@zju.edu.cn]            return nullptr;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        auto object_class = env->FindClass("java/lang/Object");
+[external][shana][shana@zju.edu.cn]        auto string_class = env->FindClass("java/lang/String");
+[external][shana][shana@zju.edu.cn]        auto int_array_class = env->FindClass("[I");
+[external][shana][shana@zju.edu.cn]        auto out = env->NewObjectArray(8, object_class, nullptr);
+[external][shana][shana@zju.edu.cn]        auto out0 = env->NewObjectArray(static_cast<jint>(dex.StringIds().size()),
+[external][shana][shana@zju.edu.cn]                                        string_class, nullptr);
+[external][shana][shana@zju.edu.cn]        auto strings = dex.StringIds();
+[external][shana][shana@zju.edu.cn]        for (size_t i = 0; i < strings.size(); ++i) {
+[external][shana][shana@zju.edu.cn]            const auto *ptr = dex.dataPtr<dex::u1>(strings[i].string_data_off);
+[external][shana][shana@zju.edu.cn]            [[maybe_unused]] size_t len = dex::ReadULeb128(&ptr);
+[external][shana][shana@zju.edu.cn]            auto str = env->NewStringUTF(reinterpret_cast<const char *>(ptr));
+[external][shana][shana@zju.edu.cn]            env->SetObjectArrayElement(out0, static_cast<jint>(i), str);
+[external][shana][shana@zju.edu.cn]            env->DeleteLocalRef(str);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        env->SetObjectArrayElement(out, 0, out0);
+[external][shana][shana@zju.edu.cn]        env->DeleteLocalRef(out0);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        auto types = dex.TypeIds();
+[external][shana][shana@zju.edu.cn]        auto out1 = env->NewIntArray(static_cast<jint>(types.size()));
+[external][shana][shana@zju.edu.cn]        auto *out1_ptr = env->GetIntArrayElements(out1, nullptr);
+[external][shana][shana@zju.edu.cn]        for (size_t i = 0; i < types.size(); ++i) {
+[external][shana][shana@zju.edu.cn]            out1_ptr[i] = static_cast<jint>(types[i].descriptor_idx);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        env->ReleaseIntArrayElements(out1, out1_ptr, 0);
+[external][shana][shana@zju.edu.cn]        env->SetObjectArrayElement(out, 1, out1);
+[external][shana][shana@zju.edu.cn]        env->DeleteLocalRef(out1);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        auto protos = dex.ProtoIds();
+[external][shana][shana@zju.edu.cn]        auto out2 = env->NewObjectArray(static_cast<jint>(protos.size()),
+[external][shana][shana@zju.edu.cn]                                        int_array_class, nullptr);
+[external][shana][shana@zju.edu.cn]        auto empty_type_list = dex::TypeList{.size = 0, .list = {}};
+[external][shana][shana@zju.edu.cn]        for (size_t i = 0; i < protos.size(); ++i) {
+[external][shana][shana@zju.edu.cn]            auto &proto = protos[i];
+[external][shana][shana@zju.edu.cn]            const auto &params = proto.parameters_off ? *dex.dataPtr<dex::TypeList>(
+[external][shana][shana@zju.edu.cn]                    proto.parameters_off) : empty_type_list;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            auto out2i = env->NewIntArray(static_cast<jint>(2 + params.size));
+[external][shana][shana@zju.edu.cn]            auto *out2i_ptr = env->GetIntArrayElements(out2i, nullptr);
+[external][shana][shana@zju.edu.cn]            out2i_ptr[0] = static_cast<jint>(proto.shorty_idx);
+[external][shana][shana@zju.edu.cn]            out2i_ptr[1] = static_cast<jint>(proto.return_type_idx);
+[external][shana][shana@zju.edu.cn]            for (size_t j = 0; j < params.size; ++j) {
+[external][shana][shana@zju.edu.cn]                out2i_ptr[2 + j] = static_cast<jint>(params.list[j].type_idx);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            env->ReleaseIntArrayElements(out2i, out2i_ptr, 0);
+[external][shana][shana@zju.edu.cn]            env->SetObjectArrayElement(out2, static_cast<jint>(i), out2i);
+[external][shana][shana@zju.edu.cn]            env->DeleteLocalRef(out2i);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        env->SetObjectArrayElement(out, 2, out2);
+[external][shana][shana@zju.edu.cn]        env->DeleteLocalRef(out2);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        auto fields = dex.FieldIds();
+[external][shana][shana@zju.edu.cn]        auto out3 = env->NewIntArray(static_cast<jint>(3 * fields.size()));
+[external][shana][shana@zju.edu.cn]        auto *out3_ptr = env->GetIntArrayElements(out3, nullptr);
+[external][shana][shana@zju.edu.cn]        for (size_t i = 0; i < fields.size(); ++i) {
+[external][shana][shana@zju.edu.cn]            auto &field = fields[i];
+[external][shana][shana@zju.edu.cn]            out3_ptr[3 * i] = static_cast<jint>(field.class_idx);
+[external][shana][shana@zju.edu.cn]            out3_ptr[3 * i + 1] = static_cast<jint>(field.type_idx);
+[external][shana][shana@zju.edu.cn]            out3_ptr[3 * i + 2] = static_cast<jint>(field.name_idx);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        env->ReleaseIntArrayElements(out3, out3_ptr, 0);
+[external][shana][shana@zju.edu.cn]        env->SetObjectArrayElement(out, 3, out3);
+[external][shana][shana@zju.edu.cn]        env->DeleteLocalRef(out3);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        auto methods = dex.MethodIds();
+[external][shana][shana@zju.edu.cn]        auto out4 = env->NewIntArray(static_cast<jint>(3 * methods.size()));
+[external][shana][shana@zju.edu.cn]        auto *out4_ptr = env->GetIntArrayElements(out4, nullptr);
+[external][shana][shana@zju.edu.cn]        for (size_t i = 0; i < methods.size(); ++i) {
+[external][shana][shana@zju.edu.cn]            out4_ptr[3 * i] = static_cast<jint>(methods[i].class_idx);
+[external][shana][shana@zju.edu.cn]            out4_ptr[3 * i + 1] = static_cast<jint>(methods[i].proto_idx);
+[external][shana][shana@zju.edu.cn]            out4_ptr[3 * i + 2] = static_cast<jint>(methods[i].name_idx);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        env->ReleaseIntArrayElements(out4, out4_ptr, 0);
+[external][shana][shana@zju.edu.cn]        env->SetObjectArrayElement(out, 4, out4);
+[external][shana][shana@zju.edu.cn]        env->DeleteLocalRef(out4);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        auto classes = dex.ClassDefs();
+[external][shana][shana@zju.edu.cn]        dex.class_data.resize(classes.size());
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        AnnotationList annotation_list;
+[external][shana][shana@zju.edu.cn]        ArrayList array_list;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        for (size_t i = 0; i < classes.size(); ++i) {
+[external][shana][shana@zju.edu.cn]            auto &class_def = classes[i];
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            dex::u4 static_fields_count = 0;
+[external][shana][shana@zju.edu.cn]            dex::u4 instance_fields_count = 0;
+[external][shana][shana@zju.edu.cn]            dex::u4 direct_methods_count = 0;
+[external][shana][shana@zju.edu.cn]            dex::u4 virtual_methods_count = 0;
+[external][shana][shana@zju.edu.cn]            const dex::u1 *class_data_ptr = nullptr;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            const dex::AnnotationsDirectoryItem *annotations = nullptr;
+[external][shana][shana@zju.edu.cn]            const dex::AnnotationSetItem *class_annotation = nullptr;
+[external][shana][shana@zju.edu.cn]            dex::u4 field_annotations_count = 0;
+[external][shana][shana@zju.edu.cn]            dex::u4 method_annotations_count = 0;
+[external][shana][shana@zju.edu.cn]            dex::u4 parameter_annotations_count = 0;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            auto &class_data = dex.class_data[i];
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            if (class_def.interfaces_off) {
+[external][shana][shana@zju.edu.cn]                auto defined_interfaces = dex.dataPtr<dex::TypeList>(class_def.interfaces_off);
+[external][shana][shana@zju.edu.cn]                class_data.interfaces.resize(defined_interfaces->size);
+[external][shana][shana@zju.edu.cn]                for (size_t k = 0; k < class_data.interfaces.size(); ++k) {
+[external][shana][shana@zju.edu.cn]                    class_data.interfaces[k] = defined_interfaces->list[k].type_idx;
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            if (class_def.annotations_off != 0) {
+[external][shana][shana@zju.edu.cn]                annotations = dex.dataPtr<dex::AnnotationsDirectoryItem>(class_def.annotations_off);
+[external][shana][shana@zju.edu.cn]                if (annotations->class_annotations_off != 0) {
+[external][shana][shana@zju.edu.cn]                    class_annotation = dex.dataPtr<dex::AnnotationSetItem>(
+[external][shana][shana@zju.edu.cn]                            annotations->class_annotations_off);
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]                field_annotations_count = annotations->fields_size;
+[external][shana][shana@zju.edu.cn]                method_annotations_count = annotations->methods_size;
+[external][shana][shana@zju.edu.cn]                parameter_annotations_count = annotations->parameters_size;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            if (class_def.class_data_off != 0) {
+[external][shana][shana@zju.edu.cn]                class_data_ptr = dex.dataPtr<dex::u1>(class_def.class_data_off);
+[external][shana][shana@zju.edu.cn]                static_fields_count = dex::ReadULeb128(&class_data_ptr);
+[external][shana][shana@zju.edu.cn]                instance_fields_count = dex::ReadULeb128(&class_data_ptr);
+[external][shana][shana@zju.edu.cn]                direct_methods_count = dex::ReadULeb128(&class_data_ptr);
+[external][shana][shana@zju.edu.cn]                virtual_methods_count = dex::ReadULeb128(&class_data_ptr);
+[external][shana][shana@zju.edu.cn]                class_data.static_fields.resize(static_fields_count);
+[external][shana][shana@zju.edu.cn]                class_data.static_fields_access_flags.resize(static_fields_count);
+[external][shana][shana@zju.edu.cn]                class_data.instance_fields.resize(instance_fields_count);
+[external][shana][shana@zju.edu.cn]                class_data.instance_fields_access_flags.resize(instance_fields_count);
+[external][shana][shana@zju.edu.cn]                class_data.direct_methods.resize(direct_methods_count);
+[external][shana][shana@zju.edu.cn]                class_data.direct_methods_access_flags.resize(direct_methods_count);
+[external][shana][shana@zju.edu.cn]                class_data.direct_methods_code.resize(direct_methods_count);
+[external][shana][shana@zju.edu.cn]                class_data.virtual_methods.resize(virtual_methods_count);
+[external][shana][shana@zju.edu.cn]                class_data.virtual_methods_access_flags.resize(virtual_methods_count);
+[external][shana][shana@zju.edu.cn]                class_data.virtual_methods_code.resize(virtual_methods_count);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            if (class_data_ptr) {
+[external][shana][shana@zju.edu.cn]                for (size_t k = 0, field_idx = 0; k < static_fields_count; ++k) {
+[external][shana][shana@zju.edu.cn]                    class_data.static_fields[k] = static_cast<jint>(field_idx += dex::ReadULeb128(
+[external][shana][shana@zju.edu.cn]                            &class_data_ptr));
+[external][shana][shana@zju.edu.cn]                    class_data.static_fields_access_flags[k] = static_cast<jint>(dex::ReadULeb128(
+[external][shana][shana@zju.edu.cn]                            &class_data_ptr));
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]                for (size_t k = 0, field_idx = 0; k < instance_fields_count; ++k) {
+[external][shana][shana@zju.edu.cn]                    class_data.instance_fields[k] = static_cast<jint>(field_idx += dex::ReadULeb128(
+[external][shana][shana@zju.edu.cn]                            &class_data_ptr));
+[external][shana][shana@zju.edu.cn]                    class_data.instance_fields_access_flags[k] = static_cast<jint>(dex::ReadULeb128(
+[external][shana][shana@zju.edu.cn]                            &class_data_ptr));
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]                for (size_t k = 0, method_idx = 0; k < direct_methods_count; ++k) {
+[external][shana][shana@zju.edu.cn]                    class_data.direct_methods[k] = static_cast<jint>(method_idx += dex::ReadULeb128(
+[external][shana][shana@zju.edu.cn]                            &class_data_ptr));
+[external][shana][shana@zju.edu.cn]                    class_data.direct_methods_access_flags[k] = static_cast<jint>(dex::ReadULeb128(
+[external][shana][shana@zju.edu.cn]                            &class_data_ptr));
+[external][shana][shana@zju.edu.cn]                    auto code_off = dex::ReadULeb128(&class_data_ptr);
+[external][shana][shana@zju.edu.cn]                    class_data.direct_methods_code[k] = code_off ? dex.dataPtr<dex::Code>(code_off)
+[external][shana][shana@zju.edu.cn]                                                                 : nullptr;
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]                for (size_t k = 0, method_idx = 0; k < virtual_methods_count; ++k) {
+[external][shana][shana@zju.edu.cn]                    class_data.virtual_methods[k] = static_cast<jint>(method_idx += dex::ReadULeb128(
+[external][shana][shana@zju.edu.cn]                            &class_data_ptr));
+[external][shana][shana@zju.edu.cn]                    class_data.virtual_methods_access_flags[k] = static_cast<jint>(dex::ReadULeb128(
+[external][shana][shana@zju.edu.cn]                            &class_data_ptr));
+[external][shana][shana@zju.edu.cn]                    auto code_off = dex::ReadULeb128(&class_data_ptr);
+[external][shana][shana@zju.edu.cn]                    class_data.virtual_methods_code[k] = code_off ? dex.dataPtr<dex::Code>(code_off)
+[external][shana][shana@zju.edu.cn]                                                                  : nullptr;
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            if (!include_annotations) continue;
+[external][shana][shana@zju.edu.cn]            ParseAnnotationSet(dex, annotation_list, array_list, class_data.annotations,
+[external][shana][shana@zju.edu.cn]                               class_annotation);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            auto *field_annotations = annotations
+[external][shana][shana@zju.edu.cn]                                      ? reinterpret_cast<const dex::FieldAnnotationsItem *>(
+[external][shana][shana@zju.edu.cn]                                              annotations + 1) : nullptr;
+[external][shana][shana@zju.edu.cn]            for (size_t k = 0; k < field_annotations_count; ++k) {
+[external][shana][shana@zju.edu.cn]                auto *field_annotation = dex.dataPtr<dex::AnnotationSetItem>(
+[external][shana][shana@zju.edu.cn]                        field_annotations[k].annotations_off);
+[external][shana][shana@zju.edu.cn]                ParseAnnotationSet(dex, annotation_list, array_list,
+[external][shana][shana@zju.edu.cn]                                   dex.field_annotations[static_cast<jint>(field_annotations[k].field_idx)],
+[external][shana][shana@zju.edu.cn]                                   field_annotation);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            auto *method_annotations = field_annotations
+[external][shana][shana@zju.edu.cn]                                       ? reinterpret_cast<const dex::MethodAnnotationsItem *>(
+[external][shana][shana@zju.edu.cn]                                               field_annotations + field_annotations_count)
+[external][shana][shana@zju.edu.cn]                                       : nullptr;
+[external][shana][shana@zju.edu.cn]            for (size_t k = 0; k < method_annotations_count; ++k) {
+[external][shana][shana@zju.edu.cn]                auto *method_annotation = dex.dataPtr<dex::AnnotationSetItem>(
+[external][shana][shana@zju.edu.cn]                        method_annotations[k].annotations_off);
+[external][shana][shana@zju.edu.cn]                ParseAnnotationSet(dex, annotation_list, array_list,
+[external][shana][shana@zju.edu.cn]                                   dex.method_annotations[static_cast<jint>(method_annotations[k].method_idx)],
+[external][shana][shana@zju.edu.cn]                                   method_annotation);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            auto *parameter_annotations = method_annotations
+[external][shana][shana@zju.edu.cn]                                          ? reinterpret_cast<const dex::ParameterAnnotationsItem *>(
+[external][shana][shana@zju.edu.cn]                                                  method_annotations + method_annotations_count)
+[external][shana][shana@zju.edu.cn]                                          : nullptr;
+[external][shana][shana@zju.edu.cn]            for (size_t k = 0; k < parameter_annotations_count; ++k) {
+[external][shana][shana@zju.edu.cn]                auto *parameter_annotation = dex.dataPtr<dex::AnnotationSetRefList>(
+[external][shana][shana@zju.edu.cn]                        parameter_annotations[k].annotations_off);
+[external][shana][shana@zju.edu.cn]                auto &indices = dex.parameter_annotations[static_cast<jint>(parameter_annotations[k].method_idx)];
+[external][shana][shana@zju.edu.cn]                for (size_t l = 0; l < parameter_annotation->size; ++l) {
+[external][shana][shana@zju.edu.cn]                    if (parameter_annotation->list[l].annotations_off != 0) {
+[external][shana][shana@zju.edu.cn]                        auto *parameter_annotation_item = dex.dataPtr<dex::AnnotationSetItem>(
+[external][shana][shana@zju.edu.cn]                                parameter_annotation->list[l].annotations_off);
+[external][shana][shana@zju.edu.cn]                        ParseAnnotationSet(dex, annotation_list, array_list, indices,
+[external][shana][shana@zju.edu.cn]                                           parameter_annotation_item);
+[external][shana][shana@zju.edu.cn]                    }
+[external][shana][shana@zju.edu.cn]                    indices.emplace_back(dex::kNoIndex);
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        if (!include_annotations) return out;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        auto out5 = env->NewIntArray(static_cast<jint>(2 * annotation_list.size()));
+[external][shana][shana@zju.edu.cn]        auto out6 = env->NewObjectArray(static_cast<jint>(2 * annotation_list.size()), object_class,
+[external][shana][shana@zju.edu.cn]                                        nullptr);
+[external][shana][shana@zju.edu.cn]        auto out5_ptr = env->GetIntArrayElements(out5, nullptr);
+[external][shana][shana@zju.edu.cn]        size_t i = 0;
+[external][shana][shana@zju.edu.cn]        for (auto &[visibility, type, items]: annotation_list) {
+[external][shana][shana@zju.edu.cn]            auto out6i0 = env->NewIntArray(static_cast<jint>(2 * items.size()));
+[external][shana][shana@zju.edu.cn]            auto out6i0_ptr = env->GetIntArrayElements(out6i0, nullptr);
+[external][shana][shana@zju.edu.cn]            auto out6i1 = env->NewObjectArray(static_cast<jint>(items.size()), object_class,
+[external][shana][shana@zju.edu.cn]                                              nullptr);
+[external][shana][shana@zju.edu.cn]            size_t j = 0;
+[external][shana][shana@zju.edu.cn]            for (auto&[name, value]: items) {
+[external][shana][shana@zju.edu.cn]                auto &[value_type, value_data] = value;
+[external][shana][shana@zju.edu.cn]                auto java_value = value_data.empty() ? nullptr : env->NewDirectByteBuffer(
+[external][shana][shana@zju.edu.cn]                        value_data.data(), value_data.size());
+[external][shana][shana@zju.edu.cn]                env->SetObjectArrayElement(out6i1, static_cast<jint>(j), java_value);
+[external][shana][shana@zju.edu.cn]                out6i0_ptr[2 * j] = name;
+[external][shana][shana@zju.edu.cn]                out6i0_ptr[2 * j + 1] = value_type;
+[external][shana][shana@zju.edu.cn]                env->DeleteLocalRef(java_value);
+[external][shana][shana@zju.edu.cn]                ++j;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            env->ReleaseIntArrayElements(out6i0, out6i0_ptr, 0);
+[external][shana][shana@zju.edu.cn]            env->SetObjectArrayElement(out6, static_cast<jint>(2 * i), out6i0);
+[external][shana][shana@zju.edu.cn]            env->SetObjectArrayElement(out6, static_cast<jint>(2 * i + 1), out6i1);
+[external][shana][shana@zju.edu.cn]            out5_ptr[2 * i] = visibility;
+[external][shana][shana@zju.edu.cn]            out5_ptr[2 * i + 1] = type;
+[external][shana][shana@zju.edu.cn]            env->DeleteLocalRef(out6i0);
+[external][shana][shana@zju.edu.cn]            env->DeleteLocalRef(out6i1);
+[external][shana][shana@zju.edu.cn]            ++i;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        env->ReleaseIntArrayElements(out5, out5_ptr, 0);
+[external][shana][shana@zju.edu.cn]        env->SetObjectArrayElement(out, 5, out5);
+[external][shana][shana@zju.edu.cn]        env->SetObjectArrayElement(out, 6, out6);
+[external][shana][shana@zju.edu.cn]        env->DeleteLocalRef(out5);
+[external][shana][shana@zju.edu.cn]        env->DeleteLocalRef(out6);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        auto out7 = env->NewObjectArray(static_cast<jint>(2 * array_list.size()), object_class,
+[external][shana][shana@zju.edu.cn]                                        nullptr);
+[external][shana][shana@zju.edu.cn]        i = 0;
+[external][shana][shana@zju.edu.cn]        for (auto &array: array_list) {
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            auto out7i0 = env->NewIntArray(static_cast<jint>(array.size()));
+[external][shana][shana@zju.edu.cn]            auto out7i0_ptr = env->GetIntArrayElements(out7i0, nullptr);
+[external][shana][shana@zju.edu.cn]            auto out7i1 = env->NewObjectArray(static_cast<jint>(array.size()), object_class,
+[external][shana][shana@zju.edu.cn]                                              nullptr);
+[external][shana][shana@zju.edu.cn]            size_t j = 0;
+[external][shana][shana@zju.edu.cn]            for (auto &value: array) {
+[external][shana][shana@zju.edu.cn]                auto &[value_type, value_data] = value;
+[external][shana][shana@zju.edu.cn]                auto java_value = value_data.empty() ? nullptr : env->NewDirectByteBuffer(
+[external][shana][shana@zju.edu.cn]                        value_data.data(), value_data.size());
+[external][shana][shana@zju.edu.cn]                out7i0_ptr[j] = value_type;
+[external][shana][shana@zju.edu.cn]                env->SetObjectArrayElement(out7i1, static_cast<jint>(j), java_value);
+[external][shana][shana@zju.edu.cn]                env->DeleteLocalRef(java_value);
+[external][shana][shana@zju.edu.cn]                ++j;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            env->ReleaseIntArrayElements(out7i0, out7i0_ptr, 0);
+[external][shana][shana@zju.edu.cn]            env->SetObjectArrayElement(out7, static_cast<jint>(2 * i), out7i0);
+[external][shana][shana@zju.edu.cn]            env->SetObjectArrayElement(out7, static_cast<jint>(2 * i + 1), out7i1);
+[external][shana][shana@zju.edu.cn]            env->DeleteLocalRef(out7i0);
+[external][shana][shana@zju.edu.cn]            env->DeleteLocalRef(out7i1);
+[external][shana][shana@zju.edu.cn]            ++i;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        env->SetObjectArrayElement(out, 7, out7);
+[external][shana][shana@zju.edu.cn]        env->DeleteLocalRef(out7);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        return out;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    LSP_DEF_NATIVE_METHOD(void, DexParserBridge, closeDex, jlong cookie) {
+[external][shana][shana@zju.edu.cn]        if (cookie != 0)
+[external][shana][shana@zju.edu.cn]            delete reinterpret_cast<DexParser *>(cookie);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    LSP_DEF_NATIVE_METHOD(void, DexParserBridge, visitClass, jlong cookie, jobject visitor,
+[external][shana][shana@zju.edu.cn]                          jclass field_visitor_class,
+[external][shana][shana@zju.edu.cn]                          jclass method_visitor_class,
+[external][shana][shana@zju.edu.cn]                          jobject class_visit_method,
+[external][shana][shana@zju.edu.cn]                          jobject field_visit_method,
+[external][shana][shana@zju.edu.cn]                          jobject method_visit_method,
+[external][shana][shana@zju.edu.cn]                          jobject method_body_visit_method,
+[external][shana][shana@zju.edu.cn]                          jobject stop_method) {
+[external][shana][shana@zju.edu.cn]        static constexpr dex::u1 kOpcodeMask = 0xff;
+[external][shana][shana@zju.edu.cn]        static constexpr dex::u1 kOpcodeNoOp = 0x00;
+[external][shana][shana@zju.edu.cn]        static constexpr dex::u1 kOpcodeConstString = 0x1a;
+[external][shana][shana@zju.edu.cn]        static constexpr dex::u1 kOpcodeConstStringJumbo = 0x1b;
+[external][shana][shana@zju.edu.cn]        static constexpr dex::u1 kOpcodeIGetStart = 0x52;
+[external][shana][shana@zju.edu.cn]        static constexpr dex::u1 kOpcodeIGetEnd = 0x58;
+[external][shana][shana@zju.edu.cn]        static constexpr dex::u1 kOpcodeSGetStart = 0x60;
+[external][shana][shana@zju.edu.cn]        static constexpr dex::u1 kOpcodeSGetEnd = 0x66;
+[external][shana][shana@zju.edu.cn]        static constexpr dex::u1 kOpcodeIPutStart = 0x59;
+[external][shana][shana@zju.edu.cn]        static constexpr dex::u1 kOpcodeIPutEnd = 0x5f;
+[external][shana][shana@zju.edu.cn]        static constexpr dex::u1 kOpcodeSPutStart = 0x67;
+[external][shana][shana@zju.edu.cn]        static constexpr dex::u1 kOpcodeSPutEnd = 0x6d;
+[external][shana][shana@zju.edu.cn]        static constexpr dex::u1 kOpcodeInvokeStart = 0x6e;
+[external][shana][shana@zju.edu.cn]        static constexpr dex::u1 kOpcodeInvokeEnd = 0x72;
+[external][shana][shana@zju.edu.cn]        static constexpr dex::u1 kOpcodeInvokeRangeStart = 0x74;
+[external][shana][shana@zju.edu.cn]        static constexpr dex::u1 kOpcodeInvokeRangeEnd = 0x78;
+[external][shana][shana@zju.edu.cn]        static constexpr dex::u2 kInstPackedSwitchPlayLoad = 0x0100;
+[external][shana][shana@zju.edu.cn]        static constexpr dex::u2 kInstSparseSwitchPlayLoad = 0x0200;
+[external][shana][shana@zju.edu.cn]        static constexpr dex::u2 kInstFillArrayDataPlayLoad = 0x0300;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        if (cookie == 0) {
+[external][shana][shana@zju.edu.cn]            return;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        auto &dex = *reinterpret_cast<DexParser *>(cookie);
+[external][shana][shana@zju.edu.cn]        auto *visit_class = env->FromReflectedMethod(class_visit_method);
+[external][shana][shana@zju.edu.cn]        auto *visit_field = env->FromReflectedMethod(field_visit_method);
+[external][shana][shana@zju.edu.cn]        auto *visit_method = env->FromReflectedMethod(method_visit_method);
+[external][shana][shana@zju.edu.cn]        auto *visit_method_body = env->FromReflectedMethod(method_body_visit_method);
+[external][shana][shana@zju.edu.cn]        auto *stop = env->FromReflectedMethod(stop_method);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        auto classes = dex.ClassDefs();
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        for (size_t i = 0; i < classes.size(); ++i) {
+[external][shana][shana@zju.edu.cn]            auto &class_def = classes[i];
+[external][shana][shana@zju.edu.cn]            auto &class_data = dex.class_data[i];
+[external][shana][shana@zju.edu.cn]            auto interfaces = env->NewIntArray(
+[external][shana][shana@zju.edu.cn]                    static_cast<jint>(class_data.interfaces.size()));
+[external][shana][shana@zju.edu.cn]            env->SetIntArrayRegion(interfaces, 0,
+[external][shana][shana@zju.edu.cn]                                   static_cast<jint>(class_data.interfaces.size()),
+[external][shana][shana@zju.edu.cn]                                   class_data.interfaces.data());
+[external][shana][shana@zju.edu.cn]            auto static_fields = env->NewIntArray(
+[external][shana][shana@zju.edu.cn]                    static_cast<jint>(class_data.static_fields.size()));
+[external][shana][shana@zju.edu.cn]            env->SetIntArrayRegion(static_fields, 0,
+[external][shana][shana@zju.edu.cn]                                   static_cast<jint>(class_data.static_fields.size()),
+[external][shana][shana@zju.edu.cn]                                   class_data.static_fields.data());
+[external][shana][shana@zju.edu.cn]            auto static_fields_access_flags = env->NewIntArray(
+[external][shana][shana@zju.edu.cn]                    static_cast<jint>(class_data.static_fields_access_flags.size()));
+[external][shana][shana@zju.edu.cn]            env->SetIntArrayRegion(static_fields_access_flags, 0,
+[external][shana][shana@zju.edu.cn]                                   static_cast<jint>(
+[external][shana][shana@zju.edu.cn]                                           class_data.static_fields_access_flags.size()),
+[external][shana][shana@zju.edu.cn]                                   class_data.static_fields_access_flags.data());
+[external][shana][shana@zju.edu.cn]            auto instance_fields = env->NewIntArray(
+[external][shana][shana@zju.edu.cn]                    static_cast<jint>(class_data.instance_fields.size()));
+[external][shana][shana@zju.edu.cn]            env->SetIntArrayRegion(instance_fields, 0,
+[external][shana][shana@zju.edu.cn]                                   static_cast<jint>(class_data.instance_fields.size()),
+[external][shana][shana@zju.edu.cn]                                   class_data.instance_fields.data());
+[external][shana][shana@zju.edu.cn]            auto instance_fields_access_flags = env->NewIntArray(
+[external][shana][shana@zju.edu.cn]                    static_cast<jint>(class_data.instance_fields_access_flags.size()));
+[external][shana][shana@zju.edu.cn]            env->SetIntArrayRegion(instance_fields_access_flags, 0,
+[external][shana][shana@zju.edu.cn]                                   static_cast<jint>(
+[external][shana][shana@zju.edu.cn]                                           class_data.instance_fields_access_flags.size()),
+[external][shana][shana@zju.edu.cn]                                   class_data.instance_fields_access_flags.data());
+[external][shana][shana@zju.edu.cn]            auto direct_methods = env->NewIntArray(
+[external][shana][shana@zju.edu.cn]                    static_cast<jint>(class_data.direct_methods.size()));
+[external][shana][shana@zju.edu.cn]            env->SetIntArrayRegion(direct_methods, 0,
+[external][shana][shana@zju.edu.cn]                                   static_cast<jint>(class_data.direct_methods.size()),
+[external][shana][shana@zju.edu.cn]                                   class_data.direct_methods.data());
+[external][shana][shana@zju.edu.cn]            auto direct_methods_access_flags = env->NewIntArray(
+[external][shana][shana@zju.edu.cn]                    static_cast<jint>(class_data.direct_methods_access_flags.size()));
+[external][shana][shana@zju.edu.cn]            env->SetIntArrayRegion(direct_methods_access_flags, 0,
+[external][shana][shana@zju.edu.cn]                                   static_cast<jint>(
+[external][shana][shana@zju.edu.cn]                                           class_data.direct_methods_access_flags.size()),
+[external][shana][shana@zju.edu.cn]                                   class_data.direct_methods_access_flags.data());
+[external][shana][shana@zju.edu.cn]            auto virtual_methods = env->NewIntArray(
+[external][shana][shana@zju.edu.cn]                    static_cast<jint>(class_data.virtual_methods.size()));
+[external][shana][shana@zju.edu.cn]            env->SetIntArrayRegion(virtual_methods, 0,
+[external][shana][shana@zju.edu.cn]                                   static_cast<jint>(class_data.virtual_methods.size()),
+[external][shana][shana@zju.edu.cn]                                   class_data.virtual_methods.data());
+[external][shana][shana@zju.edu.cn]            auto virtual_methods_access_flags = env->NewIntArray(
+[external][shana][shana@zju.edu.cn]                    static_cast<jint>(class_data.virtual_methods_access_flags.size()));
+[external][shana][shana@zju.edu.cn]            env->SetIntArrayRegion(virtual_methods_access_flags, 0,
+[external][shana][shana@zju.edu.cn]                                   static_cast<jint>(
+[external][shana][shana@zju.edu.cn]                                           class_data.virtual_methods_access_flags.size()),
+[external][shana][shana@zju.edu.cn]                                   class_data.virtual_methods_access_flags.data());
+[external][shana][shana@zju.edu.cn]            auto class_annotations = env->NewIntArray(
+[external][shana][shana@zju.edu.cn]                    static_cast<jint>(class_data.annotations.size()));
+[external][shana][shana@zju.edu.cn]            env->SetIntArrayRegion(class_annotations, 0,
+[external][shana][shana@zju.edu.cn]                                   static_cast<jint>(class_data.annotations.size()),
+[external][shana][shana@zju.edu.cn]                                   class_data.annotations.data());
+[external][shana][shana@zju.edu.cn]            jobject member_visitor = env->CallObjectMethod(visitor, visit_class,
+[external][shana][shana@zju.edu.cn]                                                           static_cast<jint>(class_def.class_idx),
+[external][shana][shana@zju.edu.cn]                                                           static_cast<jint>(class_def.access_flags),
+[external][shana][shana@zju.edu.cn]                                                           static_cast<jint>(class_def.superclass_idx),
+[external][shana][shana@zju.edu.cn]                                                           interfaces,
+[external][shana][shana@zju.edu.cn]                                                           static_cast<jint>(class_def.source_file_idx),
+[external][shana][shana@zju.edu.cn]                                                           static_fields,
+[external][shana][shana@zju.edu.cn]                                                           static_fields_access_flags,
+[external][shana][shana@zju.edu.cn]                                                           instance_fields,
+[external][shana][shana@zju.edu.cn]                                                           instance_fields_access_flags,
+[external][shana][shana@zju.edu.cn]                                                           direct_methods,
+[external][shana][shana@zju.edu.cn]                                                           direct_methods_access_flags,
+[external][shana][shana@zju.edu.cn]                                                           virtual_methods,
+[external][shana][shana@zju.edu.cn]                                                           virtual_methods_access_flags,
+[external][shana][shana@zju.edu.cn]                                                           class_annotations
+[external][shana][shana@zju.edu.cn]            );
+[external][shana][shana@zju.edu.cn]            env->DeleteLocalRef(interfaces);
+[external][shana][shana@zju.edu.cn]            env->DeleteLocalRef(static_fields);
+[external][shana][shana@zju.edu.cn]            env->DeleteLocalRef(static_fields_access_flags);
+[external][shana][shana@zju.edu.cn]            env->DeleteLocalRef(instance_fields);
+[external][shana][shana@zju.edu.cn]            env->DeleteLocalRef(instance_fields_access_flags);
+[external][shana][shana@zju.edu.cn]            env->DeleteLocalRef(direct_methods);
+[external][shana][shana@zju.edu.cn]            env->DeleteLocalRef(direct_methods_access_flags);
+[external][shana][shana@zju.edu.cn]            env->DeleteLocalRef(virtual_methods);
+[external][shana][shana@zju.edu.cn]            env->DeleteLocalRef(virtual_methods_access_flags);
+[external][shana][shana@zju.edu.cn]            env->DeleteLocalRef(class_annotations);
+[external][shana][shana@zju.edu.cn]            if (member_visitor && env->IsInstanceOf(member_visitor, field_visitor_class)) {
+[external][shana][shana@zju.edu.cn]                jboolean stopped = JNI_FALSE;
+[external][shana][shana@zju.edu.cn]                for (auto &[fields, fields_access_flags]: {
+[external][shana][shana@zju.edu.cn]                        std::make_tuple(class_data.static_fields,
+[external][shana][shana@zju.edu.cn]                                        class_data.static_fields_access_flags),
+[external][shana][shana@zju.edu.cn]                        std::make_tuple(class_data.instance_fields,
+[external][shana][shana@zju.edu.cn]                                        class_data.instance_fields_access_flags)}) {
+[external][shana][shana@zju.edu.cn]                    for (size_t j = 0; j < fields.size(); j++) {
+[external][shana][shana@zju.edu.cn]                        auto field_idx = fields[j];
+[external][shana][shana@zju.edu.cn]                        auto access_flags = fields_access_flags[j];
+[external][shana][shana@zju.edu.cn]                        auto &field_annotations = dex.field_annotations[field_idx];
+[external][shana][shana@zju.edu.cn]                        auto annotations = env->NewIntArray(
+[external][shana][shana@zju.edu.cn]                                static_cast<jint>(field_annotations.size()));
+[external][shana][shana@zju.edu.cn]                        env->SetIntArrayRegion(annotations, 0,
+[external][shana][shana@zju.edu.cn]                                               static_cast<jint>(field_annotations.size()),
+[external][shana][shana@zju.edu.cn]                                               field_annotations.data());
+[external][shana][shana@zju.edu.cn]                        env->CallVoidMethod(member_visitor, visit_field, field_idx,
+[external][shana][shana@zju.edu.cn]                                            access_flags, annotations);
+[external][shana][shana@zju.edu.cn]                        env->DeleteLocalRef(annotations);
+[external][shana][shana@zju.edu.cn]                        stopped = env->CallBooleanMethod(member_visitor, stop);
+[external][shana][shana@zju.edu.cn]                        if (stopped == JNI_TRUE) break;
+[external][shana][shana@zju.edu.cn]                    }
+[external][shana][shana@zju.edu.cn]                    if (stopped == JNI_TRUE) break;
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            if (member_visitor && env->IsInstanceOf(member_visitor, method_visitor_class)) {
+[external][shana][shana@zju.edu.cn]                jboolean stopped = JNI_FALSE;
+[external][shana][shana@zju.edu.cn]                for (auto &[methods, methods_access_flags, methods_code]: {
+[external][shana][shana@zju.edu.cn]                        std::make_tuple(class_data.direct_methods,
+[external][shana][shana@zju.edu.cn]                                        class_data.direct_methods_access_flags,
+[external][shana][shana@zju.edu.cn]                                        class_data.direct_methods_code),
+[external][shana][shana@zju.edu.cn]                        std::make_tuple(class_data.virtual_methods,
+[external][shana][shana@zju.edu.cn]                                        class_data.virtual_methods_access_flags,
+[external][shana][shana@zju.edu.cn]                                        class_data.virtual_methods_code)}) {
+[external][shana][shana@zju.edu.cn]                    for (size_t j = 0; j < methods.size(); j++) {
+[external][shana][shana@zju.edu.cn]                        auto method_idx = methods[j];
+[external][shana][shana@zju.edu.cn]                        auto access_flags = methods_access_flags[j];
+[external][shana][shana@zju.edu.cn]                        auto code = methods_code[j];
+[external][shana][shana@zju.edu.cn]                        auto method_annotation = dex.method_annotations[method_idx];
+[external][shana][shana@zju.edu.cn]                        auto method_annotations = env->NewIntArray(
+[external][shana][shana@zju.edu.cn]                                static_cast<jint>(method_annotation.size()));
+[external][shana][shana@zju.edu.cn]                        env->SetIntArrayRegion(method_annotations, 0,
+[external][shana][shana@zju.edu.cn]                                               static_cast<jint>(method_annotation.size()),
+[external][shana][shana@zju.edu.cn]                                               method_annotation.data());
+[external][shana][shana@zju.edu.cn]                        auto parameter_annotation = dex.parameter_annotations[method_idx];
+[external][shana][shana@zju.edu.cn]                        auto parameter_annotations = env->NewIntArray(
+[external][shana][shana@zju.edu.cn]                                static_cast<jint>(parameter_annotation.size()));
+[external][shana][shana@zju.edu.cn]                        env->SetIntArrayRegion(parameter_annotations, 0,
+[external][shana][shana@zju.edu.cn]                                               static_cast<jint>(parameter_annotation.size()),
+[external][shana][shana@zju.edu.cn]                                               parameter_annotation.data());
+[external][shana][shana@zju.edu.cn]                        auto body_visitor = env->CallObjectMethod(member_visitor, visit_method,
+[external][shana][shana@zju.edu.cn]                                                                  method_idx,
+[external][shana][shana@zju.edu.cn]                                                                  access_flags, code != nullptr,
+[external][shana][shana@zju.edu.cn]                                                                  method_annotations,
+[external][shana][shana@zju.edu.cn]                                                                  parameter_annotations);
+[external][shana][shana@zju.edu.cn]                        env->DeleteLocalRef(method_annotations);
+[external][shana][shana@zju.edu.cn]                        env->DeleteLocalRef(parameter_annotations);
+[external][shana][shana@zju.edu.cn]                        if (body_visitor && code != nullptr) {
+[external][shana][shana@zju.edu.cn]                            auto body = dex.method_bodies[method_idx];
+[external][shana][shana@zju.edu.cn]                            if (!body.loaded) {
+[external][shana][shana@zju.edu.cn]                                std::set<jint> referred_strings;
+[external][shana][shana@zju.edu.cn]                                std::set<jint> assigned_fields;
+[external][shana][shana@zju.edu.cn]                                std::set<jint> accessed_fields;
+[external][shana][shana@zju.edu.cn]                                std::set<jint> invoked_methods;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]                                const dex::u2 *inst = code->insns;
+[external][shana][shana@zju.edu.cn]                                const dex::u2 *end = inst + code->insns_size;
+[external][shana][shana@zju.edu.cn]                                while (inst < end) {
+[external][shana][shana@zju.edu.cn]                                    dex::u1 opcode = *inst & kOpcodeMask;
+[external][shana][shana@zju.edu.cn]                                    body.opcodes.push_back(static_cast<jbyte>(opcode));
+[external][shana][shana@zju.edu.cn]                                    if (opcode == kOpcodeConstString) {
+[external][shana][shana@zju.edu.cn]                                        auto str_idx = inst[1];
+[external][shana][shana@zju.edu.cn]                                        referred_strings.emplace(str_idx);
+[external][shana][shana@zju.edu.cn]                                    }
+[external][shana][shana@zju.edu.cn]                                    if (opcode == kOpcodeConstStringJumbo) {
+[external][shana][shana@zju.edu.cn]                                        auto str_idx = *reinterpret_cast<const dex::u4 *>(&inst[1]);
+[external][shana][shana@zju.edu.cn]                                        referred_strings.emplace(static_cast<jint>(str_idx));
+[external][shana][shana@zju.edu.cn]                                    }
+[external][shana][shana@zju.edu.cn]                                    if ((opcode >= kOpcodeIGetStart && opcode <= kOpcodeIGetEnd) ||
+[external][shana][shana@zju.edu.cn]                                        (opcode >= kOpcodeSGetStart && opcode <= kOpcodeSGetEnd)) {
+[external][shana][shana@zju.edu.cn]                                        auto field_idx = inst[1];
+[external][shana][shana@zju.edu.cn]                                        accessed_fields.emplace(field_idx);
+[external][shana][shana@zju.edu.cn]                                    }
+[external][shana][shana@zju.edu.cn]                                    if ((opcode >= kOpcodeIPutStart && opcode <= kOpcodeIPutEnd) ||
+[external][shana][shana@zju.edu.cn]                                        (opcode >= kOpcodeSPutStart && opcode <= kOpcodeSPutEnd)) {
+[external][shana][shana@zju.edu.cn]                                        auto field_idx = inst[1];
+[external][shana][shana@zju.edu.cn]                                        assigned_fields.emplace(field_idx);
+[external][shana][shana@zju.edu.cn]                                    }
+[external][shana][shana@zju.edu.cn]                                    if ((opcode >= kOpcodeInvokeStart &&
+[external][shana][shana@zju.edu.cn]                                         opcode <= kOpcodeInvokeEnd) ||
+[external][shana][shana@zju.edu.cn]                                        (opcode >= kOpcodeInvokeRangeStart &&
+[external][shana][shana@zju.edu.cn]                                         opcode <= kOpcodeInvokeRangeEnd)) {
+[external][shana][shana@zju.edu.cn]                                        auto callee = inst[1];
+[external][shana][shana@zju.edu.cn]                                        invoked_methods.emplace(callee);
+[external][shana][shana@zju.edu.cn]                                    }
+[external][shana][shana@zju.edu.cn]                                    if (opcode == kOpcodeNoOp) {
+[external][shana][shana@zju.edu.cn]                                        if (*inst == kInstPackedSwitchPlayLoad) {
+[external][shana][shana@zju.edu.cn]                                            inst += inst[1] * 2 + 3;
+[external][shana][shana@zju.edu.cn]                                        } else if (*inst == kInstSparseSwitchPlayLoad) {
+[external][shana][shana@zju.edu.cn]                                            inst += inst[1] * 4 + 1;
+[external][shana][shana@zju.edu.cn]                                        } else if (*inst == kInstFillArrayDataPlayLoad) {
+[external][shana][shana@zju.edu.cn]                                            inst += (*reinterpret_cast<const dex::u4 *>(&inst[2]) *
+[external][shana][shana@zju.edu.cn]                                                     inst[1] + 1) /
+[external][shana][shana@zju.edu.cn]                                                    2 + 3;
+[external][shana][shana@zju.edu.cn]                                        }
+[external][shana][shana@zju.edu.cn]                                    }
+[external][shana][shana@zju.edu.cn]                                    inst += dex::opcode_len[opcode];
+[external][shana][shana@zju.edu.cn]                                }
+[external][shana][shana@zju.edu.cn]                                body.referred_strings.insert(body.referred_strings.end(),
+[external][shana][shana@zju.edu.cn]                                                             referred_strings.begin(),
+[external][shana][shana@zju.edu.cn]                                                             referred_strings.end());
+[external][shana][shana@zju.edu.cn]                                body.assigned_fields.insert(body.assigned_fields.end(),
+[external][shana][shana@zju.edu.cn]                                                            assigned_fields.begin(),
+[external][shana][shana@zju.edu.cn]                                                            assigned_fields.end());
+[external][shana][shana@zju.edu.cn]                                body.accessed_fields.insert(body.accessed_fields.end(),
+[external][shana][shana@zju.edu.cn]                                                            accessed_fields.begin(),
+[external][shana][shana@zju.edu.cn]                                                            accessed_fields.end());
+[external][shana][shana@zju.edu.cn]                                body.invoked_methods.insert(body.invoked_methods.end(),
+[external][shana][shana@zju.edu.cn]                                                            invoked_methods.begin(),
+[external][shana][shana@zju.edu.cn]                                                            invoked_methods.end());
+[external][shana][shana@zju.edu.cn]                                body.loaded = true;
+[external][shana][shana@zju.edu.cn]                            }
+[external][shana][shana@zju.edu.cn]                            auto referred_strings = env->NewIntArray(
+[external][shana][shana@zju.edu.cn]                                    static_cast<jint>(body.referred_strings.size()));
+[external][shana][shana@zju.edu.cn]                            env->SetIntArrayRegion(referred_strings, 0,
+[external][shana][shana@zju.edu.cn]                                                   static_cast<jint>(body.referred_strings.size()),
+[external][shana][shana@zju.edu.cn]                                                   body.referred_strings.data());
+[external][shana][shana@zju.edu.cn]                            auto accessed_fields = env->NewIntArray(
+[external][shana][shana@zju.edu.cn]                                    static_cast<jint>(body.accessed_fields.size()));
+[external][shana][shana@zju.edu.cn]                            env->SetIntArrayRegion(accessed_fields, 0,
+[external][shana][shana@zju.edu.cn]                                                   static_cast<jint>(body.accessed_fields.size()),
+[external][shana][shana@zju.edu.cn]                                                   body.accessed_fields.data());
+[external][shana][shana@zju.edu.cn]                            auto assigned_fields = env->NewIntArray(
+[external][shana][shana@zju.edu.cn]                                    static_cast<jint>(body.assigned_fields.size()));
+[external][shana][shana@zju.edu.cn]                            env->SetIntArrayRegion(assigned_fields, 0,
+[external][shana][shana@zju.edu.cn]                                                   static_cast<jint>(body.assigned_fields.size()),
+[external][shana][shana@zju.edu.cn]                                                   body.assigned_fields.data());
+[external][shana][shana@zju.edu.cn]                            auto invoked_methods = env->NewIntArray(
+[external][shana][shana@zju.edu.cn]                                    static_cast<jint>(body.invoked_methods.size()));
+[external][shana][shana@zju.edu.cn]                            env->SetIntArrayRegion(invoked_methods, 0,
+[external][shana][shana@zju.edu.cn]                                                   static_cast<jint>(body.invoked_methods.size()),
+[external][shana][shana@zju.edu.cn]                                                   body.invoked_methods.data());
+[external][shana][shana@zju.edu.cn]                            auto opcodes = env->NewByteArray(
+[external][shana][shana@zju.edu.cn]                                    static_cast<jint>(body.opcodes.size()));
+[external][shana][shana@zju.edu.cn]                            env->SetByteArrayRegion(opcodes, 0,
+[external][shana][shana@zju.edu.cn]                                                    static_cast<jint>(body.opcodes.size()),
+[external][shana][shana@zju.edu.cn]                                                    body.opcodes.data());
+[external][shana][shana@zju.edu.cn]                            env->CallVoidMethod(body_visitor, visit_method_body,
+[external][shana][shana@zju.edu.cn]                                                referred_strings,
+[external][shana][shana@zju.edu.cn]                                                invoked_methods,
+[external][shana][shana@zju.edu.cn]                                                accessed_fields, assigned_fields, opcodes);
+[external][shana][shana@zju.edu.cn]                        }
+[external][shana][shana@zju.edu.cn]                        stopped = env->CallBooleanMethod(member_visitor, stop);
+[external][shana][shana@zju.edu.cn]                        if (stopped == JNI_TRUE) break;
+[external][shana][shana@zju.edu.cn]                    }
+[external][shana][shana@zju.edu.cn]                    if (stopped == JNI_TRUE) break;
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            if (env->CallBooleanMethod(visitor, stop) == JNI_TRUE) break;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    static JNINativeMethod gMethods[] = {
+[external][shana][shana@zju.edu.cn]            LSP_NATIVE_METHOD(DexParserBridge, openDex,
+[external][shana][shana@zju.edu.cn]                              "(Ljava/nio/ByteBuffer;[J)Ljava/lang/Object;"),
+[external][shana][shana@zju.edu.cn]            LSP_NATIVE_METHOD(DexParserBridge, closeDex, "(J)V"),
+[external][shana][shana@zju.edu.cn]            LSP_NATIVE_METHOD(DexParserBridge, visitClass,
+[external][shana][shana@zju.edu.cn]                              "(JLjava/lang/Object;Ljava/lang/Class;Ljava/lang/Class;Ljava/lang/reflect/Method;Ljava/lang/reflect/Method;Ljava/lang/reflect/Method;Ljava/lang/reflect/Method;Ljava/lang/reflect/Method;)V"),
+[external][shana][shana@zju.edu.cn]    };
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    void RegisterDexParserBridge(JNIEnv *env) {
+[external][shana][shana@zju.edu.cn]        REGISTER_LSP_NATIVE_METHODS(DexParserBridge);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

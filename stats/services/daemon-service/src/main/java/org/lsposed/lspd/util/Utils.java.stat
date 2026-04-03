@@ -1,0 +1,77 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.lspd.util;
+[external][hsushulong][hsushulong@gmail.com]
+[external][wanghan1995315][wanghan1995315@gmail.com]import android.os.SystemProperties;
+[external][wanghan1995315][wanghan1995315@gmail.com]import android.text.TextUtils;
+[external][hsushulong][hsushulong@gmail.com]import android.util.Log;
+[external][hsushulong][hsushulong@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import java.time.ZoneId;
+[internal][vvb2060][vvb2060@gmail.com]import java.time.ZoneOffset;
+[internal][vvb2060][vvb2060@gmail.com]import java.time.zone.ZoneRulesException;
+[internal][vvb2060][vvb2060@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]public class Utils {
+[external][hsushulong][hsushulong@gmail.com]
+[external][shana][shana@zju.edu.cn]    public static final String LOG_TAG = "LSPosed";
+[external][wanghan1995315][wanghan1995315@gmail.com]    public static final boolean isMIUI = !TextUtils.isEmpty(SystemProperties.get("ro.miui.ui.version.name"));
+[external][shana][shana@zju.edu.cn]    public static final boolean isLENOVO = !TextUtils.isEmpty(SystemProperties.get("ro.lenovo.region"));
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]    public static void logD(Object msg) {
+[external][shana][shana@zju.edu.cn]        Log.d(LOG_TAG, msg.toString());
+[external][hsushulong][hsushulong@gmail.com]    }
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]    public static void logD(String msg, Throwable throwable) {
+[external][shana][shana@zju.edu.cn]        Log.d(LOG_TAG, msg, throwable);
+[external][hsushulong][hsushulong@gmail.com]    }
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]    public static void logW(String msg) {
+[external][hsushulong][hsushulong@gmail.com]        Log.w(LOG_TAG, msg);
+[external][hsushulong][hsushulong@gmail.com]    }
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]    public static void logW(String msg, Throwable throwable) {
+[external][hsushulong][hsushulong@gmail.com]        Log.w(LOG_TAG, msg, throwable);
+[external][hsushulong][hsushulong@gmail.com]    }
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]    public static void logI(String msg) {
+[external][hsushulong][hsushulong@gmail.com]        Log.i(LOG_TAG, msg);
+[external][hsushulong][hsushulong@gmail.com]    }
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]    public static void logI(String msg, Throwable throwable) {
+[external][hsushulong][hsushulong@gmail.com]        Log.i(LOG_TAG, msg, throwable);
+[external][hsushulong][hsushulong@gmail.com]    }
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]    public static void logE(String msg) {
+[external][hsushulong][hsushulong@gmail.com]        Log.e(LOG_TAG, msg);
+[external][hsushulong][hsushulong@gmail.com]    }
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]    public static void logE(String msg, Throwable throwable) {
+[external][hsushulong][hsushulong@gmail.com]        Log.e(LOG_TAG, msg, throwable);
+[external][hsushulong][hsushulong@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    public static ZoneId getZoneId() {
+[internal][vvb2060][vvb2060@gmail.com]        var timezone = SystemProperties.get("persist.sys.timezone", "GMT");
+[internal][vvb2060][vvb2060@gmail.com]        try {
+[internal][vvb2060][vvb2060@gmail.com]            return ZoneId.of(timezone);
+[internal][vvb2060][vvb2060@gmail.com]        } catch (ZoneRulesException e) {
+[internal][vvb2060][vvb2060@gmail.com]            return ZoneOffset.UTC;
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]    }
+[external][hsushulong][hsushulong@gmail.com]}

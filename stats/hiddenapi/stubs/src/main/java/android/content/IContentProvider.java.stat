@@ -1,0 +1,24 @@
+[external][shana][shana@zju.edu.cn]package android.content;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import android.os.Bundle;
+[external][shana][shana@zju.edu.cn]import android.os.IInterface;
+[external][shana][shana@zju.edu.cn]import android.os.RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import androidx.annotation.RequiresApi;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public interface IContentProvider extends IInterface {
+[external][howardwu20][HowardWu20@outlook.com]    Bundle call(String callingPkg, String method,
+[external][howardwu20][HowardWu20@outlook.com]                String arg, Bundle extras) throws RemoteException;
+[external][howardwu20][HowardWu20@outlook.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    @RequiresApi(29)
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    Bundle call(String callingPkg, String authority, String method,
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                String arg, Bundle extras) throws RemoteException;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    @RequiresApi(30)
+[external][shana][shana@zju.edu.cn]    Bundle call(String callingPkg, String attributionTag, String authority,
+[external][shana][shana@zju.edu.cn]                String method, String arg, Bundle extras) throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @RequiresApi(31)
+[external][shana][shana@zju.edu.cn]    Bundle call(AttributionSource attributionSource, String authority,
+[external][shana][shana@zju.edu.cn]                String method, String arg, Bundle extras) throws RemoteException;
+[external][shana][shana@zju.edu.cn]}

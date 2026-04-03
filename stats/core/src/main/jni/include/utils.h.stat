@@ -1,0 +1,53 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]#pragma once
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]#pragma clang diagnostic push
+[external][shana][shana@zju.edu.cn]#pragma clang diagnostic ignored "-Wgnu-string-literal-operator-template"
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]#include <string>
+[external][shana][shana@zju.edu.cn]#include <filesystem>
+[external][shana][shana@zju.edu.cn]#include <sys/system_properties.h>
+[external][shana][shana@zju.edu.cn]#include <unistd.h>
+[external][shana][shana@zju.edu.cn]#include <sys/stat.h>
+[external][shana][shana@zju.edu.cn]#include "logging.h"
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]namespace lspd {
+[external][shana][shana@zju.edu.cn]    using namespace std::literals::string_literals;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    inline int32_t GetAndroidApiLevel() {
+[external][shana][shana@zju.edu.cn]        static int32_t api_level = []() {
+[external][shana][shana@zju.edu.cn]            char prop_value[PROP_VALUE_MAX];
+[external][shana][shana@zju.edu.cn]            __system_property_get("ro.build.version.sdk", prop_value);
+[external][shana][shana@zju.edu.cn]            int base = atoi(prop_value);
+[external][shana][shana@zju.edu.cn]            __system_property_get("ro.build.version.preview_sdk", prop_value);
+[external][shana][shana@zju.edu.cn]            return base + atoi(prop_value);
+[external][shana][shana@zju.edu.cn]        }();
+[external][shana][shana@zju.edu.cn]        return api_level;
+[external][shana][shana@zju.edu.cn]    }
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    inline std::string JavaNameToSignature(std::string s) {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        std::replace(s.begin(), s.end(), '.', '/');
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        return "L" + s;
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    }
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]#pragma clang diagnostic pop

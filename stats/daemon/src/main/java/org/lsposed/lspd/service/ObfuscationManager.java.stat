@@ -1,0 +1,13 @@
+[external][admin][admin@0x.mk]package org.lsposed.lspd.service;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]import android.os.SharedMemory;
+[external][admin][admin@0x.mk]
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]import java.util.HashMap;
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]
+[external][admin][admin@0x.mk]public class ObfuscationManager {
+[external][admin][admin@0x.mk]    // For module dexes
+[external][admin][admin@0x.mk]    static native SharedMemory obfuscateDex(SharedMemory memory);
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    // generates signature
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    static native HashMap<String, String> getSignatures();
+[external][admin][admin@0x.mk]}

@@ -1,0 +1,14 @@
+[external][shana][shana@zju.edu.cn]package com.android.server.am;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import com.android.server.SystemService;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public class ActivityManagerService {
+[external][shana][shana@zju.edu.cn]    public static final class Lifecycle extends SystemService {
+[external][shana][shana@zju.edu.cn]        public ActivityManagerService getService() {
+[external][shana][shana@zju.edu.cn]            throw new UnsupportedOperationException("STUB");
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        private ProcessRecord findProcessLocked(String process, int userId, String callName) {
+[external][shana][shana@zju.edu.cn]            throw new UnsupportedOperationException("STUB");
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

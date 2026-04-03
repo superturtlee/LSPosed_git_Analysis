@@ -1,0 +1,167 @@
+[external][shana][shana@zju.edu.cn]/*
+[external][shana][shana@zju.edu.cn] * This file is part of LSPosed.
+[external][shana][shana@zju.edu.cn] *
+[external][shana][shana@zju.edu.cn] * LSPosed is free software: you can redistribute it and/or modify
+[external][shana][shana@zju.edu.cn] * it under the terms of the GNU General Public License as published by
+[external][shana][shana@zju.edu.cn] * the Free Software Foundation, either version 3 of the License, or
+[external][shana][shana@zju.edu.cn] * (at your option) any later version.
+[external][shana][shana@zju.edu.cn] *
+[external][shana][shana@zju.edu.cn] * LSPosed is distributed in the hope that it will be useful,
+[external][shana][shana@zju.edu.cn] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][shana][shana@zju.edu.cn] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][shana][shana@zju.edu.cn] * GNU General Public License for more details.
+[external][shana][shana@zju.edu.cn] *
+[external][shana][shana@zju.edu.cn] * You should have received a copy of the GNU General Public License
+[external][shana][shana@zju.edu.cn] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][shana][shana@zju.edu.cn] *
+[external][shana][shana@zju.edu.cn] * Copyright (C) 2021 LSPosed Contributors
+[external][shana][shana@zju.edu.cn] */
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]import java.time.Instant
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]plugins {
+[external][shana][shana@zju.edu.cn]    alias(libs.plugins.agp.app)
+[external][shana][shana@zju.edu.cn]    alias(libs.plugins.nav.safeargs)
+[external][shana][shana@zju.edu.cn]    alias(libs.plugins.autoresconfig)
+[external][shana][shana@zju.edu.cn]    alias(libs.plugins.materialthemebuilder)
+[external][shana][shana@zju.edu.cn]    alias(libs.plugins.lsplugin.resopt)
+[external][shana][shana@zju.edu.cn]    alias(libs.plugins.lsplugin.apksign)
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]apksign {
+[external][shana][shana@zju.edu.cn]    storeFileProperty = "androidStoreFile"
+[external][shana][shana@zju.edu.cn]    storePasswordProperty = "androidStorePassword"
+[external][shana][shana@zju.edu.cn]    keyAliasProperty = "androidKeyAlias"
+[external][shana][shana@zju.edu.cn]    keyPasswordProperty = "androidKeyPassword"
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]val defaultManagerPackageName: String by rootProject.extra
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]android {
+[external][shana][shana@zju.edu.cn]    buildFeatures {
+[external][shana][shana@zju.edu.cn]        viewBinding = true
+[external][shana][shana@zju.edu.cn]        buildConfig = true
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    defaultConfig {
+[external][shana][shana@zju.edu.cn]        applicationId = defaultManagerPackageName
+[internal][vvb2060][vvb2060@gmail.com]        buildConfigField("long", "BUILD_TIME", Instant.now().epochSecond.toString())
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    packaging {
+[internal][vvb2060][vvb2060@gmail.com]        resources {
+[internal][vvb2060][vvb2060@gmail.com]            excludes += "META-INF/**"
+[internal][vvb2060][vvb2060@gmail.com]            excludes += "okhttp3/**"
+[internal][vvb2060][vvb2060@gmail.com]            excludes += "kotlin/**"
+[internal][vvb2060][vvb2060@gmail.com]            excludes += "org/**"
+[internal][vvb2060][vvb2060@gmail.com]            excludes += "**.properties"
+[internal][vvb2060][vvb2060@gmail.com]            excludes += "**.bin"
+[internal][vvb2060][vvb2060@gmail.com]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    dependenciesInfo.includeInApk = false
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]    buildTypes {
+[external][shana][shana@zju.edu.cn]        release {
+[external][shana][shana@zju.edu.cn]            isMinifyEnabled = true
+[external][shana][shana@zju.edu.cn]            isShrinkResources = true
+[external][shana][shana@zju.edu.cn]            proguardFiles("proguard-rules.pro")
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    sourceSets {
+[external][shana][shana@zju.edu.cn]        named("main") {
+[external][shana][shana@zju.edu.cn]            res {
+[external][shana][shana@zju.edu.cn]                srcDirs("src/common/res")
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[internal][vvb2060][vvb2060@gmail.com]    namespace = defaultManagerPackageName
+[external][shana][shana@zju.edu.cn]}
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]autoResConfig {
+[external][shana][shana@zju.edu.cn]    generateClass = true
+[external][shana][shana@zju.edu.cn]    generateRes = false
+[external][shana][shana@zju.edu.cn]    generatedClassFullName = "org.lsposed.manager.util.LangList"
+[external][shana][shana@zju.edu.cn]    generatedArrayFirstItem = "SYSTEM"
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]materialThemeBuilder {
+[external][shana][shana@zju.edu.cn]    themes {
+[external][shana][shana@zju.edu.cn]        for ((name, color) in listOf(
+[external][shana][shana@zju.edu.cn]            "Red" to "F44336",
+[external][shana][shana@zju.edu.cn]            "Pink" to "E91E63",
+[external][shana][shana@zju.edu.cn]            "Purple" to "9C27B0",
+[external][shana][shana@zju.edu.cn]            "DeepPurple" to "673AB7",
+[external][shana][shana@zju.edu.cn]            "Indigo" to "3F51B5",
+[external][shana][shana@zju.edu.cn]            "Blue" to "2196F3",
+[external][shana][shana@zju.edu.cn]            "LightBlue" to "03A9F4",
+[external][shana][shana@zju.edu.cn]            "Cyan" to "00BCD4",
+[external][shana][shana@zju.edu.cn]            "Teal" to "009688",
+[external][shana][shana@zju.edu.cn]            "Green" to "4FAF50",
+[external][shana][shana@zju.edu.cn]            "LightGreen" to "8BC3A4",
+[external][shana][shana@zju.edu.cn]            "Lime" to "CDDC39",
+[external][shana][shana@zju.edu.cn]            "Yellow" to "FFEB3B",
+[external][shana][shana@zju.edu.cn]            "Amber" to "FFC107",
+[external][shana][shana@zju.edu.cn]            "Orange" to "FF9800",
+[external][shana][shana@zju.edu.cn]            "DeepOrange" to "FF5722",
+[external][shana][shana@zju.edu.cn]            "Brown" to "795548",
+[external][shana][shana@zju.edu.cn]            "BlueGrey" to "607D8F",
+[external][shana][shana@zju.edu.cn]            "Sakura" to "FF9CA8"
+[external][shana][shana@zju.edu.cn]        )) {
+[external][shana][shana@zju.edu.cn]            create("Material$name") {
+[external][shana][shana@zju.edu.cn]                lightThemeFormat = "ThemeOverlay.Light.%s"
+[external][shana][shana@zju.edu.cn]                darkThemeFormat = "ThemeOverlay.Dark.%s"
+[external][shana][shana@zju.edu.cn]                primaryColor = "#$color"
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]    // Add Material Design 3 color tokens (such as palettePrimary100) in generated theme
+[external][shana][shana@zju.edu.cn]    // rikka.material >= 2.0.0 provides such attributes
+[external][shana][shana@zju.edu.cn]    generatePalette = true
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]dependencies {
+[external][shana][shana@zju.edu.cn]    annotationProcessor(libs.glide.compiler)
+[external][shana][shana@zju.edu.cn]    implementation(libs.androidx.activity)
+[external][shana][shana@zju.edu.cn]    implementation(libs.androidx.browser)
+[external][shana][shana@zju.edu.cn]    implementation(libs.androidx.constraintlayout)
+[external][shana][shana@zju.edu.cn]    implementation(libs.androidx.core)
+[external][shana][shana@zju.edu.cn]    implementation(libs.androidx.fragment)
+[external][shana][shana@zju.edu.cn]    implementation(libs.androidx.navigation.fragment)
+[external][shana][shana@zju.edu.cn]    implementation(libs.androidx.navigation.ui)
+[external][shana][shana@zju.edu.cn]    implementation(libs.androidx.preference)
+[external][shana][shana@zju.edu.cn]    implementation(libs.androidx.recyclerview)
+[external][shana][shana@zju.edu.cn]    implementation(libs.androidx.swiperefreshlayout)
+[external][shana][shana@zju.edu.cn]    implementation(libs.glide)
+[external][shana][shana@zju.edu.cn]    implementation(libs.material)
+[external][shana][shana@zju.edu.cn]    implementation(libs.gson)
+[external][shana][shana@zju.edu.cn]    implementation(libs.okhttp)
+[external][shana][shana@zju.edu.cn]    implementation(libs.okhttp.dnsoverhttps)
+[external][shana][shana@zju.edu.cn]    implementation(libs.okhttp.logging.interceptor)
+[external][shana][shana@zju.edu.cn]    implementation(libs.rikkax.appcompat)
+[external][shana][shana@zju.edu.cn]    implementation(libs.rikkax.core)
+[external][shana][shana@zju.edu.cn]    implementation(libs.rikkax.insets)
+[external][shana][shana@zju.edu.cn]    implementation(libs.rikkax.material)
+[external][shana][shana@zju.edu.cn]    implementation(libs.rikkax.material.preference)
+[external][shana][shana@zju.edu.cn]    implementation(libs.rikkax.preference)
+[external][shana][shana@zju.edu.cn]    implementation(libs.rikkax.recyclerview)
+[external][shana][shana@zju.edu.cn]    implementation(libs.rikkax.widget.borderview)
+[external][shana][shana@zju.edu.cn]    implementation(libs.rikkax.widget.mainswitchbar)
+[external][shana][shana@zju.edu.cn]    implementation(libs.rikkax.layoutinflater)
+[external][shana][shana@zju.edu.cn]    implementation(libs.appiconloader)
+[external][shana][shana@zju.edu.cn]    implementation(libs.hiddenapibypass)
+[external][shana][shana@zju.edu.cn]    implementation(libs.kotlin.stdlib)
+[external][shana][shana@zju.edu.cn]    implementation(libs.kotlinx.coroutines.core)
+[external][shana][shana@zju.edu.cn]    implementation(projects.services.managerService)
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    debugImplementation(libs.appcenter.analytics)
+[external][shana][shana@zju.edu.cn]    debugImplementation(libs.appcenter.crashes)
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]configurations.all {
+[internal][vvb2060][vvb2060@gmail.com]    exclude("org.jetbrains", "annotations")
+[internal][vvb2060][vvb2060@gmail.com]    exclude("androidx.appcompat", "appcompat")
+[internal][vvb2060][vvb2060@gmail.com]    exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk7")
+[internal][vvb2060][vvb2060@gmail.com]    exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk8")
+[external][shana][shana@zju.edu.cn]}

@@ -1,0 +1,32 @@
+[external][shana][shana@zju.edu.cn]package android.os;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import android.content.pm.UserInfo;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import androidx.annotation.RequiresApi;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import java.util.List;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public interface IUserManager extends IInterface {
+[external][shana][shana@zju.edu.cn]    @RequiresApi(26)
+[external][shana][shana@zju.edu.cn]    boolean isUserUnlocked(int userId)
+[external][shana][shana@zju.edu.cn]            throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    List<UserInfo> getUsers(boolean excludeDying)
+[external][shana][shana@zju.edu.cn]            throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    List<UserInfo> getUsers(boolean excludePartial, boolean excludeDying, boolean excludePreCreated)
+[external][shana][shana@zju.edu.cn]            throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]    UserInfo getUserInfo(int userHandle) throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    UserInfo getProfileParent(int userId) throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    boolean isUserUnlockingOrUnlocked(int userId) throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    abstract class Stub extends Binder implements IUserManager {
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        public static IUserManager asInterface(IBinder obj) {
+[external][shana][shana@zju.edu.cn]            throw new RuntimeException("STUB");
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

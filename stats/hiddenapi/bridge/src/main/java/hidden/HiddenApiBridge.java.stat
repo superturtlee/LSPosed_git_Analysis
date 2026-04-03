@@ -1,0 +1,151 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]package hidden;
+[external][shana][shana@zju.edu.cn]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import android.app.ActivityManager;
+[external][shana][shana@zju.edu.cn]import android.content.BroadcastReceiver;
+[external][shana][shana@zju.edu.cn]import android.content.Context;
+[external][shana][shana@zju.edu.cn]import android.content.Intent;
+[external][shana][shana@zju.edu.cn]import android.content.IntentFilter;
+[external][shana][shana@zju.edu.cn]import android.content.pm.ApplicationInfo;
+[external][shana][shana@zju.edu.cn]import android.content.pm.PackageInstaller;
+[external][shana][shana@zju.edu.cn]import android.content.res.AssetManager;
+[external][shana][shana@zju.edu.cn]import android.content.res.CompatibilityInfo;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.content.res.Resources;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.content.res.ResourcesImpl;
+[external][shana][shana@zju.edu.cn]import android.os.Binder;
+[external][shana][shana@zju.edu.cn]import android.os.Build;
+[external][shana][shana@zju.edu.cn]import android.os.Environment;
+[external][shana][shana@zju.edu.cn]import android.os.Handler;
+[external][shana][shana@zju.edu.cn]import android.os.IBinder;
+[external][shana][shana@zju.edu.cn]import android.os.UserHandle;
+[external][shana][shana@zju.edu.cn]import android.system.ErrnoException;
+[external][shana][shana@zju.edu.cn]import android.system.Int32Ref;
+[external][shana][shana@zju.edu.cn]import android.system.Os;
+[external][shana][shana@zju.edu.cn]import android.util.MutableInt;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import androidx.annotation.RequiresApi;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import java.io.File;
+[external][shana][shana@zju.edu.cn]import java.io.FileDescriptor;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public class HiddenApiBridge {
+[external][shana][shana@zju.edu.cn]    public static int AssetManager_addAssetPath(AssetManager am, String path) {
+[external][shana][shana@zju.edu.cn]        return am.addAssetPath(path);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static IBinder Binder_allowBlocking(IBinder binder) {
+[external][shana][shana@zju.edu.cn]        return Binder.allowBlocking(binder);
+[external][shana][shana@zju.edu.cn]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static void Resources_setImpl(Resources resources, ResourcesImpl impl) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        resources.setImpl(impl);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static int PackageInstaller_SessionParams_installFlags(PackageInstaller.SessionParams params) {
+[external][shana][shana@zju.edu.cn]        return params.installFlags;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static void PackageInstaller_SessionParams_installFlags(PackageInstaller.SessionParams params, int flags) {
+[external][shana][shana@zju.edu.cn]        params.installFlags = flags;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static IBinder Context_getActivityToken(Context ctx) {
+[external][shana][shana@zju.edu.cn]        return ctx.getActivityToken();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static File Environment_getDataProfilesDePackageDirectory(int userId, String packageName) {
+[external][shana][shana@zju.edu.cn]        return Environment.getDataProfilesDePackageDirectory(userId, packageName);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static Intent Context_registerReceiverAsUser(Context ctx, BroadcastReceiver receiver, UserHandle user,
+[external][shana][shana@zju.edu.cn]                                                        IntentFilter filter, String broadcastPermission, Handler scheduler) {
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        return ctx.registerReceiverAsUser(receiver, user, filter, broadcastPermission, scheduler);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static UserHandle UserHandle_ALL() {
+[external][shana][shana@zju.edu.cn]        return UserHandle.ALL;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static UserHandle UserHandle(int h) {
+[external][shana][shana@zju.edu.cn]        return new UserHandle(h);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static String ApplicationInfo_credentialProtectedDataDir(ApplicationInfo applicationInfo) {
+[external][shana][shana@zju.edu.cn]        return applicationInfo.credentialProtectedDataDir;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static void ApplicationInfo_credentialProtectedDataDir(ApplicationInfo applicationInfo, String dir) {
+[external][shana][shana@zju.edu.cn]        applicationInfo.credentialProtectedDataDir = dir;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static String[] ApplicationInfo_resourceDirs(ApplicationInfo applicationInfo) {
+[external][shana][shana@zju.edu.cn]        return applicationInfo.resourceDirs;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static void ApplicationInfo_resourceDirs(ApplicationInfo applicationInfo, String[] resourceDirs) {
+[external][shana][shana@zju.edu.cn]        applicationInfo.resourceDirs = resourceDirs;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @RequiresApi(31)
+[external][shana][shana@zju.edu.cn]    public static String[] ApplicationInfo_overlayPaths(ApplicationInfo applicationInfo) {
+[external][shana][shana@zju.edu.cn]        return applicationInfo.overlayPaths;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @RequiresApi(31)
+[external][shana][shana@zju.edu.cn]    public static void ApplicationInfo_overlayPaths(ApplicationInfo applicationInfo, String[] overlayPaths) {
+[external][shana][shana@zju.edu.cn]        applicationInfo.overlayPaths = overlayPaths;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static CompatibilityInfo Resources_getCompatibilityInfo(Resources res) {
+[external][shana][shana@zju.edu.cn]        return res.getCompatibilityInfo();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static int Os_ioctlInt(FileDescriptor fd, int cmd, int arg) throws ErrnoException {
+[external][shana][shana@zju.edu.cn]        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.O_MR1) {
+[external][shana][shana@zju.edu.cn]            return Os.ioctlInt(fd, cmd, new MutableInt(arg));
+[external][shana][shana@zju.edu.cn]        } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+[external][shana][shana@zju.edu.cn]            return Os.ioctlInt(fd, cmd, new Int32Ref(arg));
+[external][shana][shana@zju.edu.cn]        } else {
+[external][shana][shana@zju.edu.cn]            return Os.ioctlInt(fd, cmd);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    public static int ActivityManager_UID_OBSERVER_GONE() {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        return ActivityManager.UID_OBSERVER_GONE;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    public static int ActivityManager_UID_OBSERVER_ACTIVE() {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        return ActivityManager.UID_OBSERVER_ACTIVE;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    public static int ActivityManager_UID_OBSERVER_IDLE() {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        return ActivityManager.UID_OBSERVER_IDLE;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    public static int ActivityManager_UID_OBSERVER_CACHED() {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        return ActivityManager.UID_OBSERVER_CACHED;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    public static int ActivityManager_PROCESS_STATE_UNKNOWN() {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        return ActivityManager.PROCESS_STATE_UNKNOWN;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    }
+[external][shana][shana@zju.edu.cn]}

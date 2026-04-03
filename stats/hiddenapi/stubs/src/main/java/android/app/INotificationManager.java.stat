@@ -1,0 +1,34 @@
+[external][shana][shana@zju.edu.cn]package android.app;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import android.content.pm.ParceledListSlice;
+[external][shana][shana@zju.edu.cn]import android.os.Binder;
+[external][shana][shana@zju.edu.cn]import android.os.IBinder;
+[external][shana][shana@zju.edu.cn]import android.os.IInterface;
+[external][shana][shana@zju.edu.cn]import android.os.RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][fankes][37344460+fankes@users.noreply.github.com]import androidx.annotation.RequiresApi;
+[external][fankes][37344460+fankes@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]public interface INotificationManager extends IInterface {
+[external][shana][shana@zju.edu.cn]    void enqueueNotificationWithTag(String pkg, String opPkg, String tag, int id,
+[external][shana][shana@zju.edu.cn]                                    Notification notification, int userId) throws RemoteException;
+[external][fankes][37344460+fankes@users.noreply.github.com]
+[external][fankes][37344460+fankes@users.noreply.github.com]    void cancelNotificationWithTag(String pkg, String tag, int id, int userId) throws RemoteException;
+[external][fankes][37344460+fankes@users.noreply.github.com]
+[external][fankes][37344460+fankes@users.noreply.github.com]    @RequiresApi(30)
+[external][fankes][37344460+fankes@users.noreply.github.com]    void cancelNotificationWithTag(String pkg, String opPkg, String tag, int id, int userId) throws RemoteException;
+[external][fankes][37344460+fankes@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]    void createNotificationChannelsForPackage(String pkg, int uid, ParceledListSlice<NotificationChannel> channelsList) throws RemoteException;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    void updateNotificationChannelForPackage(String pkg, int uid, NotificationChannel channel);
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    @RequiresApi(30)
+[internal][vvb2060][vvb2060@gmail.com]    NotificationChannel getNotificationChannelForPackage(String pkg, int uid, String channelId, String conversationId, boolean includeDeleted) throws RemoteException;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    NotificationChannel getNotificationChannelForPackage(String pkg, int uid, String channelId, boolean includeDeleted) throws RemoteException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    abstract class Stub extends Binder implements INotificationManager {
+[external][shana][shana@zju.edu.cn]        public static INotificationManager asInterface(IBinder obj) {
+[external][shana][shana@zju.edu.cn]            throw new UnsupportedOperationException();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

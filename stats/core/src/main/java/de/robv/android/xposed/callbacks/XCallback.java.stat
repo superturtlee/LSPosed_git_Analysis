@@ -1,0 +1,176 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][admin][admin@0x.mk]package de.robv.android.xposed.callbacks;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]import android.os.Bundle;
+[external][admin][admin@0x.mk]
+[external][416810799][416810799@qq.com]import org.lsposed.lspd.deopt.PrebuiltMethodsDeopter;
+[external][416810799][416810799@qq.com]
+[external][admin][admin@0x.mk]import java.io.Serializable;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]import de.robv.android.xposed.XposedBridge;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][admin][admin@0x.mk]/**
+[external][admin][admin@0x.mk] * Base class for Xposed callbacks.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * <p>
+[external][admin][admin@0x.mk] * This class only keeps a priority for ordering multiple callbacks.
+[external][admin][admin@0x.mk] * The actual (abstract) callback methods are added by subclasses.
+[external][admin][admin@0x.mk] */
+[external][shana][shana@zju.edu.cn]abstract public class XCallback {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Callback priority, higher number means earlier execution.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * <p>This is usually set to {@link #PRIORITY_DEFAULT}. However, in case a certain callback should
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * be executed earlier or later a value between {@link #PRIORITY_HIGHEST} and {@link #PRIORITY_LOWEST}
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * can be set instead. The values are just for orientation though, Xposed doesn't enforce any
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * boundaries on the priority values.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public final int priority;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @deprecated This constructor can't be hidden for technical reasons. Nevertheless, don't use it!
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Deprecated
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public XCallback() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        this.priority = PRIORITY_DEFAULT;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @hide
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public XCallback(int priority) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        this.priority = priority;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Base class for Xposed callback parameters.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static abstract class Param {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         * @hide
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         */
+[external][shana][shana@zju.edu.cn]        public final XCallback[] callbacks;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        private Bundle extra;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         * @deprecated This constructor can't be hidden for technical reasons. Nevertheless, don't use it!
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        @Deprecated
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        protected Param() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            callbacks = null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         * @hide
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         */
+[external][shana][shana@zju.edu.cn]        protected Param(XCallback[] callbacks) {
+[external][shana][shana@zju.edu.cn]            this.callbacks = callbacks;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         * This can be used to store any data for the scope of the callback.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         * <p>Use this instead of instance variables, as it has a clear reference to e.g. each
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         * separate call to a method, even when the same method is called recursively.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         * @see #setObjectExtra
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         * @see #getObjectExtra
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public synchronized Bundle getExtra() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (extra == null)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                extra = new Bundle();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return extra;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         * Returns an object stored with {@link #setObjectExtra}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public Object getObjectExtra(String key) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Serializable o = getExtra().getSerializable(key);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (o instanceof SerializeWrapper)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                return ((SerializeWrapper) o).object;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         * Stores any object for the scope of the callback. For data types that support it, use
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         * the {@link Bundle} returned by {@link #getExtra} instead.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public void setObjectExtra(String key, Object o) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            getExtra().putSerializable(key, new SerializeWrapper(o));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        private static class SerializeWrapper implements Serializable {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            private static final long serialVersionUID = 1L;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            private final Object object;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            public SerializeWrapper(Object o) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                object = o;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @hide
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static void callAll(Param param) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (param instanceof XC_LoadPackage.LoadPackageParam) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            // deopt methods in system apps or priv-apps, this would be not necessary
+[external][admin][admin@0x.mk]            // only if we found out how to recompile their apks
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            XC_LoadPackage.LoadPackageParam lpp = (XC_LoadPackage.LoadPackageParam) param;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            PrebuiltMethodsDeopter.deoptMethods(lpp.packageName, lpp.classLoader);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (param.callbacks == null)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new IllegalStateException("This object was not created for use with callAll");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        for (int i = 0; i < param.callbacks.length; i++) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            try {
+[external][shana][shana@zju.edu.cn]                param.callbacks[i].call(param);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            } catch (Throwable t) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                XposedBridge.log(t);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @hide
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    protected void call(Param param) throws Throwable {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * The default priority, see {@link #priority}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static final int PRIORITY_DEFAULT = 50;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Execute this callback late, see {@link #priority}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static final int PRIORITY_LOWEST = -10000;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Execute this callback early, see {@link #priority}.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static final int PRIORITY_HIGHEST = 10000;
+[external][admin][admin@0x.mk]}

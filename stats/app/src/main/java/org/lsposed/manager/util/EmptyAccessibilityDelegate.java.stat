@@ -1,0 +1,80 @@
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]/*
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * This file is part of LSPosed.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] *
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * (at your option) any later version.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] *
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * GNU General Public License for more details.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] *
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] *
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * Copyright (C) 2022 LSPosed Contributors
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] */
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]package org.lsposed.manager.util;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import android.os.Bundle;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import android.view.View;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import android.view.ViewGroup;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import android.view.accessibility.AccessibilityEvent;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import android.view.accessibility.AccessibilityNodeInfo;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import android.view.accessibility.AccessibilityNodeProvider;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]public class EmptyAccessibilityDelegate extends View.AccessibilityDelegate {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    public void sendAccessibilityEvent(View host, int eventType) {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    public boolean performAccessibilityAction(View host, int action, Bundle args) {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        return true;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    public void sendAccessibilityEventUnchecked(View host, AccessibilityEvent event) {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    public boolean dispatchPopulateAccessibilityEvent(View host, AccessibilityEvent event) {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        return true;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    public void onPopulateAccessibilityEvent(View host, AccessibilityEvent event) {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    public void onInitializeAccessibilityEvent(View host, AccessibilityEvent event) {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    public void onInitializeAccessibilityNodeInfo(View host, AccessibilityNodeInfo info) {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    public void addExtraDataToAccessibilityNodeInfo(View host, AccessibilityNodeInfo info, String extraDataKey, Bundle arguments) {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    public boolean onRequestSendAccessibilityEvent(ViewGroup host, View child, AccessibilityEvent event) {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        return true;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    public AccessibilityNodeProvider getAccessibilityNodeProvider(View host) {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        return null;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]}

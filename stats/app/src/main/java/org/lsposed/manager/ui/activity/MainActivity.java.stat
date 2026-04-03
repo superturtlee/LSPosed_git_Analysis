@@ -1,0 +1,292 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * <!--This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors-->
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.manager.ui.activity;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.annotation.SuppressLint;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.content.Context;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]import android.content.Intent;
+[external][shana][shana@zju.edu.cn]import android.net.Uri;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import android.os.Build;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]import android.os.Bundle;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.text.TextUtils;
+[external][howardwu20][HowardWu20@outlook.com]import android.util.Log;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.view.KeyEvent;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.view.MotionEvent;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import androidx.annotation.NonNull;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import androidx.navigation.NavController;
+[external][shana][shana@zju.edu.cn]import androidx.navigation.NavOptions;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import androidx.navigation.Navigation;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import androidx.navigation.fragment.NavHostFragment;
+[external][shana][shana@zju.edu.cn]import androidx.navigation.ui.NavigationUI;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import com.google.android.material.navigation.NavigationBarView;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]import org.lsposed.manager.App;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.ConfigManager;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.R;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.databinding.ActivityMainBinding;
+[external][shana][shana@zju.edu.cn]import org.lsposed.manager.repo.RepoLoader;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.ui.activity.base.BaseActivity;
+[external][shana][shana@zju.edu.cn]import org.lsposed.manager.util.ModuleUtil;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import org.lsposed.manager.util.ShortcutUtil;
+[external][shana][shana@zju.edu.cn]import org.lsposed.manager.util.UpdateUtil;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import java.util.HashSet;
+[external][howardwu20][HowardWu20@outlook.com]import java.util.Objects;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import rikka.core.util.ResourceUtils;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]public class MainActivity extends BaseActivity implements RepoLoader.RepoListener, ModuleUtil.ModuleListener {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private static final String KEY_PREFIX = MainActivity.class.getName() + '.';
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private static final String EXTRA_SAVED_INSTANCE_STATE = KEY_PREFIX + "SAVED_INSTANCE_STATE";
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private static final RepoLoader repoLoader = RepoLoader.getInstance();
+[external][shana][shana@zju.edu.cn]    private static final ModuleUtil moduleUtil = ModuleUtil.getInstance();
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private boolean restarting;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private ActivityMainBinding binding;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @NonNull
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static Intent newIntent(@NonNull Context context) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return new Intent(context, MainActivity.class);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @NonNull
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private static Intent newIntent(@NonNull Bundle savedInstanceState, @NonNull Context context) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return newIntent(context)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                .putExtra(EXTRA_SAVED_INSTANCE_STATE, savedInstanceState);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    @Override
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    public void onCreate(Bundle savedInstanceState) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (savedInstanceState == null) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            savedInstanceState = getIntent().getBundleExtra(EXTRA_SAVED_INSTANCE_STATE);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        super.onCreate(savedInstanceState);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        binding = ActivityMainBinding.inflate(getLayoutInflater());
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        setContentView(binding.getRoot());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]        repoLoader.addListener(this);
+[external][shana][shana@zju.edu.cn]        moduleUtil.addListener(this);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        onModulesReloaded();
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+[external][shana][shana@zju.edu.cn]        if (navHostFragment == null) {
+[external][shana][shana@zju.edu.cn]            return;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        NavController navController = navHostFragment.getNavController();
+[external][shana][shana@zju.edu.cn]        var nav = (NavigationBarView) binding.nav;
+[external][shana][shana@zju.edu.cn]        NavigationUI.setupWithNavController(nav, navController);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        handleIntent(getIntent());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    protected void onNewIntent(Intent intent) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        super.onNewIntent(intent);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        handleIntent(intent);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private void handleIntent(Intent intent) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (intent == null) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (navHostFragment == null) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        NavController navController = navHostFragment.getNavController();
+[external][shana][shana@zju.edu.cn]        var nav = (NavigationBarView) binding.nav;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (intent.getAction() != null && intent.getAction().equals("android.intent.action.APPLICATION_PREFERENCES")) {
+[external][shana][shana@zju.edu.cn]            nav.setSelectedItemId(R.id.settings_fragment);
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        } else if (ConfigManager.isBinderAlive()) {
+[external][shana][shana@zju.edu.cn]            if (!TextUtils.isEmpty(intent.getDataString())) {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                switch (intent.getDataString()) {
+[external][howardwu20][HowardWu20@outlook.com]                    case "modules" -> nav.setSelectedItemId(R.id.modules_nav);
+[external][howardwu20][HowardWu20@outlook.com]                    case "logs" -> nav.setSelectedItemId(R.id.logs_fragment);
+[external][howardwu20][HowardWu20@outlook.com]                    case "repo" -> {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                        if (ConfigManager.isMagiskInstalled()) {
+[external][shana][shana@zju.edu.cn]                            nav.setSelectedItemId(R.id.repo_nav);
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                        }
+[external][howardwu20][HowardWu20@outlook.com]                    }
+[external][howardwu20][HowardWu20@outlook.com]                    case "settings" -> nav.setSelectedItemId(R.id.settings_fragment);
+[external][howardwu20][HowardWu20@outlook.com]                    default -> {
+[external][shana][shana@zju.edu.cn]                        var data = intent.getData();
+[external][howardwu20][HowardWu20@outlook.com]                        if (data != null && Objects.equals(data.getScheme(), "module")) {
+[external][shana][shana@zju.edu.cn]                            navController.navigate(
+[external][shana][shana@zju.edu.cn]                                    new Uri.Builder().scheme("lsposed").authority("module").appendQueryParameter("modulePackageName", data.getHost()).appendQueryParameter("moduleUserId", String.valueOf(data.getPort())).build(),
+[external][shana][shana@zju.edu.cn]                                    new NavOptions.Builder().setEnterAnim(R.anim.fragment_enter).setExitAnim(R.anim.fragment_exit).setPopEnterAnim(R.anim.fragment_enter_pop).setPopExitAnim(R.anim.fragment_exit_pop).setLaunchSingleTop(true).setPopUpTo(navController.getGraph().getStartDestinationId(), false, true).build());
+[external][shana][shana@zju.edu.cn]                        }
+[external][howardwu20][HowardWu20@outlook.com]                    }
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public boolean onSupportNavigateUp() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return navController.navigateUp() || super.onSupportNavigateUp();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public void restart() {
+[external][howardwu20][HowardWu20@outlook.com]        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S || App.isParasitic) {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            recreate();
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        } else {
+[external][shana][shana@zju.edu.cn]            try {
+[external][shana][shana@zju.edu.cn]                Bundle savedInstanceState = new Bundle();
+[external][shana][shana@zju.edu.cn]                onSaveInstanceState(savedInstanceState);
+[external][shana][shana@zju.edu.cn]                finish();
+[external][shana][shana@zju.edu.cn]                startActivity(newIntent(savedInstanceState, this));
+[external][shana][shana@zju.edu.cn]                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+[external][shana][shana@zju.edu.cn]                restarting = true;
+[external][shana][shana@zju.edu.cn]            } catch (Throwable e) {
+[external][shana][shana@zju.edu.cn]                recreate();
+[external][shana][shana@zju.edu.cn]            }
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public boolean dispatchKeyEvent(@NonNull KeyEvent event) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return restarting || super.dispatchKeyEvent(event);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @SuppressLint("RestrictedApi")
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public boolean dispatchKeyShortcutEvent(@NonNull KeyEvent event) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return restarting || super.dispatchKeyShortcutEvent(event);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public boolean dispatchTouchEvent(@NonNull MotionEvent event) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return restarting || super.dispatchTouchEvent(event);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public boolean dispatchTrackballEvent(@NonNull MotionEvent event) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return restarting || super.dispatchTrackballEvent(event);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public boolean dispatchGenericMotionEvent(@NonNull MotionEvent event) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return restarting || super.dispatchGenericMotionEvent(event);
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public void onRepoLoaded() {
+[external][shana][shana@zju.edu.cn]        final int[] count = new int[]{0};
+[external][shana][shana@zju.edu.cn]        HashSet<String> processedModules = new HashSet<>();
+[external][shana][shana@zju.edu.cn]        var modules = moduleUtil.getModules();
+[external][shana][shana@zju.edu.cn]        if (modules == null) return;
+[external][shana][shana@zju.edu.cn]        modules.forEach((k, v) -> {
+[external][shana][shana@zju.edu.cn]                    if (!processedModules.contains(k.first)) {
+[external][shana][shana@zju.edu.cn]                        var ver = repoLoader.getModuleLatestVersion(k.first);
+[external][shana][shana@zju.edu.cn]                        if (ver != null && ver.upgradable(v.versionCode, v.versionName)) {
+[external][shana][shana@zju.edu.cn]                            ++count[0];
+[external][shana][shana@zju.edu.cn]                        }
+[external][shana][shana@zju.edu.cn]                        processedModules.add(k.first);
+[external][shana][shana@zju.edu.cn]                    }
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]        );
+[external][shana][shana@zju.edu.cn]        runOnUiThread(() -> {
+[external][shana][shana@zju.edu.cn]            if (count[0] > 0 && binding != null) {
+[external][shana][shana@zju.edu.cn]                var nav = (NavigationBarView) binding.nav;
+[external][shana][shana@zju.edu.cn]                var badge = nav.getOrCreateBadge(R.id.repo_nav);
+[external][shana][shana@zju.edu.cn]                badge.setVisible(true);
+[external][shana][shana@zju.edu.cn]                badge.setNumber(count[0]);
+[external][shana][shana@zju.edu.cn]            } else {
+[external][shana][shana@zju.edu.cn]                onThrowable(null);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        });
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public void onThrowable(Throwable t) {
+[external][shana][shana@zju.edu.cn]        runOnUiThread(() -> {
+[external][shana][shana@zju.edu.cn]            if (binding != null) {
+[external][shana][shana@zju.edu.cn]                var nav = (NavigationBarView) binding.nav;
+[external][shana][shana@zju.edu.cn]                var badge = nav.getOrCreateBadge(R.id.repo_nav);
+[external][shana][shana@zju.edu.cn]                badge.setVisible(false);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        });
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public void onModulesReloaded() {
+[external][shana][shana@zju.edu.cn]        onRepoLoaded();
+[external][shana][shana@zju.edu.cn]        setModulesSummary(moduleUtil.getEnabledModulesCount());
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public void onResume() {
+[external][shana][shana@zju.edu.cn]        super.onResume();
+[external][shana][shana@zju.edu.cn]        if (ConfigManager.isBinderAlive()) {
+[external][shana][shana@zju.edu.cn]            setModulesSummary(moduleUtil.getEnabledModulesCount());
+[external][shana][shana@zju.edu.cn]        } else setModulesSummary(0);
+[external][shana][shana@zju.edu.cn]        if (binding != null) {
+[external][shana][shana@zju.edu.cn]            var nav = (NavigationBarView) binding.nav;
+[external][shana][shana@zju.edu.cn]            if (UpdateUtil.needUpdate()) {
+[external][shana][shana@zju.edu.cn]                var badge = nav.getOrCreateBadge(R.id.main_fragment);
+[external][shana][shana@zju.edu.cn]                badge.setVisible(true);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            if (!ConfigManager.isBinderAlive()) {
+[external][shana][shana@zju.edu.cn]                nav.getMenu().removeItem(R.id.logs_fragment);
+[external][shana][shana@zju.edu.cn]                nav.getMenu().removeItem(R.id.modules_nav);
+[external][shana][shana@zju.edu.cn]                if (!ConfigManager.isMagiskInstalled()) {
+[external][shana][shana@zju.edu.cn]                    nav.getMenu().removeItem(R.id.repo_nav);
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][howardwu20][HowardWu20@outlook.com]        if (App.isParasitic) {
+[external][howardwu20][HowardWu20@outlook.com]            var updateShortcut = ShortcutUtil.updateShortcut();
+[external][howardwu20][HowardWu20@outlook.com]            Log.d(App.TAG, "update shortcut success = " + updateShortcut);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private void setModulesSummary(int moduleCount) {
+[external][shana][shana@zju.edu.cn]        runOnUiThread(() -> {
+[external][shana][shana@zju.edu.cn]            if (binding != null) {
+[external][shana][shana@zju.edu.cn]                var nav = (NavigationBarView) binding.nav;
+[external][shana][shana@zju.edu.cn]                var badge = nav.getOrCreateBadge(R.id.modules_nav);
+[external][shana][shana@zju.edu.cn]                badge.setBackgroundColor(ResourceUtils.resolveColor(getTheme(), com.google.android.material.R.attr.colorPrimary));
+[external][shana][shana@zju.edu.cn]                badge.setBadgeTextColor(ResourceUtils.resolveColor(getTheme(), com.google.android.material.R.attr.colorOnPrimary));
+[external][shana][shana@zju.edu.cn]                if (moduleCount > 0) {
+[external][shana][shana@zju.edu.cn]                    badge.setVisible(true);
+[external][shana][shana@zju.edu.cn]                    badge.setNumber(moduleCount);
+[external][shana][shana@zju.edu.cn]                } else {
+[external][shana][shana@zju.edu.cn]                    badge.setVisible(false);
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        });
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    protected void onDestroy() {
+[external][shana][shana@zju.edu.cn]        super.onDestroy();
+[external][shana][shana@zju.edu.cn]        repoLoader.removeListener(this);
+[external][shana][shana@zju.edu.cn]        moduleUtil.removeListener(this);
+[external][shana][shana@zju.edu.cn]    }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]}

@@ -1,0 +1,7 @@
+[external][hsushulong][hsushulong@gmail.com]id=${moduleId}
+[external][shana][shana@zju.edu.cn]name=${api} - LSPosed
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]version=${versionName} (${versionCode})
+[external][hsushulong][hsushulong@gmail.com]versionCode=${versionCode}
+[external][hsushulong][hsushulong@gmail.com]author=${authorList}
+[external][howardwu20][HowardWu20@outlook.com]description=Another enhanced implementation of Xposed Framework. Supports Android 8.1 ~ 14. ${requirement}.
+[external][shana][shana@zju.edu.cn]updateJson=${updateJson}

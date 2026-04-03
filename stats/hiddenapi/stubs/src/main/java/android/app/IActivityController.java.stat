@@ -1,0 +1,66 @@
+[external][shana][shana@zju.edu.cn]package android.app;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import android.content.Intent;
+[external][shana][shana@zju.edu.cn]import android.os.Binder;
+[external][shana][shana@zju.edu.cn]import android.os.Bundle;
+[external][shana][shana@zju.edu.cn]import android.os.IBinder;
+[external][shana][shana@zju.edu.cn]import android.os.IInterface;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public interface IActivityController extends IInterface {
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * The system is trying to start an activity.  Return true to allow
+[external][shana][shana@zju.edu.cn]     * it to be started as normal, or false to cancel/reject this activity.
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    boolean activityStarting(Intent intent, String pkg);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * The system is trying to return to an activity.  Return true to allow
+[external][shana][shana@zju.edu.cn]     * it to be resumed as normal, or false to cancel/reject this activity.
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    boolean activityResuming(String pkg);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * An application process has crashed (in Java).  Return true for the
+[external][shana][shana@zju.edu.cn]     * normal error recovery (app crash dialog) to occur, false to kill
+[external][shana][shana@zju.edu.cn]     * it immediately.
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    boolean appCrashed(String processName, int pid,
+[external][shana][shana@zju.edu.cn]                       String shortMsg, String longMsg,
+[external][shana][shana@zju.edu.cn]                       long timeMillis, String stackTrace);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Early call as soon as an ANR is detected.
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    int appEarlyNotResponding(String processName, int pid, String annotation);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * An application process is not responding.  Return 0 to show the "app
+[external][shana][shana@zju.edu.cn]     * not responding" dialog, 1 to continue waiting, or -1 to kill it
+[external][shana][shana@zju.edu.cn]     * immediately.
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    int appNotResponding(String processName, int pid, String processStats);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * The system process watchdog has detected that the system seems to be
+[external][shana][shana@zju.edu.cn]     * hung.  Return 1 to continue waiting, or -1 to let it continue with its
+[external][shana][shana@zju.edu.cn]     * normal kill.
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    int systemNotResponding(String msg);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * 360 phones
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    boolean moveTaskToFront(String pkg, int task, int flags, Bundle options);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    abstract class Stub extends Binder implements IActivityController {
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        public static IActivityController asInterface(IBinder obj) {
+[external][shana][shana@zju.edu.cn]            throw new UnsupportedOperationException();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public IBinder asBinder() {
+[external][shana][shana@zju.edu.cn]            throw new UnsupportedOperationException();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

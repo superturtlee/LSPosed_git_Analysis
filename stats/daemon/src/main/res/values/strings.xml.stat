@@ -1,0 +1,20 @@
+[internal][dr-tsng][tsng.nullptr@outlook.com]<resources>
+[internal][dr-tsng][tsng.nullptr@outlook.com]    <!-- Notification -->
+[internal][dr-tsng][tsng.nullptr@outlook.com]    <string name="module_is_not_activated_yet">Xposed module is not activated yet</string>
+[external][fankes][37344460+fankes@users.noreply.github.com]    <string name="module_is_not_activated_yet_main_user_detailed">%1$s has been installed, but is not activated yet</string>
+[external][fankes][37344460+fankes@users.noreply.github.com]    <string name="module_is_not_activated_yet_multi_user_detailed">%1$s has been installed to user %2$s, but is not activated yet</string>
+[internal][dr-tsng][tsng.nullptr@outlook.com]    <string name="xposed_module_updated_notification_title">Xposed module updated</string>
+[internal][dr-tsng][tsng.nullptr@outlook.com]    <string name="xposed_module_updated_notification_content">%s has been updated, please force stop and restart apps in its scope</string>
+[internal][dr-tsng][tsng.nullptr@outlook.com]    <string name="xposed_module_updated_notification_title_system">Xposed module updated, system reboot required</string>
+[internal][dr-tsng][tsng.nullptr@outlook.com]    <string name="xposed_module_updated_notification_content_system">%s has been updated, since the scope contains System Framework, required reboot to apply changes</string>
+[internal][vvb2060][vvb2060@gmail.com]    <string name="module_updated_channel_name">Module update complete</string>
+[internal][vvb2060][vvb2060@gmail.com]    <string name="status_channel_name">LSPosed status</string>
+[internal][vvb2060][vvb2060@gmail.com]    <string name="lsposed_running_notification_title">LSPosed loaded</string>
+[internal][vvb2060][vvb2060@gmail.com]    <string name="lsposed_running_notification_content">Tap the notification to open manager</string>
+[external][shana][shana@zju.edu.cn]    <string name="xposed_module_request_scope_title">Scope Request</string>
+[external][shana][shana@zju.edu.cn]    <string name="xposed_module_request_scope_content">%1$s on user %2$s requests to add %3$s to its scope.</string>
+[external][shana][shana@zju.edu.cn]    <string name="scope_channel_name">Scope request</string>
+[external][shana][shana@zju.edu.cn]    <string name="scope_approve">Approve</string>
+[external][shana][shana@zju.edu.cn]    <string name="scope_deny">Deny</string>
+[external][shana][shana@zju.edu.cn]    <string name="nerver_ask_again">Never Ask</string>
+[internal][dr-tsng][tsng.nullptr@outlook.com]</resources>

@@ -1,0 +1,8 @@
+[external][shana][shana@zju.edu.cn]package org.lsposed.lspd.models;
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]parcelable PreLoadedApk {
+[internal][vvb2060][vvb2060@gmail.com]    List<SharedMemory> preLoadedDexes;
+[internal][vvb2060][vvb2060@gmail.com]    List<String> moduleClassNames;
+[internal][vvb2060][vvb2060@gmail.com]    List<String> moduleLibraryNames;
+[external][shana][shana@zju.edu.cn]    boolean legacy;
+[external][shana][shana@zju.edu.cn]}

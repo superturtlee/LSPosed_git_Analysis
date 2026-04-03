@@ -1,0 +1,122 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][admin][admin@0x.mk] * Copyright (C) 2021 - 2022 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][hsushulong][hsushulong@gmail.com]#include <jni.h>
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]#include "config.h"
+[external][shana][shana@zju.edu.cn]#include "context.h"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#include "native_util.h"
+[external][shana][shana@zju.edu.cn]#include "jni/hook_bridge.h"
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]#include "jni/native_api.h"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#include "jni/resources_hook.h"
+[external][shana][shana@zju.edu.cn]#include "jni/dex_parser.h"
+[external][shana][shana@zju.edu.cn]#include "symbol_cache.h"
+[external][hsushulong][hsushulong@gmail.com]
+[external][shana][shana@zju.edu.cn]using namespace lsplant;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]namespace lspd {
+[external][shana][shana@zju.edu.cn]    std::unique_ptr<Context> Context::instance_;
+[external][shana][shana@zju.edu.cn]    std::unique_ptr<ConfigBridge> ConfigBridge::instance_;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    Context::PreloadedDex::PreloadedDex(int fd, std::size_t size) {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        LOGD("Context::PreloadedDex::PreloadedDex: fd={}, size={}", fd, size);
+[external][admin][admin@0x.mk]        auto *addr = mmap(nullptr, size, PROT_READ, MAP_SHARED, fd, 0);
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]        if (addr != MAP_FAILED) {
+[external][shana][shana@zju.edu.cn]            addr_ = addr;
+[external][shana][shana@zju.edu.cn]            size_ = size;
+[external][shana][shana@zju.edu.cn]        } else {
+[external][admin][admin@0x.mk]            PLOGE("Read dex");
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    Context::PreloadedDex::~PreloadedDex() {
+[external][shana][shana@zju.edu.cn]        if (*this) munmap(addr_, size_);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    void Context::InitArtHooker(JNIEnv *env, const lsplant::InitInfo &initInfo) {
+[external][shana][shana@zju.edu.cn]        if (!lsplant::Init(env, initInfo)) {
+[external][shana][shana@zju.edu.cn]            LOGE("Failed to init lsplant");
+[external][shana][shana@zju.edu.cn]            return;
+[external][shana][shana@zju.edu.cn]        }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    void Context::InitHooks(JNIEnv *env) {
+[external][shana][shana@zju.edu.cn]        auto path_list = JNI_GetObjectFieldOf(env, inject_class_loader_, "pathList",
+[external][shana][shana@zju.edu.cn]                                              "Ldalvik/system/DexPathList;");
+[external][shana][shana@zju.edu.cn]        if (!path_list) {
+[external][shana][shana@zju.edu.cn]            LOGE("Failed to get path list");
+[external][shana][shana@zju.edu.cn]            return;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        const auto elements = JNI_Cast<jobjectArray>(
+[external][shana][shana@zju.edu.cn]                JNI_GetObjectFieldOf(env, path_list, "dexElements",
+[external][shana][shana@zju.edu.cn]                                     "[Ldalvik/system/DexPathList$Element;"));
+[external][shana][shana@zju.edu.cn]        if (!elements) {
+[external][shana][shana@zju.edu.cn]            LOGE("Failed to get elements");
+[external][shana][shana@zju.edu.cn]            return;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        for (const auto &element: elements) {
+[external][shana][shana@zju.edu.cn]            if (!element)
+[external][shana][shana@zju.edu.cn]                continue;
+[external][shana][shana@zju.edu.cn]            auto java_dex_file = JNI_GetObjectFieldOf(env, element, "dexFile",
+[external][shana][shana@zju.edu.cn]                                                      "Ldalvik/system/DexFile;");
+[external][shana][shana@zju.edu.cn]            if (!java_dex_file) {
+[external][shana][shana@zju.edu.cn]                LOGE("Failed to get java dex file");
+[external][shana][shana@zju.edu.cn]                return;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            auto cookie = JNI_GetObjectFieldOf(env, java_dex_file, "mCookie", "Ljava/lang/Object;");
+[external][shana][shana@zju.edu.cn]            if (!cookie) {
+[external][shana][shana@zju.edu.cn]                LOGE("Failed to get cookie");
+[external][shana][shana@zju.edu.cn]                return;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            lsplant::MakeDexFileTrusted(env, cookie);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        RegisterResourcesHook(env);
+[external][shana][shana@zju.edu.cn]        RegisterHookBridge(env);
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        RegisterNativeAPI(env);
+[external][shana][shana@zju.edu.cn]        RegisterDexParserBridge(env);
+[external][hsushulong][hsushulong@gmail.com]    }
+[external][hsushulong][hsushulong@gmail.com]
+[external][shana][shana@zju.edu.cn]    ScopedLocalRef<jclass>
+[external][shana][shana@zju.edu.cn]    Context::FindClassFromLoader(JNIEnv *env, jobject class_loader,
+[external][shana][shana@zju.edu.cn]                                 std::string_view class_name) {
+[external][shana][shana@zju.edu.cn]        if (class_loader == nullptr) return {env, nullptr};
+[external][shana][shana@zju.edu.cn]        static auto clz = JNI_NewGlobalRef(env,
+[external][shana][shana@zju.edu.cn]                                           JNI_FindClass(env, "dalvik/system/DexClassLoader"));
+[external][shana][shana@zju.edu.cn]        static jmethodID mid = JNI_GetMethodID(env, clz, "loadClass",
+[external][shana][shana@zju.edu.cn]                                               "(Ljava/lang/String;)Ljava/lang/Class;");
+[external][hsushulong][hsushulong@gmail.com]        if (!mid) {
+[external][shana][shana@zju.edu.cn]            mid = JNI_GetMethodID(env, clz, "findClass",
+[external][shana][shana@zju.edu.cn]                                  "(Ljava/lang/String;)Ljava/lang/Class;");
+[external][hsushulong][hsushulong@gmail.com]        }
+[external][shana][shana@zju.edu.cn]        if (mid) [[likely]] {
+[external][shana][shana@zju.edu.cn]            auto target = JNI_CallObjectMethod(env, class_loader, mid,
+[external][admin][admin@0x.mk]                                               JNI_NewStringUTF(env, class_name.data()));
+[external][hsushulong][hsushulong@gmail.com]            if (target) {
+[external][shana][shana@zju.edu.cn]                return target;
+[external][hsushulong][hsushulong@gmail.com]            }
+[external][hsushulong][hsushulong@gmail.com]        } else {
+[external][shana][shana@zju.edu.cn]            LOGE("No loadClass/findClass method found");
+[external][hsushulong][hsushulong@gmail.com]        }
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        LOGE("Class {} not found", class_name);
+[external][shana][shana@zju.edu.cn]        return {env, nullptr};
+[external][hsushulong][hsushulong@gmail.com]    }
+[external][shana][shana@zju.edu.cn]}  // namespace lspd

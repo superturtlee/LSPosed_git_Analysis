@@ -1,0 +1,125 @@
+[external][shana][shana@zju.edu.cn]#ifndef RIRU_H
+[external][shana][shana@zju.edu.cn]#define RIRU_H
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]#ifdef __cplusplus
+[external][shana][shana@zju.edu.cn]extern "C" {
+[external][shana][shana@zju.edu.cn]#endif
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]#include <stdint.h>
+[external][shana][shana@zju.edu.cn]#include <jni.h>
+[external][shana][shana@zju.edu.cn]#include <sys/types.h>
+[external][shana][shana@zju.edu.cn]#include <stddef.h>
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]// ---------------------------------------------------------
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]typedef void(onModuleLoaded_v9)();
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]#ifndef RIRU_MODULE
+[external][shana][shana@zju.edu.cn]typedef int(shouldSkipUid_v9)(int uid);
+[external][shana][shana@zju.edu.cn]#endif
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]typedef void(nativeForkAndSpecializePre_v9)(
+[external][shana][shana@zju.edu.cn]        JNIEnv *env, jclass cls, jint *uid, jint *gid, jintArray *gids, jint *runtimeFlags,
+[external][shana][shana@zju.edu.cn]        jobjectArray *rlimits, jint *mountExternal, jstring *seInfo, jstring *niceName,
+[external][shana][shana@zju.edu.cn]        jintArray *fdsToClose, jintArray *fdsToIgnore, jboolean *is_child_zygote,
+[external][shana][shana@zju.edu.cn]        jstring *instructionSet, jstring *appDataDir, jboolean *isTopApp,
+[external][shana][shana@zju.edu.cn]        jobjectArray *pkgDataInfoList,
+[external][shana][shana@zju.edu.cn]        jobjectArray *whitelistedDataInfoList, jboolean *bindMountAppDataDirs,
+[external][shana][shana@zju.edu.cn]        jboolean *bindMountAppStorageDirs);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]typedef void(nativeForkAndSpecializePost_v9)(JNIEnv *env, jclass cls, jint res);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]typedef void(nativeForkSystemServerPre_v9)(
+[external][shana][shana@zju.edu.cn]        JNIEnv *env, jclass cls, uid_t *uid, gid_t *gid, jintArray *gids, jint *runtimeFlags,
+[external][shana][shana@zju.edu.cn]        jobjectArray *rlimits, jlong *permittedCapabilities, jlong *effectiveCapabilities);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]typedef void(nativeForkSystemServerPost_v9)(JNIEnv *env, jclass cls, jint res);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]typedef void(nativeSpecializeAppProcessPre_v9)(
+[external][shana][shana@zju.edu.cn]        JNIEnv *env, jclass cls, jint *uid, jint *gid, jintArray *gids, jint *runtimeFlags,
+[external][shana][shana@zju.edu.cn]        jobjectArray *rlimits, jint *mountExternal, jstring *seInfo, jstring *niceName,
+[external][shana][shana@zju.edu.cn]        jboolean *startChildZygote, jstring *instructionSet, jstring *appDataDir,
+[external][shana][shana@zju.edu.cn]        jboolean *isTopApp, jobjectArray *pkgDataInfoList, jobjectArray *whitelistedDataInfoList,
+[external][shana][shana@zju.edu.cn]        jboolean *bindMountAppDataDirs, jboolean *bindMountAppStorageDirs);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]typedef void(nativeSpecializeAppProcessPost_v9)(JNIEnv *env, jclass cls);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]typedef struct {
+[external][shana][shana@zju.edu.cn]    int supportHide;
+[external][shana][shana@zju.edu.cn]    int version;
+[external][shana][shana@zju.edu.cn]    const char *versionName;
+[external][shana][shana@zju.edu.cn]    onModuleLoaded_v9 *onModuleLoaded;
+[external][shana][shana@zju.edu.cn]#ifndef RIRU_MODULE
+[external][shana][shana@zju.edu.cn]    shouldSkipUid_v9 *shouldSkipUid;
+[external][shana][shana@zju.edu.cn]#else
+[external][shana][shana@zju.edu.cn]    void *unused;
+[external][shana][shana@zju.edu.cn]#endif
+[external][shana][shana@zju.edu.cn]    nativeForkAndSpecializePre_v9 *forkAndSpecializePre;
+[external][shana][shana@zju.edu.cn]    nativeForkAndSpecializePost_v9 *forkAndSpecializePost;
+[external][shana][shana@zju.edu.cn]    nativeForkSystemServerPre_v9 *forkSystemServerPre;
+[external][shana][shana@zju.edu.cn]    nativeForkSystemServerPost_v9 *forkSystemServerPost;
+[external][shana][shana@zju.edu.cn]    nativeSpecializeAppProcessPre_v9 *specializeAppProcessPre;
+[external][shana][shana@zju.edu.cn]    nativeSpecializeAppProcessPost_v9 *specializeAppProcessPost;
+[external][shana][shana@zju.edu.cn]} RiruModuleInfo;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]typedef struct {
+[external][shana][shana@zju.edu.cn]    int moduleApiVersion;
+[external][shana][shana@zju.edu.cn]    RiruModuleInfo moduleInfo;
+[external][shana][shana@zju.edu.cn]} RiruVersionedModuleInfo;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]// ---------------------------------------------------------
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]typedef struct {
+[external][shana][shana@zju.edu.cn]    int riruApiVersion;
+[external][shana][shana@zju.edu.cn]    void *unused;
+[external][shana][shana@zju.edu.cn]    const char *magiskModulePath;
+[external][shana][shana@zju.edu.cn]    int *allowUnload;
+[external][shana][shana@zju.edu.cn]} Riru;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]typedef RiruVersionedModuleInfo *(RiruInit_t)(Riru *);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]#ifdef RIRU_MODULE
+[external][shana][shana@zju.edu.cn]#define RIRUD_ADDRESS "rirud"
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]#if __cplusplus < 201103L
+[external][shana][shana@zju.edu.cn]#define RIRU_EXPORT __attribute__((visibility("default"))) __attribute__((used))
+[external][shana][shana@zju.edu.cn]#else
+[external][shana][shana@zju.edu.cn]#define RIRU_EXPORT [[gnu::visibility("default")]] [[gnu::used]]
+[external][shana][shana@zju.edu.cn]#endif
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]RIRU_EXPORT RiruVersionedModuleInfo *init(Riru *riru) ;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]extern int riru_api_version;
+[external][shana][shana@zju.edu.cn]extern const char *riru_magisk_module_path;
+[external][shana][shana@zju.edu.cn]extern int *riru_allow_unload;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]#if !__cplusplus && __STDC_VERSION__ < 199409L
+[external][shana][shana@zju.edu.cn]#define RIRU_INLINE __attribute__((weak)) __inline__
+[external][shana][shana@zju.edu.cn]#elif !__cplusplus
+[external][shana][shana@zju.edu.cn]#define RIRU_INLINE  __attribute__((weak)) inline extern
+[external][shana][shana@zju.edu.cn]#else
+[external][shana][shana@zju.edu.cn]#define RIRU_INLINE inline
+[external][shana][shana@zju.edu.cn]#endif
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]RIRU_INLINE const char *riru_get_magisk_module_path() {
+[external][shana][shana@zju.edu.cn]    if (riru_api_version >= 24) {
+[external][shana][shana@zju.edu.cn]        return riru_magisk_module_path;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]    return NULL;
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]RIRU_INLINE void riru_set_unload_allowed(int allowed) {
+[external][shana][shana@zju.edu.cn]    if (riru_api_version >= 25 && riru_allow_unload) {
+[external][shana][shana@zju.edu.cn]        *riru_allow_unload = allowed;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]#undef RIRU_INLINE
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]#endif
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]#ifdef __cplusplus
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]#endif
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]#endif //RIRU_H

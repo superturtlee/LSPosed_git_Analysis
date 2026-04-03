@@ -1,0 +1,12 @@
+[external][shana][shana@zju.edu.cn][submodule "external/lsplant"]
+[external][shana][shana@zju.edu.cn]	path = external/lsplant
+[external][shana][shana@zju.edu.cn]	url = https://github.com/LSPosed/LSPlant.git
+[external][shana][shana@zju.edu.cn][submodule "external/dobby"]
+[external][shana][shana@zju.edu.cn]	path = external/dobby
+[external][shana][shana@zju.edu.cn]	url = https://github.com/LSPosed/Dobby.git
+[internal][kotori2][17663689+kotori2@users.noreply.github.com][submodule "external/fmt"]
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]	path = external/fmt
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]	url = https://github.com/fmtlib/fmt.git
+[external][shana][shana@zju.edu.cn][submodule "external/cxx"]
+[external][shana][shana@zju.edu.cn]	path = external/cxx
+[external][shana][shana@zju.edu.cn]	url = https://github.com/topjohnwu/libcxx.git

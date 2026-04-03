@@ -1,0 +1,11 @@
+{
+  "scope": "main_branch",
+  "ref": "origin/master",
+  "exclude_bots": true,
+  "period_start": "2014-01",
+  "period_end": "2024-01",
+  "total_commits": 2680,
+  "external_commits": 2262,
+  "internal_commits": 418,
+  "external_ratio": 0.8440298507462687
+}

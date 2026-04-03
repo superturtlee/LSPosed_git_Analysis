@@ -1,0 +1,7 @@
+[external][shana][shana@zju.edu.cn]package android.content.pm;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public class PackageInstaller {
+[external][shana][shana@zju.edu.cn]    public static class SessionParams {
+[external][shana][shana@zju.edu.cn]        public int installFlags = 0;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

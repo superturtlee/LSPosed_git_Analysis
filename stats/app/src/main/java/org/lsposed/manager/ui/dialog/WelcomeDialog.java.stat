@@ -1,0 +1,98 @@
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]/*
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * This file is part of LSPosed.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] *
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * (at your option) any later version.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] *
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * GNU General Public License for more details.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] *
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] *
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] * Copyright (C) 2022 LSPosed Contributors
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com] */
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.manager.ui.dialog;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import android.app.Dialog;
+[internal][vvb2060][vvb2060@gmail.com]import android.os.Bundle;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import androidx.annotation.NonNull;
+[internal][vvb2060][vvb2060@gmail.com]import androidx.annotation.Nullable;
+[internal][vvb2060][vvb2060@gmail.com]import androidx.fragment.app.DialogFragment;
+[internal][vvb2060][vvb2060@gmail.com]import androidx.fragment.app.FragmentManager;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.App;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.ConfigManager;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.R;
+[external][howardwu20][HowardWu20@outlook.com]import org.lsposed.manager.ui.fragment.BaseFragment;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.util.ShortcutUtil;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]public class WelcomeDialog extends DialogFragment {
+[internal][vvb2060][vvb2060@gmail.com]    private static boolean shown = false;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    private Dialog parasiticDialog(BlurBehindDialogBuilder builder) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        var shortcutSupported = ShortcutUtil.isRequestPinShortcutSupported(requireContext());
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        builder
+[internal][vvb2060][vvb2060@gmail.com]                .setTitle(R.string.parasitic_welcome)
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                .setMessage(shortcutSupported ? R.string.parasitic_welcome_summary :
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        R.string.parasitic_welcome_summary_no_shortcut_support)
+[internal][vvb2060][vvb2060@gmail.com]                .setNegativeButton(R.string.never_show, (dialog, which) ->
+[internal][vvb2060][vvb2060@gmail.com]                        App.getPreferences().edit().putBoolean("never_show_welcome", true).apply())
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                .setPositiveButton(android.R.string.ok, null)
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                .setNeutralButton(R.string.create_shortcut, (dialog, which) -> {
+[external][howardwu20][HowardWu20@outlook.com]                    var home = (BaseFragment) getParentFragment();
+[external][howardwu20][HowardWu20@outlook.com]                    if (!ShortcutUtil.requestPinLaunchShortcut(() -> {
+[external][howardwu20][HowardWu20@outlook.com]                        App.getPreferences().edit().putBoolean("never_show_welcome", true).apply();
+[external][howardwu20][HowardWu20@outlook.com]                        if (home != null) {
+[external][howardwu20][HowardWu20@outlook.com]                            home.showHint(R.string.settings_shortcut_pinned_hint, false);
+[external][howardwu20][HowardWu20@outlook.com]                        }
+[external][howardwu20][HowardWu20@outlook.com]                    })) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        if (home != null) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                            home.showHint(R.string.settings_unsupported_pin_shortcut_summary, false);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                });
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        return builder.create();
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    private Dialog appDialog(BlurBehindDialogBuilder builder) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]        return builder
+[internal][vvb2060][vvb2060@gmail.com]                .setTitle(R.string.app_welcome)
+[internal][vvb2060][vvb2060@gmail.com]                .setMessage(R.string.app_welcome_summary)
+[internal][vvb2060][vvb2060@gmail.com]                .setNegativeButton(R.string.never_show, (d, w) ->
+[internal][vvb2060][vvb2060@gmail.com]                        App.getPreferences().edit().putBoolean("never_show_welcome", true).apply())
+[internal][vvb2060][vvb2060@gmail.com]                .setPositiveButton(android.R.string.ok, null)
+[internal][vvb2060][vvb2060@gmail.com]                .create();
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    @NonNull
+[internal][vvb2060][vvb2060@gmail.com]    @Override
+[internal][vvb2060][vvb2060@gmail.com]    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+[internal][vvb2060][vvb2060@gmail.com]        var builder = new BlurBehindDialogBuilder(requireContext(),
+[internal][vvb2060][vvb2060@gmail.com]                R.style.ThemeOverlay_MaterialAlertDialog_Centered_FullWidthButtons);
+[external][howardwu20][HowardWu20@outlook.com]        if (App.isParasitic) {
+[internal][vvb2060][vvb2060@gmail.com]            return parasiticDialog(builder);
+[internal][vvb2060][vvb2060@gmail.com]        } else {
+[internal][vvb2060][vvb2060@gmail.com]            return appDialog(builder);
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    public static void showIfNeed(FragmentManager fm) {
+[internal][vvb2060][vvb2060@gmail.com]        if (shown) return;
+[external][shana][shana@zju.edu.cn]        if (!ConfigManager.isBinderAlive() ||
+[external][shana][shana@zju.edu.cn]                App.getPreferences().getBoolean("never_show_welcome", false) ||
+[external][shana][shana@zju.edu.cn]                (App.isParasitic && ShortcutUtil.isLaunchShortcutPinned())) {
+[external][shana][shana@zju.edu.cn]            shown = true;
+[external][shana][shana@zju.edu.cn]            return;
+[external][shana][shana@zju.edu.cn]        }
+[internal][vvb2060][vvb2060@gmail.com]        new WelcomeDialog().show(fm, "welcome");
+[internal][vvb2060][vvb2060@gmail.com]        shown = true;
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]}

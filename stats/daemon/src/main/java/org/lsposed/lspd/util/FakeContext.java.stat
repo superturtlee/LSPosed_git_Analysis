@@ -1,0 +1,90 @@
+[external][shana][shana@zju.edu.cn]package org.lsposed.lspd.util;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import static org.lsposed.lspd.service.ServiceManager.TAG;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import android.content.ContentResolver;
+[external][shana][shana@zju.edu.cn]import android.content.Context;
+[external][shana][shana@zju.edu.cn]import android.content.ContextWrapper;
+[external][shana][shana@zju.edu.cn]import android.content.pm.ApplicationInfo;
+[external][shana][shana@zju.edu.cn]import android.content.pm.PackageManager;
+[external][shana][shana@zju.edu.cn]import android.content.res.Resources;
+[external][shana][shana@zju.edu.cn]import android.os.UserHandle;
+[external][shana][shana@zju.edu.cn]import android.util.Log;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import androidx.annotation.Nullable;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import org.lsposed.lspd.service.ConfigFileManager;
+[external][shana][shana@zju.edu.cn]import org.lsposed.lspd.service.PackageService;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import hidden.HiddenApiBridge;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public class FakeContext extends ContextWrapper {
+[external][shana][shana@zju.edu.cn]    static ApplicationInfo systemApplicationInfo = null;
+[external][shana][shana@zju.edu.cn]    static Resources.Theme theme = null;
+[external][shana][shana@zju.edu.cn]    private String packageName = "android";
+[external][shana][shana@zju.edu.cn]    public FakeContext() {
+[external][shana][shana@zju.edu.cn]        super(null);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public FakeContext(String packageName) {
+[external][shana][shana@zju.edu.cn]        super(null);
+[external][shana][shana@zju.edu.cn]        this.packageName = packageName;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public String getPackageName() {
+[external][shana][shana@zju.edu.cn]        return packageName;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public Resources getResources() {
+[external][shana][shana@zju.edu.cn]        return ConfigFileManager.getResources();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[internal][5ec1cff][56485584+5ec1cff@users.noreply.github.com]    @Override
+[internal][5ec1cff][56485584+5ec1cff@users.noreply.github.com]    public String getOpPackageName() {
+[internal][5ec1cff][56485584+5ec1cff@users.noreply.github.com]        return "android";
+[internal][5ec1cff][56485584+5ec1cff@users.noreply.github.com]    }
+[internal][5ec1cff][56485584+5ec1cff@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public ApplicationInfo getApplicationInfo() {
+[external][shana][shana@zju.edu.cn]        try {
+[external][shana][shana@zju.edu.cn]            if (systemApplicationInfo == null)
+[external][shana][shana@zju.edu.cn]                systemApplicationInfo = PackageService.getApplicationInfo("android", 0, 0);
+[external][shana][shana@zju.edu.cn]        } catch (Throwable e) {
+[external][shana][shana@zju.edu.cn]            Log.e(TAG, "getApplicationInfo", e);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return systemApplicationInfo;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public ContentResolver getContentResolver() {
+[external][shana][shana@zju.edu.cn]        return new ContentResolver(this) {
+[external][shana][shana@zju.edu.cn]        };
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public int getUserId() {
+[external][shana][shana@zju.edu.cn]        return 0;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public UserHandle getUser() {
+[external][shana][shana@zju.edu.cn]        return HiddenApiBridge.UserHandle(0);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public Resources.Theme getTheme() {
+[external][shana][shana@zju.edu.cn]        if (theme == null) theme = getResources().newTheme();
+[external][shana][shana@zju.edu.cn]        return theme;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Nullable
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public String getAttributionTag() {
+[external][shana][shana@zju.edu.cn]        return null;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public Context createPackageContext(String packageName, int flags) throws PackageManager.NameNotFoundException {
+[external][shana][shana@zju.edu.cn]        throw new PackageManager.NameNotFoundException(packageName);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

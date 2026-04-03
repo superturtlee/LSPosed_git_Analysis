@@ -1,0 +1,243 @@
+[bot][lsposed][lsposed@lsposed.org]<?xml version="1.0" encoding="utf-8"?>
+[bot][lsposed][lsposed@lsposed.org]<!--
+[bot][lsposed][lsposed@lsposed.org]  ~ This file is part of LSPosed.
+[bot][lsposed][lsposed@lsposed.org]  ~
+[bot][lsposed][lsposed@lsposed.org]  ~ LSPosed is free software: you can redistribute it and/or modify
+[bot][lsposed][lsposed@lsposed.org]  ~ it under the terms of the GNU General Public License as published by
+[bot][lsposed][lsposed@lsposed.org]  ~ the Free Software Foundation, either version 3 of the License, or
+[bot][lsposed][lsposed@lsposed.org]  ~ (at your option) any later version.
+[bot][lsposed][lsposed@lsposed.org]  ~
+[bot][lsposed][lsposed@lsposed.org]  ~ LSPosed is distributed in the hope that it will be useful,
+[bot][lsposed][lsposed@lsposed.org]  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+[bot][lsposed][lsposed@lsposed.org]  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[bot][lsposed][lsposed@lsposed.org]  ~ GNU General Public License for more details.
+[bot][lsposed][lsposed@lsposed.org]  ~
+[bot][lsposed][lsposed@lsposed.org]  ~ You should have received a copy of the GNU General Public License
+[bot][lsposed][lsposed@lsposed.org]  ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[bot][lsposed][lsposed@lsposed.org]  ~
+[bot][lsposed][lsposed@lsposed.org]  ~ Copyright (C) 2021 LSPosed Contributors
+[bot][lsposed][lsposed@lsposed.org]  -->
+[bot][lsposed][lsposed@lsposed.org]<resources xmlns:tools="http://schemas.android.com/tools" tools:keep="@string/xposed_module_updated_notification_*,@string/module_is_not_activated_*">
+[bot][lsposed][lsposed@lsposed.org]    <!-- MainActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="overview">Áttekintés</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="Modules">Modulok</string>
+[bot][lsposed][lsposed@lsposed.org]    <plurals name="modules_enabled_count">
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="one">%d modul aktiválva</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="other">%d modulok aktiválva</item>
+[bot][lsposed][lsposed@lsposed.org]    </plurals>
+[bot][lsposed][lsposed@lsposed.org]    <string name="Logs">Napló fájlok</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="Settings">Beállítások</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="feedback_or_suggestion">Visszajelzés vagy javaslat</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="About">Névjegy</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="report_issue">Hibabejelentés</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo">Modulok</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo_up_to_date">Minden modul naprakész</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo_published_time">Közzétéve: %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo_updated_time">Frissítve: %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <plurals name="module_repo_upgradable">
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="one">%d modul frissíthető</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="other">%d modul frissíthető</item>
+[bot][lsposed][lsposed@lsposed.org]    </plurals>
+[bot][lsposed][lsposed@lsposed.org]    <string name="about_view_source_code"><![CDATA[A forráskódot megnézheted itt: %1$s<br/> Iratkozz fel a %2$s csatornánkra]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="translators" comment="Dear translators, please add your home page here following the format. There can be more than one translator. So feel free to append yourself.">عبدو المكحل, Balázs Juhász, Krisztián Molnár</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install">Telepítés</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install_summary">Koppints az LSPosed telepítéséhez</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="not_installed">Nincs telepítve</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="not_install_summary">Az LSPosed nincs telepítve</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="activated">Aktiválva</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="partial_activated">Részben aktiválva</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="selinux_policy_not_loaded_summary">Az SEPolicy nem töltött be megfelelően</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="selinux_policy_not_loaded"><![CDATA[Néhány funkció nem fog működni.<br/>Kérjük, jelezze ezt a <a href="https://github.com/topjohnwu/Magisk/issues"><b>Magisk</b></a> fejlesztőnek.]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_inject_fail_summary">A System Framework injektálása sikertelen</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_inject_fail"><![CDATA[Ez sajnos gyakori probléma, amit lehet, hogy a
+[bot][lsposed][lsposed@lsposed.org]<b>Magisk</b> vagy néhány Magisk modul okozott.<br/> Kérlek próbálj meg deaktiválni néhány Magisk modult a Riru és LSPosed modulokon kívül vagy küldj el egy teljes napló fájlt a fejlesztőknek.]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_prop_incorrect_summary">Helytelen rendszertulajdonságok</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_prop_incorrect"><![CDATA[Néhány szükséges rendszertulajdonság törlése vagy módosítása.<br/>A modulok időnként érvénytelenné válhatnak.]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="need_update">Frissítésre van szükség</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="please_update_summary">Kérjük, telepítse az LSPosed legújabb verzióját</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_api_version">API verzió</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_framework_version">Keretrendszer verzió</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_manager_package_name">Menedzser csomag neve</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_system_version">Rendszer verzió</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_device">Eszköz</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_system_abi">Rendszer ABI</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_dex2oat_wrapper">Dex Optimizer Wrapper</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enabled">Engedélyezve</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="not_enabled">Nincs engedélyezve</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="supported">Támogatott</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="unsupported">Nem támogatott</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="android_version_unsatisfied">Az Android verzió nem megfelelő</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="crashed">Összeomlott</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="mount_failed">A csatolás sikertelen</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="selinux_permissive">Az SELinux engedélyezett</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sepolicy_incorrect">Az SELinux házirend helytelen</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_lsposed">Az LSPosed frissítése</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_lsposed_msg">Jóváhagyja az LSPosed frissítését? A készülék a frissítés befejezése után újra fog indulni</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_copied">A vágólapra másolva</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- WelcomeDialog -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="parasitic_welcome">Üdvözöljük az LSPosed</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="parasitic_welcome_summary">Ön használja a parazita menedzser, amely képes létrehozni parancsikont vagy még mindig nyitva értesítésből.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="parasitic_welcome_summary_no_shortcut_support">Ön a parazita-kezelőt használja, amely az értesítésből megnyitható.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="create_shortcut">Parancsikon létrehozása</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="never_show">Soha ne mutassa</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_welcome">Parazita menedzser Ajánlott</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_welcome_summary">Az LSPosed mostantól támogatja a rendszerparazitizációt a felismerés elkerülése érdekében, a parazita-kezelőt az értesítésből nyithatja meg. Javasoljuk, hogy távolítsa el az aktuális alkalmazást.</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- LogsActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="menuSaveToSd">Mentés</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="nav_item_logs_verbose">Szöveges naplók</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="nav_item_logs_module">Modulok Naplói</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_saving">Napló mentése, kérem várjon</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_saved">Mentett naplók</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_save_failed2">Nem sikerült menteni:\n%s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menuClearLog">Törölje a naplót most</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_cleared">A napló sikeresen törlődött.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="scroll_top">Görgessen a tetejére</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="loading">Betöltés…</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="scroll_bottom">Görgessen az aljára</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menuReload">Újratöltés</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_clear_failed_2">Nem sikerült törölni a naplót</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_enable_word_wrap">Word Wrap</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enabled_verbose_log">Szöveges napló engedélyezve</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="disabled_verbose_log">Szöveges napló letiltva</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- ModulesActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_empty_description">(nincs leírás megadva)</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_xposed_min_version">Ez a modul egy újabb Xposed verziót igényel (%d), ezért nem aktiválható</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_target_version_higher">Ez a modul egy újabb Xposed verzióhoz készült (%d), ezért előfordulhat, hogy egyes funkciók nem működnek</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="no_min_version_specified">Ez a modul nem határoz meg szükséges Xposed verziót.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_min_version_too_low">Ez a modul az Xposed %1$dverziójához készült, de a %2$dverzióban bekövetkezett inkompatibilis változások miatt letiltásra került.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_installed_on_external_storage">Ez a modul nem tölthető be, mert az SD-kártyára van telepítve, kérjük, helyezze át a belső tárhelyre.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstall">Eltávolítás</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_settings">Modul beállítások</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="view_in_repo">Megtekintés a Repóban</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstall_message">Szeretné eltávolítani ezt a modult?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstalled">%1$s eltávolítva</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstall_failed">Az eltávolítás sikertelen</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="add_module_to_user">Modul hozzáadása a felhasználóhoz</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_installed">%1$s hozzáadva a(z) %2$s felhasználóhoz</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_install_failed">A modul hozzáadása sikertelen</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install_to_user">Telepítés a felhasználóhoz %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install_to_user_message">Szeretné telepíteni a %1$s -t a %2$sfelhasználóhoz ? Javasoljuk a manuális telepítést, az LSPosed-en keresztül történő kényszerített telepítés problémákat okozhat.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="expand">kiterjesztés</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="collapse">összecsukás</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- AppListActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_speed">Újraoptimalizálás</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_speed_msg">Optimalizálás…</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_done">Az optimalizálás befejezve</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_launch">Indítsd el</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_failed">Optimalizálás sikertelen: a visszatérési érték üres</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_failed_with_info">Az optimalizálás nem sikerült: </string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_by_name">Alkalmazás neve</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_by_package_name">Csomag neve</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_by_install_time">Telepítés ideje</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_by_update_time">Frissítés ideje</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_reverse">Fordított</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_system_apps">Rendszeralkalmazások</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_sort">Rendezés</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enable_module">Modul engedélyezése</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="no_scope_selected">Nem választott ki egyetlen alkalmazást sem. Folytatja?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_games">Játékok</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_modules">Modulok</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_denylist">Tiltólista</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="failed_to_save_scope_list">Nem sikerült elmenteni a hatókör listát</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_version">Verzió: %1$s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="use_recommended">Ajánlott</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="no_scope_selected_has_recommended">Nem választott ki egyetlen alkalmazást sem. Kiválasztja az ajánlott alkalmazásokat?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="use_recommended_message">Kiválasztja az ajánlott alkalmazásokat?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_is_not_activated_yet">Az Xposed modul még nincs aktiválva</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="requested_by_module">Ajánlott</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_available">Frissítés elérhető: %1$s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_disabled_no_selection">A %s modul le lett tiltva, mivel nincs kiválasztott alkalmazás.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="android_framework">Rendszer keretrendszer</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_backup_and_restore">Biztonsági mentés</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_backup">Biztonsági mentés</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_restore">Visszaállítás</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="force_stop">Erőszakos megállás</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="force_stop_dlg_title">Erőszakos megállás?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="force_stop_dlg_text">Ha egy alkalmazást erőltetett leállítással állít le, az rosszul viselkedhet.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="reboot_required">A módosítás érvényesítéséhez újraindítás szükséges</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="reboot">Újraindítás</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_hide">Rejtsd el</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="deny_list">%s a denyliston van. Lehet, hogy nem lép hatályba.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="deny_list_info">A denylistán</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- ModulesActivity and AppListActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="modules_other_app">Megtekintés más alkalmazásban</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_app_info">Alkalmazás információ</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="list_empty">¯\\\\_(ツ)_\/¯\nItt nincs semmi</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- SettingsActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_group_framework">Keretrendszer</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_disable_verbose_log">A szöveges naplózás kikapcsolása</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_disable_verbose_log_summary">Jelentési kérdések kérése a verbózus naplók felvételére</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="pure_black_dark_theme">Fekete sötét téma</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="pure_black_dark_theme_summary">Teljesen fekete téma használata, ha a sötét téma engedélyezve van</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_group_theme">Téma</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup_and_restore">Biztonsági mentés és visszaállítás</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup_summery">A modul lista és hatókör listák biztonsági mentése.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_restore_summery">A modullista és a hatókörlisták visszaállítása.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup">Biztonsági mentés</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup_failed2">A biztonsági mentés sikertelen:\n%s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enable_documentui">Kérjük, engedélyezze a DocumentUI-t</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_restore">Visszaállítás</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_restore_failed2">Nem sikerült visszaállítani:\n%s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="group_network">Hálózat</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="dns_over_http">DNS HTTPS-en keresztül</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="dns_over_http_summary">Megoldás DNS-mérgezés esetén egyes országokban</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="theme_color">Téma színe</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="theme_color_system">Rendszertéma színe</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_show_hidden_icon_apps_enabled">Az alkalmazások kényszerítése az indító ikonok megjelenítésére</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_show_hidden_icon_apps_enabled_summary">Az Android 10 után az alkalmazások nem rejthetik el az indítóikonjaikat. Kapcsolja ki a kapcsolót ennek a rendszerfunkciónak a letiltásához.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_group_system">Rendszer</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_language">Nyelv</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_translation_contributors">A fordításban közreműködők</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_translation">Részvétel a fordításban</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_translation_summary">Segítsen nekünk lefordítani az %s -t az Ön nyelvére</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_create_shortcut_summary">Hozzon létre egy parancsikont, amely képes megnyitni a parazita menedzser</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_shortcut_pinned_hint">Parancsikon kitüzve</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_unsupported_pin_shortcut_summary">A jelenlegi alapértelmezett indítóprogram nem támogatja a pin parancsikonokat</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_enable_status_notification">Állapot értesítés</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_enable_status_notification_summary">Értesítés megjelenítése, amely megnyithatja a parazita-kezelőt</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="disable_status_notification_error">Nincs parancsikon, nem lehet letiltani az értesítést</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_update_channel">Frissítési csatorna</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_channel_stable">Stabil</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_channel_bate">Béta</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_channel_nightly">Nightly</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_xposed_api_call_protection">Xposed API hívásvédelem</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_xposed_api_call_protection_summary">A dinamikusan betöltött modul kódjának blokkolása az Xposed API használatához, ez néhány modult tönkretehet, de a biztonság javára válik</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- Module Repo -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_readme">Olvass el</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_releases">Kiadások</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_information">Információ</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_information_homepage">Honlap</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_information_source_url">Forráskód</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_information_collaborators">Együttműködők</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_release_view_assets">Eszközök</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_open_in_browser">Megnyitás a böngészőben</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_release_load_more">Régebbi verziók megjelenítése</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_release_no_more">Nincs több kiadás</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="repo_load_failed">Nem sikerült betölteni a modul repo-t: %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_upgradable_first">Frissíthetőek először</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="installed">Telepítve</string>
+[bot][lsposed][lsposed@lsposed.org]    <plurals name="module_release_assets_download_count">
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="one">%d letöltés</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="other">%d letöltések</item>
+[bot][lsposed][lsposed@lsposed.org]    </plurals>
+[bot][lsposed][lsposed@lsposed.org]    <!-- Colors -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_sakura">Sakura</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_red">Piros</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_pink">Rózsaszín</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_purple">Lila</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_deep_purple">Mély lila</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_indigo">Indigo</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_blue">Kék</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_light_blue">Világoskék</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_cyan">Cián</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_teal">Zöldeskék</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_green">Zöld</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_light_green">Világoszöld</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_lime">Lime</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_yellow">Sárga</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_amber">Borostyán</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_orange">Narancs</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_deep_orange">Mély narancssárga</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_brown">Barna</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_blue_grey">Kékes szürke</string>
+[bot][lsposed][lsposed@lsposed.org]</resources>

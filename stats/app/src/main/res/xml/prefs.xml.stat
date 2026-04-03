@@ -1,0 +1,155 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]<?xml version="1.0" encoding="utf-8"?><!--
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  -->
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    xmlns:app="http://schemas.android.com/apk/res-auto">
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <PreferenceCategory android:title="@string/group_network">
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]        <rikka.material.preference.MaterialSwitchPreference
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            android:defaultValue="false"
+[internal][vvb2060][vvb2060@gmail.com]            android:icon="@drawable/ic_outline_dns_24"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            android:key="doh"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            android:summary="@string/dns_over_http_summary"
+[internal][vvb2060][vvb2060@gmail.com]            android:title="@string/dns_over_http" />
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    </PreferenceCategory>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <PreferenceCategory android:title="@string/settings_language">
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <rikka.preference.SimpleMenuPreference
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            android:defaultValue="SYSTEM"
+[external][shana][shana@zju.edu.cn]            android:icon="@drawable/ic_outline_language_24"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            android:key="language"
+[external][shana][shana@zju.edu.cn]            android:popupTheme="@style/language_menu_style"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            android:summary="%s"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            android:title="@string/settings_language" />
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <Preference
+[external][shana][shana@zju.edu.cn]            android:icon="@drawable/ic_outline_groups_24"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            android:key="translation_contributors"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            android:title="@string/settings_translation_contributors"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            app:enableCopying="true" />
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <Preference
+[external][shana][shana@zju.edu.cn]            android:icon="@drawable/ic_outline_translate_24"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            android:key="translation"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            android:title="@string/settings_translation" />
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    </PreferenceCategory>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <PreferenceCategory android:title="@string/settings_group_theme">
+[external][shana][shana@zju.edu.cn]        <rikka.material.preference.MaterialSwitchPreference
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            android:defaultValue="true"
+[external][shana][shana@zju.edu.cn]            android:icon="@drawable/ic_outline_palette_24"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            android:key="follow_system_accent"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            android:title="@string/theme_color_system"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            app:isPreferenceVisible="false" />
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <rikka.preference.SimpleMenuPreference
+[external][shana][shana@zju.edu.cn]            android:defaultValue="COLOR_BLUE"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            android:entries="@array/color_texts"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            android:entryValues="@array/color_values"
+[external][shana][shana@zju.edu.cn]            android:icon="@drawable/ic_outline_format_color_fill_24"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            android:key="theme_color"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            android:summary="%s"
+[internal][vvb2060][vvb2060@gmail.com]            android:title="@string/theme_color" />
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <rikka.preference.SimpleMenuPreference
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            android:defaultValue="MODE_NIGHT_FOLLOW_SYSTEM"
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]            android:entries="@array/theme_texts"
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]            android:entryValues="@array/theme_values"
+[internal][vvb2060][vvb2060@gmail.com]            android:icon="@drawable/ic_outline_dark_mode_24"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            android:key="dark_theme"
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]            android:summary="%s"
+[internal][vvb2060][vvb2060@gmail.com]            android:title="@string/dark_theme" />
+[external][shana][shana@zju.edu.cn]        <rikka.material.preference.MaterialSwitchPreference
+[external][shana][shana@zju.edu.cn]            android:icon="@drawable/ic_outline_invert_colors_24"
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]            android:key="black_dark_theme"
+[internal][vvb2060][vvb2060@gmail.com]            android:summary="@string/pure_black_dark_theme_summary"
+[internal][vvb2060][vvb2060@gmail.com]            android:title="@string/pure_black_dark_theme" />
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    </PreferenceCategory>
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <PreferenceCategory android:title="@string/settings_group_framework">
+[external][shana][shana@zju.edu.cn]        <rikka.material.preference.MaterialSwitchPreference
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]            android:defaultValue="false"
+[external][shana][shana@zju.edu.cn]            android:icon="@drawable/ic_outline_assignment_24"
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]            android:key="disable_verbose_log"
+[internal][vvb2060][vvb2060@gmail.com]            android:persistent="false"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            android:summary="@string/settings_disable_verbose_log_summary"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            android:title="@string/settings_disable_verbose_log" />
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]        <rikka.material.preference.MaterialSwitchPreference
+[external][admin][admin@0x.mk]            android:defaultValue="true"
+[external][admin][admin@0x.mk]            android:icon="@drawable/ic_outline_shield_24"
+[external][admin][admin@0x.mk]            android:key="enable_dex_obfuscate"
+[external][admin][admin@0x.mk]            android:persistent="false"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            android:summary="@string/settings_xposed_api_call_protection_summary"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            android:title="@string/settings_xposed_api_call_protection" />
+[external][admin][admin@0x.mk]
+[external][shana][shana@zju.edu.cn]        <Preference
+[external][shana][shana@zju.edu.cn]            android:icon="@drawable/ic_outline_app_shortcut_24"
+[external][shana][shana@zju.edu.cn]            android:key="add_shortcut"
+[internal][vvb2060][vvb2060@gmail.com]            android:summary="@string/settings_create_shortcut_summary"
+[external][shana][shana@zju.edu.cn]            android:title="@string/create_shortcut" />
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        <rikka.material.preference.MaterialSwitchPreference
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            android:defaultValue="false"
+[internal][vvb2060][vvb2060@gmail.com]            android:icon="@drawable/ic_outline_speaker_notes_24"
+[internal][vvb2060][vvb2060@gmail.com]            android:key="enable_status_notification"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            android:persistent="false"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            android:shouldDisableView="false"
+[internal][vvb2060][vvb2060@gmail.com]            android:summary="@string/settings_enable_status_notification_summary"
+[internal][vvb2060][vvb2060@gmail.com]            android:title="@string/settings_enable_status_notification" />
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    </PreferenceCategory>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    <PreferenceCategory android:title="@string/settings_group_repo">
+[internal][vvb2060][vvb2060@gmail.com]        <rikka.preference.SimpleMenuPreference
+[internal][vvb2060][vvb2060@gmail.com]            android:defaultValue="CHANNEL_STABLE"
+[internal][vvb2060][vvb2060@gmail.com]            android:entries="@array/update_channel_texts"
+[internal][vvb2060][vvb2060@gmail.com]            android:entryValues="@array/update_channel_values"
+[external][shana][shana@zju.edu.cn]            android:icon="@drawable/ic_outline_merge_type_24"
+[internal][vvb2060][vvb2060@gmail.com]            android:key="update_channel"
+[internal][vvb2060][vvb2060@gmail.com]            android:summary="%s"
+[internal][vvb2060][vvb2060@gmail.com]            android:title="@string/settings_update_channel" />
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    </PreferenceCategory>
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]    <PreferenceCategory android:title="@string/settings_backup_and_restore">
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <Preference
+[external][shana][shana@zju.edu.cn]            android:icon="@drawable/ic_baseline_settings_backup_restore_24"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            android:key="backup"
+[external][shana][shana@zju.edu.cn]            android:summary="@string/settings_backup_summery"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            android:title="@string/settings_backup" />
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <Preference
+[external][shana][shana@zju.edu.cn]            android:icon="@drawable/ic_outline_restore_24"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            android:key="restore"
+[external][shana][shana@zju.edu.cn]            android:summary="@string/settings_restore_summery"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            android:title="@string/settings_restore" />
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    </PreferenceCategory>
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    <PreferenceCategory
+[external][shana][shana@zju.edu.cn]        android:key="settings_group_system"
+[external][shana][shana@zju.edu.cn]        android:title="@string/settings_group_system"
+[external][shana][shana@zju.edu.cn]        app:isPreferenceVisible="@bool/show_system_settings">
+[external][shana][shana@zju.edu.cn]        <rikka.material.preference.MaterialSwitchPreference
+[external][shana][shana@zju.edu.cn]            android:defaultValue="true"
+[external][shana][shana@zju.edu.cn]            android:enabled="false"
+[external][shana][shana@zju.edu.cn]            android:icon="@drawable/ic_outline_android_24"
+[external][shana][shana@zju.edu.cn]            android:key="show_hidden_icon_apps_enabled"
+[external][shana][shana@zju.edu.cn]            android:persistent="false"
+[external][shana][shana@zju.edu.cn]            android:summary="@string/settings_show_hidden_icon_apps_enabled_summary"
+[external][shana][shana@zju.edu.cn]            android:title="@string/settings_show_hidden_icon_apps_enabled" />
+[external][shana][shana@zju.edu.cn]    </PreferenceCategory>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]</PreferenceScreen>

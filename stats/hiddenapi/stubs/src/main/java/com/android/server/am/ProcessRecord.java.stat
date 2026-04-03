@@ -1,0 +1,5 @@
+[external][shana][shana@zju.edu.cn]package com.android.server.am;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public class ProcessRecord {
+[external][shana][shana@zju.edu.cn]    String processName = null;
+[external][shana][shana@zju.edu.cn]}

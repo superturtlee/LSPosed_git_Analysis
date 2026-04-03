@@ -1,0 +1,16 @@
+[external][shana][shana@zju.edu.cn]package android.os;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public interface IServiceManager extends IInterface {
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    void tryUnregisterService(java.lang.String name, android.os.IBinder service);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    IBinder getService(String name);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void registerForNotifications(String name, IServiceCallback cb);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    abstract class Stub extends Binder implements IServiceManager {
+[external][shana][shana@zju.edu.cn]        public static IServiceManager asInterface(IBinder obj) {
+[external][shana][shana@zju.edu.cn]            throw new UnsupportedOperationException();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

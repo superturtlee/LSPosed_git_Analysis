@@ -1,0 +1,32 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]<!--
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  -->
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]<org.lsposed.manager.ui.widget.EmptyStateRecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    xmlns:app="http://schemas.android.com/apk/res-auto"
+[external][shana][shana@zju.edu.cn]    android:id="@+id/recycler_view"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    android:layout_width="match_parent"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    android:layout_height="match_parent"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    android:clipToPadding="false"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    android:fadeScrollbars="true"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    android:scrollbarStyle="insideOverlay"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    android:scrollbars="vertical"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    app:borderBottomVisibility="never"
+[external][shana][shana@zju.edu.cn]    app:borderTopDrawable="@null"
+[external][shana][shana@zju.edu.cn]    app:borderTopVisibility="whenTop"
+[external][shana][shana@zju.edu.cn]    app:fitsSystemWindowsInsets="@integer/internal_fragment_bottom_insets" />

@@ -1,0 +1,242 @@
+[bot][lsposed][lsposed@lsposed.org]<?xml version="1.0" encoding="utf-8"?>
+[bot][lsposed][lsposed@lsposed.org]<!--
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]  ~ This file is part of LSPosed.
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]  ~
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]  ~ LSPosed is free software: you can redistribute it and/or modify
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]  ~ it under the terms of the GNU General Public License as published by
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]  ~ the Free Software Foundation, either version 3 of the License, or
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]  ~ (at your option) any later version.
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]  ~
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]  ~ LSPosed is distributed in the hope that it will be useful,
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]  ~ GNU General Public License for more details.
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]  ~
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]  ~ You should have received a copy of the GNU General Public License
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]  ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]  ~
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]  ~ Copyright (C) 2021 LSPosed Contributors
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]  -->
+[bot][lsposed][lsposed@lsposed.org]<resources xmlns:tools="http://schemas.android.com/tools" tools:keep="@string/xposed_module_updated_notification_*,@string/module_is_not_activated_*">
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <!-- MainActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="overview">Overzicht</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="Modules">Modules</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <plurals name="modules_enabled_count">
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]        <item quantity="one">%d module ingeschakeld</item>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]        <item quantity="other">%d modules ingeschakeld</item>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    </plurals>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="Logs">Logboeken</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="Settings">Instellingen</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="feedback_or_suggestion">Feedback en suggestie</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="About">Over</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="report_issue">Probleem melden</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="module_repo">Opslagplaats</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo_up_to_date">Alle modules zijn up-to-date</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo_published_time">Gepubliceerd op %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo_updated_time">Bijgewerkt op %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <plurals name="module_repo_upgradable">
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="one">%d module te upgraden</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="other">%d modules te upgraden</item>
+[bot][lsposed][lsposed@lsposed.org]    </plurals>
+[external][shana][shana@zju.edu.cn]    <string name="about_view_source_code"><![CDATA[Bekijk de broncode op %1$s<br/>Sluit je aan bij onze %2$s kanaal]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="translators" comment="Dear translators, please add your home page here following the format. There can be more than one translator. So feel free to append yourself.">Pandemic-XDA</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install">Installeren</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install_summary">Tik om LSPosed te installeren</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="not_installed">Niet geïnstalleerd</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="not_install_summary">LSPosed is niet geinstalleerd</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="activated">Geactiveerd</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="partial_activated">Gedeeltelijk geactiveerd</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="selinux_policy_not_loaded_summary">SEPolicy is niet correct geladen</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="selinux_policy_not_loaded"><![CDATA[Sommige functies zullen niet werken.<br/>Gelieve dit te melden aan <a href="https://github.com/topjohnwu/Magisk/issues"><b>Magisk</b></a> ontwikkelaar.]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_inject_fail_summary">Systeem Framework injectie is mislukt</string>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    <string name="system_inject_fail"><![CDATA[Systeem Framework injectie mislukt.<br/>Dit is zeldzaam en kan worden veroorzaakt door <b>Magisk</b> of sommige Magisk-modules van lage kwaliteit.<br/>Probeer andere Magisk-modules dan Riru en LSPosed uit te schakelen of stuur een volledig logboek naar de ontwikkelaars.]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_prop_incorrect_summary">Systeem prop incorrect</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_prop_incorrect"><![CDATA[Enkele noodzakelijke systeemeigenschappen verwijderd of gewijzigd.<br/>Modules kunnen af en toe ongeldig worden.]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="need_update">Bijwerken is nodig</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="please_update_summary">Installeer de laatste versie van LSPosed</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="info_api_version">API versie</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="info_framework_version">Framework versie</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_manager_package_name">Naam beheerderspakket</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="info_system_version">Systeem versie</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="info_device">Apparaat</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="info_system_abi">Systeem ABI</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_dex2oat_wrapper">Dex Optimizer Wrapper</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enabled">Ingeschakeld</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="not_enabled">Niet ingeschakeld</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="supported">Ondersteund</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="unsupported">Niet-ondersteunde</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="android_version_unsatisfied">Android versie onbevredigd</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="crashed">Crashed</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="mount_failed">Berg mislukt</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="selinux_permissive">SELinux is permissief</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sepolicy_incorrect">SELinux beleid is onjuist</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_lsposed">Update LSPosed</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_lsposed_msg">Bevestig bijwerken van LSPosed? Dit apparaat zal opnieuw opstarten nadat de update is voltooid</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_copied">Gekopieerd naar klembord</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- WelcomeDialog -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="parasitic_welcome">Welkom bij LSPosed</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="parasitic_welcome_summary">U gebruikt de parasitaire manager, die een snelkoppeling kan maken of nog steeds kan openen vanuit een melding.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="parasitic_welcome_summary_no_shortcut_support">Je gebruikt de parasiterende manager, die kan openen vanuit de melding.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="create_shortcut">Snelkoppeling maken</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="never_show">Nooit tonen</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_welcome">Parasitaire manager aanbevolen</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_welcome_summary">LSPosed ondersteunt nu systeemparasitisatie om detectie te voorkomen, u kunt parasitaire manager openen vanuit een melding. Het wordt aanbevolen om de huidige applicatie te verwijderen.</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <!-- LogsActivity -->
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="menuSaveToSd">Opslaan</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="nav_item_logs_verbose">Uitgebreide logs</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="nav_item_logs_module">Modules Logbestanden</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_saving">Logboek wordt opgeslagen, even geduld a.u.b.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_saved">Opgeslagen logboeken</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_save_failed2">Opslaan mislukt:\n%s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menuClearLog">Wis het logboek nu</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_cleared">Log succesvol gewist.</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="scroll_top">Scroll naar boven</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="loading">Laden…</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="scroll_bottom">Scroll naar beneden</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menuReload">Herlaad</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_clear_failed_2">Het logboek kan niet worden gewist</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_enable_word_wrap">Woord Omslag</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enabled_verbose_log">Uitgebreide logboek ingeschakeld</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="disabled_verbose_log">Verbose logboek uitgeschakeld</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <!-- ModulesActivity -->
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="module_empty_description">(geen beschrijving gegeven)</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_xposed_min_version">Deze module vereist een nieuwere versie van Lsposed (%d) en kan dus niet worden geactiveerd</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_target_version_higher">Deze module is ontworpen voor een nieuwere Xposed-versie (%d) en daarom werken sommige functionaliteiten mogelijk niet</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="no_min_version_specified">Deze module heeft geen vereiste versie voor Xposed opgegeven.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_min_version_too_low">Deze module is gemaakt voor de Lsposed-versie %1$d, maar vanwege onverenigbare wijzigingen in de versie %2$d, is het uitgeschakeld</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="warning_installed_on_external_storage">Deze module kan niet worden geladen omdat deze op de SD-kaart is geïnstalleerd. Verplaats deze naar de interne opslag</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="module_uninstall">Verwijderen</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="module_settings">Module instellingen</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="view_in_repo">Bekijk in Repo</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstall_message">Wilt u deze module verwijderen?</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="module_uninstalled">Gedeïnstalleerd %1$s</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="module_uninstall_failed">Verwijderen mislukt</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="add_module_to_user">Module toevoegen aan gebruiker</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_installed">Toegevoegd %1$s naar gebruiker %2$s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_install_failed">Het toevoegen van de module is mislukt</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install_to_user">Installeer naar gebruiker %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install_to_user_message">Wil je installeren %1$s naar gebruiker %2$s? Het wordt aanbevolen om handmatig te installeren, het forceren van installatie via LSPosed kan problemen veroorzaken.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="expand">uitbreiden</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="collapse">samenvouwen</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <!-- AppListActivity -->
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="compile_speed">Opnieuw optimaliseren</string>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    <string name="compile_speed_msg">Optimaliseren…</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="compile_done">Optimalisatie voltooid.</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="app_launch">Lanceer het</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="compile_failed">Optimalisatie mislukt of geretourneerde waarde is leeg.</string>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    <string name="compile_failed_with_info">Optimalisatie is mislukt: </string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="sort_by_name">Sorteer op applicatienaam</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="sort_by_package_name">Sorteer op pakketnaam</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="sort_by_install_time">Sorteer op installatietijd</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="sort_by_update_time">Sorteer op updatetijd</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_reverse">Omkeren</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="menu_show_system_apps">Systeem apps</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_sort">Sorteren</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="enable_module">Schakel module in</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="no_scope_selected">U heeft geen app geselecteerd. Doorgaan?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_games">Games</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_modules">Modules</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_denylist">Weigerlijst</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="failed_to_save_scope_list">Scopelijst opslaan is mislukt</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_version">Versie: %1$s</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="use_recommended">Aanbevolen</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="no_scope_selected_has_recommended">U heeft geen app geselecteerd. Aanbevolen apps selecteren?</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="use_recommended_message">Aanbevolen apps selecteren?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_is_not_activated_yet">LSPosed module is nog niet geactiveerd</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="requested_by_module">Aanbevolen</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_available">Update beschikbaar: %1$s</string>
+[external][shana][shana@zju.edu.cn]    <string name="module_disabled_no_selection">Module %1$s is uitgeschakeld omdat er geen app is geselecteerd.</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="android_framework">Systeem Framework</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_backup_and_restore">Backup</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_backup">Backup</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="menu_restore">Herstellen</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="force_stop">Forceer stop</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="force_stop_dlg_title">Gedwongen stoppen?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="force_stop_dlg_text">Als je een app gedwongen stopt, kan deze onverwacht gedrag vertonen.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="reboot_required">Opnieuw opstarten is vereist om deze wijziging door te voeren</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="reboot">Herstart</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_hide">Verbergen</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="deny_list">%s staat op de weigerlijst en kan geen effect hebben.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="deny_list_info">Op weigerlijst</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <!-- ModulesActivity and AppListActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="modules_other_app">Bekijk in andere app</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_app_info">App informatie</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="list_empty">¯\\\\_(ツ)_\/¯\nNiets hier</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <!-- SettingsActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_group_framework">Framework</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_disable_verbose_log">Schakel uitgebreide logboeken uit</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_disable_verbose_log_summary">Rapporteer problemen verzoek om uitgebreide logboeken op te nemen</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="pure_black_dark_theme">Zwarte donkere thema</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="pure_black_dark_theme_summary">Gebruik het pure zwarte thema als het donkere thema is ingeschakeld</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="settings_group_theme">Thema</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="settings_backup_and_restore">Backup en herstellen</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup_summery">Backup of herstel de modulelijst en scooplijsten.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_restore_summery">Herstel de modulelijst en scooplijsten.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup">Backup</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup_failed2">Opslaan mislukt:\n%s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enable_documentui">Schakel DocumentUI in</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="settings_restore">Herstellen</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_restore_failed2">Herstellen mislukt:\n%s</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="group_network">Netwerk</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="dns_over_http">DNS via HTTPS</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="dns_over_http_summary">Tijdelijke oplossing voor DNS-vergiftiging in sommige landen</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="theme_color">Thema kleur</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="theme_color_system">Systeem thema kleur</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_show_hidden_icon_apps_enabled">Forceer apps om launcher-pictogrammen weer te geven</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_show_hidden_icon_apps_enabled_summary">Na Android 10 mogen apps de launcher pictogrammen niet verbergen. Schakel de schakelaar uit om deze functie uit te schakelen.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_group_system">Systeem</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_language">Taal</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_translation_contributors">Bijdragers van vertalingen</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_translation">Deelnemen aan vertaling</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_translation_summary">Help ons %s te vertalen in uw taal</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_create_shortcut_summary">Maak een snelkoppeling die parasitaire manager kan openen</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_shortcut_pinned_hint">Snelkoppeling vastgezet</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_unsupported_pin_shortcut_summary">De huidige standaard launcher ondersteunt geen pin-snelkoppelingen</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_enable_status_notification">Statusmelding</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_enable_status_notification_summary">Toon een melding die parasitaire manager kan openen</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="disable_status_notification_error">Geen snelkoppeling, kan melding niet uitschakelen</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_update_channel">Kanaal bijwerken</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_channel_stable">Stabiel</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_channel_bate">Bèta</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_channel_nightly">Nachtelijke bouw</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_xposed_api_call_protection">Xposed API-oproepbeveiliging</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_xposed_api_call_protection_summary">Blokkeer dynamisch geladen modulecode om Xposed API te gebruiken, dit kan sommige modules breken maar komt de veiligheid ten goede</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <!-- Module Repo -->
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="module_readme">Leesmij</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_releases">Publicaties</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_information">Informatie</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="module_information_homepage">Startpagina</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="module_information_source_url">Broncode</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="module_information_collaborators">Medewerkers</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="module_release_view_assets">Middelen</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="menu_open_in_browser">Open in de browser</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="module_release_load_more">Laat oudere versies zien</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]    <string name="module_release_no_more">Geen release meer</string>
+[external][shana][shana@zju.edu.cn]    <string name="repo_load_failed">Kan moduleopslagplaats niet laden: %1$s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_upgradable_first">Eerst te upgraden</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="installed">Geïnstalleerd</string>
+[bot][lsposed][lsposed@lsposed.org]    <plurals name="module_release_assets_download_count">
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="one">%d download</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="other">%d downloads</item>
+[bot][lsposed][lsposed@lsposed.org]    </plurals>
+[bot][lsposed][lsposed@lsposed.org]    <!-- Colors -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_sakura">Sakura</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_red">Rood</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_pink">Roze</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_purple">Paars</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_deep_purple">Donker paars</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_indigo">Indigo</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_blue">Blauw</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_light_blue">Licht blauw</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_cyan">Turquoise</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_teal">Groenblauw</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_green">Groen</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_light_green">Licht groen</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_lime">Limoen</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_yellow">Geel</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_amber">Amber</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_orange">Oranje</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_deep_orange">Diep oranje</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_brown">Bruin</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_blue_grey">Blauw grijs</string>
+[external][pandemic-xda][76658856+Pandemic-XDA@users.noreply.github.com]</resources>

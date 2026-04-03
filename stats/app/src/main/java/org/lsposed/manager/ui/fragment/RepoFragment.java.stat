@@ -1,0 +1,470 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * <!--This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors-->
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]package org.lsposed.manager.ui.fragment;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]import android.annotation.SuppressLint;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import android.content.res.Resources;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import android.graphics.Typeface;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import android.os.Build;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.os.Bundle;
+[internal][vvb2060][vvb2060@gmail.com]import android.os.Handler;
+[internal][vvb2060][vvb2060@gmail.com]import android.os.Looper;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import android.text.Spannable;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.text.SpannableStringBuilder;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.text.TextUtils;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import android.text.style.ForegroundColorSpan;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import android.text.style.StyleSpan;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import android.text.style.TypefaceSpan;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.view.LayoutInflater;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.view.Menu;
+[external][shana][shana@zju.edu.cn]import android.view.MenuInflater;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.view.MenuItem;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.view.View;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.view.ViewGroup;
+[internal][vvb2060][vvb2060@gmail.com]import android.webkit.WebView;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.widget.Filter;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.widget.Filterable;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.widget.TextView;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import androidx.annotation.NonNull;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import androidx.annotation.Nullable;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import androidx.appcompat.widget.SearchView;
+[external][shana][shana@zju.edu.cn]import androidx.constraintlayout.widget.ConstraintLayout;
+[external][shana][shana@zju.edu.cn]import androidx.core.view.MenuProvider;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import androidx.recyclerview.widget.LinearLayoutManager;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import androidx.recyclerview.widget.RecyclerView;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.manager.App;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.manager.R;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.manager.databinding.FragmentRepoBinding;
+[external][shana][shana@zju.edu.cn]import org.lsposed.manager.databinding.ItemOnlinemoduleBinding;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.manager.repo.RepoLoader;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.manager.repo.model.OnlineModule;
+[external][shana][shana@zju.edu.cn]import org.lsposed.manager.ui.widget.EmptyStateRecyclerView;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import org.lsposed.manager.util.ModuleUtil;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.time.Instant;
+[external][tigerbeanst][3889846+TigerBeanst@users.noreply.github.com]import java.time.ZoneId;
+[external][tigerbeanst][3889846+TigerBeanst@users.noreply.github.com]import java.time.format.DateTimeFormatter;
+[external][tigerbeanst][3889846+TigerBeanst@users.noreply.github.com]import java.time.format.FormatStyle;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.util.ArrayList;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.util.Collection;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.util.Collections;
+[external][shana][shana@zju.edu.cn]import java.util.HashSet;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.util.List;
+[external][shana][shana@zju.edu.cn]import java.util.concurrent.ConcurrentHashMap;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.util.stream.Collectors;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import rikka.core.util.LabelComparator;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import rikka.core.util.ResourceUtils;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import rikka.recyclerview.RecyclerViewKt;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]public class RepoFragment extends BaseFragment implements RepoLoader.RepoListener, ModuleUtil.ModuleListener, MenuProvider {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    protected FragmentRepoBinding binding;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    protected SearchView searchView;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private SearchView.OnQueryTextListener mSearchListener;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    private final Handler mHandler = new Handler(Looper.getMainLooper());
+[internal][vvb2060][vvb2060@gmail.com]    private boolean preLoadWebview = true;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private final RepoLoader repoLoader = RepoLoader.getInstance();
+[external][shana][shana@zju.edu.cn]    private final ModuleUtil moduleUtil = ModuleUtil.getInstance();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private RepoAdapter adapter;
+[external][shana][shana@zju.edu.cn]    private final RecyclerView.AdapterDataObserver observer = new RecyclerView.AdapterDataObserver() {
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public void onChanged() {
+[external][shana][shana@zju.edu.cn]            binding.swipeRefreshLayout.setRefreshing(!adapter.isLoaded());
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    };
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public void onCreate(@Nullable Bundle savedInstanceState) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        mSearchListener = new SearchView.OnQueryTextListener() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            public boolean onQueryTextSubmit(String query) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                adapter.getFilter().filter(query);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                return false;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            public boolean onQueryTextChange(String newText) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                adapter.getFilter().filter(newText);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                return false;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        };
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        super.onCreate(savedInstanceState);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Nullable
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        binding = FragmentRepoBinding.inflate(getLayoutInflater(), container, false);
+[external][shana][shana@zju.edu.cn]        binding.appBar.setLiftable(true);
+[external][shana][shana@zju.edu.cn]        binding.recyclerView.getBorderViewDelegate().setBorderVisibilityChangedListener((top, oldTop, bottom, oldBottom) -> binding.appBar.setLifted(!top));
+[external][shana][shana@zju.edu.cn]        setupToolbar(binding.toolbar, binding.clickView, R.string.module_repo, R.menu.menu_repo);
+[external][shana][shana@zju.edu.cn]        binding.toolbar.setNavigationIcon(null);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        adapter = new RepoAdapter();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        adapter.setHasStableIds(true);
+[external][shana][shana@zju.edu.cn]        adapter.registerAdapterDataObserver(observer);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        binding.recyclerView.setAdapter(adapter);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        binding.recyclerView.setHasFixedSize(true);
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireActivity()));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        RecyclerViewKt.fixEdgeEffect(binding.recyclerView, false, true);
+[external][shana][shana@zju.edu.cn]        binding.swipeRefreshLayout.setOnRefreshListener(adapter::fullRefresh);
+[external][shana][shana@zju.edu.cn]        binding.swipeRefreshLayout.setProgressViewEndTarget(true, binding.swipeRefreshLayout.getProgressViewEndOffset());
+[external][shana][shana@zju.edu.cn]        View.OnClickListener l = v -> {
+[external][shana][shana@zju.edu.cn]            if (searchView.isIconified()) {
+[external][shana][shana@zju.edu.cn]                binding.recyclerView.smoothScrollToPosition(0);
+[external][shana][shana@zju.edu.cn]                binding.appBar.setExpanded(true, true);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        };
+[external][shana][shana@zju.edu.cn]        binding.toolbar.setOnClickListener(l);
+[external][shana][shana@zju.edu.cn]        binding.clickView.setOnClickListener(l);
+[external][shana][shana@zju.edu.cn]        repoLoader.addListener(this);
+[external][shana][shana@zju.edu.cn]        moduleUtil.addListener(this);
+[external][shana][shana@zju.edu.cn]        onRepoLoaded();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return binding.getRoot();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    private void updateRepoSummary() {
+[external][shana][shana@zju.edu.cn]        final int[] count = new int[]{0};
+[external][shana][shana@zju.edu.cn]        HashSet<String> processedModules = new HashSet<>();
+[external][shana][shana@zju.edu.cn]        var modules = moduleUtil.getModules();
+[external][shana][shana@zju.edu.cn]        if (modules != null && repoLoader.isRepoLoaded()) {
+[external][shana][shana@zju.edu.cn]            modules.forEach((k, v) -> {
+[external][shana][shana@zju.edu.cn]                        if (!processedModules.contains(k.first)) {
+[external][shana][shana@zju.edu.cn]                            var ver = repoLoader.getModuleLatestVersion(k.first);
+[external][shana][shana@zju.edu.cn]                            if (ver != null && ver.upgradable(v.versionCode, v.versionName)) {
+[external][shana][shana@zju.edu.cn]                                ++count[0];
+[external][shana][shana@zju.edu.cn]                            }
+[external][shana][shana@zju.edu.cn]                            processedModules.add(k.first);
+[external][shana][shana@zju.edu.cn]                        }
+[external][shana][shana@zju.edu.cn]                    }
+[external][shana][shana@zju.edu.cn]            );
+[external][shana][shana@zju.edu.cn]        } else {
+[external][shana][shana@zju.edu.cn]            count[0] = -1;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        runOnUiThread(() -> {
+[external][shana][shana@zju.edu.cn]            if (binding != null) {
+[external][shana][shana@zju.edu.cn]                if (count[0] > 0) {
+[external][shana][shana@zju.edu.cn]                    binding.toolbar.setSubtitle(getResources().getQuantityString(R.plurals.module_repo_upgradable, count[0], count[0]));
+[external][shana][shana@zju.edu.cn]                } else if (count[0] == 0) {
+[external][shana][shana@zju.edu.cn]                    binding.toolbar.setSubtitle(getResources().getString(R.string.module_repo_up_to_date));
+[external][shana][shana@zju.edu.cn]                } else {
+[external][shana][shana@zju.edu.cn]                    binding.toolbar.setSubtitle(getResources().getString(R.string.loading));
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]                binding.toolbarLayout.setSubtitle(binding.toolbar.getSubtitle());
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        });
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][shana][shana@zju.edu.cn]    public void onPrepareMenu(Menu menu) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
+[external][howardwu20][HowardWu20@outlook.com]        if (searchView != null) {
+[external][howardwu20][HowardWu20@outlook.com]            searchView.setOnQueryTextListener(mSearchListener);
+[external][howardwu20][HowardWu20@outlook.com]            searchView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+[external][howardwu20][HowardWu20@outlook.com]                @Override
+[external][howardwu20][HowardWu20@outlook.com]                public void onViewAttachedToWindow(@NonNull View arg0) {
+[external][howardwu20][HowardWu20@outlook.com]                    binding.appBar.setExpanded(false, true);
+[external][howardwu20][HowardWu20@outlook.com]                    binding.recyclerView.setNestedScrollingEnabled(false);
+[external][howardwu20][HowardWu20@outlook.com]                }
+[external][shana][shana@zju.edu.cn]
+[external][howardwu20][HowardWu20@outlook.com]                @Override
+[external][howardwu20][HowardWu20@outlook.com]                public void onViewDetachedFromWindow(@NonNull View v) {
+[external][howardwu20][HowardWu20@outlook.com]                    binding.recyclerView.setNestedScrollingEnabled(true);
+[external][howardwu20][HowardWu20@outlook.com]                }
+[external][howardwu20][HowardWu20@outlook.com]            });
+[external][howardwu20][HowardWu20@outlook.com]            searchView.findViewById(androidx.appcompat.R.id.search_edit_frame).setLayoutDirection(View.LAYOUT_DIRECTION_INHERIT);
+[external][howardwu20][HowardWu20@outlook.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        int sort = App.getPreferences().getInt("repo_sort", 0);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (sort == 0) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            menu.findItem(R.id.item_sort_by_name).setChecked(true);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } else if (sort == 1) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            menu.findItem(R.id.item_sort_by_update_time).setChecked(true);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][shana][shana@zju.edu.cn]        menu.findItem(R.id.item_upgradable_first).setChecked(App.getPreferences().getBoolean("upgradable_first", true));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    public void onDestroyView() {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        super.onDestroyView();
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        mHandler.removeCallbacksAndMessages(null);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        repoLoader.removeListener(this);
+[external][shana][shana@zju.edu.cn]        moduleUtil.removeListener(this);
+[external][shana][shana@zju.edu.cn]        adapter.unregisterAdapterDataObserver(observer);
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        binding = null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public void onResume() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        super.onResume();
+[external][shana][shana@zju.edu.cn]        adapter.refresh();
+[internal][vvb2060][vvb2060@gmail.com]        if (preLoadWebview) {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            mHandler.postDelayed(() -> new WebView(requireContext()), 500);
+[internal][vvb2060][vvb2060@gmail.com]            preLoadWebview = false;
+[internal][vvb2060][vvb2060@gmail.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][shana][shana@zju.edu.cn]    public void onRepoLoaded() {
+[external][shana][shana@zju.edu.cn]        if (adapter != null) {
+[external][shana][shana@zju.edu.cn]            adapter.refresh();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        updateRepoSummary();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public void onThrowable(Throwable t) {
+[external][shana][shana@zju.edu.cn]        showHint(getString(R.string.repo_load_failed, t.getLocalizedMessage()), true);
+[external][shana][shana@zju.edu.cn]        updateRepoSummary();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public void onModulesReloaded() {
+[external][shana][shana@zju.edu.cn]        updateRepoSummary();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][shana][shana@zju.edu.cn]    public boolean onMenuItemSelected(@NonNull MenuItem item) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        int itemId = item.getItemId();
+[external][shana][shana@zju.edu.cn]        if (itemId == R.id.item_sort_by_name) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            item.setChecked(true);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            App.getPreferences().edit().putInt("repo_sort", 0).apply();
+[external][shana][shana@zju.edu.cn]            adapter.refresh();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } else if (itemId == R.id.item_sort_by_update_time) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            item.setChecked(true);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            App.getPreferences().edit().putInt("repo_sort", 1).apply();
+[external][shana][shana@zju.edu.cn]            adapter.refresh();
+[external][shana][shana@zju.edu.cn]        } else if (itemId == R.id.item_upgradable_first) {
+[external][shana][shana@zju.edu.cn]            item.setChecked(!item.isChecked());
+[external][shana][shana@zju.edu.cn]            App.getPreferences().edit().putBoolean("upgradable_first", item.isChecked()).apply();
+[external][shana][shana@zju.edu.cn]            adapter.refresh();
+[external][shana][shana@zju.edu.cn]        } else {
+[external][shana][shana@zju.edu.cn]            return false;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][shana][shana@zju.edu.cn]        return true;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    private class RepoAdapter extends EmptyStateRecyclerView.EmptyStateAdapter<RepoAdapter.ViewHolder> implements Filterable {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        private List<OnlineModule> fullList, showList;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        private final LabelComparator labelComparator = new LabelComparator();
+[external][shana][shana@zju.edu.cn]        private boolean isLoaded = false;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        private final Resources resources = App.getInstance().getResources();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        private final String[] channels = resources.getStringArray(R.array.update_channel_values);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        private String channel;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        private final RepoLoader repoLoader = RepoLoader.getInstance();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        RepoAdapter() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            fullList = showList = Collections.emptyList();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        @NonNull
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public RepoAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+[external][howardwu20][HowardWu20@outlook.com]            return new ViewHolder(ItemOnlinemoduleBinding.inflate(getLayoutInflater(), parent, false));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]        RepoLoader.ModuleVersion getUpgradableVer(OnlineModule module) {
+[external][shana][shana@zju.edu.cn]            ModuleUtil.InstalledModule installedModule = moduleUtil.getModule(module.getName());
+[external][shana][shana@zju.edu.cn]            if (installedModule != null) {
+[external][shana][shana@zju.edu.cn]                var ver = repoLoader.getModuleLatestVersion(installedModule.packageName);
+[external][shana][shana@zju.edu.cn]                if (ver != null && ver.upgradable(installedModule.versionCode, installedModule.versionName))
+[external][shana][shana@zju.edu.cn]                    return ver;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            return null;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public void onBindViewHolder(@NonNull RepoAdapter.ViewHolder holder, int position) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            OnlineModule module = showList.get(position);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            holder.appName.setText(module.getDescription());
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            holder.appPackageName.setText(module.getName());
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            Instant instant;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            channel = App.getPreferences().getString("update_channel", channels[0]);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            var latestReleaseTime = repoLoader.getLatestReleaseTime(module.getName(), channel);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            instant = Instant.parse(latestReleaseTime != null ? latestReleaseTime : module.getLatestReleaseTime());
+[external][tigerbeanst][3889846+TigerBeanst@users.noreply.github.com]            var formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)
+[external][tigerbeanst][3889846+TigerBeanst@users.noreply.github.com]                    .withLocale(App.getLocale()).withZone(ZoneId.systemDefault());
+[external][tigerbeanst][3889846+TigerBeanst@users.noreply.github.com]            holder.publishedTime.setText(String.format(getString(R.string.module_repo_updated_time), formatter.format(instant)));
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            SpannableStringBuilder sb = new SpannableStringBuilder();
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            String summary = module.getSummary();
+[external][shana][shana@zju.edu.cn]            if (summary != null) {
+[external][shana][shana@zju.edu.cn]                sb.append(summary);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            holder.appDescription.setVisibility(View.VISIBLE);
+[external][shana][shana@zju.edu.cn]            holder.appDescription.setText(sb);
+[external][shana][shana@zju.edu.cn]            sb = new SpannableStringBuilder();
+[external][shana][shana@zju.edu.cn]            var upgradableVer = getUpgradableVer(module);
+[external][shana][shana@zju.edu.cn]            if (upgradableVer != null) {
+[external][shana][shana@zju.edu.cn]                String hint = getString(R.string.update_available, upgradableVer.versionName);
+[external][shana][shana@zju.edu.cn]                sb.append(hint);
+[external][shana][shana@zju.edu.cn]                final ForegroundColorSpan foregroundColorSpan = new ForegroundColorSpan(ResourceUtils.resolveColor(requireActivity().getTheme(), com.google.android.material.R.attr.colorPrimary));
+[external][shana][shana@zju.edu.cn]                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+[external][shana][shana@zju.edu.cn]                    final TypefaceSpan typefaceSpan = new TypefaceSpan(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+[external][shana][shana@zju.edu.cn]                    sb.setSpan(typefaceSpan, sb.length() - hint.length(), sb.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+[external][shana][shana@zju.edu.cn]                } else {
+[external][shana][shana@zju.edu.cn]                    final StyleSpan styleSpan = new StyleSpan(Typeface.BOLD);
+[external][shana][shana@zju.edu.cn]                    sb.setSpan(styleSpan, sb.length() - hint.length(), sb.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                }
+[external][shana][shana@zju.edu.cn]                sb.setSpan(foregroundColorSpan, sb.length() - hint.length(), sb.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+[external][shana][shana@zju.edu.cn]            } else if (moduleUtil.getModule(module.getName()) != null) {
+[external][shana][shana@zju.edu.cn]                String installed = getString(R.string.installed);
+[external][shana][shana@zju.edu.cn]                sb.append(installed);
+[external][shana][shana@zju.edu.cn]                final StyleSpan styleSpan = new StyleSpan(Typeface.ITALIC);
+[external][shana][shana@zju.edu.cn]                sb.setSpan(styleSpan, sb.length() - installed.length(), sb.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+[external][shana][shana@zju.edu.cn]                final ForegroundColorSpan foregroundColorSpan = new ForegroundColorSpan(ResourceUtils.resolveColor(requireActivity().getTheme(), com.google.android.material.R.attr.colorSecondary));
+[external][shana][shana@zju.edu.cn]                sb.setSpan(foregroundColorSpan, sb.length() - installed.length(), sb.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            }
+[external][shana][shana@zju.edu.cn]            if (sb.length() > 0) {
+[external][shana][shana@zju.edu.cn]                holder.hint.setVisibility(View.VISIBLE);
+[external][shana][shana@zju.edu.cn]                holder.hint.setText(sb);
+[external][shana][shana@zju.edu.cn]            } else {
+[external][shana][shana@zju.edu.cn]                holder.hint.setVisibility(View.GONE);
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            holder.itemView.setOnClickListener(v -> {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                searchView.clearFocus();
+[external][shana][shana@zju.edu.cn]                safeNavigate(RepoFragmentDirections.actionRepoFragmentToRepoItemFragment(module.getName()));
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            });
+[external][shana][shana@zju.edu.cn]            holder.itemView.setTooltipText(module.getDescription());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public int getItemCount() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return showList.size();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]        @SuppressLint("NotifyDataSetChanged")
+[external][shana][shana@zju.edu.cn]        private void setLoaded(List<OnlineModule> list, boolean isLoaded) {
+[external][shana][shana@zju.edu.cn]            runOnUiThread(() -> {
+[external][shana][shana@zju.edu.cn]                if (list != null) showList = list;
+[external][shana][shana@zju.edu.cn]                this.isLoaded = isLoaded;
+[external][shana][shana@zju.edu.cn]                notifyDataSetChanged();
+[external][shana][shana@zju.edu.cn]            });
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public void setData(Collection<OnlineModule> modules) {
+[external][shana][shana@zju.edu.cn]            if (modules == null) return;
+[external][shana][shana@zju.edu.cn]            setLoaded(null, false);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            channel = App.getPreferences().getString("update_channel", channels[0]);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            int sort = App.getPreferences().getInt("repo_sort", 0);
+[external][shana][shana@zju.edu.cn]            boolean upgradableFirst = App.getPreferences().getBoolean("upgradable_first", true);
+[external][shana][shana@zju.edu.cn]            ConcurrentHashMap<String, Boolean> upgradable = new ConcurrentHashMap<>();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            fullList = modules.parallelStream().filter((onlineModule -> !onlineModule.isHide() && !(repoLoader.getReleases(onlineModule.getName()) != null && repoLoader.getReleases(onlineModule.getName()).isEmpty())))
+[external][shana][shana@zju.edu.cn]                    .sorted((a, b) -> {
+[external][shana][shana@zju.edu.cn]                        if (upgradableFirst) {
+[external][shana][shana@zju.edu.cn]                            var aUpgrade = upgradable.computeIfAbsent(a.getName(), n -> getUpgradableVer(a) != null);
+[external][shana][shana@zju.edu.cn]                            var bUpgrade = upgradable.computeIfAbsent(b.getName(), n -> getUpgradableVer(b) != null);
+[external][shana][shana@zju.edu.cn]                            if (aUpgrade && !bUpgrade) return -1;
+[external][shana][shana@zju.edu.cn]                            else if (!aUpgrade && bUpgrade) return 1;
+[external][shana][shana@zju.edu.cn]                        }
+[external][shana][shana@zju.edu.cn]                        if (sort == 0) {
+[external][shana][shana@zju.edu.cn]                            return labelComparator.compare(a.getDescription(), b.getDescription());
+[external][shana][shana@zju.edu.cn]                        } else {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                            return Instant.parse(repoLoader.getLatestReleaseTime(b.getName(), channel)).compareTo(Instant.parse(repoLoader.getLatestReleaseTime(a.getName(), channel)));
+[external][shana][shana@zju.edu.cn]                        }
+[external][shana][shana@zju.edu.cn]                    }).collect(Collectors.toList());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            String queryStr = searchView != null ? searchView.getQuery().toString() : "";
+[external][shana][shana@zju.edu.cn]            runOnUiThread(() -> getFilter().filter(queryStr));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]        public void fullRefresh() {
+[external][shana][shana@zju.edu.cn]            runAsync(() -> {
+[external][shana][shana@zju.edu.cn]                setLoaded(null, false);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                repoLoader.loadRemoteData();
+[external][shana][shana@zju.edu.cn]                refresh();
+[external][shana][shana@zju.edu.cn]            });
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        public void refresh() {
+[external][shana][shana@zju.edu.cn]            runAsync(() -> adapter.setData(repoLoader.getOnlineModules()));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public long getItemId(int position) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return showList.get(position).getName().hashCode();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public Filter getFilter() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return new RepoAdapter.ModuleFilter();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public boolean isLoaded() {
+[external][shana][shana@zju.edu.cn]            return isLoaded && repoLoader.isRepoLoaded();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][howardwu20][HowardWu20@outlook.com]        static class ViewHolder extends RecyclerView.ViewHolder {
+[external][shana][shana@zju.edu.cn]            ConstraintLayout root;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            TextView appName;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            TextView appPackageName;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            TextView appDescription;
+[external][shana][shana@zju.edu.cn]            TextView hint;
+[external][tigerbeanst][3889846+TigerBeanst@users.noreply.github.com]            TextView publishedTime;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]            ViewHolder(ItemOnlinemoduleBinding binding) {
+[external][shana][shana@zju.edu.cn]                super(binding.getRoot());
+[external][shana][shana@zju.edu.cn]                root = binding.itemRoot;
+[external][shana][shana@zju.edu.cn]                appName = binding.appName;
+[external][tigerbeanst][3889846+TigerBeanst@users.noreply.github.com]                appPackageName = binding.appPackageName;
+[external][shana][shana@zju.edu.cn]                appDescription = binding.description;
+[external][shana][shana@zju.edu.cn]                hint = binding.hint;
+[external][tigerbeanst][3889846+TigerBeanst@users.noreply.github.com]                publishedTime = binding.publishedTime;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        class ModuleFilter extends Filter {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            private boolean lowercaseContains(String s, String filter) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                return !TextUtils.isEmpty(s) && s.toLowerCase().contains(filter);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            protected FilterResults performFiltering(CharSequence constraint) {
+[external][shana][shana@zju.edu.cn]                FilterResults filterResults = new FilterResults();
+[external][shana][shana@zju.edu.cn]                ArrayList<OnlineModule> filtered = new ArrayList<>();
+[external][shana][shana@zju.edu.cn]                String filter = constraint.toString().toLowerCase();
+[external][shana][shana@zju.edu.cn]                for (OnlineModule info : fullList) {
+[external][shana][shana@zju.edu.cn]                    if (lowercaseContains(info.getDescription(), filter) ||
+[external][shana][shana@zju.edu.cn]                            lowercaseContains(info.getName(), filter) ||
+[external][shana][shana@zju.edu.cn]                            lowercaseContains(info.getSummary(), filter)) {
+[external][shana][shana@zju.edu.cn]                        filtered.add(info);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                }
+[external][shana][shana@zju.edu.cn]                filterResults.values = filtered;
+[external][shana][shana@zju.edu.cn]                filterResults.count = filtered.size();
+[external][shana][shana@zju.edu.cn]                return filterResults;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            protected void publishResults(CharSequence constraint, FilterResults results) {
+[external][shana][shana@zju.edu.cn]                //noinspection unchecked
+[external][shana][shana@zju.edu.cn]                setLoaded((List<OnlineModule>) results.values, true);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]}

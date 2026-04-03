@@ -1,0 +1,583 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * Copyright (C) 2021 - 2022 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][admin][admin@0x.mk]package de.robv.android.xposed;
+[external][admin][admin@0x.mk]
+[external][shana][shana@zju.edu.cn]import static org.lsposed.lspd.core.ApplicationServiceClient.serviceClient;
+[external][416810799][416810799@qq.com]
+[external][admin][admin@0x.mk]import android.annotation.SuppressLint;
+[external][admin][admin@0x.mk]import android.content.Context;
+[external][admin][admin@0x.mk]import android.content.SharedPreferences;
+[external][admin][admin@0x.mk]import android.os.Environment;
+[external][admin][admin@0x.mk]import android.preference.PreferenceManager;
+[external][admin][admin@0x.mk]import android.util.Log;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]import com.android.internal.util.XmlUtils;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import org.lsposed.lspd.core.BuildConfig;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.lspd.util.MetaDataReader;
+[external][admin][admin@0x.mk]import org.xmlpull.v1.XmlPullParserException;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]import java.io.File;
+[external][admin][admin@0x.mk]import java.io.FileNotFoundException;
+[external][admin][admin@0x.mk]import java.io.IOException;
+[external][admin][admin@0x.mk]import java.io.InputStream;
+[external][admin][admin@0x.mk]import java.nio.file.AccessDeniedException;
+[external][ceco][ceco@ceco.sk.eu.org]import java.nio.file.ClosedWatchServiceException;
+[external][admin][admin@0x.mk]import java.nio.file.Path;
+[external][admin][admin@0x.mk]import java.nio.file.StandardWatchEventKinds;
+[external][admin][admin@0x.mk]import java.nio.file.WatchEvent;
+[external][admin][admin@0x.mk]import java.nio.file.WatchKey;
+[external][admin][admin@0x.mk]import java.nio.file.WatchService;
+[external][admin][admin@0x.mk]import java.security.MessageDigest;
+[external][admin][admin@0x.mk]import java.util.Arrays;
+[external][admin][admin@0x.mk]import java.util.HashMap;
+[external][admin][admin@0x.mk]import java.util.Map;
+[external][shana][shana@zju.edu.cn]import java.util.Optional;
+[external][admin][admin@0x.mk]import java.util.Set;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]import de.robv.android.xposed.services.FileResult;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]/**
+[external][admin][admin@0x.mk] * This class is basically the same as SharedPreferencesImpl from AOSP, but
+[external][admin][admin@0x.mk] * read-only and without listeners support. Instead, it is made to be
+[external][admin][admin@0x.mk] * compatible with all ROMs.
+[external][admin][admin@0x.mk] */
+[external][admin][admin@0x.mk]public final class XSharedPreferences implements SharedPreferences {
+[external][admin][admin@0x.mk]    private static final String TAG = "XSharedPreferences";
+[external][ceco][ceco@ceco.sk.eu.org]    private static final HashMap<WatchKey, PrefsData> sWatcherKeyInstances = new HashMap<>();
+[external][admin][admin@0x.mk]    private static final Object sContent = new Object();
+[external][ceco][ceco@ceco.sk.eu.org]    private static Thread sWatcherDaemon = null;
+[external][admin][admin@0x.mk]    private static WatchService sWatcher;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    private final HashMap<OnSharedPreferenceChangeListener, Object> mListeners = new HashMap<>();
+[external][admin][admin@0x.mk]    private final File mFile;
+[external][admin][admin@0x.mk]    private final String mFilename;
+[external][admin][admin@0x.mk]    private Map<String, Object> mMap;
+[external][admin][admin@0x.mk]    private boolean mLoaded = false;
+[external][admin][admin@0x.mk]    private long mLastModified;
+[external][admin][admin@0x.mk]    private long mFileSize;
+[external][ceco][ceco@ceco.sk.eu.org]    private WatchKey mWatchKey;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    private static void initWatcherDaemon() {
+[external][ceco][ceco@ceco.sk.eu.org]        sWatcherDaemon = new Thread() {
+[external][admin][admin@0x.mk]            @Override
+[external][admin][admin@0x.mk]            public void run() {
+[external][ceco][ceco@ceco.sk.eu.org]                if (BuildConfig.DEBUG) Log.d(TAG, "Watcher daemon thread started");
+[external][admin][admin@0x.mk]                while (true) {
+[external][admin][admin@0x.mk]                    WatchKey key;
+[external][admin][admin@0x.mk]                    try {
+[external][admin][admin@0x.mk]                        key = sWatcher.take();
+[external][ceco][ceco@ceco.sk.eu.org]                    } catch (ClosedWatchServiceException ignored) {
+[external][ceco][ceco@ceco.sk.eu.org]                        if (BuildConfig.DEBUG) Log.d(TAG, "Watcher daemon thread finished");
+[external][ceco][ceco@ceco.sk.eu.org]                        sWatcher = null;
+[external][ceco][ceco@ceco.sk.eu.org]                        return;
+[external][admin][admin@0x.mk]                    } catch (InterruptedException ignored) {
+[external][admin][admin@0x.mk]                        return;
+[external][admin][admin@0x.mk]                    }
+[external][admin][admin@0x.mk]                    for (WatchEvent<?> event : key.pollEvents()) {
+[external][admin][admin@0x.mk]                        WatchEvent.Kind<?> kind = event.kind();
+[external][admin][admin@0x.mk]                        if (kind == StandardWatchEventKinds.OVERFLOW) {
+[external][admin][admin@0x.mk]                            continue;
+[external][admin][admin@0x.mk]                        }
+[external][admin][admin@0x.mk]                        Path dir = (Path) key.watchable();
+[external][admin][admin@0x.mk]                        Path path = dir.resolve((Path) event.context());
+[external][admin][admin@0x.mk]                        String pathStr = path.toString();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        if (BuildConfig.DEBUG)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                            Log.v(TAG, "File " + path.toString() + " event: " + kind.name());
+[external][admin][admin@0x.mk]                        // We react to both real and backup files due to rare race conditions
+[external][admin][admin@0x.mk]                        if (pathStr.endsWith(".bak")) {
+[external][admin][admin@0x.mk]                            if (kind != StandardWatchEventKinds.ENTRY_DELETE) {
+[external][admin][admin@0x.mk]                                continue;
+[external][admin][admin@0x.mk]                            }
+[external][admin][admin@0x.mk]                        } else if (SELinuxHelper.getAppDataFileService().checkFileExists(pathStr + ".bak")) {
+[external][admin][admin@0x.mk]                            continue;
+[external][admin][admin@0x.mk]                        }
+[external][ceco][ceco@ceco.sk.eu.org]                        PrefsData data = sWatcherKeyInstances.get(key);
+[external][admin][admin@0x.mk]                        if (data != null && data.hasChanged()) {
+[external][admin][admin@0x.mk]                            for (OnSharedPreferenceChangeListener l : data.mPrefs.mListeners.keySet()) {
+[external][admin][admin@0x.mk]                                try {
+[external][admin][admin@0x.mk]                                    l.onSharedPreferenceChanged(data.mPrefs, null);
+[external][admin][admin@0x.mk]                                } catch (Throwable t) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                                    if (BuildConfig.DEBUG)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                                        Log.e(TAG, "Fail in preference change listener", t);
+[external][admin][admin@0x.mk]                                }
+[external][admin][admin@0x.mk]                            }
+[external][admin][admin@0x.mk]                        }
+[external][admin][admin@0x.mk]                    }
+[external][admin][admin@0x.mk]                    key.reset();
+[external][admin][admin@0x.mk]                }
+[external][admin][admin@0x.mk]            }
+[external][admin][admin@0x.mk]        };
+[external][ceco][ceco@ceco.sk.eu.org]        sWatcherDaemon.setName(TAG + "-Daemon");
+[external][ceco][ceco@ceco.sk.eu.org]        sWatcherDaemon.setDaemon(true);
+[external][ceco][ceco@ceco.sk.eu.org]        sWatcherDaemon.start();
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    /**
+[external][admin][admin@0x.mk]     * Read settings from the specified file.
+[external][admin][admin@0x.mk]     *
+[external][admin][admin@0x.mk]     * @param prefFile The file to read the preferences from.
+[external][admin][admin@0x.mk]     */
+[external][ceco][ceco@ceco.sk.eu.org]    public XSharedPreferences(File prefFile) {
+[external][admin][admin@0x.mk]        mFile = prefFile;
+[external][admin][admin@0x.mk]        mFilename = prefFile.getAbsolutePath();
+[external][admin][admin@0x.mk]        init();
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    /**
+[external][admin][admin@0x.mk]     * Read settings from the default preferences for a package.
+[external][admin][admin@0x.mk]     * These preferences are returned by {@link PreferenceManager#getDefaultSharedPreferences}.
+[external][admin][admin@0x.mk]     *
+[external][admin][admin@0x.mk]     * @param packageName The package name.
+[external][admin][admin@0x.mk]     */
+[external][admin][admin@0x.mk]    public XSharedPreferences(String packageName) {
+[external][admin][admin@0x.mk]        this(packageName, packageName + "_preferences");
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    /**
+[external][admin][admin@0x.mk]     * Read settings from a custom preferences file for a package.
+[external][admin][admin@0x.mk]     * These preferences are returned by {@link Context#getSharedPreferences(String, int)}.
+[external][admin][admin@0x.mk]     *
+[external][admin][admin@0x.mk]     * @param packageName  The package name.
+[external][admin][admin@0x.mk]     * @param prefFileName The file name without ".xml".
+[external][admin][admin@0x.mk]     */
+[external][admin][admin@0x.mk]    public XSharedPreferences(String packageName, String prefFileName) {
+[external][admin][admin@0x.mk]        boolean newModule = false;
+[external][shana][shana@zju.edu.cn]        var m = XposedInit.getLoadedModules().getOrDefault(packageName, Optional.empty());
+[external][shana][shana@zju.edu.cn]        if (m.isPresent()) {
+[external][shana][shana@zju.edu.cn]            boolean isModule = false;
+[external][shana][shana@zju.edu.cn]            int xposedminversion = -1;
+[external][shana][shana@zju.edu.cn]            boolean xposedsharedprefs = false;
+[external][shana][shana@zju.edu.cn]            try {
+[external][shana][shana@zju.edu.cn]                Map<String, Object> metaData = MetaDataReader.getMetaData(new File(m.get()));
+[external][shana][shana@zju.edu.cn]                isModule = metaData.containsKey("xposedminversion");
+[external][shana][shana@zju.edu.cn]                if (isModule) {
+[external][shana][shana@zju.edu.cn]                    Object minVersionRaw = metaData.get("xposedminversion");
+[external][shana][shana@zju.edu.cn]                    if (minVersionRaw instanceof Integer) {
+[external][shana][shana@zju.edu.cn]                        xposedminversion = (Integer) minVersionRaw;
+[external][shana][shana@zju.edu.cn]                    } else if (minVersionRaw instanceof String) {
+[external][shana][shana@zju.edu.cn]                        xposedminversion = MetaDataReader.extractIntPart((String) minVersionRaw);
+[external][admin][admin@0x.mk]                    }
+[external][shana][shana@zju.edu.cn]                    xposedsharedprefs = metaData.containsKey("xposedsharedprefs");
+[external][admin][admin@0x.mk]                }
+[external][shana][shana@zju.edu.cn]            } catch (NumberFormatException | IOException e) {
+[external][shana][shana@zju.edu.cn]                Log.w(TAG, "Apk parser fails: " + e);
+[external][admin][admin@0x.mk]            }
+[external][shana][shana@zju.edu.cn]            newModule = isModule && (xposedminversion > 92 || xposedsharedprefs);
+[external][admin][admin@0x.mk]        }
+[external][shana][shana@zju.edu.cn]        if (newModule) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            mFile = new File(serviceClient.getPrefsPath(packageName), prefFileName + ".xml");
+[external][admin][admin@0x.mk]        } else {
+[external][admin][admin@0x.mk]            mFile = new File(Environment.getDataDirectory(), "data/" + packageName + "/shared_prefs/" + prefFileName + ".xml");
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]        mFilename = mFile.getAbsolutePath();
+[external][admin][admin@0x.mk]        init();
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    private void tryRegisterWatcher() {
+[external][ceco][ceco@ceco.sk.eu.org]        if (mWatchKey != null && mWatchKey.isValid()) {
+[external][admin][admin@0x.mk]            return;
+[external][admin][admin@0x.mk]        }
+[external][ceco][ceco@ceco.sk.eu.org]
+[external][ceco][ceco@ceco.sk.eu.org]        synchronized (sWatcherKeyInstances) {
+[external][ceco][ceco@ceco.sk.eu.org]            Path path = mFile.toPath();
+[external][ceco][ceco@ceco.sk.eu.org]            try {
+[external][ceco][ceco@ceco.sk.eu.org]                if (sWatcher == null) {
+[external][shana][shana@zju.edu.cn]                    sWatcher = new File(serviceClient.getPrefsPath("")).toPath().getFileSystem().newWatchService();
+[external][ceco][ceco@ceco.sk.eu.org]                    if (BuildConfig.DEBUG) Log.d(TAG, "Created WatchService instance");
+[external][ceco][ceco@ceco.sk.eu.org]                }
+[external][ceco][ceco@ceco.sk.eu.org]                mWatchKey = path.getParent().register(sWatcher, StandardWatchEventKinds.ENTRY_CREATE,
+[external][ceco][ceco@ceco.sk.eu.org]                        StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
+[external][ceco][ceco@ceco.sk.eu.org]                sWatcherKeyInstances.put(mWatchKey, new PrefsData(this));
+[external][ceco][ceco@ceco.sk.eu.org]                if (sWatcherDaemon == null || !sWatcherDaemon.isAlive()) {
+[external][ceco][ceco@ceco.sk.eu.org]                    initWatcherDaemon();
+[external][ceco][ceco@ceco.sk.eu.org]                }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                if (BuildConfig.DEBUG)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    Log.d(TAG, "tryRegisterWatcher: registered file watcher for " + path);
+[external][ceco][ceco@ceco.sk.eu.org]            } catch (AccessDeniedException accDeniedEx) {
+[external][ceco][ceco@ceco.sk.eu.org]                if (BuildConfig.DEBUG) Log.e(TAG, "tryRegisterWatcher: access denied to " + path);
+[external][ceco][ceco@ceco.sk.eu.org]            } catch (Exception e) {
+[external][ceco][ceco@ceco.sk.eu.org]                Log.e(TAG, "tryRegisterWatcher: failed to register file watcher", e);
+[external][ceco][ceco@ceco.sk.eu.org]            }
+[external][admin][admin@0x.mk]        }
+[external][ceco][ceco@ceco.sk.eu.org]    }
+[external][ceco][ceco@ceco.sk.eu.org]
+[external][ceco][ceco@ceco.sk.eu.org]    private void tryUnregisterWatcher() {
+[external][ceco][ceco@ceco.sk.eu.org]        synchronized (sWatcherKeyInstances) {
+[external][ceco][ceco@ceco.sk.eu.org]            if (mWatchKey != null) {
+[external][ceco][ceco@ceco.sk.eu.org]                sWatcherKeyInstances.remove(mWatchKey);
+[external][ceco][ceco@ceco.sk.eu.org]                mWatchKey.cancel();
+[external][ceco][ceco@ceco.sk.eu.org]                mWatchKey = null;
+[external][ceco][ceco@ceco.sk.eu.org]            }
+[external][ceco][ceco@ceco.sk.eu.org]            boolean atLeastOneValid = false;
+[external][ceco][ceco@ceco.sk.eu.org]            for (WatchKey key : sWatcherKeyInstances.keySet()) {
+[external][ceco][ceco@ceco.sk.eu.org]                atLeastOneValid |= key.isValid();
+[external][ceco][ceco@ceco.sk.eu.org]            }
+[external][ceco][ceco@ceco.sk.eu.org]            if (!atLeastOneValid) {
+[external][ceco][ceco@ceco.sk.eu.org]                try {
+[external][ceco][ceco@ceco.sk.eu.org]                    sWatcher.close();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                } catch (Exception ignore) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                }
+[external][ceco][ceco@ceco.sk.eu.org]            }
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    private void init() {
+[external][admin][admin@0x.mk]        startLoadFromDisk();
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    private static long tryGetFileSize(String filename) {
+[external][admin][admin@0x.mk]        try {
+[external][admin][admin@0x.mk]            return SELinuxHelper.getAppDataFileService().getFileSize(filename);
+[external][admin][admin@0x.mk]        } catch (IOException ignored) {
+[external][admin][admin@0x.mk]            return 0;
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    private static byte[] tryGetFileHash(String filename) {
+[external][admin][admin@0x.mk]        try {
+[external][admin][admin@0x.mk]            MessageDigest md = MessageDigest.getInstance("MD5");
+[external][admin][admin@0x.mk]            try (InputStream is = SELinuxHelper.getAppDataFileService().getFileInputStream(filename)) {
+[external][admin][admin@0x.mk]                byte[] buf = new byte[4096];
+[external][admin][admin@0x.mk]                int read;
+[external][admin][admin@0x.mk]                while ((read = is.read(buf)) != -1) {
+[external][admin][admin@0x.mk]                    md.update(buf, 0, read);
+[external][admin][admin@0x.mk]                }
+[external][admin][admin@0x.mk]            }
+[external][admin][admin@0x.mk]            return md.digest();
+[external][admin][admin@0x.mk]        } catch (Exception ignored) {
+[external][admin][admin@0x.mk]            return new byte[0];
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    /**
+[external][admin][admin@0x.mk]     * Tries to make the preferences file world-readable.
+[external][admin][admin@0x.mk]     *
+[external][admin][admin@0x.mk]     * <p><strong>Warning:</strong> This is only meant to work around permission "fix" functions that are part
+[external][admin][admin@0x.mk]     * of some recoveries. It doesn't replace the need to open preferences with {@code MODE_WORLD_READABLE}
+[external][admin][admin@0x.mk]     * in the module's UI code. Otherwise, Android will set stricter permissions again during the next save.
+[external][admin][admin@0x.mk]     *
+[external][admin][admin@0x.mk]     * <p>This will only work if executed as root (e.g. {@code initZygote()}) and only if SELinux is disabled.
+[external][admin][admin@0x.mk]     *
+[external][admin][admin@0x.mk]     * @return {@code true} in case the file could be made world-readable.
+[external][admin][admin@0x.mk]     */
+[external][admin][admin@0x.mk]    @SuppressLint("SetWorldReadable")
+[external][admin][admin@0x.mk]    public boolean makeWorldReadable() {
+[external][admin][admin@0x.mk]        if (!SELinuxHelper.getAppDataFileService().hasDirectFileAccess())
+[external][admin][admin@0x.mk]            return false; // It doesn't make much sense to make the file readable if we wouldn't be able to access it anyway.
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]        if (!mFile.exists()) // Just in case - the file should never be created if it doesn't exist.
+[external][admin][admin@0x.mk]            return false;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]        if (!mFile.setReadable(true, false))
+[external][admin][admin@0x.mk]            return false;
+[external][admin][admin@0x.mk]
+[external][ceco][ceco@ceco.sk.eu.org]        // Watcher service needs read access to parent directory (looks like execute is not enough)
+[external][ceco][ceco@ceco.sk.eu.org]        if (mFile.getParentFile() != null) {
+[external][ceco][ceco@ceco.sk.eu.org]            mFile.getParentFile().setReadable(true, false);
+[external][ceco][ceco@ceco.sk.eu.org]        }
+[external][ceco][ceco@ceco.sk.eu.org]
+[external][ceco][ceco@ceco.sk.eu.org]        if (!mListeners.isEmpty()) {
+[external][ceco][ceco@ceco.sk.eu.org]            tryRegisterWatcher();
+[external][ceco][ceco@ceco.sk.eu.org]        }
+[external][ceco][ceco@ceco.sk.eu.org]
+[external][admin][admin@0x.mk]        return true;
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    /**
+[external][admin][admin@0x.mk]     * Returns the file that is backing these preferences.
+[external][admin][admin@0x.mk]     *
+[external][admin][admin@0x.mk]     * <p><strong>Warning:</strong> The file might not be accessible directly.
+[external][admin][admin@0x.mk]     */
+[external][admin][admin@0x.mk]    public File getFile() {
+[external][admin][admin@0x.mk]        return mFile;
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    private void startLoadFromDisk() {
+[external][admin][admin@0x.mk]        synchronized (this) {
+[external][admin][admin@0x.mk]            mLoaded = false;
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]        new Thread("XSharedPreferences-load") {
+[external][admin][admin@0x.mk]            @Override
+[external][admin][admin@0x.mk]            public void run() {
+[external][admin][admin@0x.mk]                synchronized (XSharedPreferences.this) {
+[external][admin][admin@0x.mk]                    loadFromDiskLocked();
+[external][admin][admin@0x.mk]                }
+[external][admin][admin@0x.mk]            }
+[external][admin][admin@0x.mk]        }.start();
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    @SuppressWarnings({"rawtypes", "unchecked"})
+[external][admin][admin@0x.mk]    private void loadFromDiskLocked() {
+[external][admin][admin@0x.mk]        if (mLoaded) {
+[external][admin][admin@0x.mk]            return;
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]        Map map = null;
+[external][admin][admin@0x.mk]        FileResult result = null;
+[external][admin][admin@0x.mk]        try {
+[external][admin][admin@0x.mk]            result = SELinuxHelper.getAppDataFileService().getFileInputStream(mFilename, mFileSize, mLastModified);
+[external][admin][admin@0x.mk]            if (result.stream != null) {
+[external][admin][admin@0x.mk]                map = XmlUtils.readMapXml(result.stream);
+[external][admin][admin@0x.mk]                result.stream.close();
+[external][admin][admin@0x.mk]            } else {
+[external][admin][admin@0x.mk]                // The file is unchanged, keep the current values
+[external][admin][admin@0x.mk]                map = mMap;
+[external][admin][admin@0x.mk]            }
+[external][admin][admin@0x.mk]        } catch (XmlPullParserException e) {
+[external][admin][admin@0x.mk]            Log.w(TAG, "getSharedPreferences failed for: " + mFilename, e);
+[external][admin][admin@0x.mk]        } catch (FileNotFoundException ignored) {
+[external][admin][admin@0x.mk]            // SharedPreferencesImpl has a canRead() check, so it doesn't log anything in case the file doesn't exist
+[external][admin][admin@0x.mk]        } catch (IOException e) {
+[external][admin][admin@0x.mk]            Log.w(TAG, "getSharedPreferences failed for: " + mFilename, e);
+[external][admin][admin@0x.mk]        } finally {
+[external][admin][admin@0x.mk]            if (result != null && result.stream != null) {
+[external][admin][admin@0x.mk]                try {
+[external][admin][admin@0x.mk]                    result.stream.close();
+[external][admin][admin@0x.mk]                } catch (RuntimeException rethrown) {
+[external][admin][admin@0x.mk]                    throw rethrown;
+[external][admin][admin@0x.mk]                } catch (Exception ignored) {
+[external][admin][admin@0x.mk]                }
+[external][admin][admin@0x.mk]            }
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]        mLoaded = true;
+[external][admin][admin@0x.mk]        if (map != null) {
+[external][admin][admin@0x.mk]            mMap = map;
+[external][admin][admin@0x.mk]            mLastModified = result.mtime;
+[external][admin][admin@0x.mk]            mFileSize = result.size;
+[external][admin][admin@0x.mk]        } else {
+[external][admin][admin@0x.mk]            mMap = new HashMap<>();
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]        notifyAll();
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    /**
+[external][admin][admin@0x.mk]     * Reload the settings from file if they have changed.
+[external][admin][admin@0x.mk]     *
+[external][admin][admin@0x.mk]     * <p><strong>Warning:</strong> With enforcing SELinux, this call might be quite expensive.
+[external][admin][admin@0x.mk]     */
+[external][admin][admin@0x.mk]    public synchronized void reload() {
+[external][admin][admin@0x.mk]        if (hasFileChanged()) {
+[external][admin][admin@0x.mk]            init();
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    /**
+[external][admin][admin@0x.mk]     * Check whether the file has changed since the last time it has been loaded.
+[external][admin][admin@0x.mk]     *
+[external][admin][admin@0x.mk]     * <p><strong>Warning:</strong> With enforcing SELinux, this call might be quite expensive.
+[external][admin][admin@0x.mk]     */
+[external][admin][admin@0x.mk]    public synchronized boolean hasFileChanged() {
+[external][admin][admin@0x.mk]        try {
+[external][admin][admin@0x.mk]            FileResult result = SELinuxHelper.getAppDataFileService().statFile(mFilename);
+[external][admin][admin@0x.mk]            return mLastModified != result.mtime || mFileSize != result.size;
+[external][admin][admin@0x.mk]        } catch (FileNotFoundException ignored) {
+[external][admin][admin@0x.mk]            // SharedPreferencesImpl doesn't log anything in case the file doesn't exist
+[external][admin][admin@0x.mk]            return true;
+[external][admin][admin@0x.mk]        } catch (IOException e) {
+[external][admin][admin@0x.mk]            Log.w(TAG, "hasFileChanged", e);
+[external][admin][admin@0x.mk]            return true;
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    private void awaitLoadedLocked() {
+[external][admin][admin@0x.mk]        while (!mLoaded) {
+[external][admin][admin@0x.mk]            try {
+[external][admin][admin@0x.mk]                wait();
+[external][admin][admin@0x.mk]            } catch (InterruptedException unused) {
+[external][admin][admin@0x.mk]            }
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    /**
+[external][admin][admin@0x.mk]     * @hide
+[external][admin][admin@0x.mk]     */
+[external][admin][admin@0x.mk]    @Override
+[external][admin][admin@0x.mk]    public Map<String, ?> getAll() {
+[external][admin][admin@0x.mk]        synchronized (this) {
+[external][admin][admin@0x.mk]            awaitLoadedLocked();
+[external][admin][admin@0x.mk]            return new HashMap<>(mMap);
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    /**
+[external][admin][admin@0x.mk]     * @hide
+[external][admin][admin@0x.mk]     */
+[external][admin][admin@0x.mk]    @Override
+[external][admin][admin@0x.mk]    public String getString(String key, String defValue) {
+[external][admin][admin@0x.mk]        synchronized (this) {
+[external][admin][admin@0x.mk]            awaitLoadedLocked();
+[external][admin][admin@0x.mk]            String v = (String) mMap.get(key);
+[external][admin][admin@0x.mk]            return v != null ? v : defValue;
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    /**
+[external][admin][admin@0x.mk]     * @hide
+[external][admin][admin@0x.mk]     */
+[external][admin][admin@0x.mk]    @Override
+[external][admin][admin@0x.mk]    @SuppressWarnings("unchecked")
+[external][admin][admin@0x.mk]    public Set<String> getStringSet(String key, Set<String> defValues) {
+[external][admin][admin@0x.mk]        synchronized (this) {
+[external][admin][admin@0x.mk]            awaitLoadedLocked();
+[external][admin][admin@0x.mk]            Set<String> v = (Set<String>) mMap.get(key);
+[external][admin][admin@0x.mk]            return v != null ? v : defValues;
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    /**
+[external][admin][admin@0x.mk]     * @hide
+[external][admin][admin@0x.mk]     */
+[external][admin][admin@0x.mk]    @Override
+[external][admin][admin@0x.mk]    public int getInt(String key, int defValue) {
+[external][admin][admin@0x.mk]        synchronized (this) {
+[external][admin][admin@0x.mk]            awaitLoadedLocked();
+[external][admin][admin@0x.mk]            Integer v = (Integer) mMap.get(key);
+[external][admin][admin@0x.mk]            return v != null ? v : defValue;
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    /**
+[external][admin][admin@0x.mk]     * @hide
+[external][admin][admin@0x.mk]     */
+[external][admin][admin@0x.mk]    @Override
+[external][admin][admin@0x.mk]    public long getLong(String key, long defValue) {
+[external][admin][admin@0x.mk]        synchronized (this) {
+[external][admin][admin@0x.mk]            awaitLoadedLocked();
+[external][admin][admin@0x.mk]            Long v = (Long) mMap.get(key);
+[external][admin][admin@0x.mk]            return v != null ? v : defValue;
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    /**
+[external][admin][admin@0x.mk]     * @hide
+[external][admin][admin@0x.mk]     */
+[external][admin][admin@0x.mk]    @Override
+[external][admin][admin@0x.mk]    public float getFloat(String key, float defValue) {
+[external][admin][admin@0x.mk]        synchronized (this) {
+[external][admin][admin@0x.mk]            awaitLoadedLocked();
+[external][admin][admin@0x.mk]            Float v = (Float) mMap.get(key);
+[external][admin][admin@0x.mk]            return v != null ? v : defValue;
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    /**
+[external][admin][admin@0x.mk]     * @hide
+[external][admin][admin@0x.mk]     */
+[external][admin][admin@0x.mk]    @Override
+[external][admin][admin@0x.mk]    public boolean getBoolean(String key, boolean defValue) {
+[external][admin][admin@0x.mk]        synchronized (this) {
+[external][admin][admin@0x.mk]            awaitLoadedLocked();
+[external][admin][admin@0x.mk]            Boolean v = (Boolean) mMap.get(key);
+[external][admin][admin@0x.mk]            return v != null ? v : defValue;
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    /**
+[external][admin][admin@0x.mk]     * @hide
+[external][admin][admin@0x.mk]     */
+[external][admin][admin@0x.mk]    @Override
+[external][admin][admin@0x.mk]    public boolean contains(String key) {
+[external][admin][admin@0x.mk]        synchronized (this) {
+[external][admin][admin@0x.mk]            awaitLoadedLocked();
+[external][admin][admin@0x.mk]            return mMap.containsKey(key);
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    /**
+[external][admin][admin@0x.mk]     * @deprecated Not supported by this implementation.
+[external][admin][admin@0x.mk]     */
+[external][admin][admin@0x.mk]    @Deprecated
+[external][admin][admin@0x.mk]    @Override
+[external][admin][admin@0x.mk]    public Editor edit() {
+[external][admin][admin@0x.mk]        throw new UnsupportedOperationException("read-only implementation");
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]
+[external][ceco][ceco@ceco.sk.eu.org]    /**
+[external][ceco][ceco@ceco.sk.eu.org]     * Registers a callback to be invoked when a change happens to a preference file.<br>
+[external][ceco][ceco@ceco.sk.eu.org]     * Note that it is not possible to determine which preference changed exactly and thus
+[external][ceco][ceco@ceco.sk.eu.org]     * preference key in callback invocation will always be null.
+[external][ceco][ceco@ceco.sk.eu.org]     *
+[external][ceco][ceco@ceco.sk.eu.org]     * @param listener The callback that will run.
+[external][ceco][ceco@ceco.sk.eu.org]     * @see #unregisterOnSharedPreferenceChangeListener
+[external][ceco][ceco@ceco.sk.eu.org]     */
+[external][admin][admin@0x.mk]    @Override
+[external][admin][admin@0x.mk]    public void registerOnSharedPreferenceChangeListener(OnSharedPreferenceChangeListener listener) {
+[external][ceco][ceco@ceco.sk.eu.org]        if (listener == null)
+[external][ceco][ceco@ceco.sk.eu.org]            throw new IllegalArgumentException("listener cannot be null");
+[external][admin][admin@0x.mk]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        synchronized (this) {
+[external][ceco][ceco@ceco.sk.eu.org]            if (mListeners.put(listener, sContent) == null) {
+[external][ceco][ceco@ceco.sk.eu.org]                tryRegisterWatcher();
+[external][ceco][ceco@ceco.sk.eu.org]            }
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]
+[external][ceco][ceco@ceco.sk.eu.org]    /**
+[external][ceco][ceco@ceco.sk.eu.org]     * Unregisters a previous callback.
+[external][ceco][ceco@ceco.sk.eu.org]     *
+[external][ceco][ceco@ceco.sk.eu.org]     * @param listener The callback that should be unregistered.
+[external][ceco][ceco@ceco.sk.eu.org]     * @see #registerOnSharedPreferenceChangeListener
+[external][ceco][ceco@ceco.sk.eu.org]     */
+[external][admin][admin@0x.mk]    @Override
+[external][admin][admin@0x.mk]    public void unregisterOnSharedPreferenceChangeListener(OnSharedPreferenceChangeListener listener) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        synchronized (this) {
+[external][ceco][ceco@ceco.sk.eu.org]            if (mListeners.remove(listener) != null && mListeners.isEmpty()) {
+[external][ceco][ceco@ceco.sk.eu.org]                tryUnregisterWatcher();
+[external][ceco][ceco@ceco.sk.eu.org]            }
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    private static class PrefsData {
+[external][admin][admin@0x.mk]        public final XSharedPreferences mPrefs;
+[external][admin][admin@0x.mk]        private long mSize;
+[external][admin][admin@0x.mk]        private byte[] mHash;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]        public PrefsData(XSharedPreferences prefs) {
+[external][admin][admin@0x.mk]            mPrefs = prefs;
+[external][admin][admin@0x.mk]            mSize = tryGetFileSize(prefs.mFilename);
+[external][admin][admin@0x.mk]            mHash = tryGetFileHash(prefs.mFilename);
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]        public boolean hasChanged() {
+[external][admin][admin@0x.mk]            long size = tryGetFileSize(mPrefs.mFilename);
+[external][admin][admin@0x.mk]            if (size < 1) {
+[external][admin][admin@0x.mk]                if (BuildConfig.DEBUG) Log.d(TAG, "Ignoring empty prefs file");
+[external][admin][admin@0x.mk]                return false;
+[external][admin][admin@0x.mk]            }
+[external][admin][admin@0x.mk]            if (size != mSize) {
+[external][admin][admin@0x.mk]                mSize = size;
+[external][admin][admin@0x.mk]                mHash = tryGetFileHash(mPrefs.mFilename);
+[external][admin][admin@0x.mk]                if (BuildConfig.DEBUG) Log.d(TAG, "Prefs file size changed");
+[external][admin][admin@0x.mk]                return true;
+[external][admin][admin@0x.mk]            }
+[external][admin][admin@0x.mk]            byte[] hash = tryGetFileHash(mPrefs.mFilename);
+[external][admin][admin@0x.mk]            if (!Arrays.equals(hash, mHash)) {
+[external][admin][admin@0x.mk]                mHash = hash;
+[external][admin][admin@0x.mk]                if (BuildConfig.DEBUG) Log.d(TAG, "Prefs file hash changed");
+[external][admin][admin@0x.mk]                return true;
+[external][admin][admin@0x.mk]            }
+[external][admin][admin@0x.mk]            if (BuildConfig.DEBUG) Log.d(TAG, "Prefs file not changed");
+[external][admin][admin@0x.mk]            return false;
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]}

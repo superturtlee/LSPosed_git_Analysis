@@ -1,0 +1,51 @@
+[external][shana][shana@zju.edu.cn]/*
+[external][shana][shana@zju.edu.cn] * Copyright (C) 2015 The Android Open Source Project
+[external][shana][shana@zju.edu.cn] *
+[external][shana][shana@zju.edu.cn] * Licensed under the Apache License, Version 2.0 (the "License");
+[external][shana][shana@zju.edu.cn] * you may not use this file except in compliance with the License.
+[external][shana][shana@zju.edu.cn] * You may obtain a copy of the License at
+[external][shana][shana@zju.edu.cn] *
+[external][shana][shana@zju.edu.cn] *      http://www.apache.org/licenses/LICENSE-2.0
+[external][shana][shana@zju.edu.cn] *
+[external][shana][shana@zju.edu.cn] * Unless required by applicable law or agreed to in writing, software
+[external][shana][shana@zju.edu.cn] * distributed under the License is distributed on an "AS IS" BASIS,
+[external][shana][shana@zju.edu.cn] * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+[external][shana][shana@zju.edu.cn] * See the License for the specific language governing permissions and
+[external][shana][shana@zju.edu.cn] * limitations under the License.
+[external][shana][shana@zju.edu.cn] */
+[external][shana][shana@zju.edu.cn]package androidx.annotation;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import java.lang.annotation.Retention;
+[external][shana][shana@zju.edu.cn]import java.lang.annotation.Target;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
+[external][shana][shana@zju.edu.cn]import static java.lang.annotation.ElementType.FIELD;
+[external][shana][shana@zju.edu.cn]import static java.lang.annotation.ElementType.LOCAL_VARIABLE;
+[external][shana][shana@zju.edu.cn]import static java.lang.annotation.ElementType.METHOD;
+[external][shana][shana@zju.edu.cn]import static java.lang.annotation.ElementType.PARAMETER;
+[external][shana][shana@zju.edu.cn]import static java.lang.annotation.RetentionPolicy.CLASS;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]/**
+[external][shana][shana@zju.edu.cn] * Denotes that the annotated element should be an int or long in the given range
+[external][shana][shana@zju.edu.cn] * <p>
+[external][shana][shana@zju.edu.cn] * Example:
+[external][shana][shana@zju.edu.cn] * <pre><code>
+[external][shana][shana@zju.edu.cn] *  &#64;IntRange(from=0,to=255)
+[external][shana][shana@zju.edu.cn] *  public int getAlpha() {
+[external][shana][shana@zju.edu.cn] *      ...
+[external][shana][shana@zju.edu.cn] *  }
+[external][shana][shana@zju.edu.cn] * </code></pre>
+[external][shana][shana@zju.edu.cn] */
+[external][shana][shana@zju.edu.cn]@Retention(CLASS)
+[external][shana][shana@zju.edu.cn]@Target({METHOD, PARAMETER, FIELD, LOCAL_VARIABLE, ANNOTATION_TYPE})
+[external][shana][shana@zju.edu.cn]public @interface IntRange {
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Smallest value, inclusive
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    long from() default Long.MIN_VALUE;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    /**
+[external][shana][shana@zju.edu.cn]     * Largest value, inclusive
+[external][shana][shana@zju.edu.cn]     */
+[external][shana][shana@zju.edu.cn]    long to() default Long.MAX_VALUE;
+[external][shana][shana@zju.edu.cn]}

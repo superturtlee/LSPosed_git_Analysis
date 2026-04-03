@@ -1,0 +1,237 @@
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]/*
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * This file is part of LSPosed.
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] *
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * (at your option) any later version.
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] *
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * GNU General Public License for more details.
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] *
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] *
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * Copyright (C) 2021 - 2022 LSPosed Contributors
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] */
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#include <fcntl.h>
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#include <linux/fs.h>
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#include <sys/mman.h>
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]#include "config_impl.h"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#include "elf_util.h"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#include "loader.h"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#include "magisk_loader.h"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#include "native_util.h"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#include "service.h"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#include "symbol_cache.h"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]#include "utils/jni_helper.hpp"
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]using namespace lsplant;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]static_assert(FS_IOC_SETFLAGS == LP_SELECT(0x40046602, 0x40086602));
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]namespace lspd {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    extern int *allowUnload;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    constexpr int FIRST_ISOLATED_UID = 99000;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    constexpr int LAST_ISOLATED_UID = 99999;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    constexpr int FIRST_APP_ZYGOTE_ISOLATED_UID = 90000;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    constexpr int LAST_APP_ZYGOTE_ISOLATED_UID = 98999;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    constexpr int SHARED_RELRO_UID = 1037;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    constexpr int PER_USER_RANGE = 100000;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    static constexpr uid_t kAidInjected = INJECTED_AID;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    static constexpr uid_t kAidInet = 3003;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    void MagiskLoader::LoadDex(JNIEnv *env, PreloadedDex &&dex) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        auto classloader = JNI_FindClass(env, "java/lang/ClassLoader");
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        auto getsyscl_mid = JNI_GetStaticMethodID(
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                env, classloader, "getSystemClassLoader", "()Ljava/lang/ClassLoader;");
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        auto sys_classloader = JNI_CallStaticObjectMethod(env, classloader, getsyscl_mid);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        if (!sys_classloader) [[unlikely]] {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            LOGE("getSystemClassLoader failed!!!");
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            return;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        auto in_memory_classloader = JNI_FindClass(env, "dalvik/system/InMemoryDexClassLoader");
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        auto initMid = JNI_GetMethodID(env, in_memory_classloader, "<init>",
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                                       "(Ljava/nio/ByteBuffer;Ljava/lang/ClassLoader;)V");
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        auto byte_buffer_class = JNI_FindClass(env, "java/nio/ByteBuffer");
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        auto dex_buffer = env->NewDirectByteBuffer(dex.data(), dex.size());
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        if (auto my_cl = JNI_NewObject(env, in_memory_classloader, initMid,
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                                       dex_buffer, sys_classloader)) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            inject_class_loader_ = JNI_NewGlobalRef(env, my_cl);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        } else {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            LOGE("InMemoryDexClassLoader creation failed!!!");
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            return;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        env->DeleteLocalRef(dex_buffer);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    std::string GetEntryClassName() {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        const auto &obfs_map = ConfigBridge::GetInstance()->obfuscation_map();
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        static auto signature = obfs_map.at("org.lsposed.lspd.core.") + "Main";
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        return signature;
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    }
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    void MagiskLoader::SetupEntryClass(JNIEnv *env) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        if (auto entry_class = FindClassFromLoader(env, GetCurrentClassLoader(),
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                                                   GetEntryClassName())) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            entry_class_ = JNI_NewGlobalRef(env, entry_class);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    void
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    MagiskLoader::OnNativeForkSystemServerPre(JNIEnv *env) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        Service::instance()->InitService(env);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        setAllowUnload(skip_);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    void
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    MagiskLoader::OnNativeForkSystemServerPost(JNIEnv *env) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        if (!skip_) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            auto *instance = Service::instance();
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            auto system_server_binder = instance->RequestSystemServerBinder(env);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            if (!system_server_binder) {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                LOGF("Failed to get system server binder, system server initialization failed.");
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                return;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            auto application_binder = instance->RequestApplicationBinderFromSystemServer(env, system_server_binder);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            // Call application_binder directly if application binder is available,
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            // or we proxy the request from system server binder
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]            auto &&next_binder = application_binder ? application_binder : system_server_binder;
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]            const auto [dex_fd, size] = instance->RequestLSPDex(env, next_binder);
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]            auto obfs_map = instance->RequestObfuscationMap(env, next_binder);
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]            ConfigBridge::GetInstance()->obfuscation_map(std::move(obfs_map));
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            LoadDex(env, PreloadedDex(dex_fd, size));
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            close(dex_fd);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            instance->HookBridge(*this, env);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            if (application_binder) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                lsplant::InitInfo initInfo{
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                    .inline_hooker = [](auto t, auto r) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                        void* bk = nullptr;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                        return HookFunction(t, r, &bk) == RS_SUCCESS ? bk : nullptr;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                    },
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                    .inline_unhooker = [](auto t) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                        return UnhookFunction(t) == RT_SUCCESS ;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                    },
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                    .art_symbol_resolver = [](auto symbol) {
+[external][shana][shana@zju.edu.cn]                        return GetArt()->getSymbAddress(symbol);
+[external][shana][shana@zju.edu.cn]                    },
+[external][shana][shana@zju.edu.cn]                    .art_symbol_prefix_resolver = [](auto symbol) {
+[external][shana][shana@zju.edu.cn]                        return GetArt()->getSymbPrefixFirstAddress(symbol);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                    },
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                };
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                InitArtHooker(env, initInfo);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                InitHooks(env);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                SetupEntryClass(env);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                FindAndCall(env, "forkCommon",
+[external][shana][shana@zju.edu.cn]                            "(ZLjava/lang/String;Ljava/lang/String;Landroid/os/IBinder;)V",
+[external][shana][shana@zju.edu.cn]                            JNI_TRUE, JNI_NewStringUTF(env, "system"), nullptr, application_binder);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                GetArt(true);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            } else {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                LOGI("skipped system server");
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                GetArt(true);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    void MagiskLoader::OnNativeForkAndSpecializePre(JNIEnv *env,
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                                               jint uid,
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                                               jintArray &gids,
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                                               jstring nice_name,
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                                               jboolean is_child_zygote,
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                                               jstring app_data_dir) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        if (uid == kAidInjected) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            int array_size = gids ? env->GetArrayLength(gids) : 0;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            auto region = std::make_unique<jint[]>(array_size + 1);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            auto *new_gids = env->NewIntArray(array_size + 1);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            if (gids) env->GetIntArrayRegion(gids, 0, array_size, region.get());
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            region.get()[array_size] = kAidInet;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            env->SetIntArrayRegion(new_gids, 0, array_size + 1, region.get());
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            if (gids) env->SetIntArrayRegion(gids, 0, 1, region.get() + array_size);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            gids = new_gids;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        Service::instance()->InitService(env);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        const auto app_id = uid % PER_USER_RANGE;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        JUTFString process_name(env, nice_name);
+[external][shana][shana@zju.edu.cn]        skip_ = false;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        if (!skip_ && !app_data_dir) {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]            LOGD("skip injecting into {} because it has no data dir", process_name.get());
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            skip_ = true;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        if (!skip_ && is_child_zygote) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            skip_ = true;
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]            LOGD("skip injecting into {} because it's a child zygote", process_name.get());
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        if (!skip_ && ((app_id >= FIRST_ISOLATED_UID && app_id <= LAST_ISOLATED_UID) ||
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                       (app_id >= FIRST_APP_ZYGOTE_ISOLATED_UID &&
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                        app_id <= LAST_APP_ZYGOTE_ISOLATED_UID) ||
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                       app_id == SHARED_RELRO_UID)) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            skip_ = true;
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]            LOGI("skip injecting into {} because it's isolated", process_name.get());
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        setAllowUnload(skip_);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    void
+[external][shana][shana@zju.edu.cn]    MagiskLoader::OnNativeForkAndSpecializePost(JNIEnv *env, jstring nice_name, jstring app_dir) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        const JUTFString process_name(env, nice_name);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        auto *instance = Service::instance();
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        auto binder = skip_ ? ScopedLocalRef<jobject>{env, nullptr}
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                            : instance->RequestBinder(env, nice_name);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        if (binder) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            lsplant::InitInfo initInfo{
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                    .inline_hooker = [](auto t, auto r) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                        void* bk = nullptr;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                        return HookFunction(t, r, &bk) == RS_SUCCESS ? bk : nullptr;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                    },
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                    .inline_unhooker = [](auto t) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                        return UnhookFunction(t) == RT_SUCCESS;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                    },
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                    .art_symbol_resolver = [](auto symbol){
+[external][shana][shana@zju.edu.cn]                        return GetArt()->getSymbAddress(symbol);
+[external][shana][shana@zju.edu.cn]                    },
+[external][shana][shana@zju.edu.cn]                    .art_symbol_prefix_resolver = [](auto symbol) {
+[external][shana][shana@zju.edu.cn]                        return GetArt()->getSymbPrefixFirstAddress(symbol);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]                    },
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            };
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            auto [dex_fd, size] = instance->RequestLSPDex(env, binder);
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]            auto obfs_map = instance->RequestObfuscationMap(env, binder);
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]            ConfigBridge::GetInstance()->obfuscation_map(std::move(obfs_map));
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            LoadDex(env, PreloadedDex(dex_fd, size));
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            close(dex_fd);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            InitArtHooker(env, initInfo);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            InitHooks(env);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            SetupEntryClass(env);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            LOGD("Done prepare");
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            FindAndCall(env, "forkCommon",
+[external][shana][shana@zju.edu.cn]                        "(ZLjava/lang/String;Ljava/lang/String;Landroid/os/IBinder;)V",
+[external][shana][shana@zju.edu.cn]                        JNI_FALSE, nice_name, app_dir, binder);
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]            LOGD("injected xposed into {}", process_name.get());
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            setAllowUnload(false);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            GetArt(true);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        } else {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            auto context = Context::ReleaseInstance();
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            auto service = Service::ReleaseInstance();
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            GetArt(true);
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]            LOGD("skipped {}", process_name.get());
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            setAllowUnload(true);
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    void MagiskLoader::setAllowUnload(bool unload) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        if (allowUnload) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            *allowUnload = unload ? 1 : 0;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]}  // namespace lspd

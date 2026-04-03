@@ -1,0 +1,31 @@
+[internal][vvb2060][vvb2060@gmail.com]/*
+[internal][vvb2060][vvb2060@gmail.com] * Licensed to the Apache Software Foundation (ASF) under one or more
+[internal][vvb2060][vvb2060@gmail.com] * contributor license agreements.  See the NOTICE file distributed with
+[internal][vvb2060][vvb2060@gmail.com] * this work for additional information regarding copyright ownership.
+[internal][vvb2060][vvb2060@gmail.com] * The ASF licenses this file to You under the Apache License, Version 2.0
+[internal][vvb2060][vvb2060@gmail.com] * (the "License"); you may not use this file except in compliance with
+[internal][vvb2060][vvb2060@gmail.com] * the License.  You may obtain a copy of the License at
+[internal][vvb2060][vvb2060@gmail.com] *
+[internal][vvb2060][vvb2060@gmail.com] *      http://www.apache.org/licenses/LICENSE-2.0
+[internal][vvb2060][vvb2060@gmail.com] *
+[internal][vvb2060][vvb2060@gmail.com] * Unless required by applicable law or agreed to in writing, software
+[internal][vvb2060][vvb2060@gmail.com] * distributed under the License is distributed on an "AS IS" BASIS,
+[internal][vvb2060][vvb2060@gmail.com] * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+[internal][vvb2060][vvb2060@gmail.com] * See the License for the specific language governing permissions and
+[internal][vvb2060][vvb2060@gmail.com] * limitations under the License.
+[internal][vvb2060][vvb2060@gmail.com] */
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]package org.apache.commons.lang3.reflect;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import java.lang.reflect.Constructor;
+[internal][vvb2060][vvb2060@gmail.com]import java.lang.reflect.Method;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]public class MemberUtilsX {
+[internal][vvb2060][vvb2060@gmail.com]    public static int compareConstructorFit(final Constructor<?> left, final Constructor<?> right, final Class<?>[] actual) {
+[internal][vvb2060][vvb2060@gmail.com]        return MemberUtils.compareConstructorFit(left, right, actual);
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    public static int compareMethodFit(final Method left, final Method right, final Class<?>[] actual) {
+[internal][vvb2060][vvb2060@gmail.com]        return MemberUtils.compareMethodFit(left, right, actual);
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]}

@@ -1,0 +1,1817 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][admin][admin@0x.mk]package android.content.res;
+[external][admin][admin@0x.mk]
+[external][416810799][416810799@qq.com]import static org.lsposed.lspd.nativebridge.ResourcesHook.rewriteXmlReferencesNative;
+[external][416810799][416810799@qq.com]import static de.robv.android.xposed.XposedHelpers.decrementMethodDepth;
+[external][416810799][416810799@qq.com]import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
+[external][shana][shana@zju.edu.cn]import static de.robv.android.xposed.XposedHelpers.getBooleanField;
+[external][416810799][416810799@qq.com]import static de.robv.android.xposed.XposedHelpers.getLongField;
+[external][416810799][416810799@qq.com]import static de.robv.android.xposed.XposedHelpers.getObjectField;
+[external][416810799][416810799@qq.com]import static de.robv.android.xposed.XposedHelpers.incrementMethodDepth;
+[external][416810799][416810799@qq.com]
+[external][admin][admin@0x.mk]import android.content.Context;
+[external][admin][admin@0x.mk]import android.content.pm.PackageParser;
+[external][admin][admin@0x.mk]import android.content.pm.PackageParser.PackageParserException;
+[external][admin][admin@0x.mk]import android.graphics.Color;
+[external][admin][admin@0x.mk]import android.graphics.Movie;
+[external][shana][shana@zju.edu.cn]import android.graphics.Typeface;
+[external][admin][admin@0x.mk]import android.graphics.drawable.ColorDrawable;
+[external][admin][admin@0x.mk]import android.graphics.drawable.Drawable;
+[external][shana][shana@zju.edu.cn]import android.os.Build;
+[external][admin][admin@0x.mk]import android.os.StrictMode;
+[external][admin][admin@0x.mk]import android.text.Html;
+[external][admin][admin@0x.mk]import android.util.AttributeSet;
+[external][admin][admin@0x.mk]import android.util.DisplayMetrics;
+[external][admin][admin@0x.mk]import android.util.SparseArray;
+[external][admin][admin@0x.mk]import android.util.TypedValue;
+[external][admin][admin@0x.mk]import android.view.LayoutInflater;
+[external][admin][admin@0x.mk]import android.view.View;
+[external][admin][admin@0x.mk]import android.view.ViewGroup;
+[external][admin][admin@0x.mk]
+[external][shana][shana@zju.edu.cn]import androidx.annotation.NonNull;
+[external][shana][shana@zju.edu.cn]import androidx.annotation.RequiresApi;
+[external][shana][shana@zju.edu.cn]
+[external][admin][admin@0x.mk]import org.xmlpull.v1.XmlPullParser;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]import java.io.File;
+[external][admin][admin@0x.mk]import java.util.Arrays;
+[external][admin][admin@0x.mk]import java.util.HashMap;
+[external][admin][admin@0x.mk]import java.util.LinkedList;
+[external][admin][admin@0x.mk]import java.util.WeakHashMap;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]import de.robv.android.xposed.IXposedHookZygoteInit;
+[external][admin][admin@0x.mk]import de.robv.android.xposed.XC_MethodHook;
+[external][admin][admin@0x.mk]import de.robv.android.xposed.XC_MethodHook.MethodHookParam;
+[external][admin][admin@0x.mk]import de.robv.android.xposed.XposedBridge;
+[external][admin][admin@0x.mk]import de.robv.android.xposed.XposedBridge.CopyOnWriteSortedSet;
+[external][shana][shana@zju.edu.cn]import de.robv.android.xposed.XposedInit;
+[external][admin][admin@0x.mk]import de.robv.android.xposed.callbacks.XC_LayoutInflated;
+[external][admin][admin@0x.mk]import de.robv.android.xposed.callbacks.XC_LayoutInflated.LayoutInflatedParam;
+[external][admin][admin@0x.mk]import de.robv.android.xposed.callbacks.XCallback;
+[external][shana][shana@zju.edu.cn]import xposed.dummy.XResourcesSuperClass;
+[external][shana][shana@zju.edu.cn]import xposed.dummy.XTypedArraySuperClass;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]/**
+[external][admin][admin@0x.mk] * {@link android.content.res.Resources} subclass that allows replacing individual resources.
+[external][admin][admin@0x.mk] *
+[external][admin][admin@0x.mk] * <p>Xposed replaces the standard resources with this class, which overrides the methods used for
+[external][admin][admin@0x.mk] * retrieving individual resources and adds possibilities to replace them. These replacements can
+[external][admin][admin@0x.mk] * be set using the methods made available via the API methods in this class.
+[external][admin][admin@0x.mk] */
+[external][admin][admin@0x.mk]@SuppressWarnings("JniMissingFunction")
+[external][shana][shana@zju.edu.cn]public class XResources extends XResourcesSuperClass {
+[external][admin][admin@0x.mk]	private static final SparseArray<HashMap<String, Object>> sReplacements = new SparseArray<>();
+[external][admin][admin@0x.mk]	private static final SparseArray<HashMap<String, ResourceNames>> sResourceNames = new SparseArray<>();
+[external][admin][admin@0x.mk]
+[external][shana][shana@zju.edu.cn]	// A resource ID is a 32 bit number of the form: PPTTNNNN. PP is the package the resource is for;
+[external][shana][shana@zju.edu.cn]	// TT is the type of the resource;
+[external][shana][shana@zju.edu.cn]	// NNNN is the name of the resource in that type.
+[external][shana][shana@zju.edu.cn]	// For applications resources, PP is always 0x7f.
+[external][admin][admin@0x.mk]	private static final byte[] sSystemReplacementsCache = new byte[256]; // bitmask: 0x000700ff => 2048 bit => 256 bytes
+[external][admin][admin@0x.mk]	private byte[] mReplacementsCache; // bitmask: 0x0007007f => 1024 bit => 128 bytes
+[external][admin][admin@0x.mk]	private static final HashMap<String, byte[]> sReplacementsCacheMap = new HashMap<>();
+[external][admin][admin@0x.mk]	private static final SparseArray<ColorStateList> sColorStateListCache = new SparseArray<>(0);
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	private static final SparseArray<HashMap<String, CopyOnWriteSortedSet<XC_LayoutInflated>>> sLayoutCallbacks = new SparseArray<>();
+[external][admin][admin@0x.mk]	private static final WeakHashMap<XmlResourceParser, XMLInstanceDetails> sXmlInstanceDetails = new WeakHashMap<>();
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	private static final String EXTRA_XML_INSTANCE_DETAILS = "xmlInstanceDetails";
+[external][shana][shana@zju.edu.cn]	private static final ThreadLocal<LinkedList<MethodHookParam>> sIncludedLayouts = ThreadLocal.withInitial(() -> new LinkedList<>());
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	private static final HashMap<String, Long> sResDirLastModified = new HashMap<>();
+[external][admin][admin@0x.mk]	private static final HashMap<String, String> sResDirPackageNames = new HashMap<>();
+[external][admin][admin@0x.mk]	private static ThreadLocal<Object> sLatestResKey = null;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	private String mResDir;
+[external][admin][admin@0x.mk]	private String mPackageName;
+[external][admin][admin@0x.mk]
+[external][shana][shana@zju.edu.cn]	public XResources(ClassLoader classLoader, String resDir) {
+[external][admin][admin@0x.mk]		super(classLoader);
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		this.mResDir = resDir;
+[external][admin][admin@0x.mk]		this.mPackageName = getPackageName(resDir);
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		if (resDir != null) {
+[external][admin][admin@0x.mk]			synchronized (sReplacementsCacheMap) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]				mReplacementsCache = sReplacementsCacheMap.computeIfAbsent(resDir, k -> new byte[128]);
+[external][admin][admin@0x.mk]			}
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][shana][shana@zju.edu.cn]	/** Dummy, will never be called (objects are transferred to this class only). */
+[external][shana][shana@zju.edu.cn]//	private XResources() {
+[external][shana][shana@zju.edu.cn]//		throw new UnsupportedOperationException();
+[external][shana][shana@zju.edu.cn]//	}
+[external][shana][shana@zju.edu.cn]
+[external][admin][admin@0x.mk]	/** @hide */
+[external][admin][admin@0x.mk]	public boolean isFirstLoad() {
+[external][admin][admin@0x.mk]		synchronized (sReplacements) {
+[external][admin][admin@0x.mk]			if (mResDir == null)
+[external][admin][admin@0x.mk]				return false;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]			final StrictMode.ThreadPolicy policy = StrictMode.allowThreadDiskReads();
+[external][admin][admin@0x.mk]			Long lastModification = new File(mResDir).lastModified();
+[external][admin][admin@0x.mk]			Long oldModified = sResDirLastModified.get(mResDir);
+[external][admin][admin@0x.mk]			StrictMode.setThreadPolicy(policy);
+[external][admin][admin@0x.mk]			if (lastModification.equals(oldModified))
+[external][admin][admin@0x.mk]				return false;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]			sResDirLastModified.put(mResDir, lastModification);
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]			if (oldModified == null)
+[external][admin][admin@0x.mk]				return true;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]			// file was changed meanwhile => remove old replacements
+[external][admin][admin@0x.mk]			for (int i = 0; i < sReplacements.size(); i++) {
+[external][admin][admin@0x.mk]				sReplacements.valueAt(i).remove(mResDir);
+[external][admin][admin@0x.mk]			}
+[external][admin][admin@0x.mk]			Arrays.fill(mReplacementsCache, (byte) 0);
+[external][admin][admin@0x.mk]			return true;
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/** @hide */
+[external][admin][admin@0x.mk]	public static void setPackageNameForResDir(String packageName, String resDir) {
+[external][admin][admin@0x.mk]		synchronized (sResDirPackageNames) {
+[external][admin][admin@0x.mk]			sResDirPackageNames.put(resDir, packageName);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/**
+[external][admin][admin@0x.mk]	 * Returns the name of the package that these resources belong to, or "android" for system resources.
+[external][admin][admin@0x.mk]	 */
+[external][shana][shana@zju.edu.cn]	@NonNull
+[external][admin][admin@0x.mk]	public String getPackageName() {
+[external][admin][admin@0x.mk]		return mPackageName;
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	private static String getPackageName(String resDir) {
+[external][admin][admin@0x.mk]		if (resDir == null)
+[external][admin][admin@0x.mk]			return "android";
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		String packageName;
+[external][admin][admin@0x.mk]		synchronized (sResDirPackageNames) {
+[external][admin][admin@0x.mk]			packageName = sResDirPackageNames.get(resDir);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		if (packageName != null)
+[external][admin][admin@0x.mk]			return packageName;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		PackageParser.PackageLite pkgInfo;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]		try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]			pkgInfo = PackageParser.parsePackageLite(new File(resDir), 0);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]		} catch (PackageParserException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]			throw new IllegalStateException("Could not determine package name for " + resDir, e);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]		if (pkgInfo != null && pkgInfo.packageName != null) {
+[external][admin][admin@0x.mk]//			Log.w(XposedBridge.TAG, "Package name for " + resDir + " had to be retrieved via parser");
+[external][admin][admin@0x.mk]			packageName = pkgInfo.packageName;
+[external][admin][admin@0x.mk]			setPackageNameForResDir(packageName, resDir);
+[external][admin][admin@0x.mk]			return packageName;
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		throw new IllegalStateException("Could not determine package name for " + resDir);
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/**
+[external][admin][admin@0x.mk]	 * Special case of {@link #getPackageName} during object creation.
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 * <p>For a short moment during/after the creation of a new {@link android.content.res Resources}
+[external][admin][admin@0x.mk]	 * object, it isn't an instance of {@link XResources} yet. For any hooks that need information
+[external][admin][admin@0x.mk]	 * about the just created object during this particular stage, this method will return the
+[external][admin][admin@0x.mk]	 * package name.
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 * <p class="warning">If you call this method outside of {@code getTopLevelResources()}, it
+[external][admin][admin@0x.mk]	 * throws an {@code IllegalStateException}.
+[external][admin][admin@0x.mk]	 */
+[external][admin][admin@0x.mk]	public static String getPackageNameDuringConstruction() {
+[external][admin][admin@0x.mk]		Object key;
+[external][admin][admin@0x.mk]		if (sLatestResKey == null || (key = sLatestResKey.get()) == null)
+[external][admin][admin@0x.mk]			throw new IllegalStateException("This method can only be called during getTopLevelResources()");
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		String resDir = (String) getObjectField(key, "mResDir");
+[external][admin][admin@0x.mk]		return getPackageName(resDir);
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/** @hide */
+[external][admin][admin@0x.mk]	public static void init(ThreadLocal<Object> latestResKey) throws Exception {
+[external][admin][admin@0x.mk]		sLatestResKey = latestResKey;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		findAndHookMethod(LayoutInflater.class, "inflate", XmlPullParser.class, ViewGroup.class, boolean.class, new XC_MethodHook() {
+[external][admin][admin@0x.mk]			@Override
+[external][admin][admin@0x.mk]			protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+[external][admin][admin@0x.mk]				if (param.hasThrowable())
+[external][admin][admin@0x.mk]					return;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]				XMLInstanceDetails details;
+[external][admin][admin@0x.mk]				synchronized (sXmlInstanceDetails) {
+[external][admin][admin@0x.mk]					details = sXmlInstanceDetails.get(param.args[0]);
+[external][admin][admin@0x.mk]				}
+[external][admin][admin@0x.mk]				if (details != null) {
+[external][admin][admin@0x.mk]					LayoutInflatedParam liparam = new LayoutInflatedParam(details.callbacks);
+[external][admin][admin@0x.mk]					liparam.view = (View) param.getResult();
+[external][admin][admin@0x.mk]					liparam.resNames = details.resNames;
+[external][admin][admin@0x.mk]					liparam.variant = details.variant;
+[external][admin][admin@0x.mk]					liparam.res = details.res;
+[external][admin][admin@0x.mk]					XCallback.callAll(liparam);
+[external][admin][admin@0x.mk]				}
+[external][admin][admin@0x.mk]			}
+[external][admin][admin@0x.mk]		});
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		final XC_MethodHook parseIncludeHook = new XC_MethodHook() {
+[external][admin][admin@0x.mk]			@Override
+[external][admin][admin@0x.mk]			protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+[external][admin][admin@0x.mk]				sIncludedLayouts.get().push(param);
+[external][admin][admin@0x.mk]			}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]			@Override
+[external][admin][admin@0x.mk]			protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+[external][admin][admin@0x.mk]				sIncludedLayouts.get().pop();
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]				if (param.hasThrowable())
+[external][admin][admin@0x.mk]					return;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]				// filled in by our implementation of getLayout()
+[external][admin][admin@0x.mk]				XMLInstanceDetails details = (XMLInstanceDetails) param.getObjectExtra(EXTRA_XML_INSTANCE_DETAILS);
+[external][admin][admin@0x.mk]				if (details != null) {
+[external][admin][admin@0x.mk]					LayoutInflatedParam liparam = new LayoutInflatedParam(details.callbacks);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]					ViewGroup group = (ViewGroup) param.args[2];
+[external][admin][admin@0x.mk]					liparam.view = group.getChildAt(group.getChildCount() - 1);
+[external][admin][admin@0x.mk]					liparam.resNames = details.resNames;
+[external][admin][admin@0x.mk]					liparam.variant = details.variant;
+[external][admin][admin@0x.mk]					liparam.res = details.res;
+[external][admin][admin@0x.mk]					XCallback.callAll(liparam);
+[external][admin][admin@0x.mk]				}
+[external][admin][admin@0x.mk]			}
+[external][admin][admin@0x.mk]		};
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]		findAndHookMethod(LayoutInflater.class, "parseInclude", XmlPullParser.class, Context.class,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]				View.class, AttributeSet.class, parseIncludeHook);
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/**
+[external][admin][admin@0x.mk]	 * Wrapper for information about an indiviual resource.
+[external][admin][admin@0x.mk]	 */
+[external][admin][admin@0x.mk]	public static class ResourceNames {
+[external][admin][admin@0x.mk]		/** The resource ID. */
+[external][admin][admin@0x.mk]		public final int id;
+[external][admin][admin@0x.mk]		/** The resource package name as returned by {@link #getResourcePackageName}. */
+[external][admin][admin@0x.mk]		public final String pkg;
+[external][admin][admin@0x.mk]		/** The resource entry name as returned by {@link #getResourceEntryName}. */
+[external][admin][admin@0x.mk]		public final String name;
+[external][admin][admin@0x.mk]		/** The resource type name as returned by {@link #getResourceTypeName}. */
+[external][admin][admin@0x.mk]		public final String type;
+[external][admin][admin@0x.mk]		/** The full resource nameas returned by {@link #getResourceName}. */
+[external][admin][admin@0x.mk]		public final String fullName;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		private ResourceNames(int id, String pkg, String name, String type) {
+[external][admin][admin@0x.mk]			this.id = id;
+[external][admin][admin@0x.mk]			this.pkg = pkg;
+[external][admin][admin@0x.mk]			this.name = name;
+[external][admin][admin@0x.mk]			this.type = type;
+[external][admin][admin@0x.mk]			this.fullName = pkg + ":" + type + "/" + name;
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		/**
+[external][admin][admin@0x.mk]		 * Returns whether all non-null parameters match the values of this object.
+[external][admin][admin@0x.mk]		 */
+[external][admin][admin@0x.mk]		public boolean equals(String pkg, String name, String type, int id) {
+[external][admin][admin@0x.mk]			return (pkg  == null || pkg.equals(this.pkg))
+[external][admin][admin@0x.mk]				&& (name == null || name.equals(this.name))
+[external][admin][admin@0x.mk]				&& (type == null || type.equals(this.type))
+[external][admin][admin@0x.mk]				&& (id == 0 || id == this.id);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	private ResourceNames getResourceNames(int id) {
+[external][admin][admin@0x.mk]		return new ResourceNames(
+[external][admin][admin@0x.mk]				id,
+[external][admin][admin@0x.mk]				getResourcePackageName(id),
+[external][admin][admin@0x.mk]				getResourceTypeName(id),
+[external][admin][admin@0x.mk]				getResourceEntryName(id));
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	private static ResourceNames getSystemResourceNames(int id) {
+[external][admin][admin@0x.mk]		Resources sysRes = getSystem();
+[external][admin][admin@0x.mk]		return new ResourceNames(
+[external][admin][admin@0x.mk]				id,
+[external][admin][admin@0x.mk]				sysRes.getResourcePackageName(id),
+[external][admin][admin@0x.mk]				sysRes.getResourceTypeName(id),
+[external][admin][admin@0x.mk]				sysRes.getResourceEntryName(id));
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	private static void putResourceNames(String resDir, ResourceNames resNames) {
+[external][admin][admin@0x.mk]		int id = resNames.id;
+[external][admin][admin@0x.mk]		synchronized (sResourceNames) {
+[external][admin][admin@0x.mk]			HashMap<String, ResourceNames> inner = sResourceNames.get(id);
+[external][admin][admin@0x.mk]			if (inner == null) {
+[external][admin][admin@0x.mk]				inner = new HashMap<>();
+[external][admin][admin@0x.mk]				sResourceNames.put(id, inner);
+[external][admin][admin@0x.mk]			}
+[external][admin][admin@0x.mk]			synchronized (inner) {
+[external][admin][admin@0x.mk]				inner.put(resDir, resNames);
+[external][admin][admin@0x.mk]			}
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	// =======================================================
+[external][admin][admin@0x.mk]	//   DEFINING REPLACEMENTS
+[external][admin][admin@0x.mk]	// =======================================================
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/**
+[external][admin][admin@0x.mk]	 * Sets a replacement for an individual resource. See {@link #setReplacement(String, String, String, Object)}.
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 * @param id The ID of the resource which should be replaced.
+[external][admin][admin@0x.mk]	 * @param replacement The replacement, see above.
+[external][admin][admin@0x.mk]	 */
+[external][admin][admin@0x.mk]	public void setReplacement(int id, Object replacement) {
+[external][admin][admin@0x.mk]		setReplacement(id, replacement, this);
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/**
+[external][admin][admin@0x.mk]	 * Sets a replacement for an individual resource. See {@link #setReplacement(String, String, String, Object)}.
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 * @deprecated Use {@link #setReplacement(String, String, String, Object)} instead.
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 * @param fullName The full resource name, e.g. {@code com.example.myapplication:string/app_name}.
+[external][admin][admin@0x.mk]	 *                 See {@link #getResourceName}.
+[external][admin][admin@0x.mk]	 * @param replacement The replacement.
+[external][admin][admin@0x.mk]	 */
+[external][admin][admin@0x.mk]	@Deprecated
+[external][admin][admin@0x.mk]	public void setReplacement(String fullName, Object replacement) {
+[external][admin][admin@0x.mk]		int id = getIdentifier(fullName, null, null);
+[external][admin][admin@0x.mk]		if (id == 0)
+[external][admin][admin@0x.mk]			throw new NotFoundException(fullName);
+[external][admin][admin@0x.mk]		setReplacement(id, replacement, this);
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/**
+[external][admin][admin@0x.mk]	 * Sets a replacement for an individual resource. If called more than once for the same ID, the
+[external][admin][admin@0x.mk]	 * replacement from the last call is used. Setting the replacement to {@code null} removes it.
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 * <p>The allowed replacements depend on the type of the source. All types accept an
+[external][admin][admin@0x.mk]	 * {@link XResForwarder} object, which is usually created with {@link XModuleResources#fwd}.
+[external][admin][admin@0x.mk]	 * The resource request will then be forwarded to another {@link android.content.res.Resources}
+[external][admin][admin@0x.mk]	 * object. In addition to that, the following replacement types are accepted:
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 * <table>
+[external][admin][admin@0x.mk]	 *     <thead>
+[external][admin][admin@0x.mk]	 *     <tr><th>Resource type</th> <th>Additional allowed replacement types (*)</th> <th>Returned from (**)</th></tr>
+[external][admin][admin@0x.mk]	 *     </thead>
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 *     <tbody>
+[external][admin][admin@0x.mk]	 *     <tr><td><a href="http://developer.android.com/guide/topics/resources/animation-resource.html">Animation</a></td>
+[external][admin][admin@0x.mk]	 *         <td>&nbsp;<i>none</i></td>
+[external][admin][admin@0x.mk]	 *         <td>{@link #getAnimation}</td>
+[external][admin][admin@0x.mk]	 *     </tr>
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 *     <tr><td><a href="http://developer.android.com/guide/topics/resources/more-resources.html#Bool">Bool</a></td>
+[external][admin][admin@0x.mk]	 *         <td>{@link Boolean}</td>
+[external][admin][admin@0x.mk]	 *         <td>{@link #getBoolean}</td>
+[external][admin][admin@0x.mk]	 *     </tr>
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 *     <tr><td><a href="http://developer.android.com/guide/topics/resources/more-resources.html#Color">Color</a></td>
+[external][admin][admin@0x.mk]	 *         <td>{@link Integer} (you might want to use {@link Color#parseColor})</td>
+[external][admin][admin@0x.mk]	 *         <td>{@link #getColor}<br>
+[external][admin][admin@0x.mk]	 *             {@link #getDrawable} (creates a {@link ColorDrawable})<br>
+[external][admin][admin@0x.mk]	 *             {@link #getColorStateList} (calls {@link android.content.res.ColorStateList#valueOf})
+[external][admin][admin@0x.mk]	 *         </td>
+[external][admin][admin@0x.mk]	 *     </tr>
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 *     <tr><td><a href="http://developer.android.com/guide/topics/resources/color-list-resource.html">Color State List</a></td>
+[external][admin][admin@0x.mk]	 *         <td>{@link android.content.res.ColorStateList}<br>
+[external][admin][admin@0x.mk]	 *             {@link Integer} (calls {@link android.content.res.ColorStateList#valueOf})
+[external][admin][admin@0x.mk]	 *         </td>
+[external][admin][admin@0x.mk]	 *         <td>{@link #getColorStateList}</td>
+[external][admin][admin@0x.mk]	 *     </tr>
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 *     <tr><td><a href="http://developer.android.com/guide/topics/resources/more-resources.html#Dimension">Dimension</a></td>
+[external][admin][admin@0x.mk]	 *         <td>{@link DimensionReplacement} <i>(since v50)</i></td>
+[external][admin][admin@0x.mk]	 *         <td>{@link #getDimension}<br>
+[external][admin][admin@0x.mk]	 *             {@link #getDimensionPixelOffset}<br>
+[external][admin][admin@0x.mk]	 *             {@link #getDimensionPixelSize}
+[external][admin][admin@0x.mk]	 *         </td>
+[external][admin][admin@0x.mk]	 *     </tr>
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 *     <tr><td><a href="http://developer.android.com/guide/topics/resources/drawable-resource.html">Drawable</a>
+[external][admin][admin@0x.mk]	 *             (including <a href="http://developer.android.com/tools/projects/index.html#mipmap">mipmap</a>)</td>
+[external][admin][admin@0x.mk]	 *         <td>{@link DrawableLoader}<br>
+[external][admin][admin@0x.mk]	 *             {@link Integer} (creates a {@link ColorDrawable})
+[external][admin][admin@0x.mk]	 *         </td>
+[external][admin][admin@0x.mk]	 *         <td>{@link #getDrawable}<br>
+[external][admin][admin@0x.mk]	 *             {@link #getDrawableForDensity}
+[external][admin][admin@0x.mk]	 *         </td>
+[external][admin][admin@0x.mk]	 *     </tr>
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 *     <tr><td>Fraction</td>
+[external][admin][admin@0x.mk]	 *         <td>&nbsp;<i>none</i></td>
+[external][admin][admin@0x.mk]	 *         <td>{@link #getFraction}</td>
+[external][admin][admin@0x.mk]	 *     </tr>
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 *     <tr><td><a href="http://developer.android.com/guide/topics/resources/more-resources.html#Integer">Integer</a></td>
+[external][admin][admin@0x.mk]	 *         <td>{@link Integer}</td>
+[external][admin][admin@0x.mk]	 *         <td>{@link #getInteger}</td>
+[external][admin][admin@0x.mk]	 *     </tr>
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 *     <tr><td><a href="http://developer.android.com/guide/topics/resources/more-resources.html#IntegerArray">Integer Array</a></td>
+[external][admin][admin@0x.mk]	 *         <td>{@code int[]}</td>
+[external][admin][admin@0x.mk]	 *         <td>{@link #getIntArray}</td>
+[external][admin][admin@0x.mk]	 *     </tr>
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 *     <tr><td><a href="http://developer.android.com/guide/topics/resources/layout-resource.html">Layout</a></td>
+[external][admin][admin@0x.mk]	 *         <td>&nbsp;<i>none, but see {@link #hookLayout}</i></td>
+[external][admin][admin@0x.mk]	 *         <td>{@link #getLayout}</td>
+[external][admin][admin@0x.mk]	 *     </tr>
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 *     <tr><td>Movie</td>
+[external][admin][admin@0x.mk]	 *         <td>&nbsp;<i>none</i></td>
+[external][admin][admin@0x.mk]	 *         <td>{@link #getMovie}</td>
+[external][admin][admin@0x.mk]	 *     </tr>
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 *     <tr><td><a href="http://developer.android.com/guide/topics/resources/string-resource.html#Plurals">Quantity Strings (Plurals)</a></td>
+[external][admin][admin@0x.mk]	 *         <td>&nbsp;<i>none</i></td>
+[external][admin][admin@0x.mk]	 *         <td>{@link #getQuantityString}<br>
+[external][admin][admin@0x.mk]	 *             {@link #getQuantityText}
+[external][admin][admin@0x.mk]	 *         </td>
+[external][admin][admin@0x.mk]	 *     </tr>
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 *     <tr><td><a href="http://developer.android.com/guide/topics/resources/string-resource.html#String">String</a></td>
+[external][admin][admin@0x.mk]	 *         <td>{@link String}<br>
+[external][admin][admin@0x.mk]	 *             {@link CharSequence} (for styled texts, see also {@link Html#fromHtml})
+[external][admin][admin@0x.mk]	 *         </td>
+[external][admin][admin@0x.mk]	 *         <td>{@link #getString}<br>
+[external][admin][admin@0x.mk]	 *             {@link #getText}
+[external][admin][admin@0x.mk]	 *         </td>
+[external][admin][admin@0x.mk]	 *     </tr>
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 *     <tr><td><a href="http://developer.android.com/guide/topics/resources/string-resource.html#StringArray">String Array</a></td>
+[external][admin][admin@0x.mk]	 *         <td>{@code String[]}<br>
+[external][admin][admin@0x.mk]	 *             {@code CharSequence[]} (for styled texts, see also {@link Html#fromHtml})
+[external][admin][admin@0x.mk]	 *         </td>
+[external][admin][admin@0x.mk]	 *         <td>{@link #getStringArray}<br>
+[external][admin][admin@0x.mk]	 *             {@link #getTextArray}
+[external][admin][admin@0x.mk]	 *         </td>
+[external][admin][admin@0x.mk]	 *     </tr>
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 *     <tr><td>XML</td>
+[external][admin][admin@0x.mk]	 *         <td>&nbsp;<i>none</i></td>
+[external][admin][admin@0x.mk]	 *         <td>{@link #getXml}<br>
+[external][admin][admin@0x.mk]	 *             {@link #getQuantityText}
+[external][admin][admin@0x.mk]	 *         </td>
+[external][admin][admin@0x.mk]	 *     </tr>
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 *     </tbody>
+[external][admin][admin@0x.mk]	 * </table>
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 * <p>Other resource types, such as
+[external][admin][admin@0x.mk]	 * <a href="http://developer.android.com/guide/topics/resources/style-resource.html">styles/themes</a>,
+[external][admin][admin@0x.mk]	 * {@linkplain #openRawResource raw resources} and
+[external][admin][admin@0x.mk]	 * <a href="http://developer.android.com/guide/topics/resources/more-resources.html#TypedArray">typed arrays</a>
+[external][admin][admin@0x.mk]	 * can't be replaced.
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 * <p><i>
+[external][admin][admin@0x.mk]	 *    * Auto-boxing allows you to use literals like {@code 123} where an {@link Integer} is
+[external][admin][admin@0x.mk]	 *      accepted, so you don't neeed to call methods like {@link Integer#valueOf(int)} manually.<br>
+[external][admin][admin@0x.mk]	 *    ** Some of these methods have multiple variants, only one of them is mentioned here.
+[external][admin][admin@0x.mk]	 * </i>
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 * @param pkg The package name, e.g. {@code com.example.myapplication}.
+[external][admin][admin@0x.mk]	 *            See {@link #getResourcePackageName}.
+[external][admin][admin@0x.mk]	 * @param type The type name, e.g. {@code string}.
+[external][admin][admin@0x.mk]	 *            See {@link #getResourceTypeName}.
+[external][admin][admin@0x.mk]	 * @param name The entry name, e.g. {@code app_name}.
+[external][admin][admin@0x.mk]	 *            See {@link #getResourceEntryName}.
+[external][admin][admin@0x.mk]	 * @param replacement The replacement.
+[external][admin][admin@0x.mk]	 */
+[external][admin][admin@0x.mk]	public void setReplacement(String pkg, String type, String name, Object replacement) {
+[external][admin][admin@0x.mk]		int id = getIdentifier(name, type, pkg);
+[external][admin][admin@0x.mk]		if (id == 0)
+[external][admin][admin@0x.mk]			throw new NotFoundException(pkg + ":" + type + "/" + name);
+[external][admin][admin@0x.mk]		setReplacement(id, replacement, this);
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/**
+[external][admin][admin@0x.mk]	 * Sets a replacement for an individual Android framework resource (in the {@code android} package).
+[external][admin][admin@0x.mk]	 * See {@link #setSystemWideReplacement(String, String, String, Object)}.
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 * @param id The ID of the resource which should be replaced.
+[external][admin][admin@0x.mk]	 * @param replacement The replacement.
+[external][admin][admin@0x.mk]	 */
+[external][admin][admin@0x.mk]	public static void setSystemWideReplacement(int id, Object replacement) {
+[external][admin][admin@0x.mk]		setReplacement(id, replacement, null);
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/**
+[external][admin][admin@0x.mk]	 * Sets a replacement for an individual Android framework resource (in the {@code android} package).
+[external][admin][admin@0x.mk]	 * See {@link #setSystemWideReplacement(String, String, String, Object)}.
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 * @deprecated Use {@link #setSystemWideReplacement(String, String, String, Object)} instead.
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 * @param fullName The full resource name, e.g. {@code android:string/yes}.
+[external][admin][admin@0x.mk]	 *                 See {@link #getResourceName}.
+[external][admin][admin@0x.mk]	 * @param replacement The replacement.
+[external][admin][admin@0x.mk]	 */
+[external][admin][admin@0x.mk]	@Deprecated
+[external][admin][admin@0x.mk]	public static void setSystemWideReplacement(String fullName, Object replacement) {
+[external][admin][admin@0x.mk]		int id = getSystem().getIdentifier(fullName, null, null);
+[external][admin][admin@0x.mk]		if (id == 0)
+[external][admin][admin@0x.mk]			throw new NotFoundException(fullName);
+[external][admin][admin@0x.mk]		setReplacement(id, replacement, null);
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/**
+[external][admin][admin@0x.mk]	 * Sets a replacement for an individual Android framework resource (in the {@code android} package).
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 * <p>Some resources are part of the Android framework and can be used in any app. They're
+[external][admin][admin@0x.mk]	 * accessible via {@link android.R android.R} and are not bound to a specific
+[external][admin][admin@0x.mk]	 * {@link android.content.res.Resources} instance. Such resources can be replaced in
+[external][admin][admin@0x.mk]	 * {@link IXposedHookZygoteInit#initZygote initZygote()} for all apps. As there is no
+[external][admin][admin@0x.mk]	 * {@link XResources} object easily available in that scope, this static method can be used
+[external][admin][admin@0x.mk]	 * to set resource replacements. All other details (e.g. how certain types can be replaced) are
+[external][admin][admin@0x.mk]	 * mentioned in {@link #setReplacement(String, String, String, Object)}.
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 * @param pkg The package name, should always be {@code android} here.
+[external][admin][admin@0x.mk]	 *            See {@link #getResourcePackageName}.
+[external][admin][admin@0x.mk]	 * @param type The type name, e.g. {@code string}.
+[external][admin][admin@0x.mk]	 *            See {@link #getResourceTypeName}.
+[external][admin][admin@0x.mk]	 * @param name The entry name, e.g. {@code yes}.
+[external][admin][admin@0x.mk]	 *            See {@link #getResourceEntryName}.
+[external][admin][admin@0x.mk]	 * @param replacement The replacement.
+[external][admin][admin@0x.mk]	 */
+[external][admin][admin@0x.mk]	public static void setSystemWideReplacement(String pkg, String type, String name, Object replacement) {
+[external][admin][admin@0x.mk]		int id = getSystem().getIdentifier(name, type, pkg);
+[external][admin][admin@0x.mk]		if (id == 0)
+[external][admin][admin@0x.mk]			throw new NotFoundException(pkg + ":" + type + "/" + name);
+[external][admin][admin@0x.mk]		setReplacement(id, replacement, null);
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	private static void setReplacement(int id, Object replacement, XResources res) {
+[external][admin][admin@0x.mk]		String resDir = (res != null) ? res.mResDir : null;
+[external][shana][shana@zju.edu.cn]		if (res == null) {
+[external][shana][shana@zju.edu.cn]			try {
+[external][shana][shana@zju.edu.cn]				XposedInit.hookResources();
+[external][shana][shana@zju.edu.cn]			} catch (Throwable throwable) {
+[external][shana][shana@zju.edu.cn]				throw new IllegalStateException("Failed to initialize resources hook");
+[external][shana][shana@zju.edu.cn]			}
+[external][shana][shana@zju.edu.cn]		}
+[external][admin][admin@0x.mk]		if (id == 0)
+[external][admin][admin@0x.mk]			throw new IllegalArgumentException("id 0 is not an allowed resource identifier");
+[external][admin][admin@0x.mk]		else if (resDir == null && id >= 0x7f000000)
+[external][admin][admin@0x.mk]			throw new IllegalArgumentException("ids >= 0x7f000000 are app specific and cannot be set for the framework");
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		if (replacement instanceof Drawable)
+[external][admin][admin@0x.mk]			throw new IllegalArgumentException("Drawable replacements are deprecated since Xposed 2.1. Use DrawableLoader instead.");
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		// Cache that we have a replacement for this ID, false positives are accepted to save memory.
+[external][admin][admin@0x.mk]		if (id < 0x7f000000) {
+[external][admin][admin@0x.mk]			int cacheKey = (id & 0x00070000) >> 11 | (id & 0xf8) >> 3;
+[external][admin][admin@0x.mk]			synchronized (sSystemReplacementsCache) {
+[external][admin][admin@0x.mk]				sSystemReplacementsCache[cacheKey] |= 1 << (id & 7);
+[external][admin][admin@0x.mk]			}
+[external][admin][admin@0x.mk]		} else {
+[external][admin][admin@0x.mk]			int cacheKey = (id & 0x00070000) >> 12 | (id & 0x78) >> 3;
+[external][admin][admin@0x.mk]			synchronized (res.mReplacementsCache) {
+[external][admin][admin@0x.mk]				res.mReplacementsCache[cacheKey] |= 1 << (id & 7);
+[external][admin][admin@0x.mk]			}
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		synchronized (sReplacements) {
+[external][admin][admin@0x.mk]			HashMap<String, Object> inner = sReplacements.get(id);
+[external][admin][admin@0x.mk]			if (inner == null) {
+[external][admin][admin@0x.mk]				inner = new HashMap<>();
+[external][admin][admin@0x.mk]				sReplacements.put(id, inner);
+[external][admin][admin@0x.mk]			}
+[external][admin][admin@0x.mk]			inner.put(resDir, replacement);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	// =======================================================
+[external][admin][admin@0x.mk]	//   RETURNING REPLACEMENTS
+[external][admin][admin@0x.mk]	// =======================================================
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	private Object getReplacement(int id) {
+[external][admin][admin@0x.mk]		if (id <= 0)
+[external][admin][admin@0x.mk]			return null;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		// Check the cache whether it's worth looking for replacements
+[external][admin][admin@0x.mk]		if (id < 0x7f000000) {
+[external][admin][admin@0x.mk]			int cacheKey = (id & 0x00070000) >> 11 | (id & 0xf8) >> 3;
+[external][admin][admin@0x.mk]			if ((sSystemReplacementsCache[cacheKey] & (1 << (id & 7))) == 0)
+[external][admin][admin@0x.mk]				return null;
+[external][admin][admin@0x.mk]		} else if (mResDir != null) {
+[external][admin][admin@0x.mk]			int cacheKey = (id & 0x00070000) >> 12 | (id & 0x78) >> 3;
+[external][admin][admin@0x.mk]			if ((mReplacementsCache[cacheKey] & (1 << (id & 7))) == 0)
+[external][admin][admin@0x.mk]				return null;
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		HashMap<String, Object> inner;
+[external][admin][admin@0x.mk]		synchronized (sReplacements) {
+[external][admin][admin@0x.mk]			inner = sReplacements.get(id);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		if (inner == null)
+[external][admin][admin@0x.mk]			return null;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		synchronized (inner) {
+[external][admin][admin@0x.mk]			Object result = inner.get(mResDir);
+[external][admin][admin@0x.mk]			if (result != null || mResDir == null)
+[external][admin][admin@0x.mk]				return result;
+[external][admin][admin@0x.mk]			return inner.get(null);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/** @hide */
+[external][admin][admin@0x.mk]	@Override
+[external][admin][admin@0x.mk]	public XmlResourceParser getAnimation(int id) throws NotFoundException {
+[external][admin][admin@0x.mk]		Object replacement = getReplacement(id);
+[external][admin][admin@0x.mk]		if (replacement instanceof XResForwarder) {
+[external][admin][admin@0x.mk]			Resources repRes = ((XResForwarder) replacement).getResources();
+[external][admin][admin@0x.mk]			int repId = ((XResForwarder) replacement).getId();
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]			boolean loadedFromCache = isXmlCached(repRes, repId);
+[external][admin][admin@0x.mk]			XmlResourceParser result = repRes.getAnimation(repId);
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]			if (!loadedFromCache) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]				long parseState = getLongField(result, "mParseState");
+[external][admin][admin@0x.mk]				rewriteXmlReferencesNative(parseState, this, repRes);
+[external][admin][admin@0x.mk]			}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]			return result;
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]		return super.getAnimation(id);
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/** @hide */
+[external][admin][admin@0x.mk]	@Override
+[external][admin][admin@0x.mk]	public boolean getBoolean(int id) throws NotFoundException {
+[external][admin][admin@0x.mk]		Object replacement = getReplacement(id);
+[external][admin][admin@0x.mk]		if (replacement instanceof Boolean) {
+[external][admin][admin@0x.mk]			return (Boolean) replacement;
+[external][admin][admin@0x.mk]		} else if (replacement instanceof XResForwarder) {
+[external][admin][admin@0x.mk]			Resources repRes = ((XResForwarder) replacement).getResources();
+[external][admin][admin@0x.mk]			int repId = ((XResForwarder) replacement).getId();
+[external][admin][admin@0x.mk]			return repRes.getBoolean(repId);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]		return super.getBoolean(id);
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/** @hide */
+[external][admin][admin@0x.mk]	@Override
+[external][admin][admin@0x.mk]	public int getColor(int id) throws NotFoundException {
+[external][admin][admin@0x.mk]		Object replacement = getReplacement(id);
+[external][admin][admin@0x.mk]		if (replacement instanceof Integer) {
+[external][admin][admin@0x.mk]			return (Integer) replacement;
+[external][admin][admin@0x.mk]		} else if (replacement instanceof XResForwarder) {
+[external][admin][admin@0x.mk]			Resources repRes = ((XResForwarder) replacement).getResources();
+[external][admin][admin@0x.mk]			int repId = ((XResForwarder) replacement).getId();
+[external][admin][admin@0x.mk]			return repRes.getColor(repId);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]		return super.getColor(id);
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/** @hide */
+[external][admin][admin@0x.mk]	@Override
+[external][admin][admin@0x.mk]	public ColorStateList getColorStateList(int id) throws NotFoundException {
+[external][admin][admin@0x.mk]		Object replacement = getReplacement(id);
+[external][admin][admin@0x.mk]		if (replacement instanceof ColorStateList) {
+[external][admin][admin@0x.mk]			return (ColorStateList) replacement;
+[external][admin][admin@0x.mk]		} else if (replacement instanceof Integer) {
+[external][admin][admin@0x.mk]			int color = (Integer) replacement;
+[external][admin][admin@0x.mk]			synchronized (sColorStateListCache) {
+[external][admin][admin@0x.mk]				ColorStateList result = sColorStateListCache.get(color);
+[external][admin][admin@0x.mk]				if (result == null) {
+[external][admin][admin@0x.mk]					result = ColorStateList.valueOf(color);
+[external][admin][admin@0x.mk]					sColorStateListCache.put(color, result);
+[external][admin][admin@0x.mk]				}
+[external][admin][admin@0x.mk]				return result;
+[external][admin][admin@0x.mk]			}
+[external][admin][admin@0x.mk]		} else if (replacement instanceof XResForwarder) {
+[external][admin][admin@0x.mk]			Resources repRes = ((XResForwarder) replacement).getResources();
+[external][admin][admin@0x.mk]			int repId = ((XResForwarder) replacement).getId();
+[external][admin][admin@0x.mk]			return repRes.getColorStateList(repId);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]		return super.getColorStateList(id);
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/** @hide */
+[external][admin][admin@0x.mk]	@Override
+[external][admin][admin@0x.mk]	public float getDimension(int id) throws NotFoundException {
+[external][admin][admin@0x.mk]		Object replacement = getReplacement(id);
+[external][admin][admin@0x.mk]		if (replacement instanceof DimensionReplacement) {
+[external][admin][admin@0x.mk]			return ((DimensionReplacement) replacement).getDimension(getDisplayMetrics());
+[external][admin][admin@0x.mk]		} else if (replacement instanceof XResForwarder) {
+[external][admin][admin@0x.mk]			Resources repRes = ((XResForwarder) replacement).getResources();
+[external][admin][admin@0x.mk]			int repId = ((XResForwarder) replacement).getId();
+[external][admin][admin@0x.mk]			return repRes.getDimension(repId);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]		return super.getDimension(id);
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/** @hide */
+[external][admin][admin@0x.mk]	@Override
+[external][admin][admin@0x.mk]	public int getDimensionPixelOffset(int id) throws NotFoundException {
+[external][admin][admin@0x.mk]		Object replacement = getReplacement(id);
+[external][admin][admin@0x.mk]		if (replacement instanceof DimensionReplacement) {
+[external][admin][admin@0x.mk]			return ((DimensionReplacement) replacement).getDimensionPixelOffset(getDisplayMetrics());
+[external][admin][admin@0x.mk]		} else if (replacement instanceof XResForwarder) {
+[external][admin][admin@0x.mk]			Resources repRes = ((XResForwarder) replacement).getResources();
+[external][admin][admin@0x.mk]			int repId = ((XResForwarder) replacement).getId();
+[external][admin][admin@0x.mk]			return repRes.getDimensionPixelOffset(repId);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]		return super.getDimensionPixelOffset(id);
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/** @hide */
+[external][admin][admin@0x.mk]	@Override
+[external][admin][admin@0x.mk]	public int getDimensionPixelSize(int id) throws NotFoundException {
+[external][admin][admin@0x.mk]		Object replacement = getReplacement(id);
+[external][admin][admin@0x.mk]		if (replacement instanceof DimensionReplacement) {
+[external][admin][admin@0x.mk]			return ((DimensionReplacement) replacement).getDimensionPixelSize(getDisplayMetrics());
+[external][admin][admin@0x.mk]		} else if (replacement instanceof XResForwarder) {
+[external][admin][admin@0x.mk]			Resources repRes = ((XResForwarder) replacement).getResources();
+[external][admin][admin@0x.mk]			int repId = ((XResForwarder) replacement).getId();
+[external][admin][admin@0x.mk]			return repRes.getDimensionPixelSize(repId);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]		return super.getDimensionPixelSize(id);
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/** @hide */
+[external][admin][admin@0x.mk]	@Override
+[external][admin][admin@0x.mk]	public Drawable getDrawable(int id) throws NotFoundException {
+[external][admin][admin@0x.mk]		try {
+[external][admin][admin@0x.mk]			if (incrementMethodDepth("getDrawable") == 1) {
+[external][admin][admin@0x.mk]				Object replacement = getReplacement(id);
+[external][admin][admin@0x.mk]				if (replacement instanceof DrawableLoader) {
+[external][admin][admin@0x.mk]					try {
+[external][admin][admin@0x.mk]						Drawable result = ((DrawableLoader) replacement).newDrawable(this, id);
+[external][admin][admin@0x.mk]						if (result != null)
+[external][admin][admin@0x.mk]							return result;
+[external][admin][admin@0x.mk]					} catch (Throwable t) { XposedBridge.log(t); }
+[external][admin][admin@0x.mk]				} else if (replacement instanceof Integer) {
+[external][admin][admin@0x.mk]					return new ColorDrawable((Integer) replacement);
+[external][admin][admin@0x.mk]				} else if (replacement instanceof XResForwarder) {
+[external][admin][admin@0x.mk]					Resources repRes = ((XResForwarder) replacement).getResources();
+[external][admin][admin@0x.mk]					int repId = ((XResForwarder) replacement).getId();
+[external][admin][admin@0x.mk]					return repRes.getDrawable(repId);
+[external][admin][admin@0x.mk]				}
+[external][admin][admin@0x.mk]			}
+[external][admin][admin@0x.mk]			return super.getDrawable(id);
+[external][admin][admin@0x.mk]		} finally {
+[external][admin][admin@0x.mk]			decrementMethodDepth("getDrawable");
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/** @hide */
+[external][admin][admin@0x.mk]	@Override
+[external][admin][admin@0x.mk]	public Drawable getDrawable(int id, Theme theme) throws NotFoundException {
+[external][admin][admin@0x.mk]		try {
+[external][admin][admin@0x.mk]			if (incrementMethodDepth("getDrawable") == 1) {
+[external][admin][admin@0x.mk]				Object replacement = getReplacement(id);
+[external][admin][admin@0x.mk]				if (replacement instanceof DrawableLoader) {
+[external][admin][admin@0x.mk]					try {
+[external][admin][admin@0x.mk]						Drawable result = ((DrawableLoader) replacement).newDrawable(this, id);
+[external][admin][admin@0x.mk]						if (result != null)
+[external][admin][admin@0x.mk]							return result;
+[external][admin][admin@0x.mk]					} catch (Throwable t) { XposedBridge.log(t); }
+[external][admin][admin@0x.mk]				} else if (replacement instanceof Integer) {
+[external][admin][admin@0x.mk]					return new ColorDrawable((Integer) replacement);
+[external][admin][admin@0x.mk]				} else if (replacement instanceof XResForwarder) {
+[external][admin][admin@0x.mk]					Resources repRes = ((XResForwarder) replacement).getResources();
+[external][admin][admin@0x.mk]					int repId = ((XResForwarder) replacement).getId();
+[external][admin][admin@0x.mk]					return repRes.getDrawable(repId);
+[external][admin][admin@0x.mk]				}
+[external][admin][admin@0x.mk]			}
+[external][admin][admin@0x.mk]			return super.getDrawable(id, theme);
+[external][admin][admin@0x.mk]		} finally {
+[external][admin][admin@0x.mk]			decrementMethodDepth("getDrawable");
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/** @hide */
+[external][admin][admin@0x.mk]	@Override
+[external][admin][admin@0x.mk]	public Drawable getDrawableForDensity(int id, int density) throws NotFoundException {
+[external][admin][admin@0x.mk]		try {
+[external][admin][admin@0x.mk]			if (incrementMethodDepth("getDrawableForDensity") == 1) {
+[external][admin][admin@0x.mk]				Object replacement = getReplacement(id);
+[external][admin][admin@0x.mk]				if (replacement instanceof DrawableLoader) {
+[external][admin][admin@0x.mk]					try {
+[external][admin][admin@0x.mk]						Drawable result = ((DrawableLoader) replacement).newDrawableForDensity(this, id, density);
+[external][admin][admin@0x.mk]						if (result != null)
+[external][admin][admin@0x.mk]							return result;
+[external][admin][admin@0x.mk]					} catch (Throwable t) { XposedBridge.log(t); }
+[external][admin][admin@0x.mk]				} else if (replacement instanceof Integer) {
+[external][admin][admin@0x.mk]					return new ColorDrawable((Integer) replacement);
+[external][admin][admin@0x.mk]				} else if (replacement instanceof XResForwarder) {
+[external][admin][admin@0x.mk]					Resources repRes = ((XResForwarder) replacement).getResources();
+[external][admin][admin@0x.mk]					int repId = ((XResForwarder) replacement).getId();
+[external][admin][admin@0x.mk]					return repRes.getDrawableForDensity(repId, density);
+[external][admin][admin@0x.mk]				}
+[external][admin][admin@0x.mk]			}
+[external][admin][admin@0x.mk]			return super.getDrawableForDensity(id, density);
+[external][admin][admin@0x.mk]		} finally {
+[external][admin][admin@0x.mk]			decrementMethodDepth("getDrawableForDensity");
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/** @hide */
+[external][admin][admin@0x.mk]	@Override
+[external][admin][admin@0x.mk]	public Drawable getDrawableForDensity(int id, int density, Theme theme) throws NotFoundException {
+[external][admin][admin@0x.mk]		try {
+[external][admin][admin@0x.mk]			if (incrementMethodDepth("getDrawableForDensity") == 1) {
+[external][admin][admin@0x.mk]				Object replacement = getReplacement(id);
+[external][admin][admin@0x.mk]				if (replacement instanceof DrawableLoader) {
+[external][admin][admin@0x.mk]					try {
+[external][admin][admin@0x.mk]						Drawable result = ((DrawableLoader) replacement).newDrawableForDensity(this, id, density);
+[external][admin][admin@0x.mk]						if (result != null)
+[external][admin][admin@0x.mk]							return result;
+[external][admin][admin@0x.mk]					} catch (Throwable t) { XposedBridge.log(t); }
+[external][admin][admin@0x.mk]				} else if (replacement instanceof Integer) {
+[external][admin][admin@0x.mk]					return new ColorDrawable((Integer) replacement);
+[external][admin][admin@0x.mk]				} else if (replacement instanceof XResForwarder) {
+[external][admin][admin@0x.mk]					Resources repRes = ((XResForwarder) replacement).getResources();
+[external][admin][admin@0x.mk]					int repId = ((XResForwarder) replacement).getId();
+[external][admin][admin@0x.mk]					return repRes.getDrawableForDensity(repId, density);
+[external][admin][admin@0x.mk]				}
+[external][admin][admin@0x.mk]			}
+[external][admin][admin@0x.mk]			return super.getDrawableForDensity(id, density, theme);
+[external][admin][admin@0x.mk]		} finally {
+[external][admin][admin@0x.mk]			decrementMethodDepth("getDrawableForDensity");
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][shana][shana@zju.edu.cn]	/** @hide */
+[external][shana][shana@zju.edu.cn]	@RequiresApi(Build.VERSION_CODES.Q)
+[external][shana][shana@zju.edu.cn]	@Override
+[external][shana][shana@zju.edu.cn]	public float getFloat(int id) {
+[external][shana][shana@zju.edu.cn]		Object replacement = getReplacement(id);
+[external][shana][shana@zju.edu.cn]		if (replacement instanceof Float) {
+[external][shana][shana@zju.edu.cn]			return (Float) replacement;
+[external][shana][shana@zju.edu.cn]		} else if (replacement instanceof XResForwarder) {
+[external][shana][shana@zju.edu.cn]			Resources repRes = ((XResForwarder) replacement).getResources();
+[external][shana][shana@zju.edu.cn]			int repId = ((XResForwarder) replacement).getId();
+[external][shana][shana@zju.edu.cn]			return repRes.getFloat(repId);
+[external][shana][shana@zju.edu.cn]		}
+[external][shana][shana@zju.edu.cn]		return super.getFloat(id);
+[external][shana][shana@zju.edu.cn]	}
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]	/** @hide */
+[external][shana][shana@zju.edu.cn]	@Override
+[external][shana][shana@zju.edu.cn]	public Typeface getFont(int id) {
+[external][shana][shana@zju.edu.cn]		Object replacement = getReplacement(id);
+[external][shana][shana@zju.edu.cn]		if (replacement instanceof Typeface) {
+[external][shana][shana@zju.edu.cn]			return (Typeface) replacement;
+[external][shana][shana@zju.edu.cn]		} else if (replacement instanceof XResForwarder) {
+[external][shana][shana@zju.edu.cn]			Resources repRes = ((XResForwarder) replacement).getResources();
+[external][shana][shana@zju.edu.cn]			int repId = ((XResForwarder) replacement).getId();
+[external][shana][shana@zju.edu.cn]			return repRes.getFont(repId);
+[external][shana][shana@zju.edu.cn]		}
+[external][shana][shana@zju.edu.cn]		return super.getFont(id);
+[external][shana][shana@zju.edu.cn]	}
+[external][shana][shana@zju.edu.cn]
+[external][admin][admin@0x.mk]	/** @hide */
+[external][admin][admin@0x.mk]	@Override
+[external][admin][admin@0x.mk]	public float getFraction(int id, int base, int pbase) {
+[external][admin][admin@0x.mk]		Object replacement = getReplacement(id);
+[external][admin][admin@0x.mk]		if (replacement instanceof XResForwarder) {
+[external][admin][admin@0x.mk]			Resources repRes = ((XResForwarder) replacement).getResources();
+[external][admin][admin@0x.mk]			int repId = ((XResForwarder) replacement).getId();
+[external][admin][admin@0x.mk]			return repRes.getFraction(repId, base, pbase);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]		return super.getFraction(id, base, pbase);
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/** @hide */
+[external][admin][admin@0x.mk]	@Override
+[external][admin][admin@0x.mk]	public int getInteger(int id) throws NotFoundException {
+[external][admin][admin@0x.mk]		Object replacement = getReplacement(id);
+[external][admin][admin@0x.mk]		if (replacement instanceof Integer) {
+[external][admin][admin@0x.mk]			return (Integer) replacement;
+[external][admin][admin@0x.mk]		} else if (replacement instanceof XResForwarder) {
+[external][admin][admin@0x.mk]			Resources repRes = ((XResForwarder) replacement).getResources();
+[external][admin][admin@0x.mk]			int repId = ((XResForwarder) replacement).getId();
+[external][admin][admin@0x.mk]			return repRes.getInteger(repId);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]		return super.getInteger(id);
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/** @hide */
+[external][admin][admin@0x.mk]	@Override
+[external][admin][admin@0x.mk]	public int[] getIntArray(int id) throws NotFoundException {
+[external][admin][admin@0x.mk]		Object replacement = getReplacement(id);
+[external][admin][admin@0x.mk]		if (replacement instanceof int[]) {
+[external][admin][admin@0x.mk]			return (int[]) replacement;
+[external][admin][admin@0x.mk]		} else if (replacement instanceof XResForwarder) {
+[external][admin][admin@0x.mk]			Resources repRes = ((XResForwarder) replacement).getResources();
+[external][admin][admin@0x.mk]			int repId = ((XResForwarder) replacement).getId();
+[external][admin][admin@0x.mk]			return repRes.getIntArray(repId);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]		return super.getIntArray(id);
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/** @hide */
+[external][admin][admin@0x.mk]	@Override
+[external][admin][admin@0x.mk]	public XmlResourceParser getLayout(int id) throws NotFoundException {
+[external][admin][admin@0x.mk]		XmlResourceParser result;
+[external][admin][admin@0x.mk]		Object replacement = getReplacement(id);
+[external][admin][admin@0x.mk]		if (replacement instanceof XResForwarder) {
+[external][admin][admin@0x.mk]			Resources repRes = ((XResForwarder) replacement).getResources();
+[external][admin][admin@0x.mk]			int repId = ((XResForwarder) replacement).getId();
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]			boolean loadedFromCache = isXmlCached(repRes, repId);
+[external][admin][admin@0x.mk]			result = repRes.getLayout(repId);
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]			if (!loadedFromCache) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]				long parseState = getLongField(result, "mParseState");
+[external][admin][admin@0x.mk]				rewriteXmlReferencesNative(parseState, this, repRes);
+[external][admin][admin@0x.mk]			}
+[external][admin][admin@0x.mk]		} else {
+[external][admin][admin@0x.mk]			result = super.getLayout(id);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		// Check whether this layout is hooked
+[external][admin][admin@0x.mk]		HashMap<String, CopyOnWriteSortedSet<XC_LayoutInflated>> inner;
+[external][admin][admin@0x.mk]		synchronized (sLayoutCallbacks) {
+[external][admin][admin@0x.mk]			inner = sLayoutCallbacks.get(id);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]		if (inner != null) {
+[external][admin][admin@0x.mk]			CopyOnWriteSortedSet<XC_LayoutInflated> callbacks;
+[external][admin][admin@0x.mk]			synchronized (inner) {
+[external][admin][admin@0x.mk]				callbacks = inner.get(mResDir);
+[external][admin][admin@0x.mk]				if (callbacks == null && mResDir != null)
+[external][admin][admin@0x.mk]					callbacks = inner.get(null);
+[external][admin][admin@0x.mk]			}
+[external][admin][admin@0x.mk]			if (callbacks != null) {
+[external][admin][admin@0x.mk]				String variant = "layout";
+[external][admin][admin@0x.mk]				TypedValue value = (TypedValue) getObjectField(this, "mTmpValue");
+[external][admin][admin@0x.mk]				getValue(id, value, true);
+[external][admin][admin@0x.mk]				if (value.type == TypedValue.TYPE_STRING) {
+[external][admin][admin@0x.mk]					String[] components = value.string.toString().split("/", 3);
+[external][admin][admin@0x.mk]					if (components.length == 3)
+[external][admin][admin@0x.mk]						variant = components[1];
+[external][admin][admin@0x.mk]					else
+[external][admin][admin@0x.mk]						XposedBridge.log("Unexpected resource path \"" + value.string.toString()
+[external][admin][admin@0x.mk]								+ "\" for resource id 0x" + Integer.toHexString(id));
+[external][admin][admin@0x.mk]				} else {
+[external][admin][admin@0x.mk]					XposedBridge.log(new NotFoundException("Could not find file name for resource id 0x") + Integer.toHexString(id));
+[external][admin][admin@0x.mk]				}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]				synchronized (sXmlInstanceDetails) {
+[external][admin][admin@0x.mk]					synchronized (sResourceNames) {
+[external][admin][admin@0x.mk]						HashMap<String, ResourceNames> resNamesInner = sResourceNames.get(id);
+[external][admin][admin@0x.mk]						if (resNamesInner != null) {
+[external][admin][admin@0x.mk]							synchronized (resNamesInner) {
+[external][admin][admin@0x.mk]								XMLInstanceDetails details = new XMLInstanceDetails(resNamesInner.get(mResDir), variant, callbacks);
+[external][admin][admin@0x.mk]								sXmlInstanceDetails.put(result, details);
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]								// if we were called inside LayoutInflater.parseInclude, store the details for it
+[external][admin][admin@0x.mk]								MethodHookParam top = sIncludedLayouts.get().peek();
+[external][admin][admin@0x.mk]								if (top != null)
+[external][admin][admin@0x.mk]									top.setObjectExtra(EXTRA_XML_INSTANCE_DETAILS, details);
+[external][admin][admin@0x.mk]							}
+[external][admin][admin@0x.mk]						}
+[external][admin][admin@0x.mk]					}
+[external][admin][admin@0x.mk]				}
+[external][admin][admin@0x.mk]			}
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		return result;
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/** @hide */
+[external][admin][admin@0x.mk]	@Override
+[external][admin][admin@0x.mk]	public Movie getMovie(int id) throws NotFoundException {
+[external][admin][admin@0x.mk]		Object replacement = getReplacement(id);
+[external][admin][admin@0x.mk]		if (replacement instanceof XResForwarder) {
+[external][admin][admin@0x.mk]			Resources repRes = ((XResForwarder) replacement).getResources();
+[external][admin][admin@0x.mk]			int repId = ((XResForwarder) replacement).getId();
+[external][admin][admin@0x.mk]			return repRes.getMovie(repId);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]		return super.getMovie(id);
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/** @hide */
+[external][admin][admin@0x.mk]	@Override
+[external][admin][admin@0x.mk]	public CharSequence getQuantityText(int id, int quantity) throws NotFoundException {
+[external][admin][admin@0x.mk]		Object replacement = getReplacement(id);
+[external][admin][admin@0x.mk]		if (replacement instanceof XResForwarder) {
+[external][admin][admin@0x.mk]			Resources repRes = ((XResForwarder) replacement).getResources();
+[external][admin][admin@0x.mk]			int repId = ((XResForwarder) replacement).getId();
+[external][admin][admin@0x.mk]			return repRes.getQuantityText(repId, quantity);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]		return super.getQuantityText(id, quantity);
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]	// these are handled by getQuantityText:
+[external][admin][admin@0x.mk]	// public String getQuantityString(int id, int quantity);
+[external][admin][admin@0x.mk]	// public String getQuantityString(int id, int quantity, Object... formatArgs);
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/** @hide */
+[external][admin][admin@0x.mk]	@Override
+[external][admin][admin@0x.mk]	public String[] getStringArray(int id) throws NotFoundException {
+[external][admin][admin@0x.mk]		Object replacement = getReplacement(id);
+[external][admin][admin@0x.mk]		if (replacement instanceof String[]) {
+[external][admin][admin@0x.mk]			return (String[]) replacement;
+[external][admin][admin@0x.mk]		} else if (replacement instanceof XResForwarder) {
+[external][admin][admin@0x.mk]			Resources repRes = ((XResForwarder) replacement).getResources();
+[external][admin][admin@0x.mk]			int repId = ((XResForwarder) replacement).getId();
+[external][admin][admin@0x.mk]			return repRes.getStringArray(repId);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]		return super.getStringArray(id);
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/** @hide */
+[external][admin][admin@0x.mk]	@Override
+[external][admin][admin@0x.mk]	public CharSequence getText(int id) throws NotFoundException {
+[external][admin][admin@0x.mk]		Object replacement = getReplacement(id);
+[external][admin][admin@0x.mk]		if (replacement instanceof CharSequence) {
+[external][admin][admin@0x.mk]			return (CharSequence) replacement;
+[external][admin][admin@0x.mk]		} else if (replacement instanceof XResForwarder) {
+[external][admin][admin@0x.mk]			Resources repRes = ((XResForwarder) replacement).getResources();
+[external][admin][admin@0x.mk]			int repId = ((XResForwarder) replacement).getId();
+[external][admin][admin@0x.mk]			return repRes.getText(repId);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]		return super.getText(id);
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]	// these are handled by getText:
+[external][admin][admin@0x.mk]	// public String getString(int id);
+[external][admin][admin@0x.mk]	// public String getString(int id, Object... formatArgs);
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/** @hide */
+[external][admin][admin@0x.mk]	@Override
+[external][admin][admin@0x.mk]	public CharSequence getText(int id, CharSequence def) {
+[external][admin][admin@0x.mk]		Object replacement = getReplacement(id);
+[external][admin][admin@0x.mk]		if (replacement instanceof CharSequence) {
+[external][admin][admin@0x.mk]			return (CharSequence) replacement;
+[external][admin][admin@0x.mk]		} else if (replacement instanceof XResForwarder) {
+[external][admin][admin@0x.mk]			Resources repRes = ((XResForwarder) replacement).getResources();
+[external][admin][admin@0x.mk]			int repId = ((XResForwarder) replacement).getId();
+[external][admin][admin@0x.mk]			return repRes.getText(repId, def);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]		return super.getText(id, def);
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/** @hide */
+[external][admin][admin@0x.mk]	@Override
+[external][admin][admin@0x.mk]	public CharSequence[] getTextArray(int id) throws NotFoundException {
+[external][admin][admin@0x.mk]		Object replacement = getReplacement(id);
+[external][admin][admin@0x.mk]		if (replacement instanceof CharSequence[]) {
+[external][admin][admin@0x.mk]			return (CharSequence[]) replacement;
+[external][admin][admin@0x.mk]		} else if (replacement instanceof XResForwarder) {
+[external][admin][admin@0x.mk]			Resources repRes = ((XResForwarder) replacement).getResources();
+[external][admin][admin@0x.mk]			int repId = ((XResForwarder) replacement).getId();
+[external][admin][admin@0x.mk]			return repRes.getTextArray(repId);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]		return super.getTextArray(id);
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][shana][shana@zju.edu.cn]	/** @hide */
+[external][shana][shana@zju.edu.cn]	@Override
+[external][shana][shana@zju.edu.cn]	public void getValue(int id, TypedValue outValue, boolean resolveRefs) throws NotFoundException {
+[external][shana][shana@zju.edu.cn]		Object replacement = getReplacement(id);
+[external][shana][shana@zju.edu.cn]		if (replacement instanceof XResForwarder) {
+[external][shana][shana@zju.edu.cn]			Resources repRes = ((XResForwarder) replacement).getResources();
+[external][shana][shana@zju.edu.cn]			int repId = ((XResForwarder) replacement).getId();
+[external][shana][shana@zju.edu.cn]			repRes.getValue(repId, outValue, resolveRefs);
+[external][shana][shana@zju.edu.cn]		} else {
+[external][shana][shana@zju.edu.cn]			if (replacement != null) {
+[external][shana][shana@zju.edu.cn]				XposedBridge.log("Replacement of resource ID #0x" + Integer.toHexString(id) + " escaped because of deprecated replacement. Please use XResForwarder instead.");
+[external][shana][shana@zju.edu.cn]			}
+[external][shana][shana@zju.edu.cn]			super.getValue(id, outValue, resolveRefs);
+[external][shana][shana@zju.edu.cn]		}
+[external][shana][shana@zju.edu.cn]	}
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]	/** @hide */
+[external][shana][shana@zju.edu.cn]	@Override
+[external][shana][shana@zju.edu.cn]	public void getValueForDensity(int id, int density, TypedValue outValue, boolean resolveRefs) throws NotFoundException {
+[external][shana][shana@zju.edu.cn]		Object replacement = getReplacement(id);
+[external][shana][shana@zju.edu.cn]		if (replacement instanceof XResForwarder) {
+[external][shana][shana@zju.edu.cn]			Resources repRes = ((XResForwarder) replacement).getResources();
+[external][shana][shana@zju.edu.cn]			int repId = ((XResForwarder) replacement).getId();
+[external][shana][shana@zju.edu.cn]			repRes.getValueForDensity(repId, density, outValue, resolveRefs);
+[external][shana][shana@zju.edu.cn]		} else {
+[external][shana][shana@zju.edu.cn]			if (replacement != null) {
+[external][shana][shana@zju.edu.cn]				XposedBridge.log("Replacement of resource ID #0x" + Integer.toHexString(id) + " escaped because of deprecated replacement. Please use XResForwarder instead.");
+[external][shana][shana@zju.edu.cn]			}
+[external][shana][shana@zju.edu.cn]			super.getValueForDensity(id, density, outValue, resolveRefs);
+[external][shana][shana@zju.edu.cn]		}
+[external][shana][shana@zju.edu.cn]	}
+[external][shana][shana@zju.edu.cn]
+[external][admin][admin@0x.mk]	/** @hide */
+[external][admin][admin@0x.mk]	@Override
+[external][admin][admin@0x.mk]	public XmlResourceParser getXml(int id) throws NotFoundException {
+[external][admin][admin@0x.mk]		Object replacement = getReplacement(id);
+[external][admin][admin@0x.mk]		if (replacement instanceof XResForwarder) {
+[external][admin][admin@0x.mk]			Resources repRes = ((XResForwarder) replacement).getResources();
+[external][admin][admin@0x.mk]			int repId = ((XResForwarder) replacement).getId();
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]			boolean loadedFromCache = isXmlCached(repRes, repId);
+[external][admin][admin@0x.mk]			XmlResourceParser result = repRes.getXml(repId);
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]			if (!loadedFromCache) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]				long parseState = getLongField(result, "mParseState");
+[external][admin][admin@0x.mk]				rewriteXmlReferencesNative(parseState, this, repRes);
+[external][admin][admin@0x.mk]			}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]			return result;
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]		return super.getXml(id);
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	private static boolean isXmlCached(Resources res, int id) {
+[external][admin][admin@0x.mk]		int[] mCachedXmlBlockIds = (int[]) getObjectField(getObjectField(res, "mResourcesImpl"), "mCachedXmlBlockCookies");
+[external][admin][admin@0x.mk]		synchronized (mCachedXmlBlockIds) {
+[external][admin][admin@0x.mk]			for (int cachedId : mCachedXmlBlockIds) {
+[external][admin][admin@0x.mk]				if (cachedId == id)
+[external][admin][admin@0x.mk]					return true;
+[external][admin][admin@0x.mk]			}
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]		return false;
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/**
+[external][admin][admin@0x.mk]	 * Used to replace reference IDs in XMLs.
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 * When resource requests are forwarded to modules, the may include references to resources with the same
+[external][admin][admin@0x.mk]	 * name as in the original resources, but the IDs generated by aapt will be different. rewriteXmlReferencesNative
+[external][admin][admin@0x.mk]	 * walks through all references and calls this function to find out the original ID, which it then writes to
+[external][admin][admin@0x.mk]	 * the compiled XML file in the memory.
+[external][admin][admin@0x.mk]	 */
+[external][admin][admin@0x.mk]	private static int translateResId(int id, XResources origRes, Resources repRes) {
+[external][admin][admin@0x.mk]		try {
+[external][admin][admin@0x.mk]			String entryName = repRes.getResourceEntryName(id);
+[external][admin][admin@0x.mk]			String entryType = repRes.getResourceTypeName(id);
+[external][admin][admin@0x.mk]			String origPackage = origRes.mPackageName;
+[external][admin][admin@0x.mk]			int origResId = 0;
+[external][admin][admin@0x.mk]			try {
+[external][admin][admin@0x.mk]				// look for a resource with the same name and type in the original package
+[external][admin][admin@0x.mk]				origResId = origRes.getIdentifier(entryName, entryType, origPackage);
+[external][admin][admin@0x.mk]			} catch (NotFoundException ignored) {}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]			boolean repResDefined = false;
+[external][admin][admin@0x.mk]			try {
+[external][admin][admin@0x.mk]				final TypedValue tmpValue = new TypedValue();
+[external][admin][admin@0x.mk]				repRes.getValue(id, tmpValue, false);
+[external][admin][admin@0x.mk]				// if a resource has not been defined (i.e. only a resource ID has been created), it will equal "false"
+[external][admin][admin@0x.mk]				// this means a boolean "false" value is not detected of it is directly referenced in an XML file
+[external][admin][admin@0x.mk]				repResDefined = !(tmpValue.type == TypedValue.TYPE_INT_BOOLEAN && tmpValue.data == 0);
+[external][admin][admin@0x.mk]			} catch (NotFoundException ignored) {}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]			if (!repResDefined && origResId == 0 && !entryType.equals("id")) {
+[external][admin][admin@0x.mk]				XposedBridge.log(entryType + "/" + entryName + " is neither defined in module nor in original resources");
+[external][admin][admin@0x.mk]				return 0;
+[external][admin][admin@0x.mk]			}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]			// exists only in module, so create a fake resource id
+[external][admin][admin@0x.mk]			if (origResId == 0)
+[external][admin][admin@0x.mk]				origResId = getFakeResId(repRes, id);
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]			// IDs will never be loaded, no need to set a replacement
+[external][admin][admin@0x.mk]			if (repResDefined && !entryType.equals("id"))
+[external][admin][admin@0x.mk]				origRes.setReplacement(origResId, new XResForwarder(repRes, id));
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]			return origResId;
+[external][admin][admin@0x.mk]		} catch (Exception e) {
+[external][admin][admin@0x.mk]			XposedBridge.log(e);
+[external][admin][admin@0x.mk]			return id;
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/**
+[external][admin][admin@0x.mk]	 * Generates a fake resource ID.
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 * <p>The parameter is just hashed, it doesn't have a deeper meaning. However, it's recommended
+[external][admin][admin@0x.mk]	 * to use values with a low risk for conflicts, such as a full resource name. Calling this
+[external][admin][admin@0x.mk]	 * method multiple times will return the same ID.
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 * @param resName A used for hashing, see above.
+[external][admin][admin@0x.mk]	 * @return The fake resource ID.
+[external][admin][admin@0x.mk]	 */
+[external][admin][admin@0x.mk]	public static int getFakeResId(String resName) {
+[external][admin][admin@0x.mk]		return 0x7e000000 | (resName.hashCode() & 0x00ffffff);
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/**
+[external][admin][admin@0x.mk]	 * Generates a fake resource ID.
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 * <p>This variant uses the result of {@link #getResourceName} to create the hash that the ID is
+[external][admin][admin@0x.mk]	 * based on. The given resource doesn't need to match the {@link XResources} instance for which
+[external][admin][admin@0x.mk]	 * the fake resource ID is going to be used.
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 * @param res The {@link android.content.res.Resources} object to be used for hashing.
+[external][admin][admin@0x.mk]	 * @param id The resource ID to be used for hashing.
+[external][admin][admin@0x.mk]	 * @return The fake resource ID.
+[external][admin][admin@0x.mk]	 */
+[external][admin][admin@0x.mk]	public static int getFakeResId(Resources res, int id) {
+[external][admin][admin@0x.mk]		return getFakeResId(res.getResourceName(id));
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/**
+[external][admin][admin@0x.mk]	 * Makes any individual resource available from another {@link android.content.res.Resources}
+[external][admin][admin@0x.mk]	 * instance available in this {@link XResources} instance.
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 * <p>This method combines calls to {@link #getFakeResId(Resources, int)} and
+[external][admin][admin@0x.mk]	 * {@link #setReplacement(int, Object)} to generate a fake resource ID and set up a replacement
+[external][admin][admin@0x.mk]	 * for it which forwards to the given resource.
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 * <p>The returned ID can only be used to retrieve the resource, it won't work for methods like
+[external][admin][admin@0x.mk]	 * {@link #getResourceName} etc.
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 * @param res The target {@link android.content.res.Resources} instance.
+[external][admin][admin@0x.mk]	 * @param id The target resource ID.
+[external][admin][admin@0x.mk]	 * @return The fake resource ID (see above).
+[external][admin][admin@0x.mk]	 */
+[external][admin][admin@0x.mk]	public int addResource(Resources res, int id) {
+[external][admin][admin@0x.mk]		int fakeId = getFakeResId(res, id);
+[external][admin][admin@0x.mk]		synchronized (sReplacements) {
+[external][admin][admin@0x.mk]			if (sReplacements.indexOfKey(fakeId) < 0)
+[external][admin][admin@0x.mk]				setReplacement(fakeId, new XResForwarder(res, id));
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]		return fakeId;
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/**
+[external][admin][admin@0x.mk]	 * Similar to {@link #translateResId}, but used to determine the original ID of attribute names.
+[external][admin][admin@0x.mk]	 */
+[external][admin][admin@0x.mk]	private static int translateAttrId(String attrName, XResources origRes) {
+[external][admin][admin@0x.mk]		String origPackage = origRes.mPackageName;
+[external][admin][admin@0x.mk]		int origAttrId = 0;
+[external][admin][admin@0x.mk]		try {
+[external][admin][admin@0x.mk]			origAttrId = origRes.getIdentifier(attrName, "attr", origPackage);
+[external][admin][admin@0x.mk]		} catch (NotFoundException e) {
+[external][admin][admin@0x.mk]			XposedBridge.log("Attribute " + attrName + " not found in original resources");
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]		return origAttrId;
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	// =======================================================
+[external][admin][admin@0x.mk]	//   XTypedArray class
+[external][admin][admin@0x.mk]	// =======================================================
+[external][admin][admin@0x.mk]	/**
+[external][admin][admin@0x.mk]	 * {@link android.content.res.TypedArray} replacement that replaces values on-the-fly.
+[external][admin][admin@0x.mk]	 * Mainly used when inflating layouts.
+[external][admin][admin@0x.mk]	 * @hide
+[external][admin][admin@0x.mk]	 */
+[external][shana][shana@zju.edu.cn]	public static class XTypedArray extends XTypedArraySuperClass {
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]        public XTypedArray(Resources resources) {
+[external][admin][admin@0x.mk]            super(resources);
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]        /** Dummy, will never be called (objects are transferred to this class only). */
+[external][admin][admin@0x.mk]//		private XTypedArray() {
+[external][admin][admin@0x.mk]//			super(null, null, null, 0);
+[external][admin][admin@0x.mk]//			throw new UnsupportedOperationException();
+[external][admin][admin@0x.mk]//		}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		@Override
+[external][admin][admin@0x.mk]		public boolean getBoolean(int index, boolean defValue) {
+[external][admin][admin@0x.mk]			Object replacement = ((XResources) getResources()).getReplacement(getResourceId(index, 0));
+[external][admin][admin@0x.mk]			if (replacement instanceof Boolean) {
+[external][admin][admin@0x.mk]				return (Boolean) replacement;
+[external][admin][admin@0x.mk]			} else if (replacement instanceof XResForwarder) {
+[external][admin][admin@0x.mk]				Resources repRes = ((XResForwarder) replacement).getResources();
+[external][admin][admin@0x.mk]				int repId = ((XResForwarder) replacement).getId();
+[external][admin][admin@0x.mk]				return repRes.getBoolean(repId);
+[external][admin][admin@0x.mk]			}
+[external][admin][admin@0x.mk]			return super.getBoolean(index, defValue);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		@Override
+[external][admin][admin@0x.mk]		public int getColor(int index, int defValue) {
+[external][admin][admin@0x.mk]			Object replacement = ((XResources) getResources()).getReplacement(getResourceId(index, 0));
+[external][admin][admin@0x.mk]			if (replacement instanceof Integer) {
+[external][admin][admin@0x.mk]				return (Integer) replacement;
+[external][admin][admin@0x.mk]			} else if (replacement instanceof XResForwarder) {
+[external][admin][admin@0x.mk]				Resources repRes = ((XResForwarder) replacement).getResources();
+[external][admin][admin@0x.mk]				int repId = ((XResForwarder) replacement).getId();
+[external][admin][admin@0x.mk]				return repRes.getColor(repId);
+[external][admin][admin@0x.mk]			}
+[external][admin][admin@0x.mk]			return super.getColor(index, defValue);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		@Override
+[external][admin][admin@0x.mk]		public ColorStateList getColorStateList(int index) {
+[external][admin][admin@0x.mk]			Object replacement = ((XResources) getResources()).getReplacement(getResourceId(index, 0));
+[external][admin][admin@0x.mk]			if (replacement instanceof ColorStateList) {
+[external][admin][admin@0x.mk]				return (ColorStateList) replacement;
+[external][admin][admin@0x.mk]			} else if (replacement instanceof Integer) {
+[external][admin][admin@0x.mk]				int color = (Integer) replacement;
+[external][admin][admin@0x.mk]				synchronized (sColorStateListCache) {
+[external][admin][admin@0x.mk]					ColorStateList result = sColorStateListCache.get(color);
+[external][admin][admin@0x.mk]					if (result == null) {
+[external][admin][admin@0x.mk]						result = ColorStateList.valueOf(color);
+[external][admin][admin@0x.mk]						sColorStateListCache.put(color, result);
+[external][admin][admin@0x.mk]					}
+[external][admin][admin@0x.mk]					return result;
+[external][admin][admin@0x.mk]				}
+[external][admin][admin@0x.mk]			} else if (replacement instanceof XResForwarder) {
+[external][admin][admin@0x.mk]				Resources repRes = ((XResForwarder) replacement).getResources();
+[external][admin][admin@0x.mk]				int repId = ((XResForwarder) replacement).getId();
+[external][admin][admin@0x.mk]				return repRes.getColorStateList(repId);
+[external][admin][admin@0x.mk]			}
+[external][admin][admin@0x.mk]			return super.getColorStateList(index);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		@Override
+[external][admin][admin@0x.mk]		public float getDimension(int index, float defValue) {
+[external][admin][admin@0x.mk]			Object replacement = ((XResources) getResources()).getReplacement(getResourceId(index, 0));
+[external][admin][admin@0x.mk]			if (replacement instanceof XResForwarder) {
+[external][admin][admin@0x.mk]				Resources repRes = ((XResForwarder) replacement).getResources();
+[external][admin][admin@0x.mk]				int repId = ((XResForwarder) replacement).getId();
+[external][admin][admin@0x.mk]				return repRes.getDimension(repId);
+[external][admin][admin@0x.mk]			}
+[external][admin][admin@0x.mk]			return super.getDimension(index, defValue);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		@Override
+[external][admin][admin@0x.mk]		public int getDimensionPixelOffset(int index, int defValue) {
+[external][admin][admin@0x.mk]			Object replacement = ((XResources) getResources()).getReplacement(getResourceId(index, 0));
+[external][admin][admin@0x.mk]			if (replacement instanceof XResForwarder) {
+[external][admin][admin@0x.mk]				Resources repRes = ((XResForwarder) replacement).getResources();
+[external][admin][admin@0x.mk]				int repId = ((XResForwarder) replacement).getId();
+[external][admin][admin@0x.mk]				return repRes.getDimensionPixelOffset(repId);
+[external][admin][admin@0x.mk]			}
+[external][admin][admin@0x.mk]			return super.getDimensionPixelOffset(index, defValue);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		@Override
+[external][admin][admin@0x.mk]		public int getDimensionPixelSize(int index, int defValue) {
+[external][admin][admin@0x.mk]			Object replacement = ((XResources) getResources()).getReplacement(getResourceId(index, 0));
+[external][admin][admin@0x.mk]			if (replacement instanceof XResForwarder) {
+[external][admin][admin@0x.mk]				Resources repRes = ((XResForwarder) replacement).getResources();
+[external][admin][admin@0x.mk]				int repId = ((XResForwarder) replacement).getId();
+[external][admin][admin@0x.mk]				return repRes.getDimensionPixelSize(repId);
+[external][admin][admin@0x.mk]			}
+[external][admin][admin@0x.mk]			return super.getDimensionPixelSize(index, defValue);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		@Override
+[external][admin][admin@0x.mk]		public Drawable getDrawable(int index) {
+[external][admin][admin@0x.mk]			final int resId = getResourceId(index, 0);
+[external][admin][admin@0x.mk]			XResources xres = (XResources) getResources();
+[external][admin][admin@0x.mk]			Object replacement = xres.getReplacement(resId);
+[external][admin][admin@0x.mk]			if (replacement instanceof DrawableLoader) {
+[external][admin][admin@0x.mk]				try {
+[external][admin][admin@0x.mk]					Drawable result = ((DrawableLoader) replacement).newDrawable(xres, resId);
+[external][admin][admin@0x.mk]					if (result != null)
+[external][admin][admin@0x.mk]						return result;
+[external][admin][admin@0x.mk]				} catch (Throwable t) { XposedBridge.log(t); }
+[external][admin][admin@0x.mk]			} else if (replacement instanceof Integer) {
+[external][admin][admin@0x.mk]				return new ColorDrawable((Integer) replacement);
+[external][admin][admin@0x.mk]			} else if (replacement instanceof XResForwarder) {
+[external][admin][admin@0x.mk]				Resources repRes = ((XResForwarder) replacement).getResources();
+[external][admin][admin@0x.mk]				int repId = ((XResForwarder) replacement).getId();
+[external][admin][admin@0x.mk]				return repRes.getDrawable(repId);
+[external][admin][admin@0x.mk]			}
+[external][admin][admin@0x.mk]			return super.getDrawable(index);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		@Override
+[external][admin][admin@0x.mk]		public float getFloat(int index, float defValue) {
+[external][admin][admin@0x.mk]			Object replacement = ((XResources) getResources()).getReplacement(getResourceId(index, 0));
+[external][admin][admin@0x.mk]			if (replacement instanceof XResForwarder) {
+[external][admin][admin@0x.mk]				Resources repRes = ((XResForwarder) replacement).getResources();
+[external][admin][admin@0x.mk]				int repId = ((XResForwarder) replacement).getId();
+[external][admin][admin@0x.mk]				// dimensions seem to be the only way to define floats by references
+[external][admin][admin@0x.mk]				return repRes.getDimension(repId);
+[external][admin][admin@0x.mk]			}
+[external][admin][admin@0x.mk]			return super.getFloat(index, defValue);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]
+[external][shana][shana@zju.edu.cn]		@Override
+[external][shana][shana@zju.edu.cn]		public Typeface getFont(int index) {
+[external][shana][shana@zju.edu.cn]			Object replacement = ((XResources) getResources()).getReplacement(getResourceId(index, 0));
+[external][shana][shana@zju.edu.cn]			if (replacement instanceof Typeface) {
+[external][shana][shana@zju.edu.cn]				return (Typeface) replacement;
+[external][shana][shana@zju.edu.cn]			} else if (replacement instanceof XResForwarder) {
+[external][shana][shana@zju.edu.cn]				Resources repRes = ((XResForwarder) replacement).getResources();
+[external][shana][shana@zju.edu.cn]				int repId = ((XResForwarder) replacement).getId();
+[external][shana][shana@zju.edu.cn]				return repRes.getFont(repId);
+[external][shana][shana@zju.edu.cn]			}
+[external][shana][shana@zju.edu.cn]			return super.getFont(index);
+[external][shana][shana@zju.edu.cn]		}
+[external][shana][shana@zju.edu.cn]
+[external][admin][admin@0x.mk]		@Override
+[external][admin][admin@0x.mk]		public float getFraction(int index, int base, int pbase, float defValue) {
+[external][admin][admin@0x.mk]			Object replacement = ((XResources) getResources()).getReplacement(getResourceId(index, 0));
+[external][admin][admin@0x.mk]			if (replacement instanceof XResForwarder) {
+[external][admin][admin@0x.mk]				Resources repRes = ((XResForwarder) replacement).getResources();
+[external][admin][admin@0x.mk]				int repId = ((XResForwarder) replacement).getId();
+[external][admin][admin@0x.mk]				// dimensions seem to be the only way to define floats by references
+[external][admin][admin@0x.mk]				return repRes.getFraction(repId, base, pbase);
+[external][admin][admin@0x.mk]			}
+[external][admin][admin@0x.mk]			return super.getFraction(index, base, pbase, defValue);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		@Override
+[external][admin][admin@0x.mk]		public int getInt(int index, int defValue) {
+[external][admin][admin@0x.mk]			Object replacement = ((XResources) getResources()).getReplacement(getResourceId(index, 0));
+[external][admin][admin@0x.mk]			if (replacement instanceof Integer) {
+[external][admin][admin@0x.mk]				return (Integer) replacement;
+[external][admin][admin@0x.mk]			} else if (replacement instanceof XResForwarder) {
+[external][admin][admin@0x.mk]				Resources repRes = ((XResForwarder) replacement).getResources();
+[external][admin][admin@0x.mk]				int repId = ((XResForwarder) replacement).getId();
+[external][admin][admin@0x.mk]				return repRes.getInteger(repId);
+[external][admin][admin@0x.mk]			}
+[external][admin][admin@0x.mk]			return super.getInt(index, defValue);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		@Override
+[external][admin][admin@0x.mk]		public int getInteger(int index, int defValue) {
+[external][admin][admin@0x.mk]			Object replacement = ((XResources) getResources()).getReplacement(getResourceId(index, 0));
+[external][admin][admin@0x.mk]			if (replacement instanceof Integer) {
+[external][admin][admin@0x.mk]				return (Integer) replacement;
+[external][admin][admin@0x.mk]			} else if (replacement instanceof XResForwarder) {
+[external][admin][admin@0x.mk]				Resources repRes = ((XResForwarder) replacement).getResources();
+[external][admin][admin@0x.mk]				int repId = ((XResForwarder) replacement).getId();
+[external][admin][admin@0x.mk]				return repRes.getInteger(repId);
+[external][admin][admin@0x.mk]			}
+[external][admin][admin@0x.mk]			return super.getInteger(index, defValue);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		@Override
+[external][admin][admin@0x.mk]		public int getLayoutDimension(int index, int defValue) {
+[external][admin][admin@0x.mk]			Object replacement = ((XResources) getResources()).getReplacement(getResourceId(index, 0));
+[external][admin][admin@0x.mk]			if (replacement instanceof XResForwarder) {
+[external][admin][admin@0x.mk]				Resources repRes = ((XResForwarder) replacement).getResources();
+[external][admin][admin@0x.mk]				int repId = ((XResForwarder) replacement).getId();
+[external][admin][admin@0x.mk]				return repRes.getDimensionPixelSize(repId);
+[external][admin][admin@0x.mk]			}
+[external][admin][admin@0x.mk]			return super.getLayoutDimension(index, defValue);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		@Override
+[external][admin][admin@0x.mk]		public int getLayoutDimension(int index, String name) {
+[external][admin][admin@0x.mk]			Object replacement = ((XResources) getResources()).getReplacement(getResourceId(index, 0));
+[external][admin][admin@0x.mk]			if (replacement instanceof XResForwarder) {
+[external][admin][admin@0x.mk]				Resources repRes = ((XResForwarder) replacement).getResources();
+[external][admin][admin@0x.mk]				int repId = ((XResForwarder) replacement).getId();
+[external][admin][admin@0x.mk]				return repRes.getDimensionPixelSize(repId);
+[external][admin][admin@0x.mk]			}
+[external][admin][admin@0x.mk]			return super.getLayoutDimension(index, name);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		@Override
+[external][admin][admin@0x.mk]		public String getString(int index) {
+[external][admin][admin@0x.mk]			Object replacement = ((XResources) getResources()).getReplacement(getResourceId(index, 0));
+[external][admin][admin@0x.mk]			if (replacement instanceof CharSequence) {
+[external][admin][admin@0x.mk]				return replacement.toString();
+[external][admin][admin@0x.mk]			} else if (replacement instanceof XResForwarder) {
+[external][admin][admin@0x.mk]				Resources repRes = ((XResForwarder) replacement).getResources();
+[external][admin][admin@0x.mk]				int repId = ((XResForwarder) replacement).getId();
+[external][admin][admin@0x.mk]				return repRes.getString(repId);
+[external][admin][admin@0x.mk]			}
+[external][admin][admin@0x.mk]			return super.getString(index);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		@Override
+[external][admin][admin@0x.mk]		public CharSequence getText(int index) {
+[external][admin][admin@0x.mk]			Object replacement = ((XResources) getResources()).getReplacement(getResourceId(index, 0));
+[external][admin][admin@0x.mk]			if (replacement instanceof CharSequence) {
+[external][admin][admin@0x.mk]				return (CharSequence) replacement;
+[external][admin][admin@0x.mk]			} else if (replacement instanceof XResForwarder) {
+[external][admin][admin@0x.mk]				Resources repRes = ((XResForwarder) replacement).getResources();
+[external][admin][admin@0x.mk]				int repId = ((XResForwarder) replacement).getId();
+[external][admin][admin@0x.mk]				return repRes.getText(repId);
+[external][admin][admin@0x.mk]			}
+[external][admin][admin@0x.mk]			return super.getText(index);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		@Override
+[external][admin][admin@0x.mk]		public CharSequence[] getTextArray(int index) {
+[external][admin][admin@0x.mk]			Object replacement = ((XResources) getResources()).getReplacement(getResourceId(index, 0));
+[external][admin][admin@0x.mk]			if (replacement instanceof CharSequence[]) {
+[external][admin][admin@0x.mk]				return (CharSequence[]) replacement;
+[external][admin][admin@0x.mk]			} else if (replacement instanceof XResForwarder) {
+[external][admin][admin@0x.mk]				Resources repRes = ((XResForwarder) replacement).getResources();
+[external][admin][admin@0x.mk]				int repId = ((XResForwarder) replacement).getId();
+[external][admin][admin@0x.mk]				return repRes.getTextArray(repId);
+[external][admin][admin@0x.mk]			}
+[external][admin][admin@0x.mk]			return super.getTextArray(index);
+[external][admin][admin@0x.mk]		}
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]		@Override
+[external][shana][shana@zju.edu.cn]		public boolean getValue(int index, TypedValue outValue) {
+[external][shana][shana@zju.edu.cn]			var id = getResourceId(index, 0);
+[external][shana][shana@zju.edu.cn]			Object replacement = ((XResources) getResources()).getReplacement(id);
+[external][shana][shana@zju.edu.cn]			if (replacement instanceof XResForwarder) {
+[external][shana][shana@zju.edu.cn]				Resources repRes = ((XResForwarder) replacement).getResources();
+[external][shana][shana@zju.edu.cn]				int repId = ((XResForwarder) replacement).getId();
+[external][shana][shana@zju.edu.cn]				repRes.getValue(repId, outValue, true);
+[external][shana][shana@zju.edu.cn]				return outValue.type != TypedValue.TYPE_NULL;
+[external][shana][shana@zju.edu.cn]			} else {
+[external][shana][shana@zju.edu.cn]				if (replacement != null) {
+[external][shana][shana@zju.edu.cn]					XposedBridge.log("Replacement of resource ID #0x" + Integer.toHexString(id) + " escaped because of deprecated replacement. Please use XResForwarder instead.");
+[external][shana][shana@zju.edu.cn]				}
+[external][shana][shana@zju.edu.cn]				return super.getValue(index, outValue);
+[external][shana][shana@zju.edu.cn]			}
+[external][shana][shana@zju.edu.cn]		}
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]		@Override
+[external][shana][shana@zju.edu.cn]		public TypedValue peekValue(int index) {
+[external][shana][shana@zju.edu.cn]			var id = getResourceId(index, 0);
+[external][shana][shana@zju.edu.cn]			Object replacement = ((XResources) getResources()).getReplacement(id);
+[external][shana][shana@zju.edu.cn]			if (replacement instanceof XResForwarder) {
+[external][shana][shana@zju.edu.cn]				if (getBooleanField(this, "mRecycled")) {
+[external][shana][shana@zju.edu.cn]					throw new RuntimeException("Cannot make calls to a recycled instance!");
+[external][shana][shana@zju.edu.cn]				}
+[external][shana][shana@zju.edu.cn]				final TypedValue value = (TypedValue) getObjectField(this, "mValue");
+[external][shana][shana@zju.edu.cn]				Resources repRes = ((XResForwarder) replacement).getResources();
+[external][shana][shana@zju.edu.cn]				int repId = ((XResForwarder) replacement).getId();
+[external][shana][shana@zju.edu.cn]				repRes.getValue(repId, value, true);
+[external][shana][shana@zju.edu.cn]				return value;
+[external][shana][shana@zju.edu.cn]			} else {
+[external][shana][shana@zju.edu.cn]				if (replacement != null) {
+[external][shana][shana@zju.edu.cn]					XposedBridge.log("Replacement of resource ID #0x" + Integer.toHexString(id) + " escaped because of deprecated replacement. Please use XResForwarder instead.");
+[external][shana][shana@zju.edu.cn]				}
+[external][shana][shana@zju.edu.cn]				return super.peekValue(index);
+[external][shana][shana@zju.edu.cn]			}
+[external][shana][shana@zju.edu.cn]		}
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	// =======================================================
+[external][admin][admin@0x.mk]	//   DrawableLoader class
+[external][admin][admin@0x.mk]	// =======================================================
+[external][admin][admin@0x.mk]	/**
+[external][admin][admin@0x.mk]	 * Callback for drawable replacements. Instances of this class can passed to
+[external][admin][admin@0x.mk]	 * {@link #setReplacement(String, String, String, Object)} and its variants.
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 * <p class="caution">Make sure to always return new {@link Drawable} instances, as drawables
+[external][admin][admin@0x.mk]	 * usually can't be reused.
+[external][admin][admin@0x.mk]	 */
+[external][admin][admin@0x.mk]	@SuppressWarnings("UnusedParameters")
+[external][admin][admin@0x.mk]	public static abstract class DrawableLoader {
+[external][admin][admin@0x.mk]		/**
+[external][admin][admin@0x.mk]		 * Constructor.
+[external][admin][admin@0x.mk]		 */
+[external][admin][admin@0x.mk]		public DrawableLoader() {}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		/**
+[external][admin][admin@0x.mk]		 * Called when the hooked drawable resource has been requested.
+[external][admin][admin@0x.mk]		 *
+[external][admin][admin@0x.mk]		 * @param res The {@link XResources} object in which the hooked drawable resides.
+[external][admin][admin@0x.mk]		 * @param id The resource ID which has been requested.
+[external][admin][admin@0x.mk]		 * @return The {@link Drawable} which should be used as replacement. {@code null} is ignored.
+[external][admin][admin@0x.mk]		 * @throws Throwable Everything the callback throws is caught and logged.
+[external][admin][admin@0x.mk]		 */
+[external][admin][admin@0x.mk]		public abstract Drawable newDrawable(XResources res, int id) throws Throwable;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		/**
+[external][admin][admin@0x.mk]		 * Like {@link #newDrawable}, but called for {@link #getDrawableForDensity}. The default
+[external][admin][admin@0x.mk]		 * implementation is to use the result of {@link #newDrawable}.
+[external][admin][admin@0x.mk]		 *
+[external][admin][admin@0x.mk]		 * @param res The {@link XResources} object in which the hooked drawable resides.
+[external][admin][admin@0x.mk]		 * @param id The resource ID which has been requested.
+[external][admin][admin@0x.mk]		 * @param density The desired screen density indicated by the resource as found in
+[external][admin][admin@0x.mk]		 *                {@link DisplayMetrics}.
+[external][admin][admin@0x.mk]		 * @return The {@link Drawable} which should be used as replacement. {@code null} is ignored.
+[external][admin][admin@0x.mk]		 * @throws Throwable Everything the callback throws is caught and logged.
+[external][admin][admin@0x.mk]		 */
+[external][admin][admin@0x.mk]		public Drawable newDrawableForDensity(XResources res, int id, int density) throws Throwable {
+[external][admin][admin@0x.mk]			return newDrawable(res, id);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	// =======================================================
+[external][admin][admin@0x.mk]	//   DimensionReplacement class
+[external][admin][admin@0x.mk]	// =======================================================
+[external][admin][admin@0x.mk]	/**
+[external][admin][admin@0x.mk]	 * Callback for dimension replacements. Instances of this class can passed to
+[external][admin][admin@0x.mk]	 * {@link #setReplacement(String, String, String, Object)} and its variants.
+[external][admin][admin@0x.mk]	 */
+[external][admin][admin@0x.mk]	public static class DimensionReplacement {
+[external][admin][admin@0x.mk]		private final float mValue;
+[external][admin][admin@0x.mk]		private final int mUnit;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		/**
+[external][admin][admin@0x.mk]		 * Creates an instance that can be used for {@link #setReplacement(String, String, String, Object)}
+[external][admin][admin@0x.mk]		 * to replace a dimension resource.
+[external][admin][admin@0x.mk]		 *
+[external][admin][admin@0x.mk]		 * @param value The value of the replacement, in the unit specified with the next parameter.
+[external][admin][admin@0x.mk]		 * @param unit One of the {@code COMPLEX_UNIT_*} constants in {@link TypedValue}.
+[external][admin][admin@0x.mk]		 */
+[external][admin][admin@0x.mk]		public DimensionReplacement(float value, int unit) {
+[external][admin][admin@0x.mk]			mValue = value;
+[external][admin][admin@0x.mk]			mUnit = unit;
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		/** Called by {@link android.content.res.Resources#getDimension}. */
+[external][admin][admin@0x.mk]		public float getDimension(DisplayMetrics metrics) {
+[external][admin][admin@0x.mk]			return TypedValue.applyDimension(mUnit, mValue, metrics);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		/** Called by {@link android.content.res.Resources#getDimensionPixelOffset}. */
+[external][admin][admin@0x.mk]		public int getDimensionPixelOffset(DisplayMetrics metrics) {
+[external][admin][admin@0x.mk]			return (int) TypedValue.applyDimension(mUnit, mValue, metrics);
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		/** Called by {@link android.content.res.Resources#getDimensionPixelSize}. */
+[external][admin][admin@0x.mk]		public int getDimensionPixelSize(DisplayMetrics metrics) {
+[external][admin][admin@0x.mk]			final float f = TypedValue.applyDimension(mUnit, mValue, metrics);
+[external][admin][admin@0x.mk]			final int res = (int)(f+0.5f);
+[external][admin][admin@0x.mk]			if (res != 0) return res;
+[external][admin][admin@0x.mk]			if (mValue == 0) return 0;
+[external][admin][admin@0x.mk]			if (mValue > 0) return 1;
+[external][admin][admin@0x.mk]			return -1;
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	// =======================================================
+[external][admin][admin@0x.mk]	//   INFLATING LAYOUTS
+[external][admin][admin@0x.mk]	// =======================================================
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	private class XMLInstanceDetails {
+[external][admin][admin@0x.mk]		public final ResourceNames resNames;
+[external][admin][admin@0x.mk]		public final String variant;
+[external][admin][admin@0x.mk]		public final CopyOnWriteSortedSet<XC_LayoutInflated> callbacks;
+[external][admin][admin@0x.mk]		public final XResources res = XResources.this;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		private XMLInstanceDetails(ResourceNames resNames, String variant, CopyOnWriteSortedSet<XC_LayoutInflated> callbacks) {
+[external][admin][admin@0x.mk]			this.resNames = resNames;
+[external][admin][admin@0x.mk]			this.variant = variant;
+[external][admin][admin@0x.mk]			this.callbacks = callbacks;
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/**
+[external][admin][admin@0x.mk]	 * Hook the inflation of a layout.
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 * @param id The ID of the resource which should be replaced.
+[external][admin][admin@0x.mk]	 * @param callback The callback to be executed when the layout has been inflated.
+[external][admin][admin@0x.mk]	 * @return An object which can be used to remove the callback again.
+[external][admin][admin@0x.mk]	 */
+[external][admin][admin@0x.mk]	public XC_LayoutInflated.Unhook hookLayout(int id, XC_LayoutInflated callback) {
+[external][admin][admin@0x.mk]		return hookLayoutInternal(mResDir, id, getResourceNames(id), callback);
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/**
+[external][admin][admin@0x.mk]	 * Hook the inflation of a layout.
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 * @deprecated Use {@link #hookLayout(String, String, String, XC_LayoutInflated)} instead.
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 * @param fullName The full resource name, e.g. {@code com.android.systemui:layout/statusbar}.
+[external][admin][admin@0x.mk]	 *                 See {@link #getResourceName}.
+[external][admin][admin@0x.mk]	 * @param callback The callback to be executed when the layout has been inflated.
+[external][admin][admin@0x.mk]	 * @return An object which can be used to remove the callback again.
+[external][admin][admin@0x.mk]	 */
+[external][admin][admin@0x.mk]	@Deprecated
+[external][admin][admin@0x.mk]	public XC_LayoutInflated.Unhook hookLayout(String fullName, XC_LayoutInflated callback) {
+[external][admin][admin@0x.mk]		int id = getIdentifier(fullName, null, null);
+[external][admin][admin@0x.mk]		if (id == 0)
+[external][admin][admin@0x.mk]			throw new NotFoundException(fullName);
+[external][admin][admin@0x.mk]		return hookLayout(id, callback);
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/**
+[external][admin][admin@0x.mk]	 * Hook the inflation of a layout.
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 * @param pkg The package name, e.g. {@code com.android.systemui}.
+[external][admin][admin@0x.mk]	 *            See {@link #getResourcePackageName}.
+[external][admin][admin@0x.mk]	 * @param type The type name, e.g. {@code layout}.
+[external][admin][admin@0x.mk]	 *            See {@link #getResourceTypeName}.
+[external][admin][admin@0x.mk]	 * @param name The entry name, e.g. {@code statusbar}.
+[external][admin][admin@0x.mk]	 *            See {@link #getResourceEntryName}.
+[external][admin][admin@0x.mk]	 * @param callback The callback to be executed when the layout has been inflated.
+[external][admin][admin@0x.mk]	 * @return An object which can be used to remove the callback again.
+[external][admin][admin@0x.mk]	 */
+[external][admin][admin@0x.mk]	public XC_LayoutInflated.Unhook hookLayout(String pkg, String type, String name, XC_LayoutInflated callback) {
+[external][admin][admin@0x.mk]		int id = getIdentifier(name, type, pkg);
+[external][admin][admin@0x.mk]		if (id == 0)
+[external][admin][admin@0x.mk]			throw new NotFoundException(pkg + ":" + type + "/" + name);
+[external][admin][admin@0x.mk]		return hookLayout(id, callback);
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/**
+[external][admin][admin@0x.mk]	 * Hook the inflation of an Android framework layout (in the {@code android} package).
+[external][admin][admin@0x.mk]	 * See {@link #hookSystemWideLayout(String, String, String, XC_LayoutInflated)}.
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 * @param id The ID of the resource which should be replaced.
+[external][admin][admin@0x.mk]	 * @param callback The callback to be executed when the layout has been inflated.
+[external][admin][admin@0x.mk]	 * @return An object which can be used to remove the callback again.
+[external][admin][admin@0x.mk]	 */
+[external][admin][admin@0x.mk]	public static XC_LayoutInflated.Unhook hookSystemWideLayout(int id, XC_LayoutInflated callback) {
+[external][admin][admin@0x.mk]		if (id >= 0x7f000000)
+[external][admin][admin@0x.mk]			throw new IllegalArgumentException("ids >= 0x7f000000 are app specific and cannot be set for the framework");
+[external][admin][admin@0x.mk]		return hookLayoutInternal(null, id, getSystemResourceNames(id), callback);
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/**
+[external][admin][admin@0x.mk]	 * Hook the inflation of an Android framework layout (in the {@code android} package).
+[external][admin][admin@0x.mk]	 * See {@link #hookSystemWideLayout(String, String, String, XC_LayoutInflated)}.
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 * @deprecated Use {@link #hookSystemWideLayout(String, String, String, XC_LayoutInflated)} instead.
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 * @param fullName The full resource name, e.g. {@code android:layout/simple_list_item_1}.
+[external][admin][admin@0x.mk]	 *                 See {@link #getResourceName}.
+[external][admin][admin@0x.mk]	 * @param callback The callback to be executed when the layout has been inflated.
+[external][admin][admin@0x.mk]	 * @return An object which can be used to remove the callback again.
+[external][admin][admin@0x.mk]	 */
+[external][admin][admin@0x.mk]	@Deprecated
+[external][admin][admin@0x.mk]	public static XC_LayoutInflated.Unhook hookSystemWideLayout(String fullName, XC_LayoutInflated callback) {
+[external][admin][admin@0x.mk]		int id = getSystem().getIdentifier(fullName, null, null);
+[external][admin][admin@0x.mk]		if (id == 0)
+[external][admin][admin@0x.mk]			throw new NotFoundException(fullName);
+[external][admin][admin@0x.mk]		return hookSystemWideLayout(id, callback);
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/**
+[external][admin][admin@0x.mk]	 * Hook the inflation of an Android framework layout (in the {@code android} package).
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 * <p>Some layouts are part of the Android framework and can be used in any app. They're
+[external][admin][admin@0x.mk]	 * accessible via {@link android.R.layout android.R.layout} and are not bound to a specific
+[external][admin][admin@0x.mk]	 * {@link android.content.res.Resources} instance. Such resources can be replaced in
+[external][admin][admin@0x.mk]	 * {@link IXposedHookZygoteInit#initZygote initZygote()} for all apps. As there is no
+[external][admin][admin@0x.mk]	 * {@link XResources} object easily available in that scope, this static method can be used
+[external][admin][admin@0x.mk]	 * to hook layouts.
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 * @param pkg The package name, e.g. {@code android}.
+[external][admin][admin@0x.mk]	 *            See {@link #getResourcePackageName}.
+[external][admin][admin@0x.mk]	 * @param type The type name, e.g. {@code layout}.
+[external][admin][admin@0x.mk]	 *            See {@link #getResourceTypeName}.
+[external][admin][admin@0x.mk]	 * @param name The entry name, e.g. {@code simple_list_item_1}.
+[external][admin][admin@0x.mk]	 *            See {@link #getResourceEntryName}.
+[external][admin][admin@0x.mk]	 * @param callback The callback to be executed when the layout has been inflated.
+[external][admin][admin@0x.mk]	 * @return An object which can be used to remove the callback again.
+[external][admin][admin@0x.mk]	 */
+[external][admin][admin@0x.mk]	public static XC_LayoutInflated.Unhook hookSystemWideLayout(String pkg, String type, String name, XC_LayoutInflated callback) {
+[external][admin][admin@0x.mk]		int id = getSystem().getIdentifier(name, type, pkg);
+[external][admin][admin@0x.mk]		if (id == 0)
+[external][admin][admin@0x.mk]			throw new NotFoundException(pkg + ":" + type + "/" + name);
+[external][admin][admin@0x.mk]		return hookSystemWideLayout(id, callback);
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	private static XC_LayoutInflated.Unhook hookLayoutInternal(String resDir, int id, ResourceNames resNames, XC_LayoutInflated callback) {
+[external][admin][admin@0x.mk]		if (id == 0)
+[external][admin][admin@0x.mk]			throw new IllegalArgumentException("id 0 is not an allowed resource identifier");
+[external][admin][admin@0x.mk]
+[external][shana][shana@zju.edu.cn]		if (resDir == null) {
+[external][shana][shana@zju.edu.cn]			try {
+[external][shana][shana@zju.edu.cn]				XposedInit.hookResources();
+[external][shana][shana@zju.edu.cn]			} catch (Throwable throwable) {
+[external][shana][shana@zju.edu.cn]				throw new IllegalStateException("Failed to initialize resources hook", throwable);
+[external][shana][shana@zju.edu.cn]			}
+[external][shana][shana@zju.edu.cn]		}
+[external][shana][shana@zju.edu.cn]
+[external][admin][admin@0x.mk]		HashMap<String, CopyOnWriteSortedSet<XC_LayoutInflated>> inner;
+[external][admin][admin@0x.mk]		synchronized (sLayoutCallbacks) {
+[external][admin][admin@0x.mk]			inner = sLayoutCallbacks.get(id);
+[external][admin][admin@0x.mk]			if (inner == null) {
+[external][admin][admin@0x.mk]				inner = new HashMap<>();
+[external][admin][admin@0x.mk]				sLayoutCallbacks.put(id, inner);
+[external][admin][admin@0x.mk]			}
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		CopyOnWriteSortedSet<XC_LayoutInflated> callbacks;
+[external][admin][admin@0x.mk]		synchronized (inner) {
+[external][admin][admin@0x.mk]			callbacks = inner.get(resDir);
+[external][admin][admin@0x.mk]			if (callbacks == null) {
+[external][admin][admin@0x.mk]				callbacks = new CopyOnWriteSortedSet<>();
+[external][admin][admin@0x.mk]				inner.put(resDir, callbacks);
+[external][admin][admin@0x.mk]			}
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		callbacks.add(callback);
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		putResourceNames(resDir, resNames);
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		return callback.new Unhook(resDir, id);
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/** @hide */
+[external][admin][admin@0x.mk]	public static void unhookLayout(String resDir, int id, XC_LayoutInflated callback) {
+[external][admin][admin@0x.mk]		HashMap<String, CopyOnWriteSortedSet<XC_LayoutInflated>> inner;
+[external][admin][admin@0x.mk]		synchronized (sLayoutCallbacks) {
+[external][admin][admin@0x.mk]			inner = sLayoutCallbacks.get(id);
+[external][admin][admin@0x.mk]			if (inner == null)
+[external][admin][admin@0x.mk]				return;
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		CopyOnWriteSortedSet<XC_LayoutInflated> callbacks;
+[external][admin][admin@0x.mk]		synchronized (inner) {
+[external][admin][admin@0x.mk]			callbacks = inner.get(resDir);
+[external][admin][admin@0x.mk]			if (callbacks == null)
+[external][admin][admin@0x.mk]				return;
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		callbacks.remove(callback);
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]}

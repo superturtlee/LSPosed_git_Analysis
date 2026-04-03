@@ -1,0 +1,149 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.manager.ui.dialog;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.animation.ValueAnimator;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import android.annotation.SuppressLint;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.content.Context;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.os.Build;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import android.util.Log;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.view.SurfaceControl;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.view.View;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import android.view.Window;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import android.view.WindowManager;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.view.animation.DecelerateInterpolator;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import androidx.annotation.NonNull;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import androidx.appcompat.app.AlertDialog;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import org.lsposed.manager.App;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.lang.reflect.Method;
+[external][howardwu20][HowardWu20@outlook.com]import java.util.function.Consumer;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]@SuppressWarnings({"JavaReflectionMemberAccess", "ConstantConditions"})
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]public class BlurBehindDialogBuilder extends MaterialAlertDialogBuilder {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private static final boolean supportBlur = getSystemProperty("ro.surface_flinger.supports_background_blur", false) && !getSystemProperty("persist.sys.sf.disable_blurs", false);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public BlurBehindDialogBuilder(@NonNull Context context) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        super(context);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    public BlurBehindDialogBuilder(@NonNull Context context, int overrideThemeResId) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        super(context, overrideThemeResId);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @NonNull
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public AlertDialog create() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        AlertDialog dialog = super.create();
+[external][howardwu20][HowardWu20@outlook.com]        setupWindowBlurListener(dialog);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return dialog;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][howardwu20][HowardWu20@outlook.com]    private void setupWindowBlurListener(AlertDialog dialog) {
+[external][howardwu20][HowardWu20@outlook.com]        var window = dialog.getWindow();
+[external][howardwu20][HowardWu20@outlook.com]        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+[external][howardwu20][HowardWu20@outlook.com]            window.addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
+[external][howardwu20][HowardWu20@outlook.com]            Consumer<Boolean> windowBlurEnabledListener = enabled -> updateWindowForBlurs(window, enabled);
+[external][howardwu20][HowardWu20@outlook.com]            window.getDecorView().addOnAttachStateChangeListener(
+[external][howardwu20][HowardWu20@outlook.com]                    new View.OnAttachStateChangeListener() {
+[external][howardwu20][HowardWu20@outlook.com]                        @Override
+[external][howardwu20][HowardWu20@outlook.com]                        public void onViewAttachedToWindow(@NonNull View v) {
+[external][howardwu20][HowardWu20@outlook.com]                            window.getWindowManager().addCrossWindowBlurEnabledListener(
+[external][howardwu20][HowardWu20@outlook.com]                                    windowBlurEnabledListener);
+[external][howardwu20][HowardWu20@outlook.com]                        }
+[external][howardwu20][HowardWu20@outlook.com]
+[external][howardwu20][HowardWu20@outlook.com]                        @Override
+[external][howardwu20][HowardWu20@outlook.com]                        public void onViewDetachedFromWindow(@NonNull View v) {
+[external][howardwu20][HowardWu20@outlook.com]                            window.getWindowManager().removeCrossWindowBlurEnabledListener(
+[external][howardwu20][HowardWu20@outlook.com]                                    windowBlurEnabledListener);
+[external][howardwu20][HowardWu20@outlook.com]                        }
+[external][howardwu20][HowardWu20@outlook.com]                    });
+[external][howardwu20][HowardWu20@outlook.com]        } else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R) {
+[external][howardwu20][HowardWu20@outlook.com]            dialog.setOnShowListener(d -> updateWindowForBlurs(window, supportBlur));
+[external][howardwu20][HowardWu20@outlook.com]        }
+[external][howardwu20][HowardWu20@outlook.com]    }
+[external][howardwu20][HowardWu20@outlook.com]
+[external][howardwu20][HowardWu20@outlook.com]    private void updateWindowForBlurs(Window window, boolean blursEnabled) {
+[external][howardwu20][HowardWu20@outlook.com]        float mDimAmountWithBlur = 0.1f;
+[external][howardwu20][HowardWu20@outlook.com]        float mDimAmountNoBlur = 0.32f;
+[external][howardwu20][HowardWu20@outlook.com]        window.setDimAmount(blursEnabled ?
+[external][howardwu20][HowardWu20@outlook.com]                mDimAmountWithBlur : mDimAmountNoBlur);
+[external][howardwu20][HowardWu20@outlook.com]        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+[external][howardwu20][HowardWu20@outlook.com]            window.getAttributes().setBlurBehindRadius(20);
+[external][howardwu20][HowardWu20@outlook.com]            window.setAttributes(window.getAttributes());
+[external][howardwu20][HowardWu20@outlook.com]        } else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R) {
+[external][howardwu20][HowardWu20@outlook.com]            if (blursEnabled) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                View view = window.getDecorView();
+[external][howardwu20][HowardWu20@outlook.com]                ValueAnimator animator = ValueAnimator.ofInt(1, 53);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                animator.setInterpolator(new DecelerateInterpolator());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    Object viewRootImpl = view.getClass().getMethod("getViewRootImpl").invoke(view);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    if (viewRootImpl == null) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        return;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    SurfaceControl surfaceControl = (SurfaceControl) viewRootImpl.getClass().getMethod("getSurfaceControl").invoke(viewRootImpl);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    @SuppressLint("BlockedPrivateApi") Method setBackgroundBlurRadius = SurfaceControl.Transaction.class.getDeclaredMethod("setBackgroundBlurRadius", SurfaceControl.class, int.class);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    animator.addUpdateListener(animation -> {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                            SurfaceControl.Transaction transaction = new SurfaceControl.Transaction();
+[external][howardwu20][HowardWu20@outlook.com]                            var animatedValue = animation.getAnimatedValue();
+[external][howardwu20][HowardWu20@outlook.com]                            if (animatedValue != null) {
+[external][howardwu20][HowardWu20@outlook.com]                                setBackgroundBlurRadius.invoke(transaction, surfaceControl, (int) animatedValue);
+[external][howardwu20][HowardWu20@outlook.com]                            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                            transaction.apply();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        } catch (Throwable t) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                            Log.e(App.TAG, "Blur behind dialog builder", t);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    });
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                } catch (Throwable t) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    Log.e(App.TAG, "Blur behind dialog builder", t);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                view.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    @Override
+[external][howardwu20][HowardWu20@outlook.com]                    public void onViewAttachedToWindow(@NonNull View v) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    @Override
+[external][howardwu20][HowardWu20@outlook.com]                    public void onViewDetachedFromWindow(@NonNull View v) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        animator.cancel();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                });
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                animator.start();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static boolean getSystemProperty(String key, boolean defaultValue) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        boolean value = defaultValue;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Class<?> c = Class.forName("android.os.SystemProperties");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Method get = c.getMethod("getBoolean", String.class, boolean.class);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            value = (boolean) get.invoke(c, key, defaultValue);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } catch (Exception e) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            Log.e(App.TAG, "Blur behind dialog builder get system property", e);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return value;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]}

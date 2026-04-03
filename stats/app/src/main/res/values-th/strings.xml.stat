@@ -1,0 +1,240 @@
+[bot][lsposed][lsposed@lsposed.org]<?xml version="1.0" encoding="utf-8"?>
+[bot][lsposed][lsposed@lsposed.org]<!--
+[bot][lsposed][lsposed@lsposed.org]  ~ This file is part of LSPosed.
+[bot][lsposed][lsposed@lsposed.org]  ~
+[bot][lsposed][lsposed@lsposed.org]  ~ LSPosed is free software: you can redistribute it and/or modify
+[bot][lsposed][lsposed@lsposed.org]  ~ it under the terms of the GNU General Public License as published by
+[bot][lsposed][lsposed@lsposed.org]  ~ the Free Software Foundation, either version 3 of the License, or
+[bot][lsposed][lsposed@lsposed.org]  ~ (at your option) any later version.
+[bot][lsposed][lsposed@lsposed.org]  ~
+[bot][lsposed][lsposed@lsposed.org]  ~ LSPosed is distributed in the hope that it will be useful,
+[bot][lsposed][lsposed@lsposed.org]  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+[bot][lsposed][lsposed@lsposed.org]  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[bot][lsposed][lsposed@lsposed.org]  ~ GNU General Public License for more details.
+[bot][lsposed][lsposed@lsposed.org]  ~
+[bot][lsposed][lsposed@lsposed.org]  ~ You should have received a copy of the GNU General Public License
+[bot][lsposed][lsposed@lsposed.org]  ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[bot][lsposed][lsposed@lsposed.org]  ~
+[bot][lsposed][lsposed@lsposed.org]  ~ Copyright (C) 2021 LSPosed Contributors
+[bot][lsposed][lsposed@lsposed.org]  -->
+[bot][lsposed][lsposed@lsposed.org]<resources xmlns:tools="http://schemas.android.com/tools" tools:keep="@string/xposed_module_updated_notification_*,@string/module_is_not_activated_*">
+[bot][lsposed][lsposed@lsposed.org]    <!-- MainActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="overview">ภาพรวม</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="Modules">โมดูล</string>
+[bot][lsposed][lsposed@lsposed.org]    <plurals name="modules_enabled_count">
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="other">%d โมดูลที่เปิดใช้งาน</item>
+[bot][lsposed][lsposed@lsposed.org]    </plurals>
+[bot][lsposed][lsposed@lsposed.org]    <string name="Logs">บันทึก</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="Settings">การตั้งค่า</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="feedback_or_suggestion">ข้อเสนอแนะ หรือ คำแนะนำ</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="About">เกี่ยวกับ</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="report_issue">รายงานปัญหา</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo">คลังโมดูล</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo_up_to_date">โมดูลทั้งหมดเป็นเวอร์ชั่นล่าสุด</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo_published_time">เผยแพร่เมื่อ %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo_updated_time">อัปเดตเมื่อ %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <plurals name="module_repo_upgradable">
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="other">%d โมดูลที่สามารถอัพเกรดได้</item>
+[bot][lsposed][lsposed@lsposed.org]    </plurals>
+[bot][lsposed][lsposed@lsposed.org]    <string name="about_view_source_code"><![CDATA[ดูซอร์สโค้ดได้ที่ %1$s<br/> หรือเข้าร่วม %2$s 
+[bot][lsposed][lsposed@lsposed.org] ของเรา]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="translators" comment="Dear translators, please add your home page here following the format. There can be more than one translator. So feel free to append yourself.">null</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install">ติดตั้ง</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install_summary">แตะเพื่อติดตั้ง LSPosed</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="not_installed">ไม่ได้ติดตั้ง</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="not_install_summary">ไม่ได้ติดตั้ง LSPosed</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="activated">เปิดใช้งานแล้ว</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="partial_activated">เปิดใช้งานบางส่วน</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="selinux_policy_not_loaded_summary">การโหลด SEPolicy ไม่ถูกต้อง</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="selinux_policy_not_loaded"><![CDATA[หากฟีเจอร์บางอย่างไม่ทำงาน<br/>โปรดรายงานที่<a href="https://github.com/topjohnwu/Magisk/issues"><b>Magisk</b></a> developer.]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_inject_fail_summary">Injection ระบบ Framework ล้มเหลว</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_inject_fail"><![CDATA[สิ่งนี้เกิดขึ้นได้ยากและอาจเกิดจาก <b>Magisk</b> หรือโมดูล Magisk ที่มีคุณภาพต่ำบางตัว<br/>โปรดลองปิดการใช้งานโมดูล Magisk อื่นที่ไม่ใช่ Riru และ LSPosed หรือส่งบันทึกแบบเต็มไปยังนักพัฒนา]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_prop_incorrect_summary">System prop ไม่ถูกต้อง</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_prop_incorrect"><![CDATA[คุณสมบัติระบบที่จำเป็นบางอย่างถูกลบหรือแก้ไข<br/>โมดูลอาจใช้ไม่ได้ในบางครั้ง]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="need_update">จำเป็นต้องอัพเดท</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="please_update_summary">โปรดติดตั้ง LSPosed . เวอร์ชันล่าสุด</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_api_version">เวอร์ชัน API</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_framework_version">เวอร์ชัน Framework</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_manager_package_name">ชื่อแพ็คเกจผู้จัดการ</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_system_version">เวอร์ชันของระบบ</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_device">อุปกรณ์</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_system_abi">ระบบ ABI</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_dex2oat_wrapper">Dex Optimizer Wrapper</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enabled">เปิดใช้งาน</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="not_enabled">ไม่ได้เปิดใช้งาน</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="supported">ได้รับการสนับสนุน</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="unsupported">ไม่รองรับ</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="android_version_unsatisfied">เวอร์ชัน Android ไม่พอใจ</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="crashed">พัง</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="mount_failed">เมานต์ล้มเหลว</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="selinux_permissive">SELinux ได้รับอนุญาต</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sepolicy_incorrect">นโยบาย SELinux ไม่ถูกต้อง</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_lsposed">อัพเดท LSPosed</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_lsposed_msg">ยืนยันการอัปเดต LSPosed? อุปกรณ์นี้จะรีบูตหลังจากอัปเดตเสร็จสิ้น</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_copied">คัดลอกไปยังคลิปบอร์ดแล้ว</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- WelcomeDialog -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="parasitic_welcome">ยินดีต้อนรับสู่ LSPosed</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="parasitic_welcome_summary">คุณกำลังใช้ Lsposed ซึ่งสามารถสร้างทางลัดหรือยังคงเปิดจากการแจ้งเตือน</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="parasitic_welcome_summary_no_shortcut_support">คุณกำลังใช้ตัวจัดการ Lsposed ซึ่งสามารถเปิดได้จากการแจ้งเตือน</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="create_shortcut">สร้างทางลัด</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="never_show">ไม่ต้องแสดง</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_welcome">แนะนำ กำจัดไวรัส</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_welcome_summary">LSPosed รองรับการปรสิตของระบบเพื่อหลีกเลี่ยงการตรวจจับ คุณสามารถเปิดโปรแกรมจัดการปรสิตได้จากการแจ้งเตือน ขอแนะนำให้ถอนการติดตั้งแอปพลิเคชันปัจจุบัน</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- LogsActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="menuSaveToSd">บันทึก</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="nav_item_logs_verbose">บันทึกอย่างละเอียด</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="nav_item_logs_module">บันทึกโมดูล</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_saving">กำลังบันทึกบันทึก โปรดรอสักครู่</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_saved">บันทึก Log แล้ว</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_save_failed2">ไม่สามารถบันทึก:\n%s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menuClearLog">ล้างบันทึกตอนนี้</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_cleared">ล้างบันทึกเรียบร้อยแล้ว</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="scroll_top">เลื่อนขึ้นด้านบน</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="loading">กำลังโหลด…</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="scroll_bottom">เลื่อนไปด้านล่าง</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menuReload">โหลดซ้ำ</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_clear_failed_2">ไม่สามารถล้างบันทึก</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_enable_word_wrap">ตัดคำ</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enabled_verbose_log">เปิดใช้งานบันทึกอย่างละเอียด</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="disabled_verbose_log">บันทึกรายละเอียดปิดการใช้งาน</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- ModulesActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_empty_description">(ไม่มีคำอธิบายให้)</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_xposed_min_version">โมดูลนี้ต้องการเวอร์ชัน Xposed ที่ใหม่กว่า (%d) ดังนั้นจึงไม่สามารถเปิดใช้งานได้</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_target_version_higher">โมดูลนี้ออกแบบมาสำหรับ Xposed เวอร์ชั่น (%d) ดังนั้นฟังก์ชั่นบางอย่างอาจไม่ทำงาน</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="no_min_version_specified">โมดูลนี้ไม่ได้ระบุเวอร์ชัน Xposed ที่ต้องการ</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_min_version_too_low">โมดูลนี้ถูกสร้างขึ้นสำหรับ Xposed เวอร์ชัน %1$dแต่เนื่องจากการเปลี่ยนแปลงที่เข้ากันไม่ได้ในเวอร์ชัน %2$dจึงถูกปิดใช้งาน</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_installed_on_external_storage">ไม่สามารถโหลดโมดูลนี้ได้เนื่องจากติดตั้งอยู่ในการ์ด SD โปรดย้ายไปยังที่จัดเก็บข้อมูลภายใน</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstall">ถอนการติดตั้ง</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_settings">การตั้งค่าโมดูล</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="view_in_repo">ดูใน Repo</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstall_message">คุณต้องการถอนการติดตั้งโมดูลนี้หรือไม่?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstalled">ถอนการติดตั้ง %1$s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstall_failed">ถอนการติดตั้งไม่สำเร็จ</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="add_module_to_user">เพิ่มโมดูลให้กับผู้ใช้</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_installed">เพิ่ม %1$s ให้กับผู้ใช้ %2$s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_install_failed">การเพิ่มโมดูลล้มเหลว</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install_to_user">ติดตั้งให้กับผู้ใช้ %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install_to_user_message">ต้องการติดตั้ง %1$s ให้กับผู้ใช้ %2$sหรือไม่ ขอแนะนำให้ติดตั้งด้วยตนเอง การบังคับติดตั้งผ่าน LSPosed อาจทำให้เกิดปัญหาได้</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="expand">ขยาย</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="collapse">ทรุด</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- AppListActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_speed">เพิ่มประสิทธิภาพอีกครั้ง</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_speed_msg">การเพิ่มประสิทธิภาพ…</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_done">การเพิ่มประสิทธิภาพเสร็จสมบูรณ์</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_launch">เปิดตัวมัน</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_failed">การเพิ่มประสิทธิภาพล้มเหลว: ค่าที่ส่งคืนว่างเปล่า</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_failed_with_info">การเพิ่มประสิทธิภาพล้มเหลว: </string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_by_name">ชื่อแอปพลิเคชัน</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_by_package_name">ชื่อแพ็คเกจ</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_by_install_time">ติดตั้งเวลา</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_by_update_time">อัพเดทเวลา</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_reverse">ย้อนกลับ</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_system_apps">แอประบบ</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_sort">การเรียงลำดับ</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enable_module">เปิดใช้งานโมดูล</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="no_scope_selected">คุณไม่ได้เลือกแอพใด ๆ ดำเนินการต่อ?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_games">เกม</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_modules">โมดูล</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_denylist">ปฏิเสธ</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="failed_to_save_scope_list">ไม่สามารถบันทึกรายการขอบเขต</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_version">เวอร์ชั่น: %1$s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="use_recommended">ที่แนะนำ</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="no_scope_selected_has_recommended">คุณไม่ได้เลือกแอพใด ๆ เลือกแอพที่แนะนำ?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="use_recommended_message">เลือกแอพที่แนะนำ?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_is_not_activated_yet">โมดูล Xposed ยังไม่ได้เปิดใช้งาน</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="requested_by_module">ที่แนะนำ</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_available">มีการอัปเดต: %1$s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_disabled_no_selection">โมดูล %s ถูกปิดใช้งานเนื่องจากไม่ได้เลือกแอป</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="android_framework">กรอบงานระบบ</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_backup_and_restore">สำรอง</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_backup">สำรอง</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_restore">คืนค่า</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="force_stop">บังคับหยุด</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="force_stop_dlg_title">บังคับหยุด?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="force_stop_dlg_text">หากคุณบังคับหยุดแอป แอปอาจทำงานผิดปกติ</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="reboot_required">จำเป็นต้องรีบูตเพื่อให้การเปลี่ยนแปลงนี้มีผล</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="reboot">รีบูต</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_hide">ซ่อน</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="deny_list">%s อยู่ในรายการปฏิเสธ อาจไม่มีผล</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="deny_list_info">เกี่ยวกับผู้ปฏิเสธ</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- ModulesActivity and AppListActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="modules_other_app">ดูในแอปอื่น</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_app_info">ข้อมูลแอพ</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="list_empty">¯\\\\_(ツ)_\/¯\nไม่มีอะไรที่นี่</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- SettingsActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_group_framework">กรอบ</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_disable_verbose_log">ปิดใช้งานบันทึกอย่างละเอียด</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_disable_verbose_log_summary">แจ้งปัญหาขอรวมบันทึกอย่างละเอียด</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="pure_black_dark_theme">ธีมสีดำมืด</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="pure_black_dark_theme_summary">ใช้ธีมสีดำล้วนหากเปิดใช้งานธีมสีเข้ม</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_group_theme">ธีม</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup_and_restore">สำรองและเรียกคืน</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup_summery">รายการโมดูลสำรองและรายการขอบเขต</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_restore_summery">คืนค่ารายการโมดูลและรายการขอบเขต</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup">สำรอง</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup_failed2">การสำรองข้อมูลล้มเหลว:\n%s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enable_documentui">โปรดเปิดใช้งาน DocumentUI</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_restore">คืนค่า</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_restore_failed2">ไม่สามารถกู้คืนได้:\n%s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="group_network">เครือข่าย</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="dns_over_http">DNS ผ่าน HTTPS</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="dns_over_http_summary">วิธีแก้ปัญหา DNS เป็นขัดข้องในบางประเทศ</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="theme_color">สีของธีม</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="theme_color_system">สีของชุดรูปแบบของระบบ</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_show_hidden_icon_apps_enabled">บังคับให้แอปแสดงไอคอนตัวเรียกใช้</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_show_hidden_icon_apps_enabled_summary">หลังจาก Android 10 แอปจะไม่ได้รับอนุญาตให้ซ่อนไอคอนตัวเรียกใช้งาน ปิดสวิตช์เพื่อปิดใช้งานคุณลักษณะของระบบนี้</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_group_system">ระบบ</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_language">ภาษา</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_translation_contributors">ผู้ร่วมแปล</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_translation">มีส่วนร่วมในการแปล</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_translation_summary">ช่วยเราแปล %s เป็นภาษาของคุณ</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_create_shortcut_summary">สร้างทางลัดที่สามารถเปิดตัวจัดการปรสิต</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_shortcut_pinned_hint">ตรึงทางลัดแล้ว</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_unsupported_pin_shortcut_summary">Launcher เริ่มต้นปัจจุบันไม่รองรับทางลัด PIN</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_enable_status_notification">การแจ้งเตือนสถานะ</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_enable_status_notification_summary">แสดงการแจ้งเตือนที่สามารถเปิดตัวจัดการปรสิต</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="disable_status_notification_error">ไม่มีทางลัด ไม่สามารถปิดการแจ้งเตือนได้</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_update_channel">อัพเดทช่อง</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_channel_stable">มั่นคง</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_channel_bate">เบต้า</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_channel_nightly">สร้างทุกคืน</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_xposed_api_call_protection">การป้องกันการโทร Xposed API</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_xposed_api_call_protection_summary">บล็อกโค้ดโมดูลที่โหลดแบบไดนามิกเพื่อใช้ Xposed API ซึ่งอาจทำให้บางโมดูลเสียหายแต่ได้ประโยชน์ด้านความปลอดภัย</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- Module Repo -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_readme">ต้องอ่าน</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_releases">เผยแพร่</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_information">ข้อมูล</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_information_homepage">หน้าแรก</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_information_source_url">รหัสแหล่งที่มา</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_information_collaborators">ผู้ร่วมงาน</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_release_view_assets">คลัง</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_open_in_browser">เปิดในเบราว์เซอร์</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_release_load_more">แสดงเวอร์ชันเก่า</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_release_no_more">ไม่ปล่อยอีกแล้ว</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="repo_load_failed">ไม่สามารถโหลดโมดูล repo: %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_upgradable_first">อัพเกรดก่อน</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="installed">ติดตั้งแล้ว</string>
+[bot][lsposed][lsposed@lsposed.org]    <plurals name="module_release_assets_download_count">
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="other">%d ดาวน์โหลด</item>
+[bot][lsposed][lsposed@lsposed.org]    </plurals>
+[bot][lsposed][lsposed@lsposed.org]    <!-- Colors -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_sakura">ซากุระ</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_red">สีแดง</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_pink">สีชมพู</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_purple">สีม่วง</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_deep_purple">สีม่วงเข้ม</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_indigo">คราม</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_blue">สีน้ำเงิน</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_light_blue">ฟ้าอ่อน</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_cyan">สีฟ้า</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_teal">นกเป็ดน้ำ</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_green">สีเขียว</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_light_green">สีเขียวอ่อน</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_lime">มะนาว</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_yellow">สีเหลือง</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_amber">อำพัน</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_orange">ส้ม</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_deep_orange">ส้มเข้ม</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_brown">สีน้ำตาล</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_blue_grey">น้ำเงินเทา</string>
+[bot][lsposed][lsposed@lsposed.org]</resources>

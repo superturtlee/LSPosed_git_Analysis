@@ -1,0 +1,17 @@
+[external][shana][shana@zju.edu.cn]package org.lsposed.lspd.hooker;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import android.app.ActivityThread;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import de.robv.android.xposed.XposedInit;
+[external][noreply][noreply@nullptr.icu]import io.github.libxposed.api.XposedInterface;
+[external][noreply][noreply@nullptr.icu]import io.github.libxposed.api.annotations.AfterInvocation;
+[external][noreply][noreply@nullptr.icu]import io.github.libxposed.api.annotations.XposedHooker;
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]@XposedHooker
+[external][noreply][noreply@nullptr.icu]public class AttachHooker implements XposedInterface.Hooker {
+[external][shana][shana@zju.edu.cn]
+[external][noreply][noreply@nullptr.icu]    @AfterInvocation
+[external][noreply][noreply@nullptr.icu]    public static void afterHookedMethod(XposedInterface.AfterHookCallback callback) {
+[external][noreply][noreply@nullptr.icu]        XposedInit.loadModules((ActivityThread) callback.getThisObject());
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

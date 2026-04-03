@@ -1,0 +1,151 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][admin][admin@0x.mk] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][admin][admin@0x.mk] * Copyright (C) 2021 - 2022 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]package org.lsposed.lspd.service;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import static org.lsposed.lspd.service.ServiceManager.TAG;
+[external][shana][shana@zju.edu.cn]import static org.lsposed.lspd.service.ServiceManager.getSystemServiceManager;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import android.os.Build;
+[external][shana][shana@zju.edu.cn]import android.os.IBinder;
+[external][shana][shana@zju.edu.cn]import android.os.IServiceCallback;
+[external][shana][shana@zju.edu.cn]import android.os.Parcel;
+[external][shana][shana@zju.edu.cn]import android.os.RemoteException;
+[external][shana][shana@zju.edu.cn]import android.os.SystemProperties;
+[external][shana][shana@zju.edu.cn]import android.util.Log;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public class LSPSystemServerService extends ILSPSystemServerService.Stub implements IBinder.DeathRecipient {
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static final String PROXY_SERVICE_NAME = "serial";
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private IBinder originService = null;
+[external][shana][shana@zju.edu.cn]    private int requested;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public boolean systemServerRequested() {
+[external][shana][shana@zju.edu.cn]        return requested > 0;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void putBinderForSystemServer() {
+[external][shana][shana@zju.edu.cn]        android.os.ServiceManager.addService(PROXY_SERVICE_NAME, this);
+[external][shana][shana@zju.edu.cn]        binderDied();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public LSPSystemServerService(int maxRetry) {
+[external][admin][admin@0x.mk]        Log.d(TAG, "LSPSystemServerService::LSPSystemServerService");
+[external][shana][shana@zju.edu.cn]        requested = -maxRetry;
+[external][shana][shana@zju.edu.cn]        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+[external][admin][admin@0x.mk]            // Registers a callback when system is registering an authentic "serial" service
+[external][admin][admin@0x.mk]            // And we are proxying all requests to that system service
+[external][shana][shana@zju.edu.cn]            var serviceCallback = new IServiceCallback.Stub() {
+[external][shana][shana@zju.edu.cn]                @Override
+[external][shana][shana@zju.edu.cn]                public void onRegistration(String name, IBinder binder) {
+[external][admin][admin@0x.mk]                    Log.d(TAG, "LSPSystemServerService::LSPSystemServerService onRegistration: " + name + " " + binder);
+[external][shana][shana@zju.edu.cn]                    if (name.equals(PROXY_SERVICE_NAME) && binder != null && binder != LSPSystemServerService.this) {
+[external][shana][shana@zju.edu.cn]                        Log.d(TAG, "Register " + name + " " + binder);
+[external][shana][shana@zju.edu.cn]                        originService = binder;
+[external][shana][shana@zju.edu.cn]                        LSPSystemServerService.this.linkToDeath();
+[external][shana][shana@zju.edu.cn]                    }
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]                @Override
+[external][shana][shana@zju.edu.cn]                public IBinder asBinder() {
+[external][shana][shana@zju.edu.cn]                    return this;
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            };
+[external][shana][shana@zju.edu.cn]            try {
+[external][shana][shana@zju.edu.cn]                getSystemServiceManager().registerForNotifications(PROXY_SERVICE_NAME, serviceCallback);
+[external][shana][shana@zju.edu.cn]            } catch (Throwable e) {
+[external][shana][shana@zju.edu.cn]                Log.e(TAG, "unregister: ", e);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public ILSPApplicationService requestApplicationService(int uid, int pid, String processName, IBinder heartBeat) {
+[external][admin][admin@0x.mk]        Log.d(TAG, "ILSPApplicationService.requestApplicationService: " + uid + " " + pid + " " + processName + " " + heartBeat);
+[external][shana][shana@zju.edu.cn]        requested = 1;
+[external][shana][shana@zju.edu.cn]        if (ConfigManager.getInstance().shouldSkipSystemServer() || uid != 1000 || heartBeat == null || !"system".equals(processName))
+[external][shana][shana@zju.edu.cn]            return null;
+[external][shana][shana@zju.edu.cn]        else
+[external][shana][shana@zju.edu.cn]            return ServiceManager.requestApplicationService(uid, pid, processName, heartBeat);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public boolean onTransact(int code, Parcel data, Parcel reply, int flags) throws RemoteException {
+[external][admin][admin@0x.mk]        Log.d(TAG, "LSPSystemServerService.onTransact: code=" + code);
+[external][shana][shana@zju.edu.cn]        if (originService != null) {
+[external][shana][shana@zju.edu.cn]            return originService.transact(code, data, reply, flags);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][admin][admin@0x.mk]        switch (code) {
+[external][howardwu20][HowardWu20@outlook.com]            case BridgeService.TRANSACTION_CODE -> {
+[external][admin][admin@0x.mk]                int uid = data.readInt();
+[external][admin][admin@0x.mk]                int pid = data.readInt();
+[external][admin][admin@0x.mk]                String processName = data.readString();
+[external][admin][admin@0x.mk]                IBinder heartBeat = data.readStrongBinder();
+[external][admin][admin@0x.mk]                var service = requestApplicationService(uid, pid, processName, heartBeat);
+[external][admin][admin@0x.mk]                if (service != null) {
+[external][admin][admin@0x.mk]                    Log.d(TAG, "LSPSystemServerService.onTransact requestApplicationService granted: " + service);
+[external][admin][admin@0x.mk]                    reply.writeNoException();
+[external][admin][admin@0x.mk]                    reply.writeStrongBinder(service.asBinder());
+[external][admin][admin@0x.mk]                    return true;
+[external][admin][admin@0x.mk]                } else {
+[external][admin][admin@0x.mk]                    Log.d(TAG, "LSPSystemServerService.onTransact requestApplicationService rejected");
+[external][admin][admin@0x.mk]                    return false;
+[external][admin][admin@0x.mk]                }
+[external][howardwu20][HowardWu20@outlook.com]            }
+[external][howardwu20][HowardWu20@outlook.com]            case LSPApplicationService.OBFUSCATION_MAP_TRANSACTION_CODE, LSPApplicationService.DEX_TRANSACTION_CODE -> {
+[external][admin][admin@0x.mk]                // Proxy LSP dex transaction to Application Binder
+[external][admin][admin@0x.mk]                return ServiceManager.getApplicationService().onTransact(code, data, reply, flags);
+[external][howardwu20][HowardWu20@outlook.com]            }
+[external][howardwu20][HowardWu20@outlook.com]            default -> {
+[external][admin][admin@0x.mk]                return super.onTransact(code, data, reply, flags);
+[external][howardwu20][HowardWu20@outlook.com]            }
+[external][admin][admin@0x.mk]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void linkToDeath() {
+[external][shana][shana@zju.edu.cn]        try {
+[external][shana][shana@zju.edu.cn]            originService.linkToDeath(this, 0);
+[external][shana][shana@zju.edu.cn]        } catch (Throwable e) {
+[external][shana][shana@zju.edu.cn]            Log.e(TAG, "system server service: link to death", e);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public void binderDied() {
+[external][shana][shana@zju.edu.cn]        if (originService != null) {
+[external][shana][shana@zju.edu.cn]            originService.unlinkToDeath(this, 0);
+[external][shana][shana@zju.edu.cn]            originService = null;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void maybeRetryInject() {
+[external][shana][shana@zju.edu.cn]        if (requested < 0) {
+[external][shana][shana@zju.edu.cn]            Log.w(TAG, "System server injection fails, trying a restart");
+[external][shana][shana@zju.edu.cn]            ++requested;
+[external][shana][shana@zju.edu.cn]            if (Build.SUPPORTED_64_BIT_ABIS.length > 0 && Build.SUPPORTED_32_BIT_ABIS.length > 0) {
+[external][shana][shana@zju.edu.cn]                // Only devices with both 32-bit and 64-bit support have zygote_secondary
+[external][shana][shana@zju.edu.cn]                SystemProperties.set("ctl.restart", "zygote_secondary");
+[external][shana][shana@zju.edu.cn]            } else {
+[external][shana][shana@zju.edu.cn]                SystemProperties.set("ctl.restart", "zygote");
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

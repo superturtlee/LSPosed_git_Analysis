@@ -1,0 +1,12 @@
+[external][shana][shana@zju.edu.cn]package android.content.pm;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import androidx.annotation.RequiresApi;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public class ApplicationInfo {
+[external][shana][shana@zju.edu.cn]    public String credentialProtectedDataDir;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public String[] resourceDirs;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @RequiresApi(31)
+[external][shana][shana@zju.edu.cn]    public String[] overlayPaths;
+[external][shana][shana@zju.edu.cn]}

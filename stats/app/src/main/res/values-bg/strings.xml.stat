@@ -1,0 +1,242 @@
+[bot][lsposed][lsposed@lsposed.org]<?xml version="1.0" encoding="utf-8"?>
+[bot][lsposed][lsposed@lsposed.org]<!--
+[bot][lsposed][lsposed@lsposed.org]  ~ This file is part of LSPosed.
+[bot][lsposed][lsposed@lsposed.org]  ~
+[bot][lsposed][lsposed@lsposed.org]  ~ LSPosed is free software: you can redistribute it and/or modify
+[bot][lsposed][lsposed@lsposed.org]  ~ it under the terms of the GNU General Public License as published by
+[bot][lsposed][lsposed@lsposed.org]  ~ the Free Software Foundation, either version 3 of the License, or
+[bot][lsposed][lsposed@lsposed.org]  ~ (at your option) any later version.
+[bot][lsposed][lsposed@lsposed.org]  ~
+[bot][lsposed][lsposed@lsposed.org]  ~ LSPosed is distributed in the hope that it will be useful,
+[bot][lsposed][lsposed@lsposed.org]  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+[bot][lsposed][lsposed@lsposed.org]  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[bot][lsposed][lsposed@lsposed.org]  ~ GNU General Public License for more details.
+[bot][lsposed][lsposed@lsposed.org]  ~
+[bot][lsposed][lsposed@lsposed.org]  ~ You should have received a copy of the GNU General Public License
+[bot][lsposed][lsposed@lsposed.org]  ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[bot][lsposed][lsposed@lsposed.org]  ~
+[bot][lsposed][lsposed@lsposed.org]  ~ Copyright (C) 2021 LSPosed Contributors
+[bot][lsposed][lsposed@lsposed.org]  -->
+[bot][lsposed][lsposed@lsposed.org]<resources xmlns:tools="http://schemas.android.com/tools" tools:keep="@string/xposed_module_updated_notification_*,@string/module_is_not_activated_*">
+[bot][lsposed][lsposed@lsposed.org]    <!-- MainActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="overview">نظرة عامة</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="Modules">الوحدات</string>
+[bot][lsposed][lsposed@lsposed.org]    <plurals name="modules_enabled_count">
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="one">%d модулът е активиран</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="other">%d включени модули</item>
+[bot][lsposed][lsposed@lsposed.org]    </plurals>
+[bot][lsposed][lsposed@lsposed.org]    <string name="Logs">Дневници</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="Settings">Настройки</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="feedback_or_suggestion">Обратна връзка или предложение</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="About">За нас</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="report_issue">Докладване на проблем</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo">Хранилище</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo_up_to_date">Всички модули са актуализирани</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo_published_time">Публикувано в %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo_updated_time">Акттуализиран на %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <plurals name="module_repo_upgradable">
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="one">%d модула има актуализация</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="other">%d модули с актуализации</item>
+[bot][lsposed][lsposed@lsposed.org]    </plurals>
+[bot][lsposed][lsposed@lsposed.org]    <string name="about_view_source_code"><![CDATA[Преглед на изходния код в %1$s<br/>Присъединете се към нашия %2$s канал]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="translators" comment="Dear translators, please add your home page here following the format. There can be more than one translator. So feel free to append yourself.">невалидно</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install">Инсталиране на</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install_summary">Натиснете, за да инсталирате LSPosed</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="not_installed">Не е инсталиран</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="not_install_summary">LSPosed не е инсталиран</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="activated">Активиран</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="partial_activated">Частично активиран</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="selinux_policy_not_loaded_summary">SEPolicy не е заредена правилно</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="selinux_policy_not_loaded"><![CDATA[Някои функции няма да работят.<br/>Моля, докладвайте за това на <a href="https://github.com/topjohnwu/Magisk/issues"><b>Magisk</b></a> разработчик.]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_inject_fail_summary">Неуспешно инжектиране на системната рамка</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_inject_fail"><![CDATA[Това се случва рядко и може да е причинено от <b>Magisk</b> или някои нискокачествени модули на Magisk.<br/>Моля, опитайте се да деактивирате модулите на Magisk, различни от Riru и LSPosed, или изпратете пълен журнал на разработчиците.]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_prop_incorrect_summary">Неправилна стойност на системата</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_prop_incorrect"><![CDATA[Някои необходими системни свойства са изтрити или променени.<br/>Понякога модулите могат да се обезсилват.]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="need_update">Необходимо е да се актуализира</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="please_update_summary">Моля, инсталирайте най-новата версия на LSPosed</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_api_version">Версия на API</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_framework_version">Версия на рамката</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_manager_package_name">Име на пакета на мениджъра</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_system_version">Версия на системата</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_device">Устройство</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_system_abi">ABI на системата</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_dex2oat_wrapper">Обвивка на Dex Optimizer</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enabled">Разрешено</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="not_enabled">Не е разрешено</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="supported">Поддържан</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="unsupported">Неподдържан</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="android_version_unsatisfied">Версията за Android е неудовлетворена</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="crashed">Счупен</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="mount_failed">Монтирането е неуспешно</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="selinux_permissive">SELinux е разрешаващ</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sepolicy_incorrect">Политиката на SELinux е неправилна</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_lsposed">Актуализиране на LSPosed</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_lsposed_msg">Потвърждаване на актуализацията на LSPosed? Това устройство ще се рестартира след завършване на актуализацията</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_copied">Копиране в клипборда</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- WelcomeDialog -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="parasitic_welcome">Добре дошли в LSPosed</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="parasitic_welcome_summary">Използвате паразитния мениджър, който може да създаде пряк път или все още да се отваря от известието.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="parasitic_welcome_summary_no_shortcut_support">Използвате паразитния мениджър, който може да се отвори от известие.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="create_shortcut">Създаване на пряк път</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="never_show">Никога не показвайте</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_welcome">Препоръчва се паразитен мениджър</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_welcome_summary">LSPosed вече поддържа паразитиране на системата, за да се избегне откриването, можете да отворите мениджъра на паразити от известието. Препоръчва се да деинсталирате текущото приложение.</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- LogsActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="menuSaveToSd">Запазете</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="nav_item_logs_verbose">Условни дневници</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="nav_item_logs_module">Дневници на модулите</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_saving">Запазване на дневника, моля изчакайте</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_saved">Запазени дневници</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_save_failed2">Не успяхте да запазите:\n%s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menuClearLog">Изчистване на дневника сега</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_cleared">Дневникът е изчистен успешно.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="scroll_top">Превъртете към началото</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="loading">Зареждане…</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="scroll_bottom">Превъртете към дъното</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menuReload">Презареждане</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_clear_failed_2">Неуспешно изчистване на дневника</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_enable_word_wrap">Обвиване на думата</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enabled_verbose_log">Разрешен е вербален дневник</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="disabled_verbose_log">Деактивиран е вербалният дневник</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- ModulesActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_empty_description">(не е предоставено описание)</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_xposed_min_version">Този модул изисква по-нова версия на Xposed (%d) и поради това не може да бъде активиран</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_target_version_higher">Този модул е предназначен за по-нова версия на Xposed (%d) и поради това някои функционалности може да не работят</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="no_min_version_specified">Този модул не посочва версията на Xposed, която му е необходима.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_min_version_too_low">Този модул е създаден за Xposed версия %1$d, но поради несъвместими промени във версия %2$d, той е деактивиран</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_installed_on_external_storage">Този модул не може да бъде зареден, защото е инсталиран на SD картата, моля, преместете го във вътрешната памет</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstall">Деинсталиране на</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_settings">Настройки на модула</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="view_in_repo">Преглед в Repo</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstall_message">Искате ли да деинсталирате този модул?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstalled">Деинсталиран %1$s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstall_failed">Деинсталирането е неуспешно</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="add_module_to_user">Добавяне на модул към потребителя</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_installed">Добавяне на %1$s към потребител %2$s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_install_failed">Добавянето на модул е неуспешно</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install_to_user">Инсталиране на потребител %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install_to_user_message">Искате да инсталирате %1$s на потребител %2$s? Препоръчително е да се инсталира ръчно, принудителното инсталиране чрез LSPosed може да доведе до проблеми.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="expand">разширяване на</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="collapse">срив</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- AppListActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_speed">Оптимизиране на</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_speed_msg">Оптимизиране на…</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_done">Оптимизацията е завършена</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_launch">Стартирайте го</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_failed">Оптимизацията е неуспешна: върнатата стойност е празна</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="compile_failed_with_info">Оптимизацията е неуспешна: </string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_by_name">Име на приложението</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_by_package_name">Име на пакета</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_by_install_time">Време за инсталиране</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_by_update_time">Време за актуализация</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_reverse">Обратен</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_system_apps">Системни приложения</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_sort">Сортиране</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enable_module">Включване на модула</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="no_scope_selected">Не сте избрали нито едно приложение. Продължете?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_games">Игри</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_modules">Модули</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_denylist">Denylist</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="failed_to_save_scope_list">Неуспешно запазване на списъка с обхвата</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_version">Версия: %1$s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="use_recommended">Препоръчителен</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="no_scope_selected_has_recommended">Не сте избрали нито едно приложение. Избрахте препоръчани приложения?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="use_recommended_message">Изберете препоръчани приложения?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_is_not_activated_yet">Модулът Xposed все още не е активиран</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="requested_by_module">Препоръчителен</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_available">Налична е актуализация: %1$s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_disabled_no_selection">Модулът %s е деактивиран, тъй като не е избрано приложение.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="android_framework">Рамка на системата</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_backup_and_restore">Резервно копие</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_backup">Резервно копие</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_restore">Възстановяване на</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="force_stop">Спиране на силата</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="force_stop_dlg_title">Насилствено спиране?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="force_stop_dlg_text">Ако спрете приложение принудително, то може да се държи неправилно.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="reboot_required">Необходимо е рестартиране, за да се приложи тази промяна.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="reboot">Рестартиране на</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_hide">Скрий</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="deny_list">%s е в denylist. Възможно е той да не влезе в сила.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="deny_list_info">На denylist</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- ModulesActivity and AppListActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="modules_other_app">Преглед в друго приложение</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_app_info">Информация за приложението</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="list_empty">¯\\\\_(ツ)_\/¯\nНищо тук</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- SettingsActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_group_framework">Рамка</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_disable_verbose_log">Деактивиране на вербалните дневници</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_disable_verbose_log_summary">Искане за включване на вербални дневници</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="pure_black_dark_theme">Черна тъмна тема</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="pure_black_dark_theme_summary">Използвайте чисто черната тема, ако е активирана тъмна тема</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_group_theme">Тема</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup_and_restore">Архивиране и възстановяване</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup_summery">Списък с резервни копия на модули и списъци на обхвата.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_restore_summery">Възстановяване на списъците с модули и области.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup">Резервно копие</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup_failed2">Неуспешно архивиране:\n%s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enable_documentui">Моля, разрешете DocumentUI</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_restore">Възстановяване на</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_restore_failed2">Неуспешно възстановяване:\n%s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="group_network">Мрежа</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="dns_over_http">DNS през HTTPS</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="dns_over_http_summary">Заобикаляне на отравянето на DNS в някои държави</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="theme_color">Цвят на темата</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="theme_color_system">Цвят на темата на системата</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_show_hidden_icon_apps_enabled">Принуждаване на приложенията да показват икони на стартирането</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_show_hidden_icon_apps_enabled_summary">След Android 10 на приложенията не е позволено да скриват иконите си за стартиране. Изключете превключвателя, за да деактивирате тази системна функция.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_group_system">Система</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_language">Език</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_translation_contributors">Преводачи, които допринасят за превода</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_translation">Участие в превод</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_translation_summary">Помогнете ни да преведем %s на вашия език</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_create_shortcut_summary">Създаване на пряк път, който може да отваря паразитен мениджър</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_shortcut_pinned_hint">Кратък път, закачен</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_unsupported_pin_shortcut_summary">Текущият стартер по подразбиране не поддържа преки пътища</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_enable_status_notification">Известие за състоянието</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_enable_status_notification_summary">Показване на известие, което може да отвори паразитен мениджър</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="disable_status_notification_error">Няма пряк път, не мога да деактивирам известието</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_update_channel">Актуализиране на канала</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_channel_stable">Стабилен</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_channel_bate">Бета</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_channel_nightly">Нощно изграждане</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_xposed_api_call_protection">Защита на повикванията на Xposed API</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_xposed_api_call_protection_summary">Блокиране на динамично зареждания код на модула, за да се използва Xposed API, това може да наруши някои модули, но е от полза за сигурността</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- Module Repo -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_readme">Readme</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_releases">Освобождава</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_information">Информация</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_information_homepage">Начална страница</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_information_source_url">Изходен код</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_information_collaborators">Сътрудници</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_release_view_assets">Активи</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_open_in_browser">Отваряне в браузъра</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_release_load_more">Показване на по-стари версии</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_release_no_more">Няма повече освобождаване</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="repo_load_failed">Неуспешно зареждане на модул repo: %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_upgradable_first">Може да се надгражда първо</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="installed">Инсталиран</string>
+[bot][lsposed][lsposed@lsposed.org]    <plurals name="module_release_assets_download_count">
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="one">%d изтегляне</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="other">%d Изтегляния</item>
+[bot][lsposed][lsposed@lsposed.org]    </plurals>
+[bot][lsposed][lsposed@lsposed.org]    <!-- Colors -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_sakura">Сакура</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_red">Червено</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_pink">Розов</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_purple">Лилаво</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_deep_purple">Наситено лилаво</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_indigo">Indigo</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_blue">Синьо</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_light_blue">Светлосиньо</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_cyan">Cyan</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_teal">Teal</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_green">Зелен</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_light_green">Светлозелено</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_lime">Lime</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_yellow">Жълт</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_amber">Амбър</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_orange">Orange</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_deep_orange">Наситено оранжево</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_brown">Кафяв</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_blue_grey">Синьо сиво</string>
+[bot][lsposed][lsposed@lsposed.org]</resources>

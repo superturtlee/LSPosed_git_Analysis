@@ -1,0 +1,320 @@
+[external][shana][shana@zju.edu.cn]// This is the public API for Zygisk modules.
+[external][shana][shana@zju.edu.cn]// DO NOT MODIFY ANY CODE IN THIS HEADER.
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]#pragma once
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]#include <jni.h>
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]#define ZYGISK_API_VERSION 2
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]/*
+[external][shana][shana@zju.edu.cn]Define a class and inherit zygisk::ModuleBase to implement the functionality of your module.
+[external][shana][shana@zju.edu.cn]Use the macro REGISTER_ZYGISK_MODULE(className) to register that class to Zygisk.
+[external][shana][shana@zju.edu.cn]Please note that modules will only be loaded after zygote has forked the child process.
+[external][shana][shana@zju.edu.cn]THIS MEANS ALL OF YOUR CODE RUNS IN THE APP/SYSTEM SERVER PROCESS, NOT THE ZYGOTE DAEMON!
+[external][shana][shana@zju.edu.cn]Example code:
+[external][shana][shana@zju.edu.cn]static jint (*orig_logger_entry_max)(JNIEnv *env);
+[external][shana][shana@zju.edu.cn]static jint my_logger_entry_max(JNIEnv *env) { return orig_logger_entry_max(env); }
+[external][shana][shana@zju.edu.cn]static void example_handler(int socket) { ... }
+[external][shana][shana@zju.edu.cn]class ExampleModule : public zygisk::ModuleBase {
+[external][shana][shana@zju.edu.cn]public:
+[external][shana][shana@zju.edu.cn]    void onLoad(zygisk::Api *api, JNIEnv *env) override {
+[external][shana][shana@zju.edu.cn]        this->api = api;
+[external][shana][shana@zju.edu.cn]        this->env = env;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]    void preAppSpecialize(zygisk::AppSpecializeArgs *args) override {
+[external][shana][shana@zju.edu.cn]        JNINativeMethod methods[] = {
+[external][shana][shana@zju.edu.cn]            { "logger_entry_max_payload_native", "()I", (void*) my_logger_entry_max },
+[external][shana][shana@zju.edu.cn]        };
+[external][shana][shana@zju.edu.cn]        api->hookJniNativeMethods(env, "android/util/Log", methods, 1);
+[external][shana][shana@zju.edu.cn]        *(void **) &orig_logger_entry_max = methods[0].fnPtr;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]private:
+[external][shana][shana@zju.edu.cn]    zygisk::Api *api;
+[external][shana][shana@zju.edu.cn]    JNIEnv *env;
+[external][shana][shana@zju.edu.cn]};
+[external][shana][shana@zju.edu.cn]REGISTER_ZYGISK_MODULE(ExampleModule)
+[external][shana][shana@zju.edu.cn]REGISTER_ZYGISK_COMPANION(example_handler)
+[external][shana][shana@zju.edu.cn]*/
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]namespace zygisk {
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    struct Api;
+[external][shana][shana@zju.edu.cn]    struct AppSpecializeArgs;
+[external][shana][shana@zju.edu.cn]    struct ServerSpecializeArgs;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    class ModuleBase {
+[external][shana][shana@zju.edu.cn]    public:
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // This function is called when the module is loaded into the target process.
+[external][shana][shana@zju.edu.cn]        // A Zygisk API handle will be sent as an argument; call utility functions or interface
+[external][shana][shana@zju.edu.cn]        // with Zygisk through this handle.
+[external][shana][shana@zju.edu.cn]        virtual void onLoad([[maybe_unused]] Api *api, [[maybe_unused]] JNIEnv *env) {}
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // This function is called before the app process is specialized.
+[external][shana][shana@zju.edu.cn]        // At this point, the process just got forked from zygote, but no app specific specialization
+[external][shana][shana@zju.edu.cn]        // is applied. This means that the process does not have any sandbox restrictions and
+[external][shana][shana@zju.edu.cn]        // still runs with the same privilege of zygote.
+[external][shana][shana@zju.edu.cn]        //
+[external][shana][shana@zju.edu.cn]        // All the arguments that will be sent and used for app specialization is passed as a single
+[external][shana][shana@zju.edu.cn]        // AppSpecializeArgs object. You can read and overwrite these arguments to change how the app
+[external][shana][shana@zju.edu.cn]        // process will be specialized.
+[external][shana][shana@zju.edu.cn]        //
+[external][shana][shana@zju.edu.cn]        // If you need to run some operations as superuser, you can call Api::connectCompanion() to
+[external][shana][shana@zju.edu.cn]        // get a socket to do IPC calls with a root companion process.
+[external][shana][shana@zju.edu.cn]        // See Api::connectCompanion() for more info.
+[external][shana][shana@zju.edu.cn]        virtual void preAppSpecialize([[maybe_unused]] AppSpecializeArgs *args) {}
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // This function is called after the app process is specialized.
+[external][shana][shana@zju.edu.cn]        // At this point, the process has all sandbox restrictions enabled for this application.
+[external][shana][shana@zju.edu.cn]        // This means that this function runs as the same privilege of the app's own code.
+[external][shana][shana@zju.edu.cn]        virtual void postAppSpecialize([[maybe_unused]] const AppSpecializeArgs *args) {}
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // This function is called before the system server process is specialized.
+[external][shana][shana@zju.edu.cn]        // See preAppSpecialize(args) for more info.
+[external][shana][shana@zju.edu.cn]        virtual void preServerSpecialize([[maybe_unused]] ServerSpecializeArgs *args) {}
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // This function is called after the system server process is specialized.
+[external][shana][shana@zju.edu.cn]        // At this point, the process runs with the privilege of system_server.
+[external][shana][shana@zju.edu.cn]        virtual void postServerSpecialize([[maybe_unused]] const ServerSpecializeArgs *args) {}
+[external][shana][shana@zju.edu.cn]    };
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    struct AppSpecializeArgs {
+[external][shana][shana@zju.edu.cn]        // Required arguments. These arguments are guaranteed to exist on all Android versions.
+[external][shana][shana@zju.edu.cn]        jint &uid;
+[external][shana][shana@zju.edu.cn]        jint &gid;
+[external][shana][shana@zju.edu.cn]        jintArray &gids;
+[external][shana][shana@zju.edu.cn]        jint &runtime_flags;
+[external][shana][shana@zju.edu.cn]        jint &mount_external;
+[external][shana][shana@zju.edu.cn]        jstring &se_info;
+[external][shana][shana@zju.edu.cn]        jstring &nice_name;
+[external][shana][shana@zju.edu.cn]        jstring &instruction_set;
+[external][shana][shana@zju.edu.cn]        jstring &app_data_dir;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // Optional arguments. Please check whether the pointer is null before de-referencing
+[external][shana][shana@zju.edu.cn]        jboolean *const is_child_zygote;
+[external][shana][shana@zju.edu.cn]        jboolean *const is_top_app;
+[external][shana][shana@zju.edu.cn]        jobjectArray *const pkg_data_info_list;
+[external][shana][shana@zju.edu.cn]        jobjectArray *const whitelisted_data_info_list;
+[external][shana][shana@zju.edu.cn]        jboolean *const mount_data_dirs;
+[external][shana][shana@zju.edu.cn]        jboolean *const mount_storage_dirs;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        AppSpecializeArgs() = delete;
+[external][shana][shana@zju.edu.cn]    };
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    struct ServerSpecializeArgs {
+[external][shana][shana@zju.edu.cn]        jint &uid;
+[external][shana][shana@zju.edu.cn]        jint &gid;
+[external][shana][shana@zju.edu.cn]        jintArray &gids;
+[external][shana][shana@zju.edu.cn]        jint &runtime_flags;
+[external][shana][shana@zju.edu.cn]        jlong &permitted_capabilities;
+[external][shana][shana@zju.edu.cn]        jlong &effective_capabilities;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        ServerSpecializeArgs() = delete;
+[external][shana][shana@zju.edu.cn]    };
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    namespace internal {
+[external][shana][shana@zju.edu.cn]        struct api_table;
+[external][shana][shana@zju.edu.cn]        template <class T> void entry_impl(api_table *, JNIEnv *);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]// These values are used in Api::setOption(Option)
+[external][shana][shana@zju.edu.cn]    enum Option : int {
+[external][shana][shana@zju.edu.cn]        // Force Magisk's denylist unmount routines to run on this process.
+[external][shana][shana@zju.edu.cn]        //
+[external][shana][shana@zju.edu.cn]        // Setting this option only makes sense in preAppSpecialize.
+[external][shana][shana@zju.edu.cn]        // The actual unmounting happens during app process specialization.
+[external][shana][shana@zju.edu.cn]        //
+[external][shana][shana@zju.edu.cn]        // Set this option to force all Magisk and modules' files to be unmounted from the
+[external][shana][shana@zju.edu.cn]        // mount namespace of the process, regardless of the denylist enforcement status.
+[external][shana][shana@zju.edu.cn]        FORCE_DENYLIST_UNMOUNT = 0,
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // When this option is set, your module's library will be dlclose-ed after post[XXX]Specialize.
+[external][shana][shana@zju.edu.cn]        // Be aware that after dlclose-ing your module, all of your code will be unmapped from memory.
+[external][shana][shana@zju.edu.cn]        // YOU MUST NOT ENABLE THIS OPTION AFTER HOOKING ANY FUNCTIONS IN THE PROCESS.
+[external][shana][shana@zju.edu.cn]        DLCLOSE_MODULE_LIBRARY = 1,
+[external][shana][shana@zju.edu.cn]    };
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]// Bit masks of the return value of Api::getFlags()
+[external][shana][shana@zju.edu.cn]    enum StateFlag : uint32_t {
+[external][shana][shana@zju.edu.cn]        // The user has granted root access to the current process
+[external][shana][shana@zju.edu.cn]        PROCESS_GRANTED_ROOT = (1u << 0),
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // The current process was added on the denylist
+[external][shana][shana@zju.edu.cn]        PROCESS_ON_DENYLIST = (1u << 1),
+[external][shana][shana@zju.edu.cn]    };
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]// All API functions will stop working after post[XXX]Specialize as Zygisk will be unloaded
+[external][shana][shana@zju.edu.cn]// from the specialized process afterwards.
+[external][shana][shana@zju.edu.cn]    struct Api {
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // Connect to a root companion process and get a Unix domain socket for IPC.
+[external][shana][shana@zju.edu.cn]        //
+[external][shana][shana@zju.edu.cn]        // This API only works in the pre[XXX]Specialize functions due to SELinux restrictions.
+[external][shana][shana@zju.edu.cn]        //
+[external][shana][shana@zju.edu.cn]        // The pre[XXX]Specialize functions run with the same privilege of zygote.
+[external][shana][shana@zju.edu.cn]        // If you would like to do some operations with superuser permissions, register a handler
+[external][shana][shana@zju.edu.cn]        // function that would be called in the root process with REGISTER_ZYGISK_COMPANION(func).
+[external][shana][shana@zju.edu.cn]        // Another good use case for a companion process is that if you want to share some resources
+[external][shana][shana@zju.edu.cn]        // across multiple processes, hold the resources in the companion process and pass it over.
+[external][shana][shana@zju.edu.cn]        //
+[external][shana][shana@zju.edu.cn]        // The root companion process is ABI aware; that is, when calling this function from a 32-bit
+[external][shana][shana@zju.edu.cn]        // process, you will be connected to a 32-bit companion process, and vice versa for 64-bit.
+[external][shana][shana@zju.edu.cn]        //
+[external][shana][shana@zju.edu.cn]        // Returns a file descriptor to a socket that is connected to the socket passed to your
+[external][shana][shana@zju.edu.cn]        // module's companion request handler. Returns -1 if the connection attempt failed.
+[external][shana][shana@zju.edu.cn]        int connectCompanion();
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // Get the file descriptor of the root folder of the current module.
+[external][shana][shana@zju.edu.cn]        //
+[external][shana][shana@zju.edu.cn]        // This API only works in the pre[XXX]Specialize functions.
+[external][shana][shana@zju.edu.cn]        // Accessing the directory returned is only possible in the pre[XXX]Specialize functions
+[external][shana][shana@zju.edu.cn]        // or in the root companion process (assuming that you sent the fd over the socket).
+[external][shana][shana@zju.edu.cn]        // Both restrictions are due to SELinux and UID.
+[external][shana][shana@zju.edu.cn]        //
+[external][shana][shana@zju.edu.cn]        // Returns -1 if errors occurred.
+[external][shana][shana@zju.edu.cn]        int getModuleDir();
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // Set various options for your module.
+[external][shana][shana@zju.edu.cn]        // Please note that this function accepts one single option at a time.
+[external][shana][shana@zju.edu.cn]        // Check zygisk::Option for the full list of options available.
+[external][shana][shana@zju.edu.cn]        void setOption(Option opt);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // Get information about the current process.
+[external][shana][shana@zju.edu.cn]        // Returns bitwise-or'd zygisk::StateFlag values.
+[external][shana][shana@zju.edu.cn]        uint32_t getFlags();
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // Hook JNI native methods for a class
+[external][shana][shana@zju.edu.cn]        //
+[external][shana][shana@zju.edu.cn]        // Lookup all registered JNI native methods and replace it with your own functions.
+[external][shana][shana@zju.edu.cn]        // The original function pointer will be saved in each JNINativeMethod's fnPtr.
+[external][shana][shana@zju.edu.cn]        // If no matching class, method name, or signature is found, that specific JNINativeMethod.fnPtr
+[external][shana][shana@zju.edu.cn]        // will be set to nullptr.
+[external][shana][shana@zju.edu.cn]        void hookJniNativeMethods(JNIEnv *env, const char *className, JNINativeMethod *methods, int numMethods);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // For ELFs loaded in memory matching `regex`, replace function `symbol` with `newFunc`.
+[external][shana][shana@zju.edu.cn]        // If `oldFunc` is not nullptr, the original function pointer will be saved to `oldFunc`.
+[external][shana][shana@zju.edu.cn]        void pltHookRegister(const char *regex, const char *symbol, void *newFunc, void **oldFunc);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // For ELFs loaded in memory matching `regex`, exclude hooks registered for `symbol`.
+[external][shana][shana@zju.edu.cn]        // If `symbol` is nullptr, then all symbols will be excluded.
+[external][shana][shana@zju.edu.cn]        void pltHookExclude(const char *regex, const char *symbol);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        // Commit all the hooks that was previously registered.
+[external][shana][shana@zju.edu.cn]        // Returns false if an error occurred.
+[external][shana][shana@zju.edu.cn]        bool pltHookCommit();
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private:
+[external][shana][shana@zju.edu.cn]        internal::api_table *impl;
+[external][shana][shana@zju.edu.cn]        template <class T> friend void internal::entry_impl(internal::api_table *, JNIEnv *);
+[external][shana][shana@zju.edu.cn]    };
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]// Register a class as a Zygisk module
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]#define REGISTER_ZYGISK_MODULE(clazz) \
+[external][shana][shana@zju.edu.cn]void zygisk_module_entry(zygisk::internal::api_table *table, JNIEnv *env) { \
+[external][shana][shana@zju.edu.cn]    zygisk::internal::entry_impl<clazz>(table, env);                        \
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]// Register a root companion request handler function for your module
+[external][shana][shana@zju.edu.cn]//
+[external][shana][shana@zju.edu.cn]// The function runs in a superuser daemon process and handles a root companion request from
+[external][shana][shana@zju.edu.cn]// your module running in a target process. The function has to accept an integer value,
+[external][shana][shana@zju.edu.cn]// which is a socket that is connected to the target process.
+[external][shana][shana@zju.edu.cn]// See Api::connectCompanion() for more info.
+[external][shana][shana@zju.edu.cn]//
+[external][shana][shana@zju.edu.cn]// NOTE: the function can run concurrently on multiple threads.
+[external][shana][shana@zju.edu.cn]// Be aware of race conditions if you have a globally shared resource.
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]#define REGISTER_ZYGISK_COMPANION(func) \
+[external][shana][shana@zju.edu.cn]void zygisk_companion_entry(int client) { func(client); }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]/************************************************************************************
+[external][shana][shana@zju.edu.cn] * All the code after this point is internal code used to interface with Zygisk
+[external][shana][shana@zju.edu.cn] * and guarantee ABI stability. You do not have to understand what it is doing.
+[external][shana][shana@zju.edu.cn] ************************************************************************************/
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    namespace internal {
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        struct module_abi {
+[external][shana][shana@zju.edu.cn]            long api_version;
+[external][shana][shana@zju.edu.cn]            ModuleBase *_this;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            void (*preAppSpecialize)(ModuleBase *, AppSpecializeArgs *);
+[external][shana][shana@zju.edu.cn]            void (*postAppSpecialize)(ModuleBase *, const AppSpecializeArgs *);
+[external][shana][shana@zju.edu.cn]            void (*preServerSpecialize)(ModuleBase *, ServerSpecializeArgs *);
+[external][shana][shana@zju.edu.cn]            void (*postServerSpecialize)(ModuleBase *, const ServerSpecializeArgs *);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            module_abi(ModuleBase *module) : api_version(ZYGISK_API_VERSION), _this(module) {
+[external][shana][shana@zju.edu.cn]                preAppSpecialize = [](auto self, auto args) { self->preAppSpecialize(args); };
+[external][shana][shana@zju.edu.cn]                postAppSpecialize = [](auto self, auto args) { self->postAppSpecialize(args); };
+[external][shana][shana@zju.edu.cn]                preServerSpecialize = [](auto self, auto args) { self->preServerSpecialize(args); };
+[external][shana][shana@zju.edu.cn]                postServerSpecialize = [](auto self, auto args) { self->postServerSpecialize(args); };
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        };
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        struct api_table {
+[external][shana][shana@zju.edu.cn]            // These first 2 entries are permanent, shall never change
+[external][shana][shana@zju.edu.cn]            void *_this;
+[external][shana][shana@zju.edu.cn]            bool (*registerModule)(api_table *, module_abi *);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            // Utility functions
+[external][shana][shana@zju.edu.cn]            void (*hookJniNativeMethods)(JNIEnv *, const char *, JNINativeMethod *, int);
+[external][shana][shana@zju.edu.cn]            void (*pltHookRegister)(const char *, const char *, void *, void **);
+[external][shana][shana@zju.edu.cn]            void (*pltHookExclude)(const char *, const char *);
+[external][shana][shana@zju.edu.cn]            bool (*pltHookCommit)();
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            // Zygisk functions
+[external][shana][shana@zju.edu.cn]            int  (*connectCompanion)(void * /* _this */);
+[external][shana][shana@zju.edu.cn]            void (*setOption)(void * /* _this */, Option);
+[external][shana][shana@zju.edu.cn]            int  (*getModuleDir)(void * /* _this */);
+[external][shana][shana@zju.edu.cn]            uint32_t (*getFlags)(void * /* _this */);
+[external][shana][shana@zju.edu.cn]        };
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        template <class T>
+[external][shana][shana@zju.edu.cn]        void entry_impl(api_table *table, JNIEnv *env) {
+[external][shana][shana@zju.edu.cn]            static Api api;
+[external][shana][shana@zju.edu.cn]            api.impl = table;
+[external][shana][shana@zju.edu.cn]            static T module;
+[external][shana][shana@zju.edu.cn]            ModuleBase *m = &module;
+[external][shana][shana@zju.edu.cn]            static module_abi abi(m);
+[external][shana][shana@zju.edu.cn]            if (!table->registerModule(table, &abi)) return;
+[external][shana][shana@zju.edu.cn]            m->onLoad(&api, env);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    } // namespace internal
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    inline int Api::connectCompanion() {
+[external][shana][shana@zju.edu.cn]        return impl->connectCompanion ? impl->connectCompanion(impl->_this) : -1;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]    inline int Api::getModuleDir() {
+[external][shana][shana@zju.edu.cn]        return impl->getModuleDir ? impl->getModuleDir(impl->_this) : -1;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]    inline void Api::setOption(Option opt) {
+[external][shana][shana@zju.edu.cn]        if (impl->setOption) impl->setOption(impl->_this, opt);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]    inline uint32_t Api::getFlags() {
+[external][shana][shana@zju.edu.cn]        return impl->getFlags ? impl->getFlags(impl->_this) : 0;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]    inline void Api::hookJniNativeMethods(JNIEnv *env, const char *className, JNINativeMethod *methods, int numMethods) {
+[external][shana][shana@zju.edu.cn]        if (impl->hookJniNativeMethods) impl->hookJniNativeMethods(env, className, methods, numMethods);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]    inline void Api::pltHookRegister(const char *regex, const char *symbol, void *newFunc, void **oldFunc) {
+[external][shana][shana@zju.edu.cn]        if (impl->pltHookRegister) impl->pltHookRegister(regex, symbol, newFunc, oldFunc);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]    inline void Api::pltHookExclude(const char *regex, const char *symbol) {
+[external][shana][shana@zju.edu.cn]        if (impl->pltHookExclude) impl->pltHookExclude(regex, symbol);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]    inline bool Api::pltHookCommit() {
+[external][shana][shana@zju.edu.cn]        return impl->pltHookCommit != nullptr && impl->pltHookCommit();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]} // namespace zygisk
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]extern "C" {
+[external][shana][shana@zju.edu.cn][[gnu::visibility("default"), maybe_unused]]
+[external][shana][shana@zju.edu.cn]void zygisk_module_entry(zygisk::internal::api_table *, JNIEnv *);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn][[gnu::visibility("default"), maybe_unused]]
+[external][shana][shana@zju.edu.cn]void zygisk_companion_entry(int);
+[external][shana][shana@zju.edu.cn]}

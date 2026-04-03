@@ -1,0 +1,37 @@
+[external][admin][admin@0x.mk]package de.robv.android.xposed;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]import android.app.Application;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]import de.robv.android.xposed.callbacks.XC_LoadPackage;
+[external][admin][admin@0x.mk]import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]/**
+[external][admin][admin@0x.mk] * Get notified when an app ("Android package") is loaded.
+[external][admin][admin@0x.mk] * This is especially useful to hook some app-specific methods.
+[external][admin][admin@0x.mk] *
+[external][admin][admin@0x.mk] * <p>This interface should be implemented by the module's main class. Xposed will take care of
+[external][admin][admin@0x.mk] * registering it as a callback automatically.
+[external][admin][admin@0x.mk] */
+[external][admin][admin@0x.mk]public interface IXposedHookLoadPackage extends IXposedMod {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * This method is called when an app is loaded. It's called very early, even before
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * {@link Application#onCreate} is called.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Modules can set up their app-specific hooks here.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param lpparam Information about the app.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @throws Throwable Everything the callback throws is caught and logged.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    void handleLoadPackage(LoadPackageParam lpparam) throws Throwable;
+[external][admin][admin@0x.mk]
+[external][shana][shana@zju.edu.cn]    /** @hide */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    final class Wrapper extends XC_LoadPackage {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        private final IXposedHookLoadPackage instance;
+[external][shana][shana@zju.edu.cn]        public Wrapper(IXposedHookLoadPackage instance) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            this.instance = instance;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public void handleLoadPackage(LoadPackageParam lpparam) throws Throwable {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            instance.handleLoadPackage(lpparam);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][admin][admin@0x.mk]}

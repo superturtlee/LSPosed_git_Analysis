@@ -1,0 +1,45 @@
+[external][admin][admin@0x.mk]/*
+[external][admin][admin@0x.mk] * This file is part of LSPosed.
+[external][admin][admin@0x.mk] *
+[external][admin][admin@0x.mk] * LSPosed is free software: you can redistribute it and/or modify
+[external][admin][admin@0x.mk] * it under the terms of the GNU General Public License as published by
+[external][admin][admin@0x.mk] * the Free Software Foundation, either version 3 of the License, or
+[external][admin][admin@0x.mk] * (at your option) any later version.
+[external][admin][admin@0x.mk] *
+[external][admin][admin@0x.mk] * LSPosed is distributed in the hope that it will be useful,
+[external][admin][admin@0x.mk] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][admin][admin@0x.mk] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][admin][admin@0x.mk] * GNU General Public License for more details.
+[external][admin][admin@0x.mk] *
+[external][admin][admin@0x.mk] * You should have received a copy of the GNU General Public License
+[external][admin][admin@0x.mk] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][admin][admin@0x.mk] *
+[external][admin][admin@0x.mk] * Copyright (C) 2022 LSPosed Contributors
+[external][admin][admin@0x.mk] */
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]#pragma once
+[external][admin][admin@0x.mk]#include <string>
+[external][shana][shana@zju.edu.cn]#include <parallel_hashmap/phmap.h>
+[external][shana][shana@zju.edu.cn]#include "utils/jni_helper.hpp"
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]class WA: public dex::Writer::Allocator {
+[external][admin][admin@0x.mk]    // addr: {size, fd}
+[external][shana][shana@zju.edu.cn]    phmap::flat_hash_map<void*, std::pair<size_t, int>> allocated_;
+[external][admin][admin@0x.mk]public:
+[external][admin][admin@0x.mk]    inline void* Allocate(size_t size) override {
+[external][admin][admin@0x.mk]        auto fd = ASharedMemory_create("", size);
+[external][admin][admin@0x.mk]        auto *mem = mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+[external][admin][admin@0x.mk]        allocated_[mem] = {size, fd};
+[external][admin][admin@0x.mk]        return mem;
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]    inline void Free(void* ptr) override {
+[external][admin][admin@0x.mk]        auto alloc_data = allocated_.at(ptr);
+[external][admin][admin@0x.mk]        close(alloc_data.second);
+[external][admin][admin@0x.mk]        allocated_.erase(ptr);
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]    inline int GetFd(void* ptr) {
+[external][admin][admin@0x.mk]        auto alloc_data = allocated_.find(ptr);
+[external][admin][admin@0x.mk]        if (alloc_data == allocated_.end()) return -1;
+[external][admin][admin@0x.mk]        return (*alloc_data).second.second;
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]};

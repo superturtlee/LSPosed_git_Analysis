@@ -1,0 +1,28 @@
+[external][shana][shana@zju.edu.cn]name: Crowdin Action
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]on:
+[external][shana][shana@zju.edu.cn]  workflow_dispatch:
+[external][shana][shana@zju.edu.cn]  push:
+[external][shana][shana@zju.edu.cn]    branches: [ master ]
+[external][shana][shana@zju.edu.cn]    paths:
+[external][shana][shana@zju.edu.cn]      - app/src/main/res/values/strings.xml
+[internal][dr-tsng][tsng.nullptr@outlook.com]      - daemon/src/main/res/values/strings.xml
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]jobs:
+[external][shana][shana@zju.edu.cn]  synchronize-with-crowdin:
+[external][shana][shana@zju.edu.cn]    runs-on: ubuntu-latest
+[external][shana][shana@zju.edu.cn]    steps:
+[external][shana][shana@zju.edu.cn]    - name: Checkout
+[external][shana][shana@zju.edu.cn]      uses: actions/checkout@v3
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    - name: crowdin action
+[external][shana][shana@zju.edu.cn]      uses: crowdin/github-action@master
+[external][shana][shana@zju.edu.cn]      with:
+[external][shana][shana@zju.edu.cn]        upload_translations: false
+[external][shana][shana@zju.edu.cn]        download_translations: false
+[external][shana][shana@zju.edu.cn]        upload_sources: true
+[external][shana][shana@zju.edu.cn]        config: 'crowdin.yml'
+[external][shana][shana@zju.edu.cn]        crowdin_branch_name: master
+[external][shana][shana@zju.edu.cn]      env:
+[external][shana][shana@zju.edu.cn]        CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
+[external][shana][shana@zju.edu.cn]        CROWDIN_API_TOKEN: ${{ secrets.CROWDIN_API_TOKEN }}

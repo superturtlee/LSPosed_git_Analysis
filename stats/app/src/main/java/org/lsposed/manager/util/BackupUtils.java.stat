@@ -1,0 +1,123 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.manager.util;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.net.Uri;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.json.JSONArray;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import org.json.JSONException;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.json.JSONObject;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import org.lsposed.manager.App;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.manager.ConfigManager;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.manager.adapters.ScopeAdapter;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]import java.io.ByteArrayOutputStream;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import java.io.IOException;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.util.HashSet;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.util.List;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.util.zip.GZIPInputStream;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.util.zip.GZIPOutputStream;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]import rikka.core.os.FileUtils;
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]public class BackupUtils {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private static final int VERSION = 2;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    public static void backup(Uri uri) throws JSONException, IOException {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        backup(uri, null);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    public static void backup(Uri uri, String packageName) throws IOException, JSONException {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        JSONObject rootObject = new JSONObject();
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        rootObject.put("version", VERSION);
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        JSONArray modulesArray = new JSONArray();
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        var modules = ModuleUtil.getInstance().getModules();
+[external][shana][shana@zju.edu.cn]        if (modules == null) return;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        for (ModuleUtil.InstalledModule module : modules.values()) {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            if (packageName != null && !module.packageName.equals(packageName)) {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                continue;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            JSONObject moduleObject = new JSONObject();
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            moduleObject.put("enable", ModuleUtil.getInstance().isModuleEnabled(module.packageName));
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            moduleObject.put("package", module.packageName);
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            List<ScopeAdapter.ApplicationWithEquals> scope = ConfigManager.getModuleScope(module.packageName);
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            JSONArray scopeArray = new JSONArray();
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            for (ScopeAdapter.ApplicationWithEquals s : scope) {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                JSONObject app = new JSONObject();
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                app.put("package", s.packageName);
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                app.put("userId", s.userId);
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                scopeArray.put(app);
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            moduleObject.put("scope", scopeArray);
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            modulesArray.put(moduleObject);
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        rootObject.put("modules", modulesArray);
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        try (GZIPOutputStream gzipOutputStream = new GZIPOutputStream(App.getInstance().getContentResolver().openOutputStream(uri))) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            gzipOutputStream.write(rootObject.toString().getBytes());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    public static void restore(Uri uri) throws JSONException, IOException {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        restore(uri, null);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    public static void restore(Uri uri, String packageName) throws IOException, JSONException {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        try (GZIPInputStream gzipInputStream = new GZIPInputStream(App.getInstance().getContentResolver().openInputStream(uri), 32)) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            StringBuilder string = new StringBuilder();
+[external][shana][shana@zju.edu.cn]            try (var os = new ByteArrayOutputStream()) {
+[external][shana][shana@zju.edu.cn]                FileUtils.copy(gzipInputStream, os);
+[external][shana][shana@zju.edu.cn]                string.append(os);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            gzipInputStream.close();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            JSONObject rootObject = new JSONObject(string.toString());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            int version = rootObject.getInt("version");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (version == VERSION || version == 1) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                JSONArray modules = rootObject.getJSONArray("modules");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                for (int i = 0; i < modules.length(); i++) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    JSONObject moduleObject = modules.getJSONObject(i);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    String name = moduleObject.getString("package");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    if (packageName != null && !name.equals(packageName)) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        continue;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    ModuleUtil.InstalledModule module = ModuleUtil.getInstance().getModule(name);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    if (module != null) {
+[external][shana][shana@zju.edu.cn]                        var enabled = moduleObject.getBoolean("enable");
+[external][shana][shana@zju.edu.cn]                        ModuleUtil.getInstance().setModuleEnabled(name, enabled);
+[external][shana][shana@zju.edu.cn]                        if (!enabled) continue;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        JSONArray scopeArray = moduleObject.getJSONArray("scope");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        HashSet<ScopeAdapter.ApplicationWithEquals> scope = new HashSet<>();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        for (int j = 0; j < scopeArray.length(); j++) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                            if (version == VERSION) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                                JSONObject app = scopeArray.getJSONObject(j);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                                scope.add(new ScopeAdapter.ApplicationWithEquals(app.getString("package"), app.getInt("userId")));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                            } else {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                                scope.add(new ScopeAdapter.ApplicationWithEquals(scopeArray.getString(j), 0));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        }
+[external][noreply][noreply@nullptr.icu]                        ConfigManager.setModuleScope(name, module.legacy, scope);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            } else {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                throw new IllegalArgumentException("Unknown backup file version");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]}

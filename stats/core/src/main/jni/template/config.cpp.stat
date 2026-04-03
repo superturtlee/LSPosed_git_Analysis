@@ -1,0 +1,6 @@
+[external][shana][shana@zju.edu.cn]#include "config.h"
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]namespace lspd {
+[external][shana][shana@zju.edu.cn]const int versionCode = ${VERSION_CODE};
+[external][shana][shana@zju.edu.cn]const char* const versionName = "${VERSION_NAME}";
+[external][shana][shana@zju.edu.cn]}

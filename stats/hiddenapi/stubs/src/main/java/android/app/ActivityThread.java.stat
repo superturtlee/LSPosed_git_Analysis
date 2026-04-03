@@ -1,0 +1,54 @@
+[external][hsushulong][hsushulong@gmail.com]package android.app;
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]import android.content.pm.ApplicationInfo;
+[external][hsushulong][hsushulong@gmail.com]import android.content.res.CompatibilityInfo;
+[external][shana][shana@zju.edu.cn]import android.os.Bundle;
+[external][shana][shana@zju.edu.cn]import android.os.IBinder;
+[external][shana][shana@zju.edu.cn]import android.os.PersistableBundle;
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]public final class ActivityThread {
+[external][howardwu20][HowardWu20@outlook.com]    public static ActivityThread currentActivityThread() {
+[external][howardwu20][HowardWu20@outlook.com]        throw new UnsupportedOperationException("STUB");
+[external][howardwu20][HowardWu20@outlook.com]    }
+[external][howardwu20][HowardWu20@outlook.com]
+[external][howardwu20][HowardWu20@outlook.com]    public ApplicationThread getApplicationThread() {
+[external][howardwu20][HowardWu20@outlook.com]        throw new UnsupportedOperationException("STUB");
+[external][howardwu20][HowardWu20@outlook.com]    }
+[external][howardwu20][HowardWu20@outlook.com]
+[external][howardwu20][HowardWu20@outlook.com]
+[external][howardwu20][HowardWu20@outlook.com]    public static Application currentApplication() {
+[external][howardwu20][HowardWu20@outlook.com]        throw new UnsupportedOperationException("STUB");
+[external][howardwu20][HowardWu20@outlook.com]    }
+[external][howardwu20][HowardWu20@outlook.com]
+[external][howardwu20][HowardWu20@outlook.com]    public static String currentPackageName() {
+[external][howardwu20][HowardWu20@outlook.com]        throw new UnsupportedOperationException("STUB");
+[external][howardwu20][HowardWu20@outlook.com]    }
+[external][howardwu20][HowardWu20@outlook.com]
+[external][howardwu20][HowardWu20@outlook.com]    public final LoadedApk getPackageInfoNoCheck(ApplicationInfo ai, CompatibilityInfo compatInfo) {
+[external][howardwu20][HowardWu20@outlook.com]        throw new UnsupportedOperationException("STUB");
+[external][howardwu20][HowardWu20@outlook.com]    }
+[external][howardwu20][HowardWu20@outlook.com]
+[external][howardwu20][HowardWu20@outlook.com]    public static String currentProcessName() {
+[external][howardwu20][HowardWu20@outlook.com]        throw new UnsupportedOperationException("STUB");
+[external][howardwu20][HowardWu20@outlook.com]    }
+[external][howardwu20][HowardWu20@outlook.com]
+[external][howardwu20][HowardWu20@outlook.com]    public ContextImpl getSystemContext() {
+[external][howardwu20][HowardWu20@outlook.com]        throw new UnsupportedOperationException("STUB");
+[external][howardwu20][HowardWu20@outlook.com]    }
+[external][howardwu20][HowardWu20@outlook.com]
+[external][howardwu20][HowardWu20@outlook.com]    public static ActivityThread systemMain() {
+[external][howardwu20][HowardWu20@outlook.com]        throw new UnsupportedOperationException("STUB");
+[external][howardwu20][HowardWu20@outlook.com]    }
+[external][howardwu20][HowardWu20@outlook.com]
+[external][howardwu20][HowardWu20@outlook.com]    private class ApplicationThread extends IApplicationThread.Stub {
+[external][howardwu20][HowardWu20@outlook.com]        @Override
+[external][howardwu20][HowardWu20@outlook.com]        public IBinder asBinder() {
+[external][howardwu20][HowardWu20@outlook.com]            return null;
+[external][howardwu20][HowardWu20@outlook.com]        }
+[external][howardwu20][HowardWu20@outlook.com]    }
+[external][howardwu20][HowardWu20@outlook.com]
+[external][howardwu20][HowardWu20@outlook.com]    public static final class ActivityClientRecord {
+[external][howardwu20][HowardWu20@outlook.com]        Bundle state;
+[external][howardwu20][HowardWu20@outlook.com]        PersistableBundle persistentState;
+[external][howardwu20][HowardWu20@outlook.com]    }
+[external][hsushulong][hsushulong@gmail.com]}

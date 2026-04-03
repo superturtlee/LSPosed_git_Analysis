@@ -1,0 +1,15 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]package dalvik.system;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]public class VMRuntime {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static VMRuntime getRuntime() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        throw new RuntimeException("Stub!");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]    // Use `Process.is64Bit()` instead
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public native boolean is64Bit();
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]    public native String vmInstructionSet();
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public native boolean isJavaDebuggable();
+[external][shana][shana@zju.edu.cn]}

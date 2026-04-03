@@ -1,0 +1,54 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][admin][admin@0x.mk]package android.content.res;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]/**
+[external][admin][admin@0x.mk] * Instances of this class can be used for {@link XResources#setReplacement(String, String, String, Object)}
+[external][admin][admin@0x.mk] * and its variants. They forward the resource request to a different {@link android.content.res.Resources}
+[external][admin][admin@0x.mk] * instance with a possibly different ID.
+[external][admin][admin@0x.mk] *
+[external][admin][admin@0x.mk] * <p>Usually, instances aren't created directly but via {@link XModuleResources#fwd}.
+[external][admin][admin@0x.mk] */
+[external][admin][admin@0x.mk]public class XResForwarder {
+[external][admin][admin@0x.mk]	private final Resources res;
+[external][admin][admin@0x.mk]	private final int id;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/**
+[external][admin][admin@0x.mk]	 * Creates a new instance.
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 * @param res The target {@link android.content.res.Resources} instance to forward requests to.
+[external][admin][admin@0x.mk]	 * @param id The target resource ID.
+[external][admin][admin@0x.mk]	 */
+[external][admin][admin@0x.mk]	public XResForwarder(Resources res, int id) {
+[external][admin][admin@0x.mk]		this.res = res;
+[external][admin][admin@0x.mk]		this.id = id;
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/** Returns the target {@link android.content.res.Resources} instance. */
+[external][admin][admin@0x.mk]	public Resources getResources() {
+[external][admin][admin@0x.mk]		return res;
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/** Returns the target resource ID. */
+[external][admin][admin@0x.mk]	public int getId() {
+[external][admin][admin@0x.mk]		return id;
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]}

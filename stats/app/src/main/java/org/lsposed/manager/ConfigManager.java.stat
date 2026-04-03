@@ -1,0 +1,374 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.manager;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.content.Intent;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.content.pm.PackageInfo;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.content.pm.PackageManager;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.content.pm.ResolveInfo;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.os.ParcelFileDescriptor;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.os.RemoteException;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.util.Log;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import org.lsposed.lspd.ILSPManagerService;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.lspd.models.Application;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.lspd.models.UserInfo;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.manager.adapters.ScopeAdapter;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.receivers.LSPManagerServiceHolder;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.io.File;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.util.ArrayList;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.util.Arrays;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.util.List;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import java.util.Set;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]public class ConfigManager {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]    public static boolean isBinderAlive() {
+[internal][vvb2060][vvb2060@gmail.com]        return LSPManagerServiceHolder.getService() != null;
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static int getXposedApiVersion() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[internal][vvb2060][vvb2060@gmail.com]            return LSPManagerServiceHolder.getService().getXposedApiVersion();
+[internal][vvb2060][vvb2060@gmail.com]        } catch (RemoteException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Log.e(App.TAG, Log.getStackTraceString(e));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return -1;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static String getXposedVersionName() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[internal][vvb2060][vvb2060@gmail.com]            return LSPManagerServiceHolder.getService().getXposedVersionName();
+[internal][vvb2060][vvb2060@gmail.com]        } catch (RemoteException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Log.e(App.TAG, Log.getStackTraceString(e));
+[internal][vvb2060][vvb2060@gmail.com]            return "";
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static int getXposedVersionCode() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[internal][vvb2060][vvb2060@gmail.com]            return LSPManagerServiceHolder.getService().getXposedVersionCode();
+[internal][vvb2060][vvb2060@gmail.com]        } catch (RemoteException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Log.e(App.TAG, Log.getStackTraceString(e));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return -1;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static List<PackageInfo> getInstalledPackagesFromAllUsers(int flags, boolean filterNoProcess) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        List<PackageInfo> list = new ArrayList<>();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[internal][vvb2060][vvb2060@gmail.com]            list.addAll(LSPManagerServiceHolder.getService().getInstalledPackagesFromAllUsers(flags, filterNoProcess).getList());
+[internal][vvb2060][vvb2060@gmail.com]        } catch (RemoteException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Log.e(App.TAG, Log.getStackTraceString(e));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return list;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static String[] getEnabledModules() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[internal][vvb2060][vvb2060@gmail.com]            return LSPManagerServiceHolder.getService().enabledModules();
+[internal][vvb2060][vvb2060@gmail.com]        } catch (RemoteException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Log.e(App.TAG, Log.getStackTraceString(e));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return new String[0];
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static boolean setModuleEnabled(String packageName, boolean enable) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[internal][vvb2060][vvb2060@gmail.com]            return enable ? LSPManagerServiceHolder.getService().enableModule(packageName) : LSPManagerServiceHolder.getService().disableModule(packageName);
+[internal][vvb2060][vvb2060@gmail.com]        } catch (RemoteException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Log.e(App.TAG, Log.getStackTraceString(e));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return false;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][noreply][noreply@nullptr.icu]    public static boolean setModuleScope(String packageName, boolean legacy, Set<ScopeAdapter.ApplicationWithEquals> applications) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            List<Application> list = new ArrayList<>();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            applications.forEach(application -> {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                Application app = new Application();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                app.userId = application.userId;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                app.packageName = application.packageName;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                list.add(app);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            });
+[external][noreply][noreply@nullptr.icu]            if (legacy) {
+[external][noreply][noreply@nullptr.icu]                Application app = new Application();
+[external][noreply][noreply@nullptr.icu]                app.userId = 0;
+[external][noreply][noreply@nullptr.icu]                app.packageName = packageName;
+[external][noreply][noreply@nullptr.icu]                list.add(app);
+[external][noreply][noreply@nullptr.icu]            }
+[external][shana][shana@zju.edu.cn]            return LSPManagerServiceHolder.getService().setModuleScope(packageName, list);
+[internal][vvb2060][vvb2060@gmail.com]        } catch (RemoteException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Log.e(App.TAG, Log.getStackTraceString(e));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return false;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static List<ScopeAdapter.ApplicationWithEquals> getModuleScope(String packageName) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        List<ScopeAdapter.ApplicationWithEquals> list = new ArrayList<>();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][shana][shana@zju.edu.cn]            var applications = LSPManagerServiceHolder.getService().getModuleScope(packageName);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (applications == null) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                return list;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][shana][shana@zju.edu.cn]            applications.forEach(application -> {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                if (!application.packageName.equals(packageName)) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    list.add(new ScopeAdapter.ApplicationWithEquals(application));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            });
+[internal][vvb2060][vvb2060@gmail.com]        } catch (RemoteException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Log.e(App.TAG, Log.getStackTraceString(e));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return list;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]    public static boolean enableStatusNotification() {
+[internal][vvb2060][vvb2060@gmail.com]        try {
+[internal][vvb2060][vvb2060@gmail.com]            return LSPManagerServiceHolder.getService().enableStatusNotification();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        } catch (RemoteException e) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            Log.e(App.TAG, Log.getStackTraceString(e));
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            return false;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]    public static boolean setEnableStatusNotification(boolean enabled) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        try {
+[internal][vvb2060][vvb2060@gmail.com]            LSPManagerServiceHolder.getService().setEnableStatusNotification(enabled);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            return true;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        } catch (RemoteException e) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            Log.e(App.TAG, Log.getStackTraceString(e));
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            return false;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static boolean isVerboseLogEnabled() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[internal][vvb2060][vvb2060@gmail.com]            return LSPManagerServiceHolder.getService().isVerboseLog();
+[internal][vvb2060][vvb2060@gmail.com]        } catch (RemoteException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Log.e(App.TAG, Log.getStackTraceString(e));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return false;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static boolean setVerboseLogEnabled(boolean enabled) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[internal][vvb2060][vvb2060@gmail.com]            LSPManagerServiceHolder.getService().setVerboseLog(enabled);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return true;
+[internal][vvb2060][vvb2060@gmail.com]        } catch (RemoteException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Log.e(App.TAG, Log.getStackTraceString(e));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return false;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]    public static ParcelFileDescriptor getLog(boolean verbose) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[internal][vvb2060][vvb2060@gmail.com]            return verbose ? LSPManagerServiceHolder.getService().getVerboseLog() : LSPManagerServiceHolder.getService().getModulesLog();
+[internal][vvb2060][vvb2060@gmail.com]        } catch (RemoteException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Log.e(App.TAG, Log.getStackTraceString(e));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static boolean clearLogs(boolean verbose) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[internal][vvb2060][vvb2060@gmail.com]            return LSPManagerServiceHolder.getService().clearLogs(verbose);
+[internal][vvb2060][vvb2060@gmail.com]        } catch (RemoteException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Log.e(App.TAG, Log.getStackTraceString(e));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return false;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    public static PackageInfo getPackageInfo(String packageName, int flags, int userId) throws PackageManager.NameNotFoundException {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[internal][vvb2060][vvb2060@gmail.com]            var info = LSPManagerServiceHolder.getService().getPackageInfo(packageName, flags, userId);
+[internal][vvb2060][vvb2060@gmail.com]            if (info == null) throw new PackageManager.NameNotFoundException();
+[internal][vvb2060][vvb2060@gmail.com]            return info;
+[internal][vvb2060][vvb2060@gmail.com]        } catch (RemoteException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Log.e(App.TAG, Log.getStackTraceString(e));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            throw new PackageManager.NameNotFoundException();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static boolean forceStopPackage(String packageName, int userId) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[internal][vvb2060][vvb2060@gmail.com]            LSPManagerServiceHolder.getService().forceStopPackage(packageName, userId);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return true;
+[internal][vvb2060][vvb2060@gmail.com]        } catch (RemoteException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Log.e(App.TAG, Log.getStackTraceString(e));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return false;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][howardwu20][HowardWu20@outlook.com]    public static boolean reboot() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[external][howardwu20][HowardWu20@outlook.com]            LSPManagerServiceHolder.getService().reboot();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return true;
+[internal][vvb2060][vvb2060@gmail.com]        } catch (RemoteException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Log.e(App.TAG, Log.getStackTraceString(e));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return false;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]    public static boolean uninstallPackage(String packageName, int userId) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[internal][vvb2060][vvb2060@gmail.com]            return LSPManagerServiceHolder.getService().uninstallPackage(packageName, userId);
+[internal][vvb2060][vvb2060@gmail.com]        } catch (RemoteException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Log.e(App.TAG, Log.getStackTraceString(e));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return false;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static boolean isSepolicyLoaded() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[internal][vvb2060][vvb2060@gmail.com]            return LSPManagerServiceHolder.getService().isSepolicyLoaded();
+[internal][vvb2060][vvb2060@gmail.com]        } catch (RemoteException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Log.e(App.TAG, Log.getStackTraceString(e));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return false;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    public static List<UserInfo> getUsers() {
+[external][shana][shana@zju.edu.cn]        try {
+[internal][vvb2060][vvb2060@gmail.com]            return LSPManagerServiceHolder.getService().getUsers();
+[internal][vvb2060][vvb2060@gmail.com]        } catch (RemoteException e) {
+[external][shana][shana@zju.edu.cn]            Log.e(App.TAG, Log.getStackTraceString(e));
+[external][shana][shana@zju.edu.cn]            return null;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]    public static boolean installExistingPackageAsUser(String packageName, int userId) {
+[external][shana][shana@zju.edu.cn]        final int INSTALL_SUCCEEDED = 1;
+[internal][vvb2060][vvb2060@gmail.com]        try {
+[internal][vvb2060][vvb2060@gmail.com]            var ret = LSPManagerServiceHolder.getService().installExistingPackageAsUser(packageName, userId);
+[internal][vvb2060][vvb2060@gmail.com]            return ret == INSTALL_SUCCEEDED;
+[internal][vvb2060][vvb2060@gmail.com]        } catch (RemoteException e) {
+[internal][vvb2060][vvb2060@gmail.com]            Log.e(App.TAG, Log.getStackTraceString(e));
+[internal][vvb2060][vvb2060@gmail.com]            return false;
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static boolean isMagiskInstalled() {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        var path = System.getenv("PATH");
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        if (path == null) return false;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        else return Arrays.stream(path.split(File.pathSeparator))
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                .anyMatch(str -> new File(str, "magisk").exists());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static boolean systemServerRequested() {
+[external][shana][shana@zju.edu.cn]        try {
+[internal][vvb2060][vvb2060@gmail.com]            return LSPManagerServiceHolder.getService().systemServerRequested();
+[internal][vvb2060][vvb2060@gmail.com]        } catch (RemoteException e) {
+[external][shana][shana@zju.edu.cn]            return false;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    public static boolean dex2oatFlagsLoaded() {
+[external][shana][shana@zju.edu.cn]        try {
+[internal][vvb2060][vvb2060@gmail.com]            return LSPManagerServiceHolder.getService().dex2oatFlagsLoaded();
+[internal][vvb2060][vvb2060@gmail.com]        } catch (RemoteException e) {
+[external][shana][shana@zju.edu.cn]            return false;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static int startActivityAsUserWithFeature(Intent intent, int userId) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[internal][vvb2060][vvb2060@gmail.com]            return LSPManagerServiceHolder.getService().startActivityAsUserWithFeature(intent, userId);
+[internal][vvb2060][vvb2060@gmail.com]        } catch (RemoteException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Log.e(App.TAG, Log.getStackTraceString(e));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return -1;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static List<ResolveInfo> queryIntentActivitiesAsUser(Intent intent, int flags, int userId) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        List<ResolveInfo> list = new ArrayList<>();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        try {
+[internal][vvb2060][vvb2060@gmail.com]            list.addAll(LSPManagerServiceHolder.getService().queryIntentActivitiesAsUser(intent, flags, userId).getList());
+[internal][vvb2060][vvb2060@gmail.com]        } catch (RemoteException e) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Log.e(App.TAG, Log.getStackTraceString(e));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return list;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    public static boolean setHiddenIcon(boolean hide) {
+[internal][vvb2060][vvb2060@gmail.com]        try {
+[internal][vvb2060][vvb2060@gmail.com]            LSPManagerServiceHolder.getService().setHiddenIcon(hide);
+[internal][vvb2060][vvb2060@gmail.com]            return true;
+[internal][vvb2060][vvb2060@gmail.com]        } catch (RemoteException e) {
+[internal][vvb2060][vvb2060@gmail.com]            Log.e(App.TAG, Log.getStackTraceString(e));
+[internal][vvb2060][vvb2060@gmail.com]            return false;
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[external][shana][shana@zju.edu.cn]    public static String getApi() {
+[external][shana][shana@zju.edu.cn]        try {
+[external][shana][shana@zju.edu.cn]            return LSPManagerServiceHolder.getService().getApi();
+[external][shana][shana@zju.edu.cn]        } catch (RemoteException e) {
+[external][shana][shana@zju.edu.cn]            Log.e(App.TAG, Log.getStackTraceString(e));
+[external][shana][shana@zju.edu.cn]            return e.toString();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static List<String> getDenyListPackages() {
+[external][shana][shana@zju.edu.cn]        List<String> list = new ArrayList<>();
+[external][shana][shana@zju.edu.cn]        try {
+[external][shana][shana@zju.edu.cn]            list.addAll(LSPManagerServiceHolder.getService().getDenyListPackages());
+[external][shana][shana@zju.edu.cn]        } catch (RemoteException e) {
+[external][shana][shana@zju.edu.cn]            Log.e(App.TAG, Log.getStackTraceString(e));
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return list;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]    public static void flashZip(String zipPath, ParcelFileDescriptor outputStream) {
+[internal][vvb2060][vvb2060@gmail.com]        try {
+[internal][vvb2060][vvb2060@gmail.com]            LSPManagerServiceHolder.getService().flashZip(zipPath, outputStream);
+[internal][vvb2060][vvb2060@gmail.com]        } catch (RemoteException e) {
+[internal][vvb2060][vvb2060@gmail.com]            Log.e(App.TAG, Log.getStackTraceString(e));
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]    }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    public static boolean isDexObfuscateEnabled() {
+[external][admin][admin@0x.mk]        try {
+[external][admin][admin@0x.mk]            return LSPManagerServiceHolder.getService().getDexObfuscate();
+[external][admin][admin@0x.mk]        } catch (RemoteException e) {
+[external][admin][admin@0x.mk]            Log.e(App.TAG, Log.getStackTraceString(e));
+[external][admin][admin@0x.mk]            return false;
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]    }
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]    public static boolean setDexObfuscateEnabled(boolean enabled) {
+[external][admin][admin@0x.mk]        try {
+[external][admin][admin@0x.mk]            LSPManagerServiceHolder.getService().setDexObfuscate(enabled);
+[external][admin][admin@0x.mk]            return true;
+[external][admin][admin@0x.mk]        } catch (RemoteException e) {
+[external][admin][admin@0x.mk]            Log.e(App.TAG, Log.getStackTraceString(e));
+[external][admin][admin@0x.mk]            return false;
+[external][admin][admin@0x.mk]        }
+[external][admin][admin@0x.mk]    }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    public static int getDex2OatWrapperCompatibility() {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        try {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            return LSPManagerServiceHolder.getService().getDex2OatWrapperCompatibility();
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        } catch (RemoteException e) {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            Log.e(App.TAG, Log.getStackTraceString(e));
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]            return ILSPManagerService.DEX2OAT_CRASHED;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]}

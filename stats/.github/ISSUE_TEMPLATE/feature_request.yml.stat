@@ -1,0 +1,23 @@
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]---
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]name: Feature request/新特性请求
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]description: Suggest an idea./提出建议
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]labels: [enhancement]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]body:
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]  - type: textarea
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    attributes:
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]      label: Is your feature request related to a problem?/你的请求是否与某个问题相关？
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]      placeholder: A clear and concise description of what the problem is./请清晰准确表述该问题。
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    validations:
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]      required: true
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]  - type: textarea
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    attributes:
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]      label: Describe the solution you'd like/描述你想要的解决方案
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]      placeholder: A clear and concise description of what you want to happen./请清晰准确描述新特性的预期行为
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    validations:
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]      required: true
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]  - type: textarea
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    attributes:
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]      label: Additional context/其他信息
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]      placeholder: Add any other context or screenshots about the feature request here./其他关于新特性的信息或者截图
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    validations:
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]      required: false

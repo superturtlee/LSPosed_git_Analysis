@@ -1,0 +1,80 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.lspd.hooker;
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]import android.app.LoadedApk;
+[external][hsushulong][hsushulong@gmail.com]import android.content.res.XResources;
+[external][hsushulong][hsushulong@gmail.com]import android.util.Log;
+[external][hsushulong][hsushulong@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.lspd.util.Hookers;
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]import de.robv.android.xposed.XposedHelpers;
+[external][hsushulong][hsushulong@gmail.com]import de.robv.android.xposed.XposedInit;
+[external][noreply][noreply@nullptr.icu]import io.github.libxposed.api.XposedInterface;
+[external][noreply][noreply@nullptr.icu]import io.github.libxposed.api.annotations.AfterInvocation;
+[external][noreply][noreply@nullptr.icu]import io.github.libxposed.api.annotations.XposedHooker;
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]// when a package is loaded for an existing process, trigger the callbacks as well
+[external][noreply][noreply@nullptr.icu]@XposedHooker
+[external][noreply][noreply@nullptr.icu]public class LoadedApkCtorHooker implements XposedInterface.Hooker {
+[external][hsushulong][hsushulong@gmail.com]
+[external][noreply][noreply@nullptr.icu]    @AfterInvocation
+[external][noreply][noreply@nullptr.icu]    public static void afterHookedMethod(XposedInterface.AfterHookCallback callback) {
+[external][hsushulong][hsushulong@gmail.com]        Hookers.logD("LoadedApk#<init> starts");
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]        try {
+[external][noreply][noreply@nullptr.icu]            LoadedApk loadedApk = (LoadedApk) callback.getThisObject();
+[external][noreply][noreply@nullptr.icu]            assert loadedApk != null;
+[external][hsushulong][hsushulong@gmail.com]            String packageName = loadedApk.getPackageName();
+[external][hsushulong][hsushulong@gmail.com]            Object mAppDir = XposedHelpers.getObjectField(loadedApk, "mAppDir");
+[external][hsushulong][hsushulong@gmail.com]            Hookers.logD("LoadedApk#<init> ends: " + mAppDir);
+[external][hsushulong][hsushulong@gmail.com]
+[external][shana][shana@zju.edu.cn]            if (!XposedInit.disableResources) {
+[external][shana][shana@zju.edu.cn]                XResources.setPackageNameForResDir(packageName, loadedApk.getResDir());
+[external][shana][shana@zju.edu.cn]            }
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]            if (packageName.equals("android")) {
+[external][shana][shana@zju.edu.cn]                if (XposedInit.startsSystemServer) {
+[external][shana][shana@zju.edu.cn]                    Hookers.logD("LoadedApk#<init> is android, skip: " + mAppDir);
+[external][shana][shana@zju.edu.cn]                    return;
+[external][shana][shana@zju.edu.cn]                } else {
+[external][shana][shana@zju.edu.cn]                    packageName = "system";
+[external][shana][shana@zju.edu.cn]                }
+[external][hsushulong][hsushulong@gmail.com]            }
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]            if (!XposedInit.loadedPackagesInProcess.add(packageName)) {
+[external][hsushulong][hsushulong@gmail.com]                Hookers.logD("LoadedApk#<init> has been loaded before, skip: " + mAppDir);
+[external][hsushulong][hsushulong@gmail.com]                return;
+[external][hsushulong][hsushulong@gmail.com]            }
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]            // OnePlus magic...
+[external][hsushulong][hsushulong@gmail.com]            if (Log.getStackTraceString(new Throwable()).
+[external][hsushulong][hsushulong@gmail.com]                    contains("android.app.ActivityThread$ApplicationThread.schedulePreload")) {
+[external][hsushulong][hsushulong@gmail.com]                Hookers.logD("LoadedApk#<init> maybe oneplus's custom opt, skip");
+[external][hsushulong][hsushulong@gmail.com]                return;
+[external][hsushulong][hsushulong@gmail.com]            }
+[external][hsushulong][hsushulong@gmail.com]
+[external][shana][shana@zju.edu.cn]            LoadedApkCreateCLHooker.addLoadedApk(loadedApk);
+[external][hsushulong][hsushulong@gmail.com]        } catch (Throwable t) {
+[external][hsushulong][hsushulong@gmail.com]            Hookers.logE("error when hooking LoadedApk.<init>", t);
+[external][hsushulong][hsushulong@gmail.com]        }
+[external][hsushulong][hsushulong@gmail.com]    }
+[external][hsushulong][hsushulong@gmail.com]}

@@ -1,0 +1,68 @@
+[external][shana][shana@zju.edu.cn][versions]
+[bot][dependabot[bot]][49699333+dependabot[bot]@users.noreply.github.com]agp = "8.2.1"
+[bot][dependabot[bot]][49699333+dependabot[bot]@users.noreply.github.com]kotlin = "1.9.22"
+[bot][dependabot[bot]][49699333+dependabot[bot]@users.noreply.github.com]nav = "2.7.6"
+[bot][dependabot[bot]][49699333+dependabot[bot]@users.noreply.github.com]appcenter = "5.0.4"
+[external][shana][shana@zju.edu.cn]libxposed = "100"
+[bot][dependabot[bot]][49699333+dependabot[bot]@users.noreply.github.com]glide = "4.16.0"
+[bot][dependabot[bot]][49699333+dependabot[bot]@users.noreply.github.com]okhttp = "4.12.0"
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn][plugins]
+[external][shana][shana@zju.edu.cn]agp-lib = { id = "com.android.library", version.ref = "agp" }
+[external][shana][shana@zju.edu.cn]agp-app = { id = "com.android.application", version.ref = "agp" }
+[external][shana][shana@zju.edu.cn]kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+[external][shana][shana@zju.edu.cn]nav-safeargs = { id = "androidx.navigation.safeargs", version.ref = "nav" }
+[external][shana][shana@zju.edu.cn]autoresconfig = { id = "dev.rikka.tools.autoresconfig", version = "1.2.2" }
+[bot][dependabot[bot]][49699333+dependabot[bot]@users.noreply.github.com]materialthemebuilder = { id = "dev.rikka.tools.materialthemebuilder", version = "1.4.1" }
+[bot][dependabot[bot]][49699333+dependabot[bot]@users.noreply.github.com]lsplugin-resopt = { id = "org.lsposed.lsplugin.resopt", version = "1.5" }
+[bot][dependabot[bot]][49699333+dependabot[bot]@users.noreply.github.com]lsplugin-apksign = { id = "org.lsposed.lsplugin.apksign", version = "1.4" }
+[bot][dependabot[bot]][49699333+dependabot[bot]@users.noreply.github.com]lsplugin-cmaker = { id = "org.lsposed.lsplugin.cmaker", version = "1.2" }
+[bot][dependabot[bot]][49699333+dependabot[bot]@users.noreply.github.com]lsplugin-jgit = { id = "org.lsposed.lsplugin.jgit", version = "1.1" }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn][libraries]
+[external][shana][shana@zju.edu.cn]appcenter-crashes = { group = "com.microsoft.appcenter", name = "appcenter-crashes", version.ref = "appcenter" }
+[external][shana][shana@zju.edu.cn]appcenter-analytics = { group = "com.microsoft.appcenter", name = "appcenter-analytics", version.ref = "appcenter" }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]rikkax-appcompat = { module = "dev.rikka.rikkax.appcompat:appcompat", version = "1.6.1" }
+[external][shana][shana@zju.edu.cn]rikkax-core = { module = "dev.rikka.rikkax.core:core", version = "1.4.1" }
+[external][shana][shana@zju.edu.cn]rikkax-insets = { module = "dev.rikka.rikkax.insets:insets", version = "1.3.0" }
+[external][shana][shana@zju.edu.cn]rikkax-layoutinflater = { module = "dev.rikka.rikkax.layoutinflater:layoutinflater", version = "1.3.0" }
+[external][shana][shana@zju.edu.cn]rikkax-material = { module = "dev.rikka.rikkax.material:material", version = "2.7.0" }
+[external][shana][shana@zju.edu.cn]rikkax-material-preference = { module = "dev.rikka.rikkax.material:material-preference", version = "2.0.0" }
+[external][shana][shana@zju.edu.cn]rikkax-parcelablelist = { module = "dev.rikka.rikkax.parcelablelist:parcelablelist", version = "2.0.1" }
+[external][shana][shana@zju.edu.cn]rikkax-preference = { module = "dev.rikka.rikkax.material:material-preference", version = "2.0.0" }
+[bot][dependabot[bot]][49699333+dependabot[bot]@users.noreply.github.com]rikkax-recyclerview = { module = "dev.rikka.rikkax.recyclerview:recyclerview-ktx", version = "1.3.2" }
+[external][shana][shana@zju.edu.cn]rikkax-widget-borderview = { module = "dev.rikka.rikkax.widget:borderview", version = "1.1.0" }
+[external][shana][shana@zju.edu.cn]rikkax-widget-mainswitchbar = { module = "dev.rikka.rikkax.widget:mainswitchbar", version = "1.0.2" }
+[external][shana][shana@zju.edu.cn]
+[bot][dependabot[bot]][49699333+dependabot[bot]@users.noreply.github.com]androidx-activity = { module = "androidx.activity:activity", version = "1.8.2" }
+[bot][dependabot[bot]][49699333+dependabot[bot]@users.noreply.github.com]androidx-annotation = { module = "androidx.annotation:annotation", version = "1.7.1" }
+[bot][dependabot[bot]][49699333+dependabot[bot]@users.noreply.github.com]androidx-browser = { module = "androidx.browser:browser", version = "1.7.0" }
+[external][shana][shana@zju.edu.cn]androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version = "2.1.4" }
+[bot][dependabot[bot]][49699333+dependabot[bot]@users.noreply.github.com]androidx-core = { module = "androidx.core:core", version = "1.12.0" }
+[bot][dependabot[bot]][49699333+dependabot[bot]@users.noreply.github.com]androidx-fragment = { module = "androidx.fragment:fragment", version = "1.6.2" }
+[external][shana][shana@zju.edu.cn]androidx-navigation-fragment = { group = "androidx.navigation", name = "navigation-fragment", version.ref = "nav" }
+[external][shana][shana@zju.edu.cn]androidx-navigation-ui = { group = "androidx.navigation", name = "navigation-ui", version.ref = "nav" }
+[bot][dependabot[bot]][49699333+dependabot[bot]@users.noreply.github.com]androidx-preference = { module = "androidx.preference:preference", version = "1.2.1" }
+[bot][dependabot[bot]][49699333+dependabot[bot]@users.noreply.github.com]androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version = "1.3.2" }
+[external][shana][shana@zju.edu.cn]androidx-swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version = "1.2.0-alpha01" }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
+[external][shana][shana@zju.edu.cn]glide-compiler = { group = "com.github.bumptech.glide", name = "compiler", version.ref = "glide" }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
+[external][shana][shana@zju.edu.cn]okhttp-dnsoverhttps = { group = "com.squareup.okhttp3", name = "okhttp-dnsoverhttps", version.ref = "okhttp" }
+[external][shana][shana@zju.edu.cn]okhttp-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]agp-apksig = { group = "com.android.tools.build", name = "apksig", version.ref = "agp" }
+[external][shana][shana@zju.edu.cn]appiconloader = { module = "me.zhanghai.android.appiconloader:appiconloader", version = "1.5.0" }
+[external][shana][shana@zju.edu.cn]axml = { module = "de.upb.cs.swt:axml", version = "2.1.3" }
+[bot][dependabot[bot]][49699333+dependabot[bot]@users.noreply.github.com]commons-lang3 = { module = "org.apache.commons:commons-lang3", version = "3.14.0" }
+[bot][dependabot[bot]][49699333+dependabot[bot]@users.noreply.github.com]material = { module = "com.google.android.material:material", version = "1.11.0" }
+[external][shana][shana@zju.edu.cn]gson = { module = "com.google.code.gson:gson", version = "2.10.1" }
+[external][shana][shana@zju.edu.cn]hiddenapibypass = { module = "org.lsposed.hiddenapibypass:hiddenapibypass", version = "4.3" }
+[external][shana][shana@zju.edu.cn]kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
+[bot][dependabot[bot]][49699333+dependabot[bot]@users.noreply.github.com]kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version = "1.7.3" }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]libxposed-api = { group = "io.github.libxposed", name = "api", version.ref = "libxposed" }
+[external][shana][shana@zju.edu.cn]libxposed-interface = { group = "io.github.libxposed", name = "interface", version.ref = "libxposed" }

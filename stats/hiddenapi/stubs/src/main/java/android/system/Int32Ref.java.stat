@@ -1,0 +1,15 @@
+[external][shana][shana@zju.edu.cn]package android.system;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import java.util.Objects;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public class Int32Ref {
+[external][shana][shana@zju.edu.cn]    public int value;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public Int32Ref(int value) {
+[external][shana][shana@zju.edu.cn]        this.value = value;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override public String toString() {
+[external][shana][shana@zju.edu.cn]        return Objects.toString(this);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

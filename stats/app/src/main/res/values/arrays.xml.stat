@@ -1,0 +1,91 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]<?xml version="1.0" encoding="utf-8"?><!--
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  -->
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    <string-array name="theme_texts" translatable="false">
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <item>@string/dark_theme_off</item>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <item>@string/dark_theme_on</item>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <item>@string/dark_theme_follow_system</item>
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    </string-array>
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    <string-array name="theme_values" translatable="false">
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <item>MODE_NIGHT_NO</item>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <item>MODE_NIGHT_YES</item>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        <item>MODE_NIGHT_FOLLOW_SYSTEM</item>
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    </string-array>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    <string-array name="color_values" translatable="false">
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <item>SAKURA</item>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <item>MATERIAL_RED</item>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <item>MATERIAL_PINK</item>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <item>MATERIAL_PURPLE</item>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <item>MATERIAL_DEEP_PURPLE</item>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <item>MATERIAL_INDIGO</item>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <item>MATERIAL_BLUE</item>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <item>MATERIAL_LIGHT_BLUE</item>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <item>MATERIAL_CYAN</item>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <item>MATERIAL_TEAL</item>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <item>MATERIAL_GREEN</item>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <item>MATERIAL_LIGHT_GREEN</item>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <item>MATERIAL_LIME</item>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <item>MATERIAL_YELLOW</item>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <item>MATERIAL_AMBER</item>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <item>MATERIAL_ORANGE</item>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <item>MATERIAL_DEEP_ORANGE</item>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <item>MATERIAL_BROWN</item>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        <item>MATERIAL_BLUE_GREY</item>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    </string-array>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    <string-array name="color_texts" translatable="false">
+[external][shana][shana@zju.edu.cn]        <item>@string/color_sakura</item>
+[external][shana][shana@zju.edu.cn]        <item>@string/color_red</item>
+[external][shana][shana@zju.edu.cn]        <item>@string/color_pink</item>
+[external][shana][shana@zju.edu.cn]        <item>@string/color_purple</item>
+[external][shana][shana@zju.edu.cn]        <item>@string/color_deep_purple</item>
+[external][shana][shana@zju.edu.cn]        <item>@string/color_indigo</item>
+[external][shana][shana@zju.edu.cn]        <item>@string/color_blue</item>
+[external][shana][shana@zju.edu.cn]        <item>@string/color_light_blue</item>
+[external][shana][shana@zju.edu.cn]        <item>@string/color_cyan</item>
+[external][shana][shana@zju.edu.cn]        <item>@string/color_teal</item>
+[external][shana][shana@zju.edu.cn]        <item>@string/color_green</item>
+[external][shana][shana@zju.edu.cn]        <item>@string/color_light_green</item>
+[external][shana][shana@zju.edu.cn]        <item>@string/color_lime</item>
+[external][shana][shana@zju.edu.cn]        <item>@string/color_yellow</item>
+[external][shana][shana@zju.edu.cn]        <item>@string/color_amber</item>
+[external][shana][shana@zju.edu.cn]        <item>@string/color_orange</item>
+[external][shana][shana@zju.edu.cn]        <item>@string/color_deep_orange</item>
+[external][shana][shana@zju.edu.cn]        <item>@string/color_brown</item>
+[external][shana][shana@zju.edu.cn]        <item>@string/color_blue_grey</item>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    </string-array>
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]    <string-array name="update_channel_texts" translatable="false">
+[internal][vvb2060][vvb2060@gmail.com]        <item>@string/update_channel_stable</item>
+[internal][vvb2060][vvb2060@gmail.com]        <item>@string/update_channel_bate</item>
+[internal][vvb2060][vvb2060@gmail.com]        <item>@string/update_channel_nightly</item>
+[internal][vvb2060][vvb2060@gmail.com]    </string-array>
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]    <string-array name="update_channel_values" translatable="false">
+[internal][vvb2060][vvb2060@gmail.com]        <item>CHANNEL_STABLE</item>
+[internal][vvb2060][vvb2060@gmail.com]        <item>CHANNEL_BETA</item>
+[internal][vvb2060][vvb2060@gmail.com]        <item>CHANNEL_NIGHTLY</item>
+[internal][vvb2060][vvb2060@gmail.com]    </string-array>
+[internal][vvb2060][vvb2060@gmail.com]
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]</resources>

@@ -1,0 +1,40 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]<?xml version="1.0" encoding="utf-8"?><!--
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  -->
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]<resources>
+[external][shana][shana@zju.edu.cn]    <style name="ThemeOverlay.MaterialRed" parent="ThemeOverlay.Light.MaterialRed"/>
+[external][shana][shana@zju.edu.cn]    <style name="ThemeOverlay.MaterialPink" parent="ThemeOverlay.Light.MaterialPink"/>
+[external][shana][shana@zju.edu.cn]    <style name="ThemeOverlay.MaterialPurple" parent="ThemeOverlay.Light.MaterialPurple"/>
+[external][shana][shana@zju.edu.cn]    <style name="ThemeOverlay.MaterialDeepPurple" parent="ThemeOverlay.Light.MaterialDeepPurple"/>
+[external][shana][shana@zju.edu.cn]    <style name="ThemeOverlay.MaterialIndigo" parent="ThemeOverlay.Light.MaterialIndigo"/>
+[external][shana][shana@zju.edu.cn]    <style name="ThemeOverlay.MaterialBlue" parent="ThemeOverlay.Light.MaterialBlue"/>
+[external][shana][shana@zju.edu.cn]    <style name="ThemeOverlay.MaterialLightBlue" parent="ThemeOverlay.Light.MaterialLightBlue"/>
+[external][shana][shana@zju.edu.cn]    <style name="ThemeOverlay.MaterialCyan" parent="ThemeOverlay.Light.MaterialCyan"/>
+[external][shana][shana@zju.edu.cn]    <style name="ThemeOverlay.MaterialTeal" parent="ThemeOverlay.Light.MaterialTeal"/>
+[external][shana][shana@zju.edu.cn]    <style name="ThemeOverlay.MaterialGreen" parent="ThemeOverlay.Light.MaterialGreen"/>
+[external][shana][shana@zju.edu.cn]    <style name="ThemeOverlay.MaterialLightGreen" parent="ThemeOverlay.Light.MaterialLightGreen"/>
+[external][shana][shana@zju.edu.cn]    <style name="ThemeOverlay.MaterialLime" parent="ThemeOverlay.Light.MaterialLime"/>
+[external][shana][shana@zju.edu.cn]    <style name="ThemeOverlay.MaterialYellow" parent="ThemeOverlay.Light.MaterialYellow"/>
+[external][shana][shana@zju.edu.cn]    <style name="ThemeOverlay.MaterialAmber" parent="ThemeOverlay.Light.MaterialAmber"/>
+[external][shana][shana@zju.edu.cn]    <style name="ThemeOverlay.MaterialOrange" parent="ThemeOverlay.Light.MaterialOrange"/>
+[external][shana][shana@zju.edu.cn]    <style name="ThemeOverlay.MaterialDeepOrange" parent="ThemeOverlay.Light.MaterialDeepOrange"/>
+[external][shana][shana@zju.edu.cn]    <style name="ThemeOverlay.MaterialBrown" parent="ThemeOverlay.Light.MaterialBrown"/>
+[external][shana][shana@zju.edu.cn]    <style name="ThemeOverlay.MaterialBlueGrey" parent="ThemeOverlay.Light.MaterialBlueGrey"/>
+[external][shana][shana@zju.edu.cn]    <style name="ThemeOverlay.MaterialSakura" parent="ThemeOverlay.Light.MaterialSakura"/>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]</resources>

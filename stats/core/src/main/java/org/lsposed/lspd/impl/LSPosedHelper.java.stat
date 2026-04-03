@@ -1,0 +1,46 @@
+[external][noreply][noreply@nullptr.icu]package org.lsposed.lspd.impl;
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]import java.lang.reflect.Constructor;
+[external][noreply][noreply@nullptr.icu]import java.lang.reflect.Method;
+[external][noreply][noreply@nullptr.icu]import java.util.HashSet;
+[external][noreply][noreply@nullptr.icu]import java.util.Set;
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]import io.github.libxposed.api.XposedInterface;
+[external][noreply][noreply@nullptr.icu]import io.github.libxposed.api.errors.HookFailedError;
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]public class LSPosedHelper {
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]    @SuppressWarnings("UnusedReturnValue")
+[external][noreply][noreply@nullptr.icu]    public static <T> XposedInterface.MethodUnhooker<Method>
+[external][noreply][noreply@nullptr.icu]    hookMethod(Class<? extends XposedInterface.Hooker> hooker, Class<T> clazz, String methodName, Class<?>... parameterTypes) {
+[external][noreply][noreply@nullptr.icu]        try {
+[external][noreply][noreply@nullptr.icu]            var method = clazz.getDeclaredMethod(methodName, parameterTypes);
+[external][noreply][noreply@nullptr.icu]            return LSPosedBridge.doHook(method, XposedInterface.PRIORITY_DEFAULT, hooker);
+[external][noreply][noreply@nullptr.icu]        } catch (NoSuchMethodException e) {
+[external][noreply][noreply@nullptr.icu]            throw new HookFailedError(e);
+[external][noreply][noreply@nullptr.icu]        }
+[external][noreply][noreply@nullptr.icu]    }
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]    @SuppressWarnings("UnusedReturnValue")
+[external][noreply][noreply@nullptr.icu]    public static <T> Set<XposedInterface.MethodUnhooker<Method>>
+[external][noreply][noreply@nullptr.icu]    hookAllMethods(Class<? extends XposedInterface.Hooker> hooker, Class<T> clazz, String methodName) {
+[external][noreply][noreply@nullptr.icu]        var unhooks = new HashSet<XposedInterface.MethodUnhooker<Method>>();
+[external][noreply][noreply@nullptr.icu]        for (var method : clazz.getDeclaredMethods()) {
+[external][noreply][noreply@nullptr.icu]            if (method.getName().equals(methodName)) {
+[external][noreply][noreply@nullptr.icu]                unhooks.add(LSPosedBridge.doHook(method, XposedInterface.PRIORITY_DEFAULT, hooker));
+[external][noreply][noreply@nullptr.icu]            }
+[external][noreply][noreply@nullptr.icu]        }
+[external][noreply][noreply@nullptr.icu]        return unhooks;
+[external][noreply][noreply@nullptr.icu]    }
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]    @SuppressWarnings("UnusedReturnValue")
+[external][noreply][noreply@nullptr.icu]    public static <T> XposedInterface.MethodUnhooker<Constructor<T>>
+[external][noreply][noreply@nullptr.icu]    hookConstructor(Class<? extends XposedInterface.Hooker> hooker, Class<T> clazz, Class<?>... parameterTypes) {
+[external][noreply][noreply@nullptr.icu]        try {
+[external][noreply][noreply@nullptr.icu]            var constructor = clazz.getDeclaredConstructor(parameterTypes);
+[external][noreply][noreply@nullptr.icu]            return LSPosedBridge.doHook(constructor, XposedInterface.PRIORITY_DEFAULT, hooker);
+[external][noreply][noreply@nullptr.icu]        } catch (NoSuchMethodException e) {
+[external][noreply][noreply@nullptr.icu]            throw new HookFailedError(e);
+[external][noreply][noreply@nullptr.icu]        }
+[external][noreply][noreply@nullptr.icu]    }
+[external][noreply][noreply@nullptr.icu]}

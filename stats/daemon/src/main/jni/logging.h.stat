@@ -1,0 +1,52 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][hsushulong][hsushulong@gmail.com]#ifndef _LOGGING_H
+[external][hsushulong][hsushulong@gmail.com]#define _LOGGING_H
+[external][hsushulong][hsushulong@gmail.com]
+[external][shana][shana@zju.edu.cn]#include <android/log.h>
+[external][shana][shana@zju.edu.cn]#include <errno.h>
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]#ifndef LOG_TAG
+[external][shana][shana@zju.edu.cn]#define LOG_TAG    "LSPosed"
+[external][hsushulong][hsushulong@gmail.com]#endif
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]#ifdef LOG_DISABLED
+[external][shana][shana@zju.edu.cn]#define LOGD(...) 0
+[external][shana][shana@zju.edu.cn]#define LOGV(...) 0
+[external][shana][shana@zju.edu.cn]#define LOGI(...) 0
+[external][shana][shana@zju.edu.cn]#define LOGW(...) 0
+[external][shana][shana@zju.edu.cn]#define LOGE(...) 0
+[external][hsushulong][hsushulong@gmail.com]#else
+[external][shana][shana@zju.edu.cn]#ifndef NDEBUG
+[external][shana][shana@zju.edu.cn]#define LOGD(fmt, ...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, "%s:%d#%s" ": " fmt, __FILE_NAME__, __LINE__, __PRETTY_FUNCTION__ __VA_OPT__(,) __VA_ARGS__)
+[external][shana][shana@zju.edu.cn]#define LOGV(fmt, ...) __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, "%s:%d#%s" ": " fmt, __FILE_NAME__, __LINE__, __PRETTY_FUNCTION__ __VA_OPT__(,) __VA_ARGS__)
+[external][hsushulong][hsushulong@gmail.com]#else
+[external][shana][shana@zju.edu.cn]#define LOGD(...) 0
+[external][shana][shana@zju.edu.cn]#define LOGV(...) 0
+[external][hsushulong][hsushulong@gmail.com]#endif
+[external][hsushulong][hsushulong@gmail.com]#define LOGI(...)  __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
+[external][hsushulong][hsushulong@gmail.com]#define LOGW(...)  __android_log_print(ANDROID_LOG_WARN, LOG_TAG, __VA_ARGS__)
+[external][hsushulong][hsushulong@gmail.com]#define LOGE(...)  __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+[external][shana][shana@zju.edu.cn]#define LOGF(...)  __android_log_print(ANDROID_LOG_FATAL, LOG_TAG, __VA_ARGS__)
+[external][hsushulong][hsushulong@gmail.com]#define PLOGE(fmt, args...) LOGE(fmt " failed with %d: %s", ##args, errno, strerror(errno))
+[external][hsushulong][hsushulong@gmail.com]#endif
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]#endif // _LOGGING_H

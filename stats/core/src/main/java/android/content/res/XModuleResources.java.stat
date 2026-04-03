@@ -1,0 +1,75 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][admin][admin@0x.mk]package android.content.res;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]import android.app.AndroidAppHelper;
+[external][admin][admin@0x.mk]import android.util.DisplayMetrics;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]import de.robv.android.xposed.IXposedHookInitPackageResources;
+[external][admin][admin@0x.mk]import de.robv.android.xposed.IXposedHookZygoteInit;
+[external][admin][admin@0x.mk]import de.robv.android.xposed.IXposedHookZygoteInit.StartupParam;
+[external][admin][admin@0x.mk]import de.robv.android.xposed.callbacks.XC_InitPackageResources.InitPackageResourcesParam;
+[external][shana][shana@zju.edu.cn]import hidden.HiddenApiBridge;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]/**
+[external][admin][admin@0x.mk] * Provides access to resources from a certain path (usually the module's own path).
+[external][admin][admin@0x.mk] */
+[external][admin][admin@0x.mk]public class XModuleResources extends Resources {
+[external][admin][admin@0x.mk]	private XModuleResources(AssetManager assets, DisplayMetrics metrics, Configuration config) {
+[external][admin][admin@0x.mk]		super(assets, metrics, config);
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/**
+[external][admin][admin@0x.mk]	 * Creates a new instance.
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 * <p>This is usually called with {@link StartupParam#modulePath} from
+[external][admin][admin@0x.mk]	 * {@link IXposedHookZygoteInit#initZygote} and {@link InitPackageResourcesParam#res} from
+[external][admin][admin@0x.mk]	 * {@link IXposedHookInitPackageResources#handleInitPackageResources} (or {@code null} for
+[external][admin][admin@0x.mk]	 * system-wide replacements).
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 * @param path The path to the APK from which the resources should be loaded.
+[external][admin][admin@0x.mk]	 * @param origRes The resources object from which settings like the display metrics and the
+[external][admin][admin@0x.mk]	 *                configuration should be copied. May be {@code null}.
+[external][admin][admin@0x.mk]	 */
+[external][admin][admin@0x.mk]	public static XModuleResources createInstance(String path, XResources origRes) {
+[external][admin][admin@0x.mk]		if (path == null)
+[external][admin][admin@0x.mk]			throw new IllegalArgumentException("path must not be null");
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		AssetManager assets = new AssetManager();
+[external][shana][shana@zju.edu.cn]		HiddenApiBridge.AssetManager_addAssetPath(assets, path);
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		XModuleResources res;
+[external][admin][admin@0x.mk]		if (origRes != null)
+[external][admin][admin@0x.mk]			res = new XModuleResources(assets, origRes.getDisplayMetrics(),	origRes.getConfiguration());
+[external][admin][admin@0x.mk]		else
+[external][admin][admin@0x.mk]			res = new XModuleResources(assets, null, null);
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		AndroidAppHelper.addActiveResource(path, res);
+[external][admin][admin@0x.mk]		return res;
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/**
+[external][admin][admin@0x.mk]	 * Creates an {@link XResForwarder} instance that forwards requests to {@code id} in this resource.
+[external][admin][admin@0x.mk]	 */
+[external][admin][admin@0x.mk]	public XResForwarder fwd(int id) {
+[external][admin][admin@0x.mk]		return new XResForwarder(this, id);
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]}

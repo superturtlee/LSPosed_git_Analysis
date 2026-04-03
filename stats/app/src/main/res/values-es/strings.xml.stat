@@ -1,0 +1,242 @@
+[bot][lsposed][lsposed@lsposed.org]<?xml version="1.0" encoding="utf-8"?>
+[bot][lsposed][lsposed@lsposed.org]<!--
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]  ~ This file is part of LSPosed.
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]  ~
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]  ~ LSPosed is free software: you can redistribute it and/or modify
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]  ~ it under the terms of the GNU General Public License as published by
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]  ~ the Free Software Foundation, either version 3 of the License, or
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]  ~ (at your option) any later version.
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]  ~
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]  ~ LSPosed is distributed in the hope that it will be useful,
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]  ~ GNU General Public License for more details.
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]  ~
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]  ~ You should have received a copy of the GNU General Public License
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]  ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]  ~
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]  ~ Copyright (C) 2021 LSPosed Contributors
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]  -->
+[bot][lsposed][lsposed@lsposed.org]<resources xmlns:tools="http://schemas.android.com/tools" tools:keep="@string/xposed_module_updated_notification_*,@string/module_is_not_activated_*">
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <!-- MainActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="overview">Resumen</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="Modules">Módulos</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <plurals name="modules_enabled_count">
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]        <item quantity="one">%d módulo activado</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="other">%d Módulos activados</item>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    </plurals>
+[bot][lsposed][lsposed@lsposed.org]    <string name="Logs">Trozas</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="Settings">Configuración</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="feedback_or_suggestion">Comentarios o sugerencia</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="About">Acerca de</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="report_issue">Reportar problema</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="module_repo">Repositorio</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo_up_to_date">Todos los modulos actualizados</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo_published_time">Publicado el %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo_updated_time">Actualizado el %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <plurals name="module_repo_upgradable">
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="one">%d módulos repositorio actualizable uno</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="other">%d módulos repositorio actualizables</item>
+[bot][lsposed][lsposed@lsposed.org]    </plurals>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    <string name="about_view_source_code"><![CDATA[Ve el código fuente en %1$s<br/>Únete a nuestro %2$s canal]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="translators" comment="Dear translators, please add your home page here following the format. There can be more than one translator. So feel free to append yourself.">squaredDot</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install">Instalar</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install_summary">Pulsa para instalar LSPosed</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="not_installed">No instalado</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="not_install_summary">LSPosed no está instalado</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="activated">Activado</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="partial_activated">Parcialmente activado</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="selinux_policy_not_loaded_summary">Selinux policy no está cargado correctamente</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="selinux_policy_not_loaded"><![CDATA[Algunas funciones no funcionarán.<br/>Informa de ello al desarrollador de <a href="https://github.com/topjohnwu/Magisk/issues"><b>Magisk</b></a> .]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_inject_fail_summary">System Framework injection failed</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_inject_fail"><![CDATA[This is rare and may be caused by <b>Magisk</b> or some low-quality Magisk modules.<br/>Please try to disable Magisk modules other than Riru and LSPosed or submit full log to developers.]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_prop_incorrect_summary">System prop incorrect</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_prop_incorrect"><![CDATA[Some necessary system properties deleted or modified.<br/>Modules may invalidate occasionally.]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="need_update">Need to update</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="please_update_summary">Por favor instale la última versión de LSPosed</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="info_api_version">Versión de la API</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="info_framework_version">Versión del framework</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_manager_package_name">Nombre del paquete de gestión</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="info_system_version">Versión del sistema</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="info_device">Dispositivo</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_system_abi">ABI del Sistema</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_dex2oat_wrapper">Envoltura del optimizador Dex</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enabled">Activado</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="not_enabled">No habilitado</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="supported">Apoyado</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="unsupported">No soportado</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="android_version_unsatisfied">Versión Android insatisfecha</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="crashed">Se estrelló</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="mount_failed">El montaje falló</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="selinux_permissive">SELinux es permisivo</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sepolicy_incorrect">La política de SELinux es incorrecta</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_lsposed">Actualizar LSPosed</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_lsposed_msg">¿Confirmar para actualizar LSPose? Este dispositivo se reiniciará después de completar la actualización</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_copied">Información copiada al portapapeles</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- WelcomeDialog -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="parasitic_welcome">Bienvenido a LSPosed</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="parasitic_welcome_summary">Usted está utilizando el gestor de parásitos, que puede crear acceso directo o todavía abierta de notificación.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="parasitic_welcome_summary_no_shortcut_support">Estás usando el gestor de parásitos, que se puede abrir desde la notificación.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="create_shortcut">Crear acceso directo</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="never_show">Nunca mostrar</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_welcome">Se recomienda Parasitic Manager</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_welcome_summary">LSPosed ahora soporta la parasitación del sistema para evitar la detección, puede abrir el gestor de parásitos desde la notificación. Se recomienda desinstalar la aplicación actual.</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <!-- LogsActivity -->
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="menuSaveToSd">Guardar</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="nav_item_logs_verbose">Registros detallados</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="nav_item_logs_module">Logs de los módulos</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_saving">Guardando registro, por favor espere</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_saved">Registros guardados</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_save_failed2">No se pudo guardar:\n%s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menuClearLog">Limpiar los registros</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_cleared">Registros limpiados satisfactoriamente.</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="scroll_top">Desplazar hasta el inicio</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="loading">Cargando…</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="scroll_bottom">Desplazar hasta el final</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menuReload">Recargar</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_clear_failed_2">Fallo al limpiar los registros</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_enable_word_wrap">Ajuste de palabras</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enabled_verbose_log">Registro detallado habilitado</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="disabled_verbose_log">Registro detallado desactivado</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <!-- ModulesActivity -->
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="module_empty_description">(sin descripción)</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_xposed_min_version">Este módulo requiere una versión más nueva de Xposed (%d), por lo que no puede ser activado</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_target_version_higher">Este módulo está diseñado para una versión más reciente Xposed (%d) y por lo tanto algunas funcionalidades pueden no funcionar</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="no_min_version_specified">Este módulo no especifica la versión de Xposed que necesita.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_min_version_too_low">Este módulo fue creado para la versión de Xposed %1$d, pero, debido a cambios incompatibles en la versión %2$d, ha sido desactivado</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_installed_on_external_storage">Este módulo no puede ser cargado porque está instalado en la tarjeta SD. Por favor, muévelo al almacenamiento interno</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="module_uninstall">Desinstalar</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="module_settings">Configuración del módulo</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="view_in_repo">Ver en el repositorio</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstall_message">¿Quieres desinstalar este módulo?</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="module_uninstalled">Desinstalado %1$s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstall_failed">Fallo en la desinstalación</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="add_module_to_user">Añadir módulo al usuario</string>
+[external][shana][shana@zju.edu.cn]    <string name="module_installed">%1$s instalado %2$s</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="module_install_failed">Fallo en la instalación</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install_to_user">Instalar al usuario %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install_to_user_message">¿Quieres instalar %1$s al usuario %2$s? Se recomienda que lo instales manualmente; forzar la instalación a través de LSPosed puede causar problemas.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="expand">expandir</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="collapse">contraer</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <!-- AppListActivity -->
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="compile_speed">Optimizar de nuevo</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="compile_speed_msg">Optimizando…</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="compile_done">Optimización completada.</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="app_launch">Abrir</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="compile_failed">La optimización falló o devolvió un valor vacío.</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="compile_failed_with_info">Fallo en la optimización: </string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="sort_by_name">Filtrar por nombre de aplicación</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="sort_by_package_name">Filtrar por nombre de paquete</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="sort_by_install_time">Filtrar por fecha de instalación</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="sort_by_update_time">Filtrar por fecha de actualización</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_reverse">Invertir</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="menu_show_system_apps">Aplicaciones del sistema</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_sort">Filtrando</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="enable_module">Activar módulo</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="no_scope_selected">No seleccionaste ninguna aplicación. ¿Quieres continuar?</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="menu_show_games">Juegos</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="menu_show_modules">Módulos</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_denylist">Lista de denegación</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="failed_to_save_scope_list">Fallo al guardar la lista de scopes</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_version">Versión: %1$s</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="use_recommended">Recomendado</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="no_scope_selected_has_recommended">No seleccionaste ninguna aplicación. ¿Quieres seleccionar las aplicaciones recomendadas?</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="use_recommended_message">¿Quieres seleccionar las aplicaciones recomendadas?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_is_not_activated_yet">El módulo Xposed no está activado aún</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="requested_by_module">Recomendado</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_available">Actualización disponible: %1$s</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="module_disabled_no_selection">El módulo %s ha sido desactivado ya que no se ha seleccionado ninguna aplicación.</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="android_framework">Framework del sistema</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_backup_and_restore">Respaldo</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="menu_backup">Hacer un respaldo</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="menu_restore">Restaurar</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="force_stop">Forzar la detención</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="force_stop_dlg_title">¿Quieres forzar la detención?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="force_stop_dlg_text">Si fuerzas la detención de una aplicación puede que esta se comporte de manera indefinida.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="reboot_required">Necesitas reiniciar la aplicación para aplicar este cambio</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="reboot">Reiniciar</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_hide">Ocultar</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="deny_list">%s está en la lista de negación. Puede no tener efecto.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="deny_list_info">En lista de denegación</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <!-- ModulesActivity and AppListActivity -->
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="modules_other_app">Ver en otra aplicación</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="module_app_info">Información de la aplicación</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="list_empty">¯\\\\_(ツ)_\/¯\nNo hay nada por aquí</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <!-- SettingsActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_group_framework">Framework</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_disable_verbose_log">Desactivar registros detallados</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_disable_verbose_log_summary">Solicitud de inclusión de registros detallados en los informes de incidencias</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="pure_black_dark_theme">Tema negro oscuro</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="pure_black_dark_theme_summary">Usar el tema negro puro si el tema oscuro está activado</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="settings_group_theme">Tema</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="settings_backup_and_restore">Respaldo y restauración</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup_summery">Hacer un respaldo de la lista de módulos y scopes.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_restore_summery">Hacer una restauración de la lista de módulos y scopes.</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup">Hacer un respaldo</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup_failed2">Error al realizar la copia de seguridad:\n%s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enable_documentui">Por favor, activa DocumentUI</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="settings_restore">Restaurar</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_restore_failed2">Error al restaurar:\n%s</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="group_network">Red</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="dns_over_http">DNS sobre HTTPS</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="dns_over_http_summary">Solución alternativa al ataque de DNS en algunos países</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="theme_color">Color del tema</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="theme_color_system">Color de acentuación del sistema</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_show_hidden_icon_apps_enabled">Forzar a las aplicaciones a mostrar los íconos del ejecutable</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_show_hidden_icon_apps_enabled_summary">En versiones posteriores a Android 10 no se permite a las aplicaciones (especialmente los módulos de Xposed) a ocultar el logo de su ejecutable. Desactiva la opción para desactivar esta característica.</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="settings_group_system">Sistema</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_language">Idioma</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_translation_contributors">Colaboradores de traducción</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_translation">Participar en la traducción</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_translation_summary">Ayúdanos a traducir %s a tu idioma</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_create_shortcut_summary">Crear un acceso directo que pueda abrir el gestor de parásitos</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_shortcut_pinned_hint">Acceso directo anclado</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_unsupported_pin_shortcut_summary">El actual lanzador por defecto no admite accesos directos a pines</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_enable_status_notification">Notificación de estado</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_enable_status_notification_summary">Mostrar una notificación que puede abrir el gestor de parásitos</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="disable_status_notification_error">No hay acceso directo, no se puede desactivar la notificación</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_update_channel">Actualizar canal</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_channel_stable">Estable</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_channel_bate">Beta</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_channel_nightly">Construcción nocturna</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_xposed_api_call_protection">Protección de llamadas a la API Xposed</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_xposed_api_call_protection_summary">Bloquear el código del módulo cargado dinámicamente para utilizar Xposed API, esto puede romper algunos módulos, pero beneficiar a la seguridad</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <!-- Module Repo -->
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="module_readme">Léeme</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="module_releases">Versiones</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="module_information">Información</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="module_information_homepage">Página principal</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="module_information_source_url">Código fuente</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="module_information_collaborators">Colaboradores</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="module_release_view_assets">Archivos</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="menu_open_in_browser">Abrir en el navegador</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="module_release_load_more">Mostrar versiones anteriores</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="module_release_no_more">No hay más versiones</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]    <string name="repo_load_failed">Fallo al cargar el módulo de repositorio: %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_upgradable_first">Upgradable first</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="installed">Instalado</string>
+[bot][lsposed][lsposed@lsposed.org]    <plurals name="module_release_assets_download_count">
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="one">%d descargar</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="other">%d descargas</item>
+[bot][lsposed][lsposed@lsposed.org]    </plurals>
+[bot][lsposed][lsposed@lsposed.org]    <!-- Colors -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_sakura">Sakura</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_red">Rojo</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_pink">Rosa</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_purple">Morado</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_deep_purple">Morado profundo</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_indigo">Indigo</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_blue">Azul</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_light_blue">Azul claro</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_cyan">Cian</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_teal">Teal</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_green">Verde</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_light_green">Verde claro</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_lime">Lima</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_yellow">Amarillo</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_amber">Ámbar</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_orange">Naranja</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_deep_orange">Naranja oscuro</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_brown">Marrón</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_blue_grey">Gris azul</string>
+[external][josedefreitas][37962411+JoseDeFreitas@users.noreply.github.com]</resources>

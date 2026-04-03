@@ -1,0 +1,10 @@
+[external][shana][shana@zju.edu.cn]package android.content.pm;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import java.util.List;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]abstract class BaseParceledListSlice<T> {
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public List<T> getList() {
+[external][shana][shana@zju.edu.cn]        throw new RuntimeException("STUB");
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

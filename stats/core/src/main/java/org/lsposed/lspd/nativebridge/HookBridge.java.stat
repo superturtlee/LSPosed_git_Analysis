@@ -1,0 +1,28 @@
+[external][shana][shana@zju.edu.cn]package org.lsposed.lspd.nativebridge;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import java.lang.reflect.Executable;
+[external][shana][shana@zju.edu.cn]import java.lang.reflect.InvocationTargetException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import dalvik.annotation.optimization.FastNative;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public class HookBridge {
+[external][noreply][noreply@nullptr.icu]    public static native boolean hookMethod(boolean useModernApi, Executable hookMethod, Class<?> hooker, int priority, Object callback);
+[external][shana][shana@zju.edu.cn]
+[external][noreply][noreply@nullptr.icu]    public static native boolean unhookMethod(boolean useModernApi, Executable hookMethod, Object callback);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static native boolean deoptimizeMethod(Executable method);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static native <T> T allocateObject(Class<T> clazz) throws InstantiationException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static native Object invokeOriginalMethod(Executable method, Object thisObject, Object... args) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public static native <T> Object invokeSpecialMethod(Executable method, char[] shorty, Class<T> clazz, Object thisObject, Object... args) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @FastNative
+[external][shana][shana@zju.edu.cn]    public static native boolean instanceOf(Object obj, Class<?> clazz);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @FastNative
+[external][shana][shana@zju.edu.cn]    public static native boolean setTrusted(Object cookie);
+[internal][vvb2060][vvb2060@gmail.com]
+[external][noreply][noreply@nullptr.icu]    public static native Object[][] callbackSnapshot(Class<?> hooker_callback, Executable method);
+[external][shana][shana@zju.edu.cn]}

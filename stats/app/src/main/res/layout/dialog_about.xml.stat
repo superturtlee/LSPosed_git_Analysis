@@ -1,0 +1,62 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]<?xml version="1.0" encoding="utf-8"?><!--
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  -->
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    xmlns:app="http://schemas.android.com/apk/res-auto"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    android:orientation="horizontal"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    android:layout_width="match_parent"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    android:layout_height="match_parent"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    android:padding="24dp">
+[internal][vvb2060][vvb2060@gmail.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    <ImageView
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        android:id="@+id/design_about_icon"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        android:layout_width="48dp"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        android:layout_height="48dp"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        app:srcCompat="@drawable/ic_launcher" />
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    <LinearLayout
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        android:orientation="vertical"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        android:layout_width="wrap_content"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        android:layout_height="wrap_content"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        android:layout_marginStart="16dp">
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]        <com.google.android.material.textview.MaterialTextView
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            android:id="@+id/design_about_title"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            android:layout_width="wrap_content"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            android:layout_height="wrap_content"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            android:textSize="18sp"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            android:textAppearance="@android:style/TextAppearance.Material.Body1" />
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]        <com.google.android.material.textview.MaterialTextView
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            android:id="@+id/design_about_version"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            android:layout_width="wrap_content"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            android:layout_height="wrap_content"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            android:textSize="14sp" />
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]        <com.google.android.material.textview.MaterialTextView
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            android:id="@+id/design_about_info"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            android:layout_marginTop="24dp"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            android:layout_width="wrap_content"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            android:layout_height="wrap_content"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            android:textSize="14sp"
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            android:textColor="?android:textColorSecondary" />
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]    </LinearLayout>
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]</LinearLayout>

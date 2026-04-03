@@ -1,0 +1,124 @@
+[internal][vvb2060][vvb2060@gmail.com]/* From https://github.com/primer/github-syntax-light/blob/master/lib/github-light.css */
+[internal][vvb2060][vvb2060@gmail.com].pl-c /* comment, punctuation.definition.comment, string.comment */ {
+[internal][vvb2060][vvb2060@gmail.com]  color: #6a737d;
+[internal][vvb2060][vvb2060@gmail.com]}
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com].pl-c1 /* constant, entity.name.constant, variable.other.constant, variable.language, support, meta.property-name, support.constant, support.variable, meta.module-reference, markup.raw, meta.diff.header, meta.output */,
+[internal][vvb2060][vvb2060@gmail.com].pl-s .pl-v /* string variable */ {
+[internal][vvb2060][vvb2060@gmail.com]  color: #005cc5;
+[internal][vvb2060][vvb2060@gmail.com]}
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com].pl-e /* entity */,
+[internal][vvb2060][vvb2060@gmail.com].pl-en /* entity.name */ {
+[internal][vvb2060][vvb2060@gmail.com]  color: #6f42c1;
+[internal][vvb2060][vvb2060@gmail.com]}
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com].pl-smi /* variable.parameter.function, storage.modifier.package, storage.modifier.import, storage.type.java, variable.other */,
+[internal][vvb2060][vvb2060@gmail.com].pl-s .pl-s1 /* string source */ {
+[internal][vvb2060][vvb2060@gmail.com]  color: #24292e;
+[internal][vvb2060][vvb2060@gmail.com]}
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com].pl-ent /* entity.name.tag, markup.quote */ {
+[internal][vvb2060][vvb2060@gmail.com]  color: #22863a;
+[internal][vvb2060][vvb2060@gmail.com]}
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com].pl-k /* keyword, storage, storage.type */ {
+[internal][vvb2060][vvb2060@gmail.com]  color: #d73a49;
+[internal][vvb2060][vvb2060@gmail.com]}
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com].pl-s /* string */,
+[internal][vvb2060][vvb2060@gmail.com].pl-pds /* punctuation.definition.string, source.regexp, string.regexp.character-class */,
+[internal][vvb2060][vvb2060@gmail.com].pl-s .pl-pse .pl-s1 /* string punctuation.section.embedded source */,
+[internal][vvb2060][vvb2060@gmail.com].pl-sr /* string.regexp */,
+[internal][vvb2060][vvb2060@gmail.com].pl-sr .pl-cce /* string.regexp constant.character.escape */,
+[internal][vvb2060][vvb2060@gmail.com].pl-sr .pl-sre /* string.regexp source.ruby.embedded */,
+[internal][vvb2060][vvb2060@gmail.com].pl-sr .pl-sra /* string.regexp string.regexp.arbitrary-repitition */ {
+[internal][vvb2060][vvb2060@gmail.com]  color: #032f62;
+[internal][vvb2060][vvb2060@gmail.com]}
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com].pl-v /* variable */,
+[internal][vvb2060][vvb2060@gmail.com].pl-smw /* sublimelinter.mark.warning */ {
+[internal][vvb2060][vvb2060@gmail.com]  color: #e36209;
+[internal][vvb2060][vvb2060@gmail.com]}
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com].pl-bu /* invalid.broken, invalid.deprecated, invalid.unimplemented, message.error, brackethighlighter.unmatched, sublimelinter.mark.error */ {
+[internal][vvb2060][vvb2060@gmail.com]  color: #b31d28;
+[internal][vvb2060][vvb2060@gmail.com]}
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com].pl-ii /* invalid.illegal */ {
+[internal][vvb2060][vvb2060@gmail.com]  color: #fafbfc;
+[internal][vvb2060][vvb2060@gmail.com]  background-color: #b31d28;
+[internal][vvb2060][vvb2060@gmail.com]}
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com].pl-c2 /* carriage-return */ {
+[internal][vvb2060][vvb2060@gmail.com]  color: #fafbfc;
+[internal][vvb2060][vvb2060@gmail.com]  background-color: #d73a49;
+[internal][vvb2060][vvb2060@gmail.com]}
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com].pl-c2::before /* carriage-return */ {
+[internal][vvb2060][vvb2060@gmail.com]  content: "^M";
+[internal][vvb2060][vvb2060@gmail.com]}
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com].pl-sr .pl-cce /* string.regexp constant.character.escape */ {
+[internal][vvb2060][vvb2060@gmail.com]  font-weight: bold;
+[internal][vvb2060][vvb2060@gmail.com]  color: #22863a;
+[internal][vvb2060][vvb2060@gmail.com]}
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com].pl-ml /* markup.list */ {
+[internal][vvb2060][vvb2060@gmail.com]  color: #735c0f;
+[internal][vvb2060][vvb2060@gmail.com]}
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com].pl-mh /* markup.heading */,
+[internal][vvb2060][vvb2060@gmail.com].pl-mh .pl-en /* markup.heading entity.name */,
+[internal][vvb2060][vvb2060@gmail.com].pl-ms /* meta.separator */ {
+[internal][vvb2060][vvb2060@gmail.com]  font-weight: bold;
+[internal][vvb2060][vvb2060@gmail.com]  color: #005cc5;
+[internal][vvb2060][vvb2060@gmail.com]}
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com].pl-mi /* markup.italic */ {
+[internal][vvb2060][vvb2060@gmail.com]  font-style: italic;
+[internal][vvb2060][vvb2060@gmail.com]  color: #24292e;
+[internal][vvb2060][vvb2060@gmail.com]}
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com].pl-mb /* markup.bold */ {
+[internal][vvb2060][vvb2060@gmail.com]  font-weight: bold;
+[internal][vvb2060][vvb2060@gmail.com]  color: #24292e;
+[internal][vvb2060][vvb2060@gmail.com]}
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com].pl-md /* markup.deleted, meta.diff.header.from-file, punctuation.definition.deleted */ {
+[internal][vvb2060][vvb2060@gmail.com]  color: #b31d28;
+[internal][vvb2060][vvb2060@gmail.com]  background-color: #ffeef0;
+[internal][vvb2060][vvb2060@gmail.com]}
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com].pl-mi1 /* markup.inserted, meta.diff.header.to-file, punctuation.definition.inserted */ {
+[internal][vvb2060][vvb2060@gmail.com]  color: #22863a;
+[internal][vvb2060][vvb2060@gmail.com]  background-color: #f0fff4;
+[internal][vvb2060][vvb2060@gmail.com]}
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com].pl-mc /* markup.changed, punctuation.definition.changed */ {
+[internal][vvb2060][vvb2060@gmail.com]  color: #e36209;
+[internal][vvb2060][vvb2060@gmail.com]  background-color: #ffebda;
+[internal][vvb2060][vvb2060@gmail.com]}
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com].pl-mi2 /* markup.ignored, markup.untracked */ {
+[internal][vvb2060][vvb2060@gmail.com]  color: #f6f8fa;
+[internal][vvb2060][vvb2060@gmail.com]  background-color: #005cc5;
+[internal][vvb2060][vvb2060@gmail.com]}
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com].pl-mdr /* meta.diff.range */ {
+[internal][vvb2060][vvb2060@gmail.com]  font-weight: bold;
+[internal][vvb2060][vvb2060@gmail.com]  color: #6f42c1;
+[internal][vvb2060][vvb2060@gmail.com]}
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com].pl-ba /* brackethighlighter.tag, brackethighlighter.curly, brackethighlighter.round, brackethighlighter.square, brackethighlighter.angle, brackethighlighter.quote */ {
+[internal][vvb2060][vvb2060@gmail.com]  color: #586069;
+[internal][vvb2060][vvb2060@gmail.com]}
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com].pl-sg /* sublimelinter.gutter-mark */ {
+[internal][vvb2060][vvb2060@gmail.com]  color: #959da5;
+[internal][vvb2060][vvb2060@gmail.com]}
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com].pl-corl /* constant.other.reference.link, string.other.link */ {
+[internal][vvb2060][vvb2060@gmail.com]  text-decoration: underline;
+[internal][vvb2060][vvb2060@gmail.com]  color: #032f62;
+[internal][vvb2060][vvb2060@gmail.com]}

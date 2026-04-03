@@ -1,0 +1,800 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * <!--This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors-->
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]package org.lsposed.manager.ui.fragment;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import static android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS;
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.annotation.SuppressLint;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]import android.content.Intent;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.content.pm.PackageInfo;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]import android.content.pm.PackageManager;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.graphics.Typeface;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.graphics.drawable.Drawable;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]import android.net.Uri;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.os.Build;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]import android.os.Bundle;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.text.Spannable;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.text.SpannableStringBuilder;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]import android.text.TextUtils;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.text.style.ForegroundColorSpan;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.text.style.StyleSpan;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.text.style.TypefaceSpan;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import android.util.SparseArray;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.view.LayoutInflater;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]import android.view.Menu;
+[external][shana][shana@zju.edu.cn]import android.view.MenuInflater;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]import android.view.MenuItem;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]import android.view.View;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]import android.view.ViewGroup;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]import android.widget.Filter;
+[external][shana][shana@zju.edu.cn]import android.widget.Filterable;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]import android.widget.ImageView;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]import android.widget.TextView;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]import androidx.annotation.NonNull;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import androidx.annotation.Nullable;
+[external][shana][shana@zju.edu.cn]import androidx.appcompat.widget.SearchView;
+[external][shana][shana@zju.edu.cn]import androidx.constraintlayout.widget.ConstraintLayout;
+[external][shana][shana@zju.edu.cn]import androidx.coordinatorlayout.widget.CoordinatorLayout;
+[external][shana][shana@zju.edu.cn]import androidx.core.view.MenuProvider;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import androidx.fragment.app.Fragment;
+[external][shana][shana@zju.edu.cn]import androidx.navigation.NavOptions;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import androidx.recyclerview.widget.LinearLayoutManager;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]import androidx.recyclerview.widget.RecyclerView;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import androidx.viewpager2.adapter.FragmentStateAdapter;
+[external][shana][shana@zju.edu.cn]import androidx.viewpager2.widget.ViewPager2;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import com.bumptech.glide.request.target.CustomTarget;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import com.bumptech.glide.request.transition.Transition;
+[external][shana][shana@zju.edu.cn]import com.google.android.material.behavior.HideBottomViewOnScrollBehavior;
+[external][shana][shana@zju.edu.cn]import com.google.android.material.checkbox.MaterialCheckBox;
+[external][shana][shana@zju.edu.cn]import com.google.android.material.floatingactionbutton.FloatingActionButton;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import com.google.android.material.tabs.TabLayout;
+[external][shana][shana@zju.edu.cn]import com.google.android.material.tabs.TabLayoutMediator;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.lspd.models.UserInfo;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.manager.App;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.ConfigManager;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.R;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.adapters.AppHelper;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.manager.databinding.FragmentPagerBinding;
+[external][shana][shana@zju.edu.cn]import org.lsposed.manager.databinding.ItemModuleBinding;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import org.lsposed.manager.databinding.SwiperefreshRecyclerviewBinding;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.repo.RepoLoader;
+[external][shana][shana@zju.edu.cn]import org.lsposed.manager.ui.dialog.BlurBehindDialogBuilder;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.manager.ui.widget.EmptyStateRecyclerView;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.util.GlideApp;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.util.ModuleUtil;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.util.ArrayList;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.util.Comparator;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import java.util.HashSet;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.util.List;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import java.util.function.Consumer;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import java.util.stream.IntStream;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import rikka.core.util.ResourceUtils;
+[external][shana][shana@zju.edu.cn]import rikka.material.app.LocaleDelegate;
+[external][shana][shana@zju.edu.cn]import rikka.recyclerview.RecyclerViewKt;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public class ModulesFragment extends BaseFragment implements ModuleUtil.ModuleListener, RepoLoader.RepoListener, MenuProvider {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private static final PackageManager pm = App.getInstance().getPackageManager();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private static final ModuleUtil moduleUtil = ModuleUtil.getInstance();
+[external][shana][shana@zju.edu.cn]    private static final RepoLoader repoLoader = RepoLoader.getInstance();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    protected FragmentPagerBinding binding;
+[external][shana][shana@zju.edu.cn]    protected SearchView searchView;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private SearchView.OnQueryTextListener searchListener;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    SparseArray<ModuleAdapter> adapters = new SparseArray<>();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    PagerAdapter pagerAdapter = null;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    private ModuleUtil.InstalledModule selectedModule;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public void onCreate(@Nullable Bundle savedInstanceState) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        super.onCreate(savedInstanceState);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        searchListener = new SearchView.OnQueryTextListener() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            public boolean onQueryTextSubmit(String query) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                forEachAdaptor(adapter -> adapter.getFilter().filter(query));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                return false;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            @Override
+[external][shana][shana@zju.edu.cn]            public boolean onQueryTextChange(String query) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                forEachAdaptor(adapter -> adapter.getFilter().filter(query));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                return false;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        };
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    private void forEachAdaptor(Consumer<? super ModuleAdapter> action) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        var snapshot = adapters;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        for (var i = 0; i < snapshot.size(); ++i) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            action.accept(snapshot.valueAt(i));
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    private void showFab() {
+[external][shana][shana@zju.edu.cn]        var layoutParams = binding.fab.getLayoutParams();
+[external][shana][shana@zju.edu.cn]        if (layoutParams instanceof CoordinatorLayout.LayoutParams) {
+[external][shana][shana@zju.edu.cn]            var coordinatorLayoutBehavior =
+[external][shana][shana@zju.edu.cn]                    ((CoordinatorLayout.LayoutParams) layoutParams).getBehavior();
+[external][shana][shana@zju.edu.cn]            if (coordinatorLayoutBehavior instanceof HideBottomViewOnScrollBehavior) {
+[external][shana][shana@zju.edu.cn]                //noinspection unchecked
+[external][shana][shana@zju.edu.cn]                ((HideBottomViewOnScrollBehavior<FloatingActionButton>) coordinatorLayoutBehavior).slideUp(binding.fab);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Nullable
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        binding = FragmentPagerBinding.inflate(inflater, container, false);
+[external][shana][shana@zju.edu.cn]        binding.appBar.setLiftable(true);
+[external][shana][shana@zju.edu.cn]        setupToolbar(binding.toolbar, binding.clickView, R.string.Modules, R.menu.menu_modules);
+[external][shana][shana@zju.edu.cn]        binding.toolbar.setNavigationIcon(null);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        pagerAdapter = new PagerAdapter(this);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        binding.viewPager.setAdapter(pagerAdapter);
+[external][shana][shana@zju.edu.cn]        binding.viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+[external][shana][shana@zju.edu.cn]            @Override
+[external][shana][shana@zju.edu.cn]            public void onPageSelected(int position) {
+[external][shana][shana@zju.edu.cn]                showFab();
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        });
+[external][shana][shana@zju.edu.cn]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        new TabLayoutMediator(binding.tabLayout, binding.viewPager, (tab, position) -> {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            if (position < adapters.size()) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                tab.setText(adapters.valueAt(position).getUser().name);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        }).attach();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        binding.tabLayout.addOnLayoutChangeListener((view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            ViewGroup vg = (ViewGroup) binding.tabLayout.getChildAt(0);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            int tabLayoutWidth = IntStream.range(0, binding.tabLayout.getTabCount()).map(i -> vg.getChildAt(i).getWidth()).sum();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            if (tabLayoutWidth <= binding.getRoot().getWidth()) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                binding.tabLayout.setTabMode(TabLayout.MODE_FIXED);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                binding.tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        });
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        binding.fab.setOnClickListener(v -> {
+[external][shana][shana@zju.edu.cn]            var bundle = new Bundle();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            var user = adapters.valueAt(binding.viewPager.getCurrentItem()).getUser();
+[external][shana][shana@zju.edu.cn]            bundle.putParcelable("userInfo", user);
+[external][shana][shana@zju.edu.cn]            var f = new RecyclerViewDialogFragment();
+[external][shana][shana@zju.edu.cn]            f.setArguments(bundle);
+[external][shana][shana@zju.edu.cn]            f.show(getChildFragmentManager(), "install_to_user" + user.id);
+[external][shana][shana@zju.edu.cn]        });
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        moduleUtil.addListener(this);
+[external][shana][shana@zju.edu.cn]        repoLoader.addListener(this);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        onModulesReloaded();
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return binding.getRoot();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public void onPrepareMenu(Menu menu) {
+[external][shana][shana@zju.edu.cn]        searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
+[external][howardwu20][HowardWu20@outlook.com]        if (searchView != null) {
+[external][howardwu20][HowardWu20@outlook.com]            searchView.setOnQueryTextListener(searchListener);
+[external][howardwu20][HowardWu20@outlook.com]            searchView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+[external][howardwu20][HowardWu20@outlook.com]                @Override
+[external][howardwu20][HowardWu20@outlook.com]                public void onViewAttachedToWindow(@NonNull View arg0) {
+[external][howardwu20][HowardWu20@outlook.com]                    binding.appBar.setExpanded(false, true);
+[external][howardwu20][HowardWu20@outlook.com]                }
+[external][shana][shana@zju.edu.cn]
+[external][howardwu20][HowardWu20@outlook.com]                @Override
+[external][howardwu20][HowardWu20@outlook.com]                public void onViewDetachedFromWindow(@NonNull View v) {
+[external][howardwu20][HowardWu20@outlook.com]                }
+[external][howardwu20][HowardWu20@outlook.com]            });
+[external][howardwu20][HowardWu20@outlook.com]            searchView.findViewById(androidx.appcompat.R.id.search_edit_frame).setLayoutDirection(View.LAYOUT_DIRECTION_INHERIT);
+[external][howardwu20][HowardWu20@outlook.com]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+[external][shana][shana@zju.edu.cn]        return false;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public void onResume() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        super.onResume();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        forEachAdaptor(ModuleAdapter::refresh);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    @Override
+[external][shana][shana@zju.edu.cn]    public void onSingleModuleReloaded(ModuleUtil.InstalledModule module) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        forEachAdaptor(ModuleAdapter::refresh);
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    @Override
+[external][shana][shana@zju.edu.cn]    public void onModulesReloaded() {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        var users = moduleUtil.getUsers();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        if (users == null) return;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        if (users.size() != 1) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            binding.viewPager.setUserInputEnabled(true);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            binding.tabLayout.setVisibility(View.VISIBLE);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            binding.fab.show();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        } else {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            binding.viewPager.setUserInputEnabled(false);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            binding.tabLayout.setVisibility(View.GONE);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        var tmp = new SparseArray<ModuleAdapter>(users.size());
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        var snapshot = adapters;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        for (var user : users) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            if (snapshot.indexOfKey(user.id) >= 0) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                tmp.put(user.id, snapshot.get(user.id));
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            } else {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                var adapter = new ModuleAdapter(user);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                adapter.setHasStableIds(true);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                tmp.put(user.id, adapter);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        adapters = tmp;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        forEachAdaptor(ModuleAdapter::refresh);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        runOnUiThread(pagerAdapter::notifyDataSetChanged);
+[external][shana][shana@zju.edu.cn]        updateModuleSummary();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    @Override
+[external][shana][shana@zju.edu.cn]    public void onRepoLoaded() {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        forEachAdaptor(ModuleAdapter::refresh);
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    private void updateModuleSummary() {
+[external][shana][shana@zju.edu.cn]        var moduleCount = moduleUtil.getEnabledModulesCount();
+[external][shana][shana@zju.edu.cn]        runOnUiThread(() -> {
+[external][shana][shana@zju.edu.cn]            if (binding != null) {
+[external][shana][shana@zju.edu.cn]                binding.toolbar.setSubtitle(moduleCount == -1 ? getString(R.string.loading) : getResources().getQuantityString(R.plurals.modules_enabled_count, moduleCount, moduleCount));
+[external][shana][shana@zju.edu.cn]                binding.toolbarLayout.setSubtitle(binding.toolbar.getSubtitle());
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        });
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    void installModuleToUser(ModuleUtil.InstalledModule module, UserInfo user) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        new BlurBehindDialogBuilder(requireActivity(), R.style.ThemeOverlay_MaterialAlertDialog_Centered_FullWidthButtons)
+[external][shana][shana@zju.edu.cn]                .setTitle(getString(R.string.install_to_user, user.name))
+[external][shana][shana@zju.edu.cn]                .setMessage(getString(R.string.install_to_user_message, module.getAppName(), user.name))
+[external][shana][shana@zju.edu.cn]                .setPositiveButton(android.R.string.ok, (dialog, which) ->
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                        runAsync(() -> {
+[external][shana][shana@zju.edu.cn]                            var success = ConfigManager.installExistingPackageAsUser(module.packageName, user.id);
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                            String text = success ?
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                                    getString(R.string.module_installed, module.getAppName(), user.name) :
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                                    getString(R.string.module_install_failed);
+[external][shana][shana@zju.edu.cn]                            showHint(text, false);
+[external][shana][shana@zju.edu.cn]                            if (success)
+[external][shana][shana@zju.edu.cn]                                moduleUtil.reloadSingleModule(module.packageName, user.id);
+[external][shana][shana@zju.edu.cn]                        }))
+[external][shana][shana@zju.edu.cn]                .setNegativeButton(android.R.string.cancel, null)
+[external][shana][shana@zju.edu.cn]                .show();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    @SuppressLint("WrongConstant")
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    @Override
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    public boolean onContextItemSelected(@NonNull MenuItem item) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (selectedModule == null) {
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]            return false;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        int itemId = item.getItemId();
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        if (itemId == R.id.menu_launch) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            String packageName = selectedModule.packageName;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]            if (packageName == null) {
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]                return false;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Intent intent = AppHelper.getSettingsIntent(packageName, selectedModule.userId);
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]            if (intent != null) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                ConfigManager.startActivityAsUserWithFeature(intent, selectedModule.userId);
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]            }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]            return true;
+[internal][vvb2060][vvb2060@gmail.com]        } else if (itemId == R.id.menu_other_app) {
+[internal][vvb2060][vvb2060@gmail.com]            var intent = new Intent(Intent.ACTION_SHOW_APP_INFO);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            intent.putExtra(Intent.EXTRA_PACKAGE_NAME, selectedModule.packageName);
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+[external][shana][shana@zju.edu.cn]            ConfigManager.startActivityAsUserWithFeature(intent, selectedModule.userId);
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]            return true;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        } else if (itemId == R.id.menu_app_info) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            ConfigManager.startActivityAsUserWithFeature(new Intent(ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", selectedModule.packageName, null)), selectedModule.userId);
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]            return true;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        } else if (itemId == R.id.menu_uninstall) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            new BlurBehindDialogBuilder(requireActivity(), R.style.ThemeOverlay_MaterialAlertDialog_FullWidthButtons)
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    .setIcon(selectedModule.app.loadIcon(pm))
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    .setTitle(selectedModule.getAppName())
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    .setMessage(R.string.module_uninstall_message)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    .setPositiveButton(android.R.string.ok, (dialog, which) ->
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                            runAsync(() -> {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                                boolean success = ConfigManager.uninstallPackage(selectedModule.packageName, selectedModule.userId);
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                                String text = success ? getString(R.string.module_uninstalled, selectedModule.getAppName()) : getString(R.string.module_uninstall_failed);
+[external][shana][shana@zju.edu.cn]                                showHint(text, false);
+[external][shana][shana@zju.edu.cn]                                if (success)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                                    moduleUtil.reloadSingleModule(selectedModule.packageName, selectedModule.userId);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                            }))
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    .setNegativeButton(android.R.string.cancel, null)
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    .show();
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]            return true;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        } else if (itemId == R.id.menu_repo) {
+[external][shana][shana@zju.edu.cn]            var navController = getNavController();
+[external][shana][shana@zju.edu.cn]            navController.navigate(
+[external][shana][shana@zju.edu.cn]                    new Uri.Builder().scheme("lsposed").authority("repo").appendQueryParameter("modulePackageName", selectedModule.packageName).build(),
+[external][shana][shana@zju.edu.cn]                    new NavOptions.Builder().setEnterAnim(R.anim.fragment_enter).setExitAnim(R.anim.fragment_exit).setPopEnterAnim(R.anim.fragment_enter_pop).setPopExitAnim(R.anim.fragment_exit_pop).setLaunchSingleTop(true).setPopUpTo(getNavController().getGraph().getStartDestinationId(), false, true).build());
+[internal][vvb2060][vvb2060@gmail.com]            return true;
+[external][shana][shana@zju.edu.cn]        } else if (itemId == R.id.menu_compile_speed) {
+[external][shana][shana@zju.edu.cn]            CompileDialogFragment.speed(getChildFragmentManager(), selectedModule.pkg.applicationInfo);
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        return super.onContextItemSelected(item);
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    }
+[external][chsqwyx][chsqwyx@gmail.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public void onDestroyView() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        super.onDestroyView();
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        moduleUtil.removeListener(this);
+[external][shana][shana@zju.edu.cn]        repoLoader.removeListener(this);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        binding = null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static class ModuleListFragment extends Fragment {
+[external][shana][shana@zju.edu.cn]        public SwiperefreshRecyclerviewBinding binding;
+[external][shana][shana@zju.edu.cn]        private ModuleAdapter adapter;
+[external][shana][shana@zju.edu.cn]        private final RecyclerView.AdapterDataObserver observer = new RecyclerView.AdapterDataObserver() {
+[external][shana][shana@zju.edu.cn]            @Override
+[external][shana][shana@zju.edu.cn]            public void onChanged() {
+[external][shana][shana@zju.edu.cn]                binding.swipeRefreshLayout.setRefreshing(!adapter.isLoaded());
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        };
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        private final View.OnAttachStateChangeListener searchViewLocker = new View.OnAttachStateChangeListener() {
+[external][shana][shana@zju.edu.cn]            @Override
+[external][howardwu20][HowardWu20@outlook.com]            public void onViewAttachedToWindow(@NonNull View v) {
+[external][shana][shana@zju.edu.cn]                binding.recyclerView.setNestedScrollingEnabled(false);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            @Override
+[external][howardwu20][HowardWu20@outlook.com]            public void onViewDetachedFromWindow(@NonNull View v) {
+[external][shana][shana@zju.edu.cn]                binding.recyclerView.setNestedScrollingEnabled(true);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        };
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        @Nullable
+[external][shana][shana@zju.edu.cn]        @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            ModulesFragment fragment = (ModulesFragment) getParentFragment();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Bundle arguments = getArguments();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (fragment == null || arguments == null) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                return null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            int userId = arguments.getInt("user_id");
+[external][shana][shana@zju.edu.cn]            binding = SwiperefreshRecyclerviewBinding.inflate(getLayoutInflater(), container, false);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            adapter = fragment.adapters.get(userId);
+[external][shana][shana@zju.edu.cn]            binding.recyclerView.setAdapter(adapter);
+[external][shana][shana@zju.edu.cn]            binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireActivity()));
+[external][shana][shana@zju.edu.cn]            binding.swipeRefreshLayout.setOnRefreshListener(adapter::fullRefresh);
+[external][shana][shana@zju.edu.cn]            binding.swipeRefreshLayout.setProgressViewEndTarget(true, binding.swipeRefreshLayout.getProgressViewEndOffset());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            RecyclerViewKt.fixEdgeEffect(binding.recyclerView, false, true);
+[external][shana][shana@zju.edu.cn]            adapter.registerAdapterDataObserver(observer);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return binding.getRoot();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        void attachListeners() {
+[external][shana][shana@zju.edu.cn]            var parent = getParentFragment();
+[external][howardwu20][HowardWu20@outlook.com]            if (parent instanceof ModulesFragment moduleFragment) {
+[external][shana][shana@zju.edu.cn]                binding.recyclerView.getBorderViewDelegate().setBorderVisibilityChangedListener((top, oldTop, bottom, oldBottom) -> moduleFragment.binding.appBar.setLifted(!top));
+[external][shana][shana@zju.edu.cn]                moduleFragment.binding.appBar.setLifted(!binding.recyclerView.getBorderViewDelegate().isShowingTopBorder());
+[external][shana][shana@zju.edu.cn]                moduleFragment.searchView.addOnAttachStateChangeListener(searchViewLocker);
+[external][shana][shana@zju.edu.cn]                binding.recyclerView.setNestedScrollingEnabled(moduleFragment.searchView.isIconified());
+[external][shana][shana@zju.edu.cn]                View.OnClickListener l = v -> {
+[external][shana][shana@zju.edu.cn]                    if (moduleFragment.searchView.isIconified()) {
+[external][shana][shana@zju.edu.cn]                        binding.recyclerView.smoothScrollToPosition(0);
+[external][shana][shana@zju.edu.cn]                        moduleFragment.binding.appBar.setExpanded(true, true);
+[external][shana][shana@zju.edu.cn]                    }
+[external][shana][shana@zju.edu.cn]                };
+[external][shana][shana@zju.edu.cn]                moduleFragment.binding.clickView.setOnClickListener(l);
+[external][shana][shana@zju.edu.cn]                moduleFragment.binding.toolbar.setOnClickListener(l);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        void detachListeners() {
+[external][shana][shana@zju.edu.cn]            binding.recyclerView.getBorderViewDelegate().setBorderVisibilityChangedListener(null);
+[external][shana][shana@zju.edu.cn]            var parent = getParentFragment();
+[external][howardwu20][HowardWu20@outlook.com]            if (parent instanceof ModulesFragment moduleFragment) {
+[external][shana][shana@zju.edu.cn]                moduleFragment.searchView.removeOnAttachStateChangeListener(searchViewLocker);
+[external][shana][shana@zju.edu.cn]                binding.recyclerView.setNestedScrollingEnabled(true);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public void onStart() {
+[external][shana][shana@zju.edu.cn]            super.onStart();
+[external][shana][shana@zju.edu.cn]            attachListeners();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public void onResume() {
+[external][shana][shana@zju.edu.cn]            super.onResume();
+[external][shana][shana@zju.edu.cn]            attachListeners();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public void onDestroyView() {
+[external][shana][shana@zju.edu.cn]            adapter.unregisterAdapterDataObserver(observer);
+[external][shana][shana@zju.edu.cn]            super.onDestroyView();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public void onPause() {
+[external][shana][shana@zju.edu.cn]            super.onPause();
+[external][shana][shana@zju.edu.cn]            detachListeners();
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        @Override
+[external][shana][shana@zju.edu.cn]        public void onStop() {
+[external][shana][shana@zju.edu.cn]            super.onStop();
+[external][shana][shana@zju.edu.cn]            detachListeners();
+[external][shana][shana@zju.edu.cn]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private class PagerAdapter extends FragmentStateAdapter {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public PagerAdapter(@NonNull Fragment fragment) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            super(fragment);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        @NonNull
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public Fragment createFragment(int position) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Bundle bundle = new Bundle();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            bundle.putInt("user_id", adapters.keyAt(position));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Fragment fragment = new ModuleListFragment();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            fragment.setArguments(bundle);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return fragment;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public int getItemCount() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return adapters.size();
+[external][shana][shana@zju.edu.cn]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public long getItemId(int position) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            return adapters.keyAt(position);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        @Override
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        public boolean containsItem(long itemId) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            return adapters.indexOfKey((int) itemId) >= 0;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    ModuleAdapter createPickModuleAdapter(UserInfo userInfo) {
+[external][shana][shana@zju.edu.cn]        return new ModuleAdapter(userInfo, true);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    class ModuleAdapter extends EmptyStateRecyclerView.EmptyStateAdapter<ModuleAdapter.ViewHolder> implements Filterable {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        private List<ModuleUtil.InstalledModule> searchList = new ArrayList<>();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        private List<ModuleUtil.InstalledModule> showList = new ArrayList<>();
+[external][shana][shana@zju.edu.cn]        private final UserInfo user;
+[external][shana][shana@zju.edu.cn]        private final boolean isPick;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        private boolean isLoaded;
+[external][shana][shana@zju.edu.cn]        private View.OnClickListener onPickListener;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        ModuleAdapter(UserInfo user) {
+[external][shana][shana@zju.edu.cn]            this(user, false);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        ModuleAdapter(UserInfo user, boolean isPick) {
+[external][shana][shana@zju.edu.cn]            this.user = user;
+[external][shana][shana@zju.edu.cn]            this.isPick = isPick;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]        public UserInfo getUser() {
+[external][shana][shana@zju.edu.cn]            return user;
+[internal][vvb2060][vvb2060@gmail.com]        }
+[internal][vvb2060][vvb2060@gmail.com]
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        @NonNull
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public ModuleAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+[external][howardwu20][HowardWu20@outlook.com]            return new ViewHolder(ItemModuleBinding.inflate(getLayoutInflater(), parent, false));
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        public boolean isPick() {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            return isPick;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public void onBindViewHolder(@NonNull ModuleAdapter.ViewHolder holder, int position) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            ModuleUtil.InstalledModule item = showList.get(position);
+[external][shana][shana@zju.edu.cn]            String appName;
+[external][shana][shana@zju.edu.cn]            if (item.userId != 0) {
+[external][shana][shana@zju.edu.cn]                appName = String.format(LocaleDelegate.getDefaultLocale(), "%s (%d)", item.getAppName(), item.userId);
+[external][shana][shana@zju.edu.cn]            } else {
+[external][shana][shana@zju.edu.cn]                appName = item.getAppName();
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            holder.appName.setText(appName);
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]            GlideApp.with(holder.appIcon)
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]                    .load(item.getPackageInfo())
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    .into(new CustomTarget<Drawable>() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                            holder.appIcon.setImageDrawable(resource);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        public void onLoadCleared(@Nullable Drawable placeholder) {
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    });
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            SpannableStringBuilder sb = new SpannableStringBuilder();
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]            if (!item.getDescription().isEmpty()) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                sb.append(item.getDescription());
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]            } else {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                sb.append(getString(R.string.module_empty_description));
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]            }
+[external][shana][shana@zju.edu.cn]            holder.appDescription.setText(sb);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            holder.appDescription.setVisibility(View.VISIBLE);
+[external][shana][shana@zju.edu.cn]            sb = new SpannableStringBuilder();
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]            int installXposedVersion = ConfigManager.getXposedApiVersion();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            String warningText = null;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]            if (item.minVersion == 0) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                warningText = getString(R.string.no_min_version_specified);
+[external][shana][shana@zju.edu.cn]            } else if (installXposedVersion > 0 && item.minVersion > installXposedVersion) {
+[external][noreply][noreply@nullptr.icu]                warningText = getString(R.string.warning_xposed_min_version, item.minVersion);
+[external][noreply][noreply@nullptr.icu]            } else if (item.targetVersion > installXposedVersion) {
+[external][noreply][noreply@nullptr.icu]                warningText = getString(R.string.warning_target_version_higher, item.targetVersion);
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]            } else if (item.minVersion < ModuleUtil.MIN_MODULE_VERSION) {
+[external][noreply][noreply@nullptr.icu]                warningText = getString(R.string.warning_min_version_too_low, item.minVersion, ModuleUtil.MIN_MODULE_VERSION);
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]            } else if (item.isInstalledOnExternalStorage()) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                warningText = getString(R.string.warning_installed_on_external_storage);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (warningText != null) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                sb.append(warningText);
+[external][shana][shana@zju.edu.cn]                final ForegroundColorSpan foregroundColorSpan = new ForegroundColorSpan(ResourceUtils.resolveColor(requireActivity().getTheme(), com.google.android.material.R.attr.colorError));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    final TypefaceSpan typefaceSpan = new TypefaceSpan(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    sb.setSpan(typefaceSpan, sb.length() - warningText.length(), sb.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                } else {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    final StyleSpan styleSpan = new StyleSpan(Typeface.BOLD);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    sb.setSpan(styleSpan, sb.length() - warningText.length(), sb.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                sb.setSpan(foregroundColorSpan, sb.length() - warningText.length(), sb.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]            }
+[external][shana][shana@zju.edu.cn]            var ver = repoLoader.getModuleLatestVersion(item.packageName);
+[external][shana][shana@zju.edu.cn]            if (ver != null && ver.upgradable(item.versionCode, item.versionName)) {
+[external][shana][shana@zju.edu.cn]                if (warningText != null) sb.append("\n");
+[external][shana][shana@zju.edu.cn]                String recommended = getString(R.string.update_available, ver.versionName);
+[external][shana][shana@zju.edu.cn]                sb.append(recommended);
+[external][shana][shana@zju.edu.cn]                final ForegroundColorSpan foregroundColorSpan = new ForegroundColorSpan(ResourceUtils.resolveColor(requireActivity().getTheme(), androidx.appcompat.R.attr.colorPrimary));
+[external][shana][shana@zju.edu.cn]                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+[external][shana][shana@zju.edu.cn]                    final TypefaceSpan typefaceSpan = new TypefaceSpan(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+[external][shana][shana@zju.edu.cn]                    sb.setSpan(typefaceSpan, sb.length() - recommended.length(), sb.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+[external][shana][shana@zju.edu.cn]                } else {
+[external][shana][shana@zju.edu.cn]                    final StyleSpan styleSpan = new StyleSpan(Typeface.BOLD);
+[external][shana][shana@zju.edu.cn]                    sb.setSpan(styleSpan, sb.length() - recommended.length(), sb.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]                sb.setSpan(foregroundColorSpan, sb.length() - recommended.length(), sb.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+[external][shana][shana@zju.edu.cn]            }
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            if (sb.length() == 0) {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                holder.hint.setVisibility(View.GONE);
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            } else {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                holder.hint.setVisibility(View.VISIBLE);
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                holder.hint.setText(sb);
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]            if (!isPick) {
+[external][shana][shana@zju.edu.cn]                holder.root.setAlpha(moduleUtil.isModuleEnabled(item.packageName) ? 1.0f : .5f);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                holder.itemView.setOnClickListener(v -> {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    searchView.clearFocus();
+[external][shana][shana@zju.edu.cn]                    safeNavigate(ModulesFragmentDirections.actionModulesFragmentToAppListFragment(item.packageName, item.userId));
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                });
+[external][shana][shana@zju.edu.cn]                holder.itemView.setOnLongClickListener(v -> {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    searchView.clearFocus();
+[external][shana][shana@zju.edu.cn]                    selectedModule = item;
+[external][shana][shana@zju.edu.cn]                    return false;
+[external][shana][shana@zju.edu.cn]                });
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                holder.itemView.setOnCreateContextMenuListener((menu, v, menuInfo) -> {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    requireActivity().getMenuInflater().inflate(R.menu.context_menu_modules, menu);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    menu.setHeaderTitle(item.getAppName());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    Intent intent = AppHelper.getSettingsIntent(item.packageName, item.userId);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    if (intent == null) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        menu.removeItem(R.id.menu_launch);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    if (repoLoader.getOnlineModule(item.packageName) == null) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        menu.removeItem(R.id.menu_repo);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    if (item.userId == 0) {
+[external][shana][shana@zju.edu.cn]                        var users = ConfigManager.getUsers();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        if (users != null) {
+[external][shana][shana@zju.edu.cn]                            for (var user : users) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                                if (moduleUtil.getModule(item.packageName, user.id) == null) {
+[external][shana][shana@zju.edu.cn]                                    menu.add(1, user.id, 0, getString(R.string.install_to_user, user.name)).setOnMenuItemClickListener(i -> {
+[external][shana][shana@zju.edu.cn]                                        installModuleToUser(selectedModule, user);
+[external][shana][shana@zju.edu.cn]                                        return true;
+[external][shana][shana@zju.edu.cn]                                    });
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                                }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                });
+[external][shana][shana@zju.edu.cn]                holder.appVersion.setVisibility(View.VISIBLE);
+[external][shana][shana@zju.edu.cn]                holder.appVersion.setText(item.versionName);
+[external][shana][shana@zju.edu.cn]                holder.appVersion.setSelected(true);
+[external][shana][shana@zju.edu.cn]            } else {
+[external][shana][shana@zju.edu.cn]                holder.itemView.setTag(item);
+[external][shana][shana@zju.edu.cn]                holder.itemView.setOnClickListener(v -> {
+[external][shana][shana@zju.edu.cn]                    if (onPickListener != null) onPickListener.onClick(v);
+[external][shana][shana@zju.edu.cn]                });
+[external][shana][shana@zju.edu.cn]            }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        @Override
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        public void onViewRecycled(@NonNull ViewHolder holder) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            holder.itemView.setTag(null);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            super.onViewRecycled(holder);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        @Override
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        public int getItemCount() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return showList.size();
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        @Override
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        public long getItemId(int position) {
+[external][shana][shana@zju.edu.cn]            var module = showList.get(position);
+[external][shana][shana@zju.edu.cn]            return (module.packageName + "!" + module.userId).hashCode();
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public Filter getFilter() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return new ModuleAdapter.ApplicationFilter();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]        public void setOnPickListener(View.OnClickListener onPickListener) {
+[external][shana][shana@zju.edu.cn]            this.onPickListener = onPickListener;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public void refresh() {
+[external][shana][shana@zju.edu.cn]            runAsync(reloadModules);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]        public void fullRefresh() {
+[external][shana][shana@zju.edu.cn]            runAsync(() -> {
+[external][shana][shana@zju.edu.cn]                setLoaded(null, false);
+[external][shana][shana@zju.edu.cn]                moduleUtil.reloadInstalledModules();
+[external][shana][shana@zju.edu.cn]                refresh();
+[external][shana][shana@zju.edu.cn]            });
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        private final Runnable reloadModules = () -> {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            var modules = moduleUtil.getModules();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            if (modules == null) return;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            Comparator<PackageInfo> cmp = AppHelper.getAppListComparator(0, pm);
+[external][shana][shana@zju.edu.cn]            setLoaded(null, false);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            var tmpList = new ArrayList<ModuleUtil.InstalledModule>();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            modules.values().parallelStream()
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    .sorted((a, b) -> {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        boolean aChecked = moduleUtil.isModuleEnabled(a.packageName);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        boolean bChecked = moduleUtil.isModuleEnabled(b.packageName);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        if (aChecked == bChecked) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                            var c = cmp.compare(a.pkg, b.pkg);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                            if (c == 0) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                                if (a.userId == getUser().id) return -1;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                                if (b.userId == getUser().id) return 1;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                                else return Integer.compare(a.userId, b.userId);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                            }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                            return c;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        } else if (aChecked) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                            return -1;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        } else {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                            return 1;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    }).forEachOrdered(new Consumer<>() {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        private final HashSet<String> uniquer = new HashSet<>();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        @Override
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        public void accept(ModuleUtil.InstalledModule module) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                            if (isPick()) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                                if (!uniquer.contains(module.packageName)) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                                    uniquer.add(module.packageName);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                                    if (module.userId != getUser().id)
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                                        tmpList.add(module);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                                }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                            } else if (module.userId == getUser().id) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                                tmpList.add(module);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                            }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    });
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            String queryStr = searchView != null ? searchView.getQuery().toString() : "";
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            searchList = tmpList;
+[external][shana][shana@zju.edu.cn]            runOnUiThread(() -> getFilter().filter(queryStr));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        };
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        @SuppressLint("NotifyDataSetChanged")
+[external][shana][shana@zju.edu.cn]        private void setLoaded(List<ModuleUtil.InstalledModule> list, boolean loaded) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            runOnUiThread(() -> {
+[external][shana][shana@zju.edu.cn]                if (list != null) showList = list;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                isLoaded = loaded;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                notifyDataSetChanged();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            });
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public boolean isLoaded() {
+[external][shana][shana@zju.edu.cn]            return isLoaded && moduleUtil.isModulesLoaded();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][howardwu20][HowardWu20@outlook.com]        static class ViewHolder extends RecyclerView.ViewHolder {
+[external][shana][shana@zju.edu.cn]            ConstraintLayout root;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]            ImageView appIcon;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]            TextView appName;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]            TextView appDescription;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]            TextView appVersion;
+[external][shana][shana@zju.edu.cn]            TextView hint;
+[external][shana][shana@zju.edu.cn]            MaterialCheckBox checkBox;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            ViewHolder(ItemModuleBinding binding) {
+[external][shana][shana@zju.edu.cn]                super(binding.getRoot());
+[external][shana][shana@zju.edu.cn]                root = binding.itemRoot;
+[external][shana][shana@zju.edu.cn]                appIcon = binding.appIcon;
+[external][shana][shana@zju.edu.cn]                appName = binding.appName;
+[external][shana][shana@zju.edu.cn]                appDescription = binding.description;
+[external][shana][shana@zju.edu.cn]                appVersion = binding.versionName;
+[external][shana][shana@zju.edu.cn]                hint = binding.hint;
+[external][shana][shana@zju.edu.cn]                checkBox = binding.checkbox;
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]            }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        class ApplicationFilter extends Filter {
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            private boolean lowercaseContains(String s, String filter) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                return !TextUtils.isEmpty(s) && s.toLowerCase().contains(filter);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            protected FilterResults performFiltering(CharSequence constraint) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                FilterResults filterResults = new FilterResults();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                List<ModuleUtil.InstalledModule> filtered = new ArrayList<>();
+[external][shana][shana@zju.edu.cn]                String filter = constraint.toString().toLowerCase();
+[external][shana][shana@zju.edu.cn]                for (ModuleUtil.InstalledModule info : searchList) {
+[external][shana][shana@zju.edu.cn]                    if (lowercaseContains(info.getAppName(), filter) ||
+[external][shana][shana@zju.edu.cn]                            lowercaseContains(info.packageName, filter) ||
+[external][shana][shana@zju.edu.cn]                            lowercaseContains(info.getDescription(), filter)) {
+[external][shana][shana@zju.edu.cn]                        filtered.add(info);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                filterResults.values = filtered;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                filterResults.count = filtered.size();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                return filterResults;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            protected void publishResults(CharSequence constraint, FilterResults results) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                //noinspection unchecked
+[external][shana][shana@zju.edu.cn]                setLoaded((List<ModuleUtil.InstalledModule>) results.values, true);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]        }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]    }
+[external][nekoinverter][42698724+NekoInverter@users.noreply.github.com]}

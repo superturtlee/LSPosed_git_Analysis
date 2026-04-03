@@ -1,0 +1,230 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[internal][kotori2][17663689+kotori2@users.noreply.github.com] * Copyright (C) 2021 - 2022 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]#include <jni.h>
+[external][shana][shana@zju.edu.cn]#include "dex_builder.h"
+[external][shana][shana@zju.edu.cn]#include "framework/androidfw/resource_types.h"
+[external][shana][shana@zju.edu.cn]#include "elf_util.h"
+[external][shana][shana@zju.edu.cn]#include "native_util.h"
+[external][shana][shana@zju.edu.cn]#include "resources_hook.h"
+[external][shana][shana@zju.edu.cn]#include "config_bridge.h"
+[external][hsushulong][hsushulong@gmail.com]
+[external][shana][shana@zju.edu.cn]using namespace lsplant;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]namespace lspd {
+[external][shana][shana@zju.edu.cn]    using TYPE_GET_ATTR_NAME_ID = int32_t (*)(void *, int);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    using TYPE_STRING_AT = char16_t *(*)(const void *, int32_t, size_t *);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    using TYPE_RESTART = void (*)(void *);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    using TYPE_NEXT = int32_t (*)(void *);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    static jclass classXResources;
+[external][shana][shana@zju.edu.cn]    static jmethodID methodXResourcesTranslateAttrId;
+[external][shana][shana@zju.edu.cn]    static jmethodID methodXResourcesTranslateResId;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    static TYPE_NEXT ResXMLParser_next = nullptr;
+[external][shana][shana@zju.edu.cn]    static TYPE_RESTART ResXMLParser_restart = nullptr;
+[external][shana][shana@zju.edu.cn]    static TYPE_GET_ATTR_NAME_ID ResXMLParser_getAttributeNameID = nullptr;
+[external][shana][shana@zju.edu.cn]
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    static std::string GetXResourcesClassName() {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        auto &obfs_map = ConfigBridge::GetInstance()->obfuscation_map();
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        if (obfs_map.empty()) {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]            LOGW("GetXResourcesClassName: obfuscation_map empty?????");
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        }
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        static auto name = lspd::JavaNameToSignature(
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                obfs_map.at("android.content.res.XRes"))  // TODO: kill this hardcoded name
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                    .substr(1) + "ources";
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        LOGD("{}", name.c_str());
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        return name;
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    }
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    static bool PrepareSymbols() {
+[external][shana][shana@zju.edu.cn]        SandHook::ElfImg fw(kLibFwName);
+[external][shana][shana@zju.edu.cn]        if (!fw.isValid()) {
+[external][shana][shana@zju.edu.cn]            return false;
+[external][shana][shana@zju.edu.cn]        };
+[external][shana][shana@zju.edu.cn]        if (!(ResXMLParser_next = fw.getSymbAddress<TYPE_NEXT>(
+[external][shana][shana@zju.edu.cn]                "_ZN7android12ResXMLParser4nextEv"))) {
+[external][shana][shana@zju.edu.cn]            return false;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        if (!(ResXMLParser_restart = fw.getSymbAddress<TYPE_RESTART>(
+[external][shana][shana@zju.edu.cn]                "_ZN7android12ResXMLParser7restartEv"))) {
+[external][shana][shana@zju.edu.cn]            return false;
+[external][shana][shana@zju.edu.cn]        };
+[external][shana][shana@zju.edu.cn]        if (!(ResXMLParser_getAttributeNameID = fw.getSymbAddress<TYPE_GET_ATTR_NAME_ID>(
+[external][shana][shana@zju.edu.cn]                LP_SELECT("_ZNK7android12ResXMLParser18getAttributeNameIDEj",
+[external][shana][shana@zju.edu.cn]                          "_ZNK7android12ResXMLParser18getAttributeNameIDEm")))) {
+[external][shana][shana@zju.edu.cn]            return false;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return android::ResStringPool::setup(HookHandler{
+[external][shana][shana@zju.edu.cn]            .art_symbol_resolver = [&](auto s) {
+[external][shana][shana@zju.edu.cn]                return fw.template getSymbAddress(s);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        });
+[external][shana][shana@zju.edu.cn]    }
+[external][hsushulong][hsushulong@gmail.com]
+[external][shana][shana@zju.edu.cn]    LSP_DEF_NATIVE_METHOD(jboolean, ResourcesHook, initXResourcesNative) {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        const auto x_resources_class_name = GetXResourcesClassName();
+[external][shana][shana@zju.edu.cn]        if (auto classXResources_ = Context::GetInstance()->FindClassFromCurrentLoader(env,
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                                                                                       x_resources_class_name)) {
+[external][shana][shana@zju.edu.cn]            classXResources = JNI_NewGlobalRef(env, classXResources_);
+[external][shana][shana@zju.edu.cn]        } else {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]            LOGE("Error while loading XResources class '{}':", x_resources_class_name);
+[external][shana][shana@zju.edu.cn]            return JNI_FALSE;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        methodXResourcesTranslateResId = JNI_GetStaticMethodID(
+[external][shana][shana@zju.edu.cn]                env, classXResources, "translateResId",
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                fmt::format("(IL{};Landroid/content/res/Resources;)I", x_resources_class_name));
+[external][shana][shana@zju.edu.cn]        if (!methodXResourcesTranslateResId) {
+[external][shana][shana@zju.edu.cn]            return JNI_FALSE;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        methodXResourcesTranslateAttrId = JNI_GetStaticMethodID(
+[external][shana][shana@zju.edu.cn]                env, classXResources, "translateAttrId",
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                fmt::format("(Ljava/lang/String;L{};)I", x_resources_class_name));
+[external][shana][shana@zju.edu.cn]        if (!methodXResourcesTranslateAttrId) {
+[external][shana][shana@zju.edu.cn]            return JNI_FALSE;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        if (!PrepareSymbols()) {
+[external][shana][shana@zju.edu.cn]            return JNI_FALSE;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return JNI_TRUE;
+[external][hsushulong][hsushulong@gmail.com]    }
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]    // @ApiSensitive(Level.MIDDLE)
+[external][shana][shana@zju.edu.cn]    LSP_DEF_NATIVE_METHOD(jboolean, ResourcesHook, makeInheritable, jclass target_class) {
+[external][shana][shana@zju.edu.cn]        if (lsplant::MakeClassInheritable(env, target_class)) {
+[external][hsushulong][hsushulong@gmail.com]            return JNI_TRUE;
+[external][hsushulong][hsushulong@gmail.com]        }
+[external][hsushulong][hsushulong@gmail.com]        return JNI_FALSE;
+[external][hsushulong][hsushulong@gmail.com]    }
+[external][hsushulong][hsushulong@gmail.com]
+[external][shana][shana@zju.edu.cn]    LSP_DEF_NATIVE_METHOD(jobject, ResourcesHook, buildDummyClassLoader, jobject parent,
+[external][shana][shana@zju.edu.cn]                          jstring resource_super_class, jstring typed_array_super_class) {
+[external][shana][shana@zju.edu.cn]        using namespace startop::dex;
+[external][shana][shana@zju.edu.cn]        static auto in_memory_classloader = JNI_NewGlobalRef(env, JNI_FindClass(env,
+[external][shana][shana@zju.edu.cn]                                                                                "dalvik/system/InMemoryDexClassLoader"));
+[external][shana][shana@zju.edu.cn]        static jmethodID initMid = JNI_GetMethodID(env, in_memory_classloader, "<init>",
+[external][shana][shana@zju.edu.cn]                                                   "(Ljava/nio/ByteBuffer;Ljava/lang/ClassLoader;)V");
+[external][shana][shana@zju.edu.cn]        DexBuilder dex_file;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        ClassBuilder xresource_builder{
+[external][shana][shana@zju.edu.cn]                dex_file.MakeClass("xposed.dummy.XResourcesSuperClass")};
+[external][shana][shana@zju.edu.cn]        xresource_builder.setSuperClass(TypeDescriptor::FromClassname(JUTFString(env, resource_super_class).get()));
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        ClassBuilder xtypearray_builder{
+[external][shana][shana@zju.edu.cn]                dex_file.MakeClass("xposed.dummy.XTypedArraySuperClass")};
+[external][shana][shana@zju.edu.cn]        xtypearray_builder.setSuperClass(TypeDescriptor::FromClassname(JUTFString(env, typed_array_super_class).get()));
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        slicer::MemView image{dex_file.CreateImage()};
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        auto dex_buffer = env->NewDirectByteBuffer(const_cast<void *>(image.ptr()), image.size());
+[external][shana][shana@zju.edu.cn]        return JNI_NewObject(env, in_memory_classloader, initMid,
+[external][shana][shana@zju.edu.cn]                             dex_buffer, parent).release();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    LSP_DEF_NATIVE_METHOD(void, ResourcesHook, rewriteXmlReferencesNative,
+[external][shana][shana@zju.edu.cn]                          jlong parserPtr, jobject origRes, jobject repRes) {
+[external][shana][shana@zju.edu.cn]        auto parser = (android::ResXMLParser *) parserPtr;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        if (parser == nullptr)
+[external][shana][shana@zju.edu.cn]            return;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        const android::ResXMLTree &mTree = parser->mTree;
+[external][shana][shana@zju.edu.cn]        auto mResIds = (uint32_t *) mTree.mResIds;
+[external][shana][shana@zju.edu.cn]        android::ResXMLTree_attrExt *tag;
+[external][shana][shana@zju.edu.cn]        int attrCount;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        do {
+[external][shana][shana@zju.edu.cn]            switch (ResXMLParser_next(parser)) {
+[external][shana][shana@zju.edu.cn]                case android::ResXMLParser::START_TAG:
+[external][shana][shana@zju.edu.cn]                    tag = (android::ResXMLTree_attrExt *) parser->mCurExt;
+[external][shana][shana@zju.edu.cn]                    attrCount = tag->attributeCount;
+[external][shana][shana@zju.edu.cn]                    for (int idx = 0; idx < attrCount; idx++) {
+[external][shana][shana@zju.edu.cn]                        auto attr = (android::ResXMLTree_attribute *)
+[external][shana][shana@zju.edu.cn]                                (((const uint8_t *) tag)
+[external][shana][shana@zju.edu.cn]                                 + tag->attributeStart
+[external][shana][shana@zju.edu.cn]                                 + tag->attributeSize * idx);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]                        // find resource IDs for attribute names
+[external][shana][shana@zju.edu.cn]                        int32_t attrNameID = ResXMLParser_getAttributeNameID(parser, idx);
+[external][shana][shana@zju.edu.cn]                        // only replace attribute name IDs for app packages
+[external][shana][shana@zju.edu.cn]                        if (attrNameID >= 0 && (size_t) attrNameID < mTree.mNumResIds &&
+[external][shana][shana@zju.edu.cn]                            mResIds[attrNameID] >= 0x7f000000) {
+[external][shana][shana@zju.edu.cn]                            auto attrName = mTree.mStrings.stringAt(attrNameID);
+[external][shana][shana@zju.edu.cn]                            jint attrResID = env->CallStaticIntMethod(classXResources,
+[external][shana][shana@zju.edu.cn]                                                                      methodXResourcesTranslateAttrId,
+[external][shana][shana@zju.edu.cn]                                                                      env->NewString(
+[external][shana][shana@zju.edu.cn]                                                                              (const jchar *) attrName.data_,
+[external][shana][shana@zju.edu.cn]                                                                              attrName.length_),
+[external][shana][shana@zju.edu.cn]                                                                      origRes);
+[external][shana][shana@zju.edu.cn]                            if (env->ExceptionCheck())
+[external][shana][shana@zju.edu.cn]                                goto leave;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]                            mResIds[attrNameID] = attrResID;
+[external][shana][shana@zju.edu.cn]                        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]                        // find original resource IDs for reference values (app packages only)
+[external][shana][shana@zju.edu.cn]                        if (attr->typedValue.dataType != android::Res_value::TYPE_REFERENCE)
+[external][shana][shana@zju.edu.cn]                            continue;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]                        jint oldValue = attr->typedValue.data;
+[external][shana][shana@zju.edu.cn]                        if (oldValue < 0x7f000000)
+[external][shana][shana@zju.edu.cn]                            continue;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]                        jint newValue = env->CallStaticIntMethod(classXResources,
+[external][shana][shana@zju.edu.cn]                                                                 methodXResourcesTranslateResId,
+[external][shana][shana@zju.edu.cn]                                                                 oldValue, origRes, repRes);
+[external][shana][shana@zju.edu.cn]                        if (env->ExceptionCheck())
+[external][shana][shana@zju.edu.cn]                            goto leave;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]                        if (newValue != oldValue)
+[external][shana][shana@zju.edu.cn]                            attr->typedValue.data = newValue;
+[external][shana][shana@zju.edu.cn]                    }
+[external][shana][shana@zju.edu.cn]                    continue;
+[external][shana][shana@zju.edu.cn]                case android::ResXMLParser::END_DOCUMENT:
+[external][shana][shana@zju.edu.cn]                case android::ResXMLParser::BAD_DOCUMENT:
+[external][shana][shana@zju.edu.cn]                    goto leave;
+[external][shana][shana@zju.edu.cn]                default:
+[external][shana][shana@zju.edu.cn]                    continue;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        } while (true);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        leave:
+[external][shana][shana@zju.edu.cn]        ResXMLParser_restart(parser);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][hsushulong][hsushulong@gmail.com]    static JNINativeMethod gMethods[] = {
+[external][shana][shana@zju.edu.cn]            LSP_NATIVE_METHOD(ResourcesHook, initXResourcesNative, "()Z"),
+[external][shana][shana@zju.edu.cn]            LSP_NATIVE_METHOD(ResourcesHook, makeInheritable,"(Ljava/lang/Class;)Z"),
+[external][shana][shana@zju.edu.cn]            LSP_NATIVE_METHOD(ResourcesHook, buildDummyClassLoader,
+[external][shana][shana@zju.edu.cn]                              "(Ljava/lang/ClassLoader;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/ClassLoader;"),
+[external][shana][shana@zju.edu.cn]            LSP_NATIVE_METHOD(ResourcesHook, rewriteXmlReferencesNative,
+[external][shana][shana@zju.edu.cn]                              "(JLandroid/content/res/XResources;Landroid/content/res/Resources;)V")
+[external][hsushulong][hsushulong@gmail.com]    };
+[external][hsushulong][hsushulong@gmail.com]
+[external][shana][shana@zju.edu.cn]    void RegisterResourcesHook(JNIEnv *env) {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        auto sign = fmt::format("(JL{};Landroid/content/res/Resources;)V", GetXResourcesClassName());
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        gMethods[3].signature = sign.c_str();
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]        REGISTER_LSP_NATIVE_METHODS(ResourcesHook);
+[external][hsushulong][hsushulong@gmail.com]    }
+[external][shana][shana@zju.edu.cn]}

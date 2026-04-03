@@ -1,0 +1,29 @@
+[external][m0vie][m0viefreak.cm@googlemail.com]#################
+[external][m0vie][m0viefreak.cm@googlemail.com]# Initialization
+[external][m0vie][m0viefreak.cm@googlemail.com]#################
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]umask 022
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]# echo before loading util_functions
+[external][hsushulong][hsushulong@gmail.com]ui_print() { echo "$1"; }
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]require_new_magisk() {
+[external][m0vie][m0viefreak.cm@googlemail.com]  ui_print "*******************************"
+[external][admin][admin@0x.mk]  ui_print " Please install Magisk v20.4+! "
+[external][m0vie][m0viefreak.cm@googlemail.com]  ui_print "*******************************"
+[external][hsushulong][hsushulong@gmail.com]  exit 1
+[external][hsushulong][hsushulong@gmail.com]}
+[external][hsushulong][hsushulong@gmail.com]
+[external][admin][admin@0x.mk]#########################
+[external][admin][admin@0x.mk]# Load util_functions.sh
+[external][admin][admin@0x.mk]#########################
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]OUTFD=$2
+[external][hsushulong][hsushulong@gmail.com]ZIPFILE=$3
+[external][hsushulong][hsushulong@gmail.com]
+[external][m0vie][m0viefreak.cm@googlemail.com][ -f /data/adb/magisk/util_functions.sh ] || require_new_magisk
+[external][m0vie][m0viefreak.cm@googlemail.com]. /data/adb/magisk/util_functions.sh
+[external][admin][admin@0x.mk][ $MAGISK_VER_CODE -lt 20400 ] && require_new_magisk
+[external][hsushulong][hsushulong@gmail.com]
+[external][admin][admin@0x.mk]install_module
+[external][shana][shana@zju.edu.cn]exit 0

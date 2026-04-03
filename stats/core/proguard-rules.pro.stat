@@ -1,0 +1,33 @@
+[external][hsushulong][hsushulong@gmail.com]-keep class de.robv.android.xposed.** {*;}
+[external][shana][shana@zju.edu.cn]-keep class io.github.libxposed.** {*;}
+[external][howardwu20][HowardWu20@outlook.com]-keepattributes RuntimeVisibleAnnotations
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]-keep class android.** { *; }
+[internal][vvb2060][vvb2060@gmail.com]-keepclasseswithmembers,includedescriptorclasses class * {
+[external][shana][shana@zju.edu.cn]    native <methods>;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]}
+[external][shana][shana@zju.edu.cn]-keepclassmembers class org.lsposed.lspd.impl.LSPosedContext {
+[external][howardwu20][HowardWu20@outlook.com]    public <methods>;
+[external][howardwu20][HowardWu20@outlook.com]}
+[external][howardwu20][HowardWu20@outlook.com]-keepclassmembers class org.lsposed.lspd.impl.LSPosedHookCallback {
+[external][howardwu20][HowardWu20@outlook.com]    public <methods>;
+[external][howardwu20][HowardWu20@outlook.com]}
+[external][howardwu20][HowardWu20@outlook.com]-keep,allowoptimization,allowobfuscation @io.github.libxposed.api.annotations.* class * {
+[external][howardwu20][HowardWu20@outlook.com]    @io.github.libxposed.api.annotations.BeforeInvocation <methods>;
+[external][howardwu20][HowardWu20@outlook.com]    @io.github.libxposed.api.annotations.AfterInvocation <methods>;
+[external][howardwu20][HowardWu20@outlook.com]}
+[external][howardwu20][HowardWu20@outlook.com]-keepclassmembers class org.lsposed.lspd.impl.LSPosedBridge$NativeHooker {
+[external][howardwu20][HowardWu20@outlook.com]    <init>(java.lang.reflect.Executable);
+[external][howardwu20][HowardWu20@outlook.com]    callback(...);
+[external][howardwu20][HowardWu20@outlook.com]}
+[external][howardwu20][HowardWu20@outlook.com]-keepclassmembers class org.lsposed.lspd.impl.LSPosedBridge$HookerCallback {
+[external][howardwu20][HowardWu20@outlook.com]    final *** beforeInvocation;
+[external][howardwu20][HowardWu20@outlook.com]    final *** afterInvocation;
+[external][howardwu20][HowardWu20@outlook.com]    HookerCallback(...);
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]-assumenosideeffects class android.util.Log {
+[external][shana][shana@zju.edu.cn]    public static *** v(...);
+[external][shana][shana@zju.edu.cn]    public static *** d(...);
+[external][shana][shana@zju.edu.cn]}
+[internal][vvb2060][vvb2060@gmail.com]-repackageclasses
+[internal][vvb2060][vvb2060@gmail.com]-allowaccessmodification
+[internal][vvb2060][vvb2060@gmail.com]-dontwarn org.slf4j.impl.StaticLoggerBinder

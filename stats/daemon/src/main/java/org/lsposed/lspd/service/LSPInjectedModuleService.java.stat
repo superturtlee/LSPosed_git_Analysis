@@ -1,0 +1,91 @@
+[external][shana][shana@zju.edu.cn]package org.lsposed.lspd.service;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import static org.lsposed.lspd.service.LSPModuleService.FILES_DIR;
+[external][shana][shana@zju.edu.cn]import static org.lsposed.lspd.service.PackageService.PER_USER_RANGE;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import android.os.Binder;
+[external][shana][shana@zju.edu.cn]import android.os.Bundle;
+[external][shana][shana@zju.edu.cn]import android.os.ParcelFileDescriptor;
+[external][shana][shana@zju.edu.cn]import android.os.RemoteException;
+[external][noreply][noreply@nullptr.icu]import android.util.Log;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import org.lsposed.lspd.models.Module;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import java.util.Map;
+[external][shana][shana@zju.edu.cn]import java.util.Set;
+[external][shana][shana@zju.edu.cn]import java.util.concurrent.ConcurrentHashMap;
+[external][shana][shana@zju.edu.cn]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]import io.github.libxposed.service.IXposedService;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]public class LSPInjectedModuleService extends ILSPInjectedModuleService.Stub {
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]    private static final String TAG = "LSPosedInjectedModuleService";
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]    private final String mPackageName;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    Map<String, Set<IRemotePreferenceCallback>> callbacks = new ConcurrentHashMap<>();
+[external][shana][shana@zju.edu.cn]
+[external][noreply][noreply@nullptr.icu]    LSPInjectedModuleService(String packageName) {
+[external][noreply][noreply@nullptr.icu]        mPackageName = packageName;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    @Override
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    public int getFrameworkPrivilege() {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        return IXposedService.FRAMEWORK_PRIVILEGE_ROOT;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    }
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    @Override
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]    public Bundle requestRemotePreferences(String group, IRemotePreferenceCallback callback) {
+[external][shana][shana@zju.edu.cn]        var bundle = new Bundle();
+[external][noreply][noreply@nullptr.icu]        var userId = Binder.getCallingUid() / PER_USER_RANGE;
+[external][noreply][noreply@nullptr.icu]        bundle.putSerializable("map", ConfigManager.getInstance().getModulePrefs(mPackageName, userId, group));
+[external][shana][shana@zju.edu.cn]        if (callback != null) {
+[external][shana][shana@zju.edu.cn]            var groupCallbacks = callbacks.computeIfAbsent(group, k -> ConcurrentHashMap.newKeySet());
+[external][shana][shana@zju.edu.cn]            groupCallbacks.add(callback);
+[external][noreply][noreply@nullptr.icu]            try {
+[external][noreply][noreply@nullptr.icu]                callback.asBinder().linkToDeath(() -> groupCallbacks.remove(callback), 0);
+[external][noreply][noreply@nullptr.icu]            } catch (RemoteException e) {
+[external][noreply][noreply@nullptr.icu]                Log.w(TAG, "requestRemotePreferences: ", e);
+[external][noreply][noreply@nullptr.icu]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return bundle;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public ParcelFileDescriptor openRemoteFile(String path) throws RemoteException {
+[external][shana][shana@zju.edu.cn]        ConfigFileManager.ensureModuleFilePath(path);
+[external][shana][shana@zju.edu.cn]        var userId = Binder.getCallingUid() / PER_USER_RANGE;
+[external][shana][shana@zju.edu.cn]        try {
+[external][noreply][noreply@nullptr.icu]            var dir = ConfigFileManager.resolveModuleDir(mPackageName, FILES_DIR, userId, -1);
+[external][shana][shana@zju.edu.cn]            return ParcelFileDescriptor.open(dir.resolve(path).toFile(), ParcelFileDescriptor.MODE_READ_ONLY);
+[external][shana][shana@zju.edu.cn]        } catch (Throwable e) {
+[external][shana][shana@zju.edu.cn]            throw new RemoteException(e.getMessage());
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public String[] getRemoteFileList() throws RemoteException {
+[external][shana][shana@zju.edu.cn]        var userId = Binder.getCallingUid() / PER_USER_RANGE;
+[external][shana][shana@zju.edu.cn]        try {
+[external][noreply][noreply@nullptr.icu]            var dir = ConfigFileManager.resolveModuleDir(mPackageName, FILES_DIR, userId, -1);
+[external][shana][shana@zju.edu.cn]            var files = dir.toFile().list();
+[external][shana][shana@zju.edu.cn]            return files == null ? new String[0] : files;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        } catch (Throwable e) {
+[external][shana][shana@zju.edu.cn]            throw new RemoteException(e.getMessage());
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    void onUpdateRemotePreferences(String group, Bundle diff) {
+[external][shana][shana@zju.edu.cn]        var groupCallbacks = callbacks.get(group);
+[external][shana][shana@zju.edu.cn]        if (groupCallbacks != null) {
+[external][shana][shana@zju.edu.cn]            for (var callback : groupCallbacks) {
+[external][shana][shana@zju.edu.cn]                try {
+[external][shana][shana@zju.edu.cn]                    callback.onUpdate(diff);
+[external][shana][shana@zju.edu.cn]                } catch (RemoteException e) {
+[external][shana][shana@zju.edu.cn]                    groupCallbacks.remove(callback);
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

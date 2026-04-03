@@ -1,0 +1,100 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.manager.ui.activity.base;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]import android.app.ActivityManager;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.content.res.Resources;
+[external][shana][shana@zju.edu.cn]import android.graphics.Bitmap;
+[external][shana][shana@zju.edu.cn]import android.graphics.Canvas;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.graphics.Color;
+[external][howardwu20][HowardWu20@outlook.com]import android.graphics.drawable.AdaptiveIconDrawable;
+[external][shana][shana@zju.edu.cn]import android.graphics.drawable.BitmapDrawable;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.os.Bundle;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.view.Window;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import androidx.annotation.NonNull;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import androidx.annotation.Nullable;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][howardwu20][HowardWu20@outlook.com]import org.lsposed.manager.App;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.R;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.util.Telemetry;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import org.lsposed.manager.util.ThemeUtil;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import rikka.material.app.MaterialActivity;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]public class BaseActivity extends MaterialActivity {
+[external][shana][shana@zju.edu.cn]    private static Bitmap icon = null;
+[external][shana][shana@zju.edu.cn]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public void onCreate(@Nullable Bundle savedInstanceState) {
+[internal][vvb2060][vvb2060@gmail.com]        setTheme(R.style.AppTheme);
+[external][howardwu20][HowardWu20@outlook.com]        super.onCreate(savedInstanceState);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    protected void onStart() {
+[external][shana][shana@zju.edu.cn]        super.onStart();
+[external][howardwu20][HowardWu20@outlook.com]        if (!App.isParasitic) return;
+[external][shana][shana@zju.edu.cn]        for (var task : getSystemService(ActivityManager.class).getAppTasks()) {
+[external][shana][shana@zju.edu.cn]            task.setExcludeFromRecents(false);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        if (icon == null) {
+[external][shana][shana@zju.edu.cn]            var drawable = getApplicationInfo().loadIcon(getPackageManager());
+[external][shana][shana@zju.edu.cn]            if (drawable instanceof BitmapDrawable) {
+[external][shana][shana@zju.edu.cn]                icon = ((BitmapDrawable) drawable).getBitmap();
+[external][howardwu20][HowardWu20@outlook.com]            } else if (drawable instanceof AdaptiveIconDrawable) {
+[external][shana][shana@zju.edu.cn]                icon = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+[external][shana][shana@zju.edu.cn]                final Canvas canvas = new Canvas(icon);
+[external][shana][shana@zju.edu.cn]                drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+[external][shana][shana@zju.edu.cn]                drawable.draw(canvas);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][howardwu20][HowardWu20@outlook.com]        setTaskDescription(new ActivityManager.TaskDescription(getTitle().toString(), icon, getColor(R.color.ic_launcher_background)));
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[internal][vvb2060][vvb2060@gmail.com]    @Override
+[internal][vvb2060][vvb2060@gmail.com]    protected void onStop() {
+[internal][vvb2060][vvb2060@gmail.com]        super.onStop();
+[internal][vvb2060][vvb2060@gmail.com]        Telemetry.trackEvent("BaseActivity stop", null);
+[internal][vvb2060][vvb2060@gmail.com]    }
+[internal][vvb2060][vvb2060@gmail.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public void onApplyUserThemeResource(@NonNull Resources.Theme theme, boolean isDecorView) {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        if (!ThemeUtil.isSystemAccent()) {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            theme.applyStyle(ThemeUtil.getColorThemeStyleRes(), true);
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        }
+[external][shana][shana@zju.edu.cn]        theme.applyStyle(ThemeUtil.getNightThemeStyleRes(this), true);
+[external][shana][shana@zju.edu.cn]        theme.applyStyle(rikka.material.preference.R.style.ThemeOverlay_Rikka_Material3_Preference, true);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public String computeUserThemeKey() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return ThemeUtil.getColorTheme() + ThemeUtil.getNightTheme(this);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public void onApplyTranslucentSystemBars() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        super.onApplyTranslucentSystemBars();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        Window window = getWindow();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        window.setStatusBarColor(Color.TRANSPARENT);
+[external][shana][shana@zju.edu.cn]        window.setNavigationBarColor(Color.TRANSPARENT);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]}

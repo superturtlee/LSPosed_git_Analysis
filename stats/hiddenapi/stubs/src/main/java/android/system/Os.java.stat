@@ -1,0 +1,23 @@
+[external][shana][shana@zju.edu.cn]package android.system;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import android.util.MutableInt;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import androidx.annotation.RequiresApi;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import java.io.FileDescriptor;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public class Os {
+[external][shana][shana@zju.edu.cn]    public static int ioctlInt(FileDescriptor fd, int cmd, MutableInt arg) throws ErrnoException {
+[external][shana][shana@zju.edu.cn]        throw new ErrnoException();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @RequiresApi(27)
+[external][shana][shana@zju.edu.cn]    public static int ioctlInt(FileDescriptor fd, int cmd, Int32Ref arg) throws ErrnoException {
+[external][shana][shana@zju.edu.cn]        throw new ErrnoException();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @RequiresApi(31)
+[external][shana][shana@zju.edu.cn]    public static int ioctlInt(FileDescriptor fd, int cmd) throws ErrnoException {
+[external][shana][shana@zju.edu.cn]        throw new ErrnoException();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

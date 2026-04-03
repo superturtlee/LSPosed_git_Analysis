@@ -1,0 +1,4 @@
+[internal][vvb2060][vvb2060@gmail.com]package sun.net.www.protocol.jar;
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]public abstract class Handler extends java.net.URLStreamHandler {
+[internal][vvb2060][vvb2060@gmail.com]}

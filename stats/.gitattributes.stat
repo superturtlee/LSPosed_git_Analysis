@@ -1,0 +1,12 @@
+[external][hsushulong][hsushulong@gmail.com]# Set the default behavior, in case people don't have core.autocrlf set.
+[internal][vvb2060][vvb2060@gmail.com]* text=auto eol=lf
+[external][hsushulong][hsushulong@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]# Declare files that will always have CRLF line endings on checkout.
+[internal][vvb2060][vvb2060@gmail.com]*.cmd text eol=crlf
+[internal][vvb2060][vvb2060@gmail.com]*.bat text eol=crlf
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]# Denote all files that are truly binary and should not be modified.
+[external][hsushulong][hsushulong@gmail.com]*.so binary
+[external][hsushulong][hsushulong@gmail.com]*.dex binary
+[internal][vvb2060][vvb2060@gmail.com]*.jar binary
+[internal][vvb2060][vvb2060@gmail.com]*.png binary

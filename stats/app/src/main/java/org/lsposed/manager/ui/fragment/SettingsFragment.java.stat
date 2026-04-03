@@ -1,0 +1,393 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * <!--This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors-->
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]package org.lsposed.manager.ui.fragment;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]import android.content.ActivityNotFoundException;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import android.content.Context;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.os.Build;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.os.Bundle;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.provider.Settings;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import android.text.TextUtils;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.view.LayoutInflater;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.view.View;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import android.view.ViewGroup;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import androidx.activity.result.ActivityResultLauncher;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import androidx.activity.result.contract.ActivityResultContracts;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import androidx.annotation.NonNull;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import androidx.annotation.Nullable;
+[external][shana][shana@zju.edu.cn]import androidx.appcompat.app.AppCompatDelegate;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import androidx.core.text.HtmlCompat;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import androidx.preference.Preference;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import androidx.preference.PreferenceFragmentCompat;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import androidx.recyclerview.widget.RecyclerView;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import com.google.android.material.color.DynamicColors;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.manager.App;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.BuildConfig;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.manager.ConfigManager;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.manager.R;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.manager.databinding.FragmentSettingsBinding;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import org.lsposed.manager.repo.RepoLoader;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.manager.ui.activity.MainActivity;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import org.lsposed.manager.util.BackupUtils;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.util.CloudflareDNS;
+[external][shana][shana@zju.edu.cn]import org.lsposed.manager.util.LangList;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import org.lsposed.manager.util.NavUtil;
+[internal][vvb2060][vvb2060@gmail.com]import org.lsposed.manager.util.ShortcutUtil;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import org.lsposed.manager.util.ThemeUtil;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]import java.time.LocalDateTime;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import java.util.ArrayList;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import java.util.Locale;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import rikka.core.util.ResourceUtils;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import rikka.material.app.LocaleDelegate;
+[internal][vvb2060][vvb2060@gmail.com]import rikka.material.preference.MaterialSwitchPreference;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]import rikka.preference.SimpleMenuPreference;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import rikka.recyclerview.RecyclerViewKt;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import rikka.widget.borderview.BorderRecyclerView;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]public class SettingsFragment extends BaseFragment {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    FragmentSettingsBinding binding;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Nullable
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        binding = FragmentSettingsBinding.inflate(inflater, container, false);
+[external][shana][shana@zju.edu.cn]        binding.appBar.setLiftable(true);
+[external][shana][shana@zju.edu.cn]        setupToolbar(binding.toolbar, binding.clickView, R.string.Settings);
+[external][shana][shana@zju.edu.cn]        binding.toolbar.setNavigationIcon(null);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        if (savedInstanceState == null) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            getChildFragmentManager().beginTransaction().add(R.id.setting_container, new PreferenceFragment()).commitNow();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][shana][shana@zju.edu.cn]        if (ConfigManager.isBinderAlive()) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            binding.toolbar.setSubtitle(String.format(LocaleDelegate.getDefaultLocale(), "%s (%d) - %s", ConfigManager.getXposedVersionName(), ConfigManager.getXposedVersionCode(), ConfigManager.getApi()));
+[external][shana][shana@zju.edu.cn]        } else {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            binding.toolbar.setSubtitle(String.format(LocaleDelegate.getDefaultLocale(), "%s (%d) - %s", BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE, getString(R.string.not_installed)));
+[external][shana][shana@zju.edu.cn]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return binding.getRoot();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Override
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public void onDestroyView() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        super.onDestroyView();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        binding = null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public static class PreferenceFragment extends PreferenceFragmentCompat {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        private SettingsFragment parentFragment;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        ActivityResultLauncher<String> backupLauncher = registerForActivityResult(new ActivityResultContracts.CreateDocument("application/gzip"), uri -> {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            if (uri == null || parentFragment == null) return;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            parentFragment.runAsync(() -> {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                try {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    BackupUtils.backup(uri);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                } catch (Exception e) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    var text = App.getInstance().getString(R.string.settings_backup_failed2, e.getMessage());
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    parentFragment.showHint(text, false);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            });
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        });
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        ActivityResultLauncher<String[]> restoreLauncher = registerForActivityResult(new ActivityResultContracts.OpenDocument(), uri -> {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            if (uri == null || parentFragment == null) return;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            parentFragment.runAsync(() -> {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                try {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    BackupUtils.restore(uri);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                } catch (Exception e) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    var text = App.getInstance().getString(R.string.settings_restore_failed2, e.getMessage());
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    parentFragment.showHint(text, false);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            });
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        });
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        @Override
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        public void onAttach(@NonNull Context context) {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            super.onAttach(context);
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            parentFragment = (SettingsFragment) requireParentFragment();
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        @Override
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        public void onDetach() {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            super.onDetach();
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            parentFragment = null;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][howardwu20][HowardWu20@outlook.com]        private boolean setNotificationPreferenceEnabled(MaterialSwitchPreference notificationPreference, boolean preferenceEnabled) {
+[external][howardwu20][HowardWu20@outlook.com]            var notificationEnabled = ConfigManager.enableStatusNotification();
+[external][howardwu20][HowardWu20@outlook.com]            if (notificationPreference != null) {
+[external][howardwu20][HowardWu20@outlook.com]                notificationPreference.setEnabled(!notificationEnabled || preferenceEnabled);
+[external][howardwu20][HowardWu20@outlook.com]                notificationPreference.setSummaryOn(preferenceEnabled ?
+[external][howardwu20][HowardWu20@outlook.com]                        notificationPreference.getContext().getString(R.string.settings_enable_status_notification_summary) :
+[external][howardwu20][HowardWu20@outlook.com]                        notificationPreference.getContext().getString(R.string.settings_enable_status_notification_summary) + "\n" +
+[external][howardwu20][HowardWu20@outlook.com]                                notificationPreference.getContext().getString(R.string.disable_status_notification_error));
+[external][howardwu20][HowardWu20@outlook.com]            }
+[external][howardwu20][HowardWu20@outlook.com]            return notificationEnabled;
+[external][howardwu20][HowardWu20@outlook.com]        }
+[external][howardwu20][HowardWu20@outlook.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        @Override
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]        public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+[external][etmatrix][3065939+etmatrix@users.noreply.github.com]            final String SYSTEM = "SYSTEM";
+[external][etmatrix][3065939+etmatrix@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            addPreferencesFromResource(R.xml.prefs);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]            boolean installed = ConfigManager.isBinderAlive();
+[external][shana][shana@zju.edu.cn]            MaterialSwitchPreference prefVerboseLogs = findPreference("disable_verbose_log");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (prefVerboseLogs != null) {
+[internal][vvb2060][vvb2060@gmail.com]                prefVerboseLogs.setEnabled(!BuildConfig.DEBUG && installed);
+[internal][vvb2060][vvb2060@gmail.com]                prefVerboseLogs.setChecked(!installed || !ConfigManager.isVerboseLogEnabled());
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                prefVerboseLogs.setOnPreferenceChangeListener((preference, newValue) -> ConfigManager.setVerboseLogEnabled(!(boolean) newValue));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]            MaterialSwitchPreference prefDexObfuscate = findPreference("enable_dex_obfuscate");
+[external][admin][admin@0x.mk]            if (prefDexObfuscate != null) {
+[external][admin][admin@0x.mk]                prefDexObfuscate.setEnabled(installed);
+[external][admin][admin@0x.mk]                prefDexObfuscate.setChecked(!installed || ConfigManager.isDexObfuscateEnabled());
+[external][admin][admin@0x.mk]                prefDexObfuscate.setOnPreferenceChangeListener((preference, newValue) -> {
+[external][howardwu20][HowardWu20@outlook.com]                    parentFragment.showHint(R.string.reboot_required, true, R.string.reboot, v -> ConfigManager.reboot());
+[external][admin][admin@0x.mk]                    return ConfigManager.setDexObfuscateEnabled((boolean) newValue);
+[external][admin][admin@0x.mk]                });
+[external][admin][admin@0x.mk]            }
+[external][admin][admin@0x.mk]
+[external][howardwu20][HowardWu20@outlook.com]            MaterialSwitchPreference notificationPreference = findPreference("enable_status_notification");
+[external][howardwu20][HowardWu20@outlook.com]            if (notificationPreference != null) {
+[external][howardwu20][HowardWu20@outlook.com]                notificationPreference.setVisible(installed);
+[external][howardwu20][HowardWu20@outlook.com]                if (installed) {
+[external][howardwu20][HowardWu20@outlook.com]                    notificationPreference.setChecked(setNotificationPreferenceEnabled(notificationPreference, !App.isParasitic || ShortcutUtil.isLaunchShortcutPinned()));
+[external][howardwu20][HowardWu20@outlook.com]                }
+[external][howardwu20][HowardWu20@outlook.com]                notificationPreference.setOnPreferenceChangeListener((p, v) -> {
+[external][howardwu20][HowardWu20@outlook.com]                    var succeeded = ConfigManager.setEnableStatusNotification((boolean) v);
+[external][howardwu20][HowardWu20@outlook.com]                    if ((boolean) v && App.isParasitic && !ShortcutUtil.isLaunchShortcutPinned()) {
+[external][howardwu20][HowardWu20@outlook.com]                        setNotificationPreferenceEnabled(notificationPreference, false);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    }
+[external][howardwu20][HowardWu20@outlook.com]                    return succeeded;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                });
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]
+[internal][vvb2060][vvb2060@gmail.com]            Preference shortcut = findPreference("add_shortcut");
+[internal][vvb2060][vvb2060@gmail.com]            if (shortcut != null) {
+[external][howardwu20][HowardWu20@outlook.com]                shortcut.setVisible(App.isParasitic);
+[external][howardwu20][HowardWu20@outlook.com]                if (!ShortcutUtil.isRequestPinShortcutSupported(requireContext())) {
+[internal][vvb2060][vvb2060@gmail.com]                    shortcut.setEnabled(false);
+[external][howardwu20][HowardWu20@outlook.com]                    shortcut.setSummary(R.string.settings_unsupported_pin_shortcut_summary);
+[external][howardwu20][HowardWu20@outlook.com]                }
+[internal][vvb2060][vvb2060@gmail.com]                shortcut.setOnPreferenceClickListener(preference -> {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    if (!ShortcutUtil.requestPinLaunchShortcut(() -> {
+[external][howardwu20][HowardWu20@outlook.com]                        setNotificationPreferenceEnabled(notificationPreference, true);
+[internal][vvb2060][vvb2060@gmail.com]                        App.getPreferences().edit().putBoolean("never_show_welcome", true).apply();
+[external][howardwu20][HowardWu20@outlook.com]                        parentFragment.showHint(R.string.settings_shortcut_pinned_hint, false);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    })) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        parentFragment.showHint(R.string.settings_unsupported_pin_shortcut_summary, true);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    }
+[internal][vvb2060][vvb2060@gmail.com]                    return true;
+[internal][vvb2060][vvb2060@gmail.com]                });
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Preference backup = findPreference("backup");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (backup != null) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                backup.setEnabled(installed);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                backup.setOnPreferenceClickListener(preference -> {
+[internal][vvb2060][vvb2060@gmail.com]                    LocalDateTime now = LocalDateTime.now();
+[external][shana][shana@zju.edu.cn]                    try {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                        backupLauncher.launch(String.format(LocaleDelegate.getDefaultLocale(), "LSPosed_%s.lsp", now.toString()));
+[external][shana][shana@zju.edu.cn]                        return true;
+[external][shana][shana@zju.edu.cn]                    } catch (ActivityNotFoundException e) {
+[external][shana][shana@zju.edu.cn]                        parentFragment.showHint(R.string.enable_documentui, true);
+[external][shana][shana@zju.edu.cn]                        return false;
+[external][shana][shana@zju.edu.cn]                    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                });
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Preference restore = findPreference("restore");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (restore != null) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                restore.setEnabled(installed);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                restore.setOnPreferenceClickListener(preference -> {
+[external][shana][shana@zju.edu.cn]                    try {
+[external][shana][shana@zju.edu.cn]                        restoreLauncher.launch(new String[]{"*/*"});
+[external][shana][shana@zju.edu.cn]                        return true;
+[external][shana][shana@zju.edu.cn]                    } catch (ActivityNotFoundException e) {
+[external][shana][shana@zju.edu.cn]                        parentFragment.showHint(R.string.enable_documentui, true);
+[external][shana][shana@zju.edu.cn]                        return false;
+[external][shana][shana@zju.edu.cn]                    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                });
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Preference theme = findPreference("dark_theme");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (theme != null) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                theme.setOnPreferenceChangeListener((preference, newValue) -> {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    if (!App.getPreferences().getString("dark_theme", ThemeUtil.MODE_NIGHT_FOLLOW_SYSTEM).equals(newValue)) {
+[external][shana][shana@zju.edu.cn]                        AppCompatDelegate.setDefaultNightMode(ThemeUtil.getDarkTheme((String) newValue));
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    return true;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                });
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Preference black_dark_theme = findPreference("black_dark_theme");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            if (black_dark_theme != null) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                black_dark_theme.setOnPreferenceChangeListener((preference, newValue) -> {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    MainActivity activity = (MainActivity) getActivity();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    if (activity != null && ResourceUtils.isNightMode(getResources().getConfiguration())) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        activity.restart();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    return true;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                });
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            Preference primary_color = findPreference("theme_color");
+[external][shana][shana@zju.edu.cn]            if (primary_color != null) {
+[external][shana][shana@zju.edu.cn]                primary_color.setOnPreferenceChangeListener((preference, newValue) -> {
+[external][shana][shana@zju.edu.cn]                    MainActivity activity = (MainActivity) getActivity();
+[external][shana][shana@zju.edu.cn]                    if (activity != null) {
+[external][shana][shana@zju.edu.cn]                        activity.restart();
+[external][shana][shana@zju.edu.cn]                    }
+[external][shana][shana@zju.edu.cn]                    return true;
+[external][shana][shana@zju.edu.cn]                });
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            MaterialSwitchPreference prefShowHiddenIcons = findPreference("show_hidden_icon_apps_enabled");
+[internal][vvb2060][vvb2060@gmail.com]            if (prefShowHiddenIcons != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+[internal][vvb2060][vvb2060@gmail.com]                if (ConfigManager.isBinderAlive()) {
+[internal][vvb2060][vvb2060@gmail.com]                    prefShowHiddenIcons.setEnabled(true);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    prefShowHiddenIcons.setOnPreferenceChangeListener((preference, newValue) -> ConfigManager.setHiddenIcon(!(boolean) newValue));
+[internal][vvb2060][vvb2060@gmail.com]                }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                prefShowHiddenIcons.setChecked(Settings.Global.getInt(requireActivity().getContentResolver(), "show_hidden_icon_apps_enabled", 1) != 0);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]            MaterialSwitchPreference prefFollowSystemAccent = findPreference("follow_system_accent");
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            if (prefFollowSystemAccent != null && DynamicColors.isDynamicColorAvailable()) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                if (primary_color != null) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    primary_color.setVisible(!prefFollowSystemAccent.isChecked());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                prefFollowSystemAccent.setVisible(true);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                prefFollowSystemAccent.setOnPreferenceChangeListener((preference, newValue) -> {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    MainActivity activity = (MainActivity) getActivity();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    if (activity != null) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                        activity.restart();
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                    return true;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]                });
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]            MaterialSwitchPreference prefDoH = findPreference("doh");
+[internal][vvb2060][vvb2060@gmail.com]            if (prefDoH != null) {
+[internal][vvb2060][vvb2060@gmail.com]                var dns = (CloudflareDNS) App.getOkHttpClient().dns();
+[internal][vvb2060][vvb2060@gmail.com]                if (!dns.noProxy) {
+[internal][vvb2060][vvb2060@gmail.com]                    prefDoH.setEnabled(false);
+[internal][vvb2060][vvb2060@gmail.com]                    prefDoH.setVisible(false);
+[internal][vvb2060][vvb2060@gmail.com]                    var group = prefDoH.getParent();
+[internal][vvb2060][vvb2060@gmail.com]                    assert group != null;
+[internal][vvb2060][vvb2060@gmail.com]                    group.setVisible(false);
+[internal][vvb2060][vvb2060@gmail.com]                }
+[internal][vvb2060][vvb2060@gmail.com]                prefDoH.setOnPreferenceChangeListener((p, v) -> {
+[internal][vvb2060][vvb2060@gmail.com]                    dns.DoH = (boolean) v;
+[internal][vvb2060][vvb2060@gmail.com]                    return true;
+[internal][vvb2060][vvb2060@gmail.com]                });
+[internal][vvb2060][vvb2060@gmail.com]            }
+[internal][vvb2060][vvb2060@gmail.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            SimpleMenuPreference language = findPreference("language");
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            if (language != null) {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                var tag = language.getValue();
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                var userLocale = App.getLocale();
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                var entries = new ArrayList<CharSequence>();
+[external][shana][shana@zju.edu.cn]                var lstLang = LangList.LOCALES;
+[external][etmatrix][3065939+etmatrix@users.noreply.github.com]                for (var lang : lstLang) {
+[external][shana][shana@zju.edu.cn]                    if (lang.equals(SYSTEM)) {
+[external][shana][shana@zju.edu.cn]                        entries.add(getString(rikka.core.R.string.follow_system));
+[external][shana][shana@zju.edu.cn]                        continue;
+[external][shana][shana@zju.edu.cn]                    }
+[external][etmatrix][3065939+etmatrix@users.noreply.github.com]                    var locale = Locale.forLanguageTag(lang);
+[external][shana][shana@zju.edu.cn]                    entries.add(HtmlCompat.fromHtml(locale.getDisplayName(locale), HtmlCompat.FROM_HTML_MODE_LEGACY));
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                }
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                language.setEntries(entries.toArray(new CharSequence[0]));
+[external][shana][shana@zju.edu.cn]                language.setEntryValues(lstLang);
+[external][etmatrix][3065939+etmatrix@users.noreply.github.com]                if (TextUtils.isEmpty(tag) || SYSTEM.equals(tag)) {
+[external][shana][shana@zju.edu.cn]                    language.setSummary(getString(rikka.core.R.string.follow_system));
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                } else {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                    var locale = Locale.forLanguageTag(tag);
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                    language.setSummary(!TextUtils.isEmpty(locale.getScript()) ? locale.getDisplayScript(userLocale) : locale.getDisplayName(userLocale));
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                }
+[external][shana][shana@zju.edu.cn]                language.setOnPreferenceChangeListener((preference, newValue) -> {
+[external][shana][shana@zju.edu.cn]                    var app = App.getInstance();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    var locale = App.getLocale((String) newValue);
+[external][shana][shana@zju.edu.cn]                    var res = app.getResources();
+[external][shana][shana@zju.edu.cn]                    var config = res.getConfiguration();
+[external][shana][shana@zju.edu.cn]                    config.setLocale(locale);
+[external][shana][shana@zju.edu.cn]                    LocaleDelegate.setDefaultLocale(locale);
+[external][shana][shana@zju.edu.cn]                    //noinspection deprecation
+[external][shana][shana@zju.edu.cn]                    res.updateConfiguration(config, res.getDisplayMetrics());
+[external][shana][shana@zju.edu.cn]                    MainActivity activity = (MainActivity) getActivity();
+[external][shana][shana@zju.edu.cn]                    if (activity != null) {
+[external][shana][shana@zju.edu.cn]                        activity.restart();
+[external][shana][shana@zju.edu.cn]                    }
+[external][shana][shana@zju.edu.cn]                    return true;
+[external][shana][shana@zju.edu.cn]                });
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            Preference translation = findPreference("translation");
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            if (translation != null) {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                translation.setOnPreferenceClickListener(preference -> {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                    NavUtil.startURL(requireActivity(), "https://lsposed.crowdin.com/lsposed");
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                    return true;
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                });
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                translation.setSummary(getString(R.string.settings_translation_summary, getString(R.string.app_name)));
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            }
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            Preference translation_contributors = findPreference("translation_contributors");
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            if (translation_contributors != null) {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                var translators = HtmlCompat.fromHtml(getString(R.string.translators), HtmlCompat.FROM_HTML_MODE_LEGACY);
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                if (translators.toString().equals("null")) {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                    translation_contributors.setVisible(false);
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                } else {
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                    translation_contributors.setSummary(translators);
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]                }
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]            }
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            SimpleMenuPreference channel = findPreference("update_channel");
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            if (channel != null) {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                channel.setOnPreferenceChangeListener((preference, newValue) -> {
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    var repoLoader = RepoLoader.getInstance();
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    repoLoader.updateLatestVersion(String.valueOf(newValue));
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                    return true;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]                });
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]        @NonNull
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        @Override
+[external][shana][shana@zju.edu.cn]        public RecyclerView onCreateRecyclerView(@NonNull LayoutInflater inflater, @NonNull ViewGroup parent, Bundle savedInstanceState) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            BorderRecyclerView recyclerView = (BorderRecyclerView) super.onCreateRecyclerView(inflater, parent, savedInstanceState);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            RecyclerViewKt.fixEdgeEffect(recyclerView, false, true);
+[external][shana][shana@zju.edu.cn]            recyclerView.getBorderViewDelegate().setBorderVisibilityChangedListener((top, oldTop, bottom, oldBottom) -> parentFragment.binding.appBar.setLifted(!top));
+[external][shana][shana@zju.edu.cn]            var fragment = getParentFragment();
+[external][howardwu20][HowardWu20@outlook.com]            if (fragment instanceof SettingsFragment settingsFragment) {
+[external][shana][shana@zju.edu.cn]                View.OnClickListener l = v -> {
+[external][shana][shana@zju.edu.cn]                    settingsFragment.binding.appBar.setExpanded(true, true);
+[external][shana][shana@zju.edu.cn]                    recyclerView.smoothScrollToPosition(0);
+[external][shana][shana@zju.edu.cn]                };
+[external][shana][shana@zju.edu.cn]                settingsFragment.binding.toolbar.setOnClickListener(l);
+[external][shana][shana@zju.edu.cn]                settingsFragment.binding.clickView.setOnClickListener(l);
+[external][shana][shana@zju.edu.cn]            }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]            return recyclerView;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]}

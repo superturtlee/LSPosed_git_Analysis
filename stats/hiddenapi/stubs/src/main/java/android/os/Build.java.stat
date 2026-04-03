@@ -1,0 +1,15 @@
+[external][shana][shana@zju.edu.cn]package android.os;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public class Build {
+[external][shana][shana@zju.edu.cn]    public static class VERSION {
+[external][shana][shana@zju.edu.cn]        public final static int SDK_INT = SystemProperties.getInt(
+[external][shana][shana@zju.edu.cn]                "ro.build.version.sdk", 0);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]    public static class VERSION_CODES {
+[external][shana][shana@zju.edu.cn]        public static final int O_MR1 = 27;
+[external][shana][shana@zju.edu.cn]        public static final int P = 28;
+[external][shana][shana@zju.edu.cn]        public static final int Q = 29;
+[external][shana][shana@zju.edu.cn]        public static final int R = 30;
+[external][shana][shana@zju.edu.cn]        public static final int S = 31;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

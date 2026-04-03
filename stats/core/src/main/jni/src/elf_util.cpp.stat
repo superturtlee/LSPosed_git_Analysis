@@ -1,0 +1,291 @@
+[external][shana][shana@zju.edu.cn]/*
+[external][shana][shana@zju.edu.cn] * This file is part of LSPosed.
+[external][shana][shana@zju.edu.cn] *
+[external][shana][shana@zju.edu.cn] * LSPosed is free software: you can redistribute it and/or modify
+[external][shana][shana@zju.edu.cn] * it under the terms of the GNU General Public License as published by
+[external][shana][shana@zju.edu.cn] * the Free Software Foundation, either version 3 of the License, or
+[external][shana][shana@zju.edu.cn] * (at your option) any later version.
+[external][shana][shana@zju.edu.cn] *
+[external][shana][shana@zju.edu.cn] * LSPosed is distributed in the hope that it will be useful,
+[external][shana][shana@zju.edu.cn] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][shana][shana@zju.edu.cn] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][shana][shana@zju.edu.cn] * GNU General Public License for more details.
+[external][shana][shana@zju.edu.cn] *
+[external][shana][shana@zju.edu.cn] * You should have received a copy of the GNU General Public License
+[external][shana][shana@zju.edu.cn] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][shana][shana@zju.edu.cn] *
+[external][shana][shana@zju.edu.cn] * Copyright (C) 2019 Swift Gan
+[external][shana][shana@zju.edu.cn] * Copyright (C) 2021 LSPosed Contributors
+[external][shana][shana@zju.edu.cn] */
+[external][shana][shana@zju.edu.cn]#include <malloc.h>
+[external][shana][shana@zju.edu.cn]#include <cstring>
+[external][shana][shana@zju.edu.cn]#include <sys/mman.h>
+[external][shana][shana@zju.edu.cn]#include <fcntl.h>
+[external][shana][shana@zju.edu.cn]#include <unistd.h>
+[external][shana][shana@zju.edu.cn]#include <cassert>
+[external][shana][shana@zju.edu.cn]#include <sys/stat.h>
+[external][shana][shana@zju.edu.cn]#include "logging.h"
+[external][shana][shana@zju.edu.cn]#include "elf_util.h"
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]using namespace SandHook;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]template<typename T>
+[external][shana][shana@zju.edu.cn]inline constexpr auto offsetOf(ElfW(Ehdr) *head, ElfW(Off) off) {
+[external][shana][shana@zju.edu.cn]    return reinterpret_cast<std::conditional_t<std::is_pointer_v<T>, T, T *>>(
+[external][shana][shana@zju.edu.cn]            reinterpret_cast<uintptr_t>(head) + off);
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]ElfImg::ElfImg(std::string_view base_name) : elf(base_name) {
+[external][shana][shana@zju.edu.cn]    if (!findModuleBase()) {
+[external][shana][shana@zju.edu.cn]        base = nullptr;
+[external][shana][shana@zju.edu.cn]        return;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    //load elf
+[external][shana][shana@zju.edu.cn]    int fd = open(elf.data(), O_RDONLY);
+[external][shana][shana@zju.edu.cn]    if (fd < 0) {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        LOGE("failed to open {}", elf);
+[external][shana][shana@zju.edu.cn]        return;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    size = lseek(fd, 0, SEEK_END);
+[external][shana][shana@zju.edu.cn]    if (size <= 0) {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        LOGE("lseek() failed for {}", elf);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    header = reinterpret_cast<decltype(header)>(mmap(nullptr, size, PROT_READ, MAP_SHARED, fd, 0));
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    close(fd);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    section_header = offsetOf<decltype(section_header)>(header, header->e_shoff);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    auto shoff = reinterpret_cast<uintptr_t>(section_header);
+[external][shana][shana@zju.edu.cn]    char *section_str = offsetOf<char *>(header, section_header[header->e_shstrndx].sh_offset);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    for (int i = 0; i < header->e_shnum; i++, shoff += header->e_shentsize) {
+[external][shana][shana@zju.edu.cn]        auto *section_h = (ElfW(Shdr) *) shoff;
+[external][shana][shana@zju.edu.cn]        char *sname = section_h->sh_name + section_str;
+[external][shana][shana@zju.edu.cn]        auto entsize = section_h->sh_entsize;
+[external][shana][shana@zju.edu.cn]        switch (section_h->sh_type) {
+[external][shana][shana@zju.edu.cn]            case SHT_DYNSYM: {
+[external][shana][shana@zju.edu.cn]                if (bias == -4396) {
+[external][shana][shana@zju.edu.cn]                    dynsym = section_h;
+[external][shana][shana@zju.edu.cn]                    dynsym_offset = section_h->sh_offset;
+[external][shana][shana@zju.edu.cn]                    dynsym_start = offsetOf<decltype(dynsym_start)>(header, dynsym_offset);
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]                break;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            case SHT_SYMTAB: {
+[external][shana][shana@zju.edu.cn]                if (strcmp(sname, ".symtab") == 0) {
+[external][shana][shana@zju.edu.cn]                    symtab = section_h;
+[external][shana][shana@zju.edu.cn]                    symtab_offset = section_h->sh_offset;
+[external][shana][shana@zju.edu.cn]                    symtab_size = section_h->sh_size;
+[external][shana][shana@zju.edu.cn]                    symtab_count = symtab_size / entsize;
+[external][shana][shana@zju.edu.cn]                    symtab_start = offsetOf<decltype(symtab_start)>(header, symtab_offset);
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]                break;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            case SHT_STRTAB: {
+[external][shana][shana@zju.edu.cn]                if (bias == -4396) {
+[external][shana][shana@zju.edu.cn]                    strtab = section_h;
+[external][shana][shana@zju.edu.cn]                    symstr_offset = section_h->sh_offset;
+[external][shana][shana@zju.edu.cn]                    strtab_start = offsetOf<decltype(strtab_start)>(header, symstr_offset);
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]                if (strcmp(sname, ".strtab") == 0) {
+[external][shana][shana@zju.edu.cn]                    symstr_offset_for_symtab = section_h->sh_offset;
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]                break;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            case SHT_PROGBITS: {
+[external][shana][shana@zju.edu.cn]                if (strtab == nullptr || dynsym == nullptr) break;
+[external][shana][shana@zju.edu.cn]                if (bias == -4396) {
+[external][shana][shana@zju.edu.cn]                    bias = (off_t) section_h->sh_addr - (off_t) section_h->sh_offset;
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]                break;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            case SHT_HASH: {
+[external][shana][shana@zju.edu.cn]                auto *d_un = offsetOf<ElfW(Word)>(header, section_h->sh_offset);
+[external][shana][shana@zju.edu.cn]                nbucket_ = d_un[0];
+[external][shana][shana@zju.edu.cn]                bucket_ = d_un + 2;
+[external][shana][shana@zju.edu.cn]                chain_ = bucket_ + nbucket_;
+[external][shana][shana@zju.edu.cn]                break;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            case SHT_GNU_HASH: {
+[external][shana][shana@zju.edu.cn]                auto *d_buf = reinterpret_cast<ElfW(Word) *>(((size_t) header) +
+[external][shana][shana@zju.edu.cn]                                                             section_h->sh_offset);
+[external][shana][shana@zju.edu.cn]                gnu_nbucket_ = d_buf[0];
+[external][shana][shana@zju.edu.cn]                gnu_symndx_ = d_buf[1];
+[external][shana][shana@zju.edu.cn]                gnu_bloom_size_ = d_buf[2];
+[external][shana][shana@zju.edu.cn]                gnu_shift2_ = d_buf[3];
+[external][shana][shana@zju.edu.cn]                gnu_bloom_filter_ = reinterpret_cast<decltype(gnu_bloom_filter_)>(d_buf + 4);
+[external][shana][shana@zju.edu.cn]                gnu_bucket_ = reinterpret_cast<decltype(gnu_bucket_)>(gnu_bloom_filter_ +
+[external][shana][shana@zju.edu.cn]                                                                      gnu_bloom_size_);
+[external][shana][shana@zju.edu.cn]                gnu_chain_ = gnu_bucket_ + gnu_nbucket_ - gnu_symndx_;
+[external][shana][shana@zju.edu.cn]                break;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]ElfW(Addr) ElfImg::ElfLookup(std::string_view name, uint32_t hash) const {
+[external][shana][shana@zju.edu.cn]    if (nbucket_ == 0) return 0;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    char *strings = (char *) strtab_start;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    for (auto n = bucket_[hash % nbucket_]; n != 0; n = chain_[n]) {
+[external][shana][shana@zju.edu.cn]        auto *sym = dynsym_start + n;
+[external][shana][shana@zju.edu.cn]        if (name == strings + sym->st_name) {
+[external][shana][shana@zju.edu.cn]            return sym->st_value;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]    return 0;
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]ElfW(Addr) ElfImg::GnuLookup(std::string_view name, uint32_t hash) const {
+[external][shana][shana@zju.edu.cn]    static constexpr auto bloom_mask_bits = sizeof(ElfW(Addr)) * 8;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    if (gnu_nbucket_ == 0 || gnu_bloom_size_ == 0) return 0;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    auto bloom_word = gnu_bloom_filter_[(hash / bloom_mask_bits) % gnu_bloom_size_];
+[external][shana][shana@zju.edu.cn]    uintptr_t mask = 0
+[external][shana][shana@zju.edu.cn]                     | (uintptr_t) 1 << (hash % bloom_mask_bits)
+[external][shana][shana@zju.edu.cn]                     | (uintptr_t) 1 << ((hash >> gnu_shift2_) % bloom_mask_bits);
+[external][shana][shana@zju.edu.cn]    if ((mask & bloom_word) == mask) {
+[external][shana][shana@zju.edu.cn]        auto sym_index = gnu_bucket_[hash % gnu_nbucket_];
+[external][shana][shana@zju.edu.cn]        if (sym_index >= gnu_symndx_) {
+[external][shana][shana@zju.edu.cn]            char *strings = (char *) strtab_start;
+[external][shana][shana@zju.edu.cn]            do {
+[external][shana][shana@zju.edu.cn]                auto *sym = dynsym_start + sym_index;
+[external][shana][shana@zju.edu.cn]                if (((gnu_chain_[sym_index] ^ hash) >> 1) == 0
+[external][shana][shana@zju.edu.cn]                    && name == strings + sym->st_name) {
+[external][shana][shana@zju.edu.cn]                    return sym->st_value;
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            } while ((gnu_chain_[sym_index++] & 1) == 0);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]    return 0;
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]void ElfImg::MayInitLinearMap() const {
+[external][shana][shana@zju.edu.cn]    if (symtabs_.empty()) {
+[external][shana][shana@zju.edu.cn]        if (symtab_start != nullptr && symstr_offset_for_symtab != 0) {
+[internal][vvb2060][vvb2060@gmail.com]            for (ElfW(Off) i = 0; i < symtab_count; i++) {
+[external][shana][shana@zju.edu.cn]                unsigned int st_type = ELF_ST_TYPE(symtab_start[i].st_info);
+[external][shana][shana@zju.edu.cn]                const char *st_name = offsetOf<const char *>(header, symstr_offset_for_symtab +
+[external][shana][shana@zju.edu.cn]                                                                     symtab_start[i].st_name);
+[external][shana][shana@zju.edu.cn]                if ((st_type == STT_FUNC || st_type == STT_OBJECT) && symtab_start[i].st_size) {
+[external][shana][shana@zju.edu.cn]                    symtabs_.emplace(st_name, &symtab_start[i]);
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]ElfW(Addr) ElfImg::LinearLookup(std::string_view name) const {
+[external][shana][shana@zju.edu.cn]    MayInitLinearMap();
+[external][shana][shana@zju.edu.cn]    if (auto i = symtabs_.find(name); i != symtabs_.end()) {
+[external][shana][shana@zju.edu.cn]        return i->second->st_value;
+[external][shana][shana@zju.edu.cn]    } else {
+[external][shana][shana@zju.edu.cn]        return 0;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]std::vector<ElfW(Addr)> ElfImg::LinearRangeLookup(std::string_view name) const {
+[external][shana][shana@zju.edu.cn]    MayInitLinearMap();
+[external][shana][shana@zju.edu.cn]    std::vector<ElfW(Addr)> res;
+[external][shana][shana@zju.edu.cn]    for (auto [i, end] = symtabs_.equal_range(name); i != end; ++i) {
+[external][shana][shana@zju.edu.cn]        auto offset = i->second->st_value;
+[external][shana][shana@zju.edu.cn]        res.emplace_back(offset);
+[external][shana][shana@zju.edu.cn]        LOGD("found {} {:#x} in {} in symtab by linear range lookup", name, offset, elf);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]    return res;
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]ElfW(Addr) ElfImg::PrefixLookupFirst(std::string_view prefix) const {
+[external][shana][shana@zju.edu.cn]    MayInitLinearMap();
+[external][shana][shana@zju.edu.cn]    if (auto i = symtabs_.lower_bound(prefix); i != symtabs_.end() && i->first.starts_with(prefix)) {
+[external][shana][shana@zju.edu.cn]        LOGD("found prefix {} of {} {:#x} in {} in symtab by linear lookup", prefix, i->first, i->second->st_value, elf);
+[external][shana][shana@zju.edu.cn]        return i->second->st_value;
+[external][shana][shana@zju.edu.cn]    } else {
+[external][shana][shana@zju.edu.cn]        return 0;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]ElfImg::~ElfImg() {
+[external][shana][shana@zju.edu.cn]    //open elf file local
+[external][shana][shana@zju.edu.cn]    if (buffer) {
+[external][shana][shana@zju.edu.cn]        free(buffer);
+[external][shana][shana@zju.edu.cn]        buffer = nullptr;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]    //use mmap
+[external][shana][shana@zju.edu.cn]    if (header) {
+[external][shana][shana@zju.edu.cn]        munmap(header, size);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]ElfW(Addr)
+[external][shana][shana@zju.edu.cn]ElfImg::getSymbOffset(std::string_view name, uint32_t gnu_hash, uint32_t elf_hash) const {
+[external][shana][shana@zju.edu.cn]    if (auto offset = GnuLookup(name, gnu_hash); offset > 0) {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        LOGD("found {} {:#x} in {} in dynsym by gnuhash", name, offset, elf);
+[external][shana][shana@zju.edu.cn]        return offset;
+[external][shana][shana@zju.edu.cn]    } else if (offset = ElfLookup(name, elf_hash); offset > 0) {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        LOGD("found {} {:#x} in {} in dynsym by elfhash", name, offset, elf);
+[external][shana][shana@zju.edu.cn]        return offset;
+[external][shana][shana@zju.edu.cn]    } else if (offset = LinearLookup(name); offset > 0) {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        LOGD("found {} {:#x} in {} in symtab by linear lookup", name, offset, elf);
+[external][shana][shana@zju.edu.cn]        return offset;
+[external][shana][shana@zju.edu.cn]    } else {
+[external][shana][shana@zju.edu.cn]        return 0;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]constexpr inline bool contains(std::string_view a, std::string_view b) {
+[external][shana][shana@zju.edu.cn]    return a.find(b) != std::string_view::npos;
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]bool ElfImg::findModuleBase() {
+[external][shana][shana@zju.edu.cn]    off_t load_addr;
+[internal][canyie][31466456+canyie@users.noreply.github.com]    bool found = false;
+[external][shana][shana@zju.edu.cn]    FILE *maps = fopen("/proc/self/maps", "r");
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    char *buff = nullptr;
+[external][shana][shana@zju.edu.cn]    size_t len = 0;
+[external][shana][shana@zju.edu.cn]    ssize_t nread;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    while ((nread = getline(&buff, &len, maps)) != -1) {
+[external][shana][shana@zju.edu.cn]        std::string_view line{buff, static_cast<size_t>(nread)};
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        if ((contains(line, "r-xp") || contains(line, "r--p")) && contains(line, elf)) {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]            LOGD("found: {}", line);
+[external][shana][shana@zju.edu.cn]            if (auto begin = line.find_last_of(' '); begin != std::string_view::npos &&
+[external][shana][shana@zju.edu.cn]                                                     line[++begin] == '/') {
+[internal][canyie][31466456+canyie@users.noreply.github.com]                found = true;
+[external][shana][shana@zju.edu.cn]                elf = line.substr(begin);
+[external][shana][shana@zju.edu.cn]                if (elf.back() == '\n') elf.pop_back();
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]                LOGD("update path: {}", elf);
+[internal][canyie][31466456+canyie@users.noreply.github.com]                break;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]    if (!found) {
+[external][shana][shana@zju.edu.cn]        if (buff) free(buff);
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        LOGE("failed to read load address for {}", elf);
+[external][shana][shana@zju.edu.cn]        fclose(maps);
+[external][shana][shana@zju.edu.cn]        return false;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    if (char *next = buff; load_addr = strtoul(buff, &next, 16), next == buff) {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]        LOGE("failed to read load address for {}", elf);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    if (buff) free(buff);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    fclose(maps);
+[external][shana][shana@zju.edu.cn]
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    LOGD("get module base {}: {:#x}", elf, load_addr);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    base = reinterpret_cast<void *>(load_addr);
+[external][shana][shana@zju.edu.cn]    return true;
+[external][shana][shana@zju.edu.cn]}

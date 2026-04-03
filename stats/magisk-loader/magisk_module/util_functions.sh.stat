@@ -1,0 +1,63 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]#
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]# This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]#
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]# LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]# it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]# the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]# (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]#
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]# LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]# but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]# GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]#
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]# You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]# along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]#
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]# Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]# Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]#
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][mlgmxyysd][mlgmxyysd@meowcat.org]check_magisk_version() {
+[internal][vvb2060][vvb2060@gmail.com]  ui_print "- Magisk version: $MAGISK_VER_CODE"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  if [ "$FLAVOR" == "riru" ] || [ "$FLAVOR" == "zygisk" ]; then
+[internal][vvb2060][vvb2060@gmail.com]    if [ "$MAGISK_VER_CODE" -lt 24000 ]; then
+[external][shana][shana@zju.edu.cn]      ui_print "*********************************************************"
+[internal][vvb2060][vvb2060@gmail.com]      ui_print "! Please install Magisk v24+"
+[external][shana][shana@zju.edu.cn]      abort    "*********************************************************"
+[external][shana][shana@zju.edu.cn]    fi
+[external][shana][shana@zju.edu.cn]  else
+[external][wanghan1995315][wanghan1995315@gmail.com]    ui_print "*********************************************************"
+[external][shana][shana@zju.edu.cn]    ui_print "! Unsupported flavor $FLAVOR"
+[external][wanghan1995315][wanghan1995315@gmail.com]    abort    "*********************************************************"
+[external][wanghan1995315][wanghan1995315@gmail.com]  fi
+[external][mlgmxyysd][mlgmxyysd@meowcat.org]}
+[external][mlgmxyysd][mlgmxyysd@meowcat.org]
+[external][mlgmxyysd][mlgmxyysd@meowcat.org]require_new_android() {
+[internal][vvb2060][vvb2060@gmail.com]  ui_print "*********************************************************"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ui_print "! Unsupported Android version ${1} (below Oreo MR1)"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  ui_print "! Learn more from our GitHub"
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]  [ "$BOOTMODE" == "true" ] && am start -a android.intent.action.VIEW -d https://github.com/LSPosed/LSPosed/#supported-versions
+[external][wanghan1995315][wanghan1995315@gmail.com]  abort    "*********************************************************"
+[external][mlgmxyysd][mlgmxyysd@meowcat.org]}
+[external][mlgmxyysd][mlgmxyysd@meowcat.org]
+[external][mlgmxyysd][mlgmxyysd@meowcat.org]check_android_version() {
+[internal][vvb2060][vvb2060@gmail.com]  if [ "$API" -ge 27 ]; then
+[internal][vvb2060][vvb2060@gmail.com]    ui_print "- Android SDK version: $API"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  else
+[internal][vvb2060][vvb2060@gmail.com]    require_new_android "$API"
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  fi
+[external][shana][shana@zju.edu.cn]}
+[external][wanghan1995315][wanghan1995315@gmail.com]
+[external][wanghan1995315][wanghan1995315@gmail.com]check_incompatible_module() {
+[external][wanghan1995315][wanghan1995315@gmail.com]  MODULEDIR="$(magisk --path)/.magisk/modules"
+[internal][vvb2060][vvb2060@gmail.com]  for id in "riru_dreamland" "riru_edxposed" "riru_edxposed_sandhook" "taichi"; do
+[external][416810799][416810799@qq.com]    if [ -d "$MODULEDIR/$id" ] && [ ! -f "$MODULEDIR/$id/disable" ] && [ ! -f "$MODULEDIR/$id/remove" ]; then
+[internal][vvb2060][vvb2060@gmail.com]      ui_print "*********************************************************"
+[internal][vvb2060][vvb2060@gmail.com]      ui_print "! Please disable or uninstall incompatible frameworks:"
+[internal][vvb2060][vvb2060@gmail.com]      ui_print "! $id"
+[internal][vvb2060][vvb2060@gmail.com]      abort    "*********************************************************"
+[internal][vvb2060][vvb2060@gmail.com]      break
+[internal][vvb2060][vvb2060@gmail.com]    fi
+[external][wanghan1995315][wanghan1995315@gmail.com]  done
+[external][wanghan1995315][wanghan1995315@gmail.com]}

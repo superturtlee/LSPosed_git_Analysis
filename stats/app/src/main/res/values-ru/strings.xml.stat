@@ -1,0 +1,250 @@
+[bot][lsposed][lsposed@lsposed.org]<?xml version="1.0" encoding="utf-8"?>
+[bot][lsposed][lsposed@lsposed.org]<!--
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  ~ Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]  -->
+[bot][lsposed][lsposed@lsposed.org]<resources xmlns:tools="http://schemas.android.com/tools" tools:keep="@string/xposed_module_updated_notification_*,@string/module_is_not_activated_*">
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <!-- MainActivity -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="overview">LSPosed</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="Modules">Модули</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <plurals name="modules_enabled_count">
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]        <item quantity="one">Включен %d модуль</item>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]        <item quantity="few">Включены %d модуля</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="many">Включено %d модулей</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="other">Включено %d модулей</item>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    </plurals>
+[external][hankaviator][HankAviator@users.noreply.github.com]    <string name="Logs">Логи</string>
+[external][841474544][841474544@qq.com]    <string name="Settings">Настройки</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="feedback_or_suggestion">Обратная связь</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="About">О приложении</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="report_issue">Сообщить о проблеме</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="module_repo">Репозиторий</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo_up_to_date">Все модули в актуальном состоянии</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo_published_time">Опубликовано %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_repo_updated_time">Обновлено %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <plurals name="module_repo_upgradable">
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="one">Найдено обновление %d модуля</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="few">Найдены обновления %d модулей</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="many">Найдены обновления %d модулей</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="other">Найдены обновления %d модулей</item>
+[bot][lsposed][lsposed@lsposed.org]    </plurals>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="about_view_source_code"><![CDATA[Просмотреть исходный код на %1$s<br/>Присоединяйтесь к нашему %2$s каналу]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="translators" comment="Dear translators, please add your home page here following the format. There can be more than one translator. So feel free to append yourself.">Alеxеy</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install">Установить</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install_summary">Нажмите, чтобы установить LSPosed</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="not_installed">Не установлен</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="not_install_summary">LSPosed не установлен!</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="activated">Активирован</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="partial_activated">Частично активирован</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="selinux_policy_not_loaded_summary">SEPolicy загружен неправильно</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="selinux_policy_not_loaded"><![CDATA[Некоторые функции не будут работать.<br/>Пожалуйста, сообщите об этом разработчику <a href="https://github.com/topjohnwu/Magisk/issues"><b>Magisk</b></a>]]></string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="system_inject_fail_summary">Ошибка внедрения системного фреймворка</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_inject_fail"><![CDATA[Это редкость и может быть вызвано <b>Magisk</b> или несовместимыми модулями Magisk.<br/>Пожалуйста, попробуйте отключить модули Magisk кроме Riru и LSPosed или пришлите полные логи разработчику]]></string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_prop_incorrect_summary">Неправильные системные настройки</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="system_prop_incorrect"><![CDATA[Неправильные системные настройки.<br/>Некоторые системные настройки нужные для работы удалены или изменены.<br/>Модули могут не работать должным образом]]></string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="need_update">Требуется обновление</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="please_update_summary">Установите последнюю версию LSPosed!</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="developer_warning_title">Советы разработчику модулей</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="developer_warning_summary">Пожалуйста, отключите оптимизацию развертывания в Android Studio или используйте для установки команду `gradlew installDebug`. Иначе модуль не обновится</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="info_api_version">Версия API</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_framework_version">Версия фреймворк</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_manager_package_name">Имя пакета менеджера</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="info_system_version">Версия Android</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="info_device">Устройство</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_system_abi">Разрядность системы (ABI)</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_dex2oat_wrapper">Оптимизатор Dex</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enabled">Включена</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="not_enabled">Не включена</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="supported">Поддерживается</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="unsupported">Не поддерживается</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="android_version_unsatisfied">Версия Android не подходит</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="crashed">Сбой</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="mount_failed">Ошибка монтирования</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="selinux_permissive">SELinux в разрешающим режиме</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sepolicy_incorrect">Неправильная политика SELinux</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_lsposed">Обновление LSPosed</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_lsposed_msg">Вы точно хотите обновить LSPosed?\nУстройство перезагрузится после завершения обновления</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="info_copied">Скопировано в буфер обмена</string>
+[bot][lsposed][lsposed@lsposed.org]    <!-- WelcomeDialog -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="parasitic_welcome">Добро пожаловать в LSPosed</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="parasitic_welcome_summary">Вы используете скрытый режим. Для открытия LSPosed, можно создать ярлык на рабочем столе или открывать через уведомление</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="parasitic_welcome_summary_no_shortcut_support">Вы используете скрытый режим. LSPosed можно открыть через уведомление</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="create_shortcut">Ярлык</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="never_show">Больше не показывать</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_welcome">Скрытие приложения LSPosed</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_welcome_summary">LSPosed теперь поддерживает скрытие, чтобы избежать различные обнаружения системой, вы можете открыть LSPosed из уведомления. Рекомендуется удалить текущее приложение</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <!-- LogsActivity -->
+[external][hankaviator][HankAviator@users.noreply.github.com]    <string name="menuSaveToSd">Сохранить</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="nav_item_logs_verbose">Подробные логи</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="nav_item_logs_module">Логи модулей</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_saving">Сохранение логов, пожалуйста подождите</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_saved">Логи сохранены</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_save_failed2">Ошибка сохранения:\n%s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menuClearLog">Очистить логи</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_cleared">Логи успешно очищены</string>
+[external][hankaviator][HankAviator@users.noreply.github.com]    <string name="scroll_top">Прокрутить вверх</string>
+[external][hankaviator][HankAviator@users.noreply.github.com]    <string name="loading">Загрузка…</string>
+[external][hankaviator][HankAviator@users.noreply.github.com]    <string name="scroll_bottom">Прокрутить вниз</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="menuReload">Обновить</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="logs_clear_failed_2">Не удалось очистить логи</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_enable_word_wrap">Переносить текст</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enabled_verbose_log">Подробные логи включены</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="disabled_verbose_log">Подробные логи выключены</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <!-- ModulesActivity -->
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="module_empty_description">(описание отсутствует)</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_xposed_min_version">Этот модуль требует более новой версии LSPosed (%d) и не может быть включен</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_target_version_higher">Этот модуль разработан для более новой версии Xposed (%d), поэтому некоторые функции могут не работать</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="no_min_version_specified">Этот модуль не указал версию LSPosed, в которой он нуждается</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="warning_min_version_too_low">Этот модуль был создан для LSPosed версии %1$d, но из-за несовместимых изменений в версии %2$d, он был выключен</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="warning_installed_on_external_storage">Этот модуль не может быть загружен, потому что он установлен на SD-карте, переместите его во внутреннюю память</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="module_uninstall">Удалить</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="module_settings">Открыть настройки</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="view_in_repo">Просмотр в репозитории</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_uninstall_message">Вы точно хотите удалить это модуль?</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="module_uninstalled">Модуль %1$s удален!</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="module_uninstall_failed">Удаление прервано</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="add_module_to_user">Добавить модуль пользователю</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="module_installed">Добавить %1$s для пользователя %2$s</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="module_install_failed">Добавление модуля не удалось</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="install_to_user">Установить пользователю %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="install_to_user_message">Хотите установить %1$s пользователю %2$s? Рекомендуется устанавливать вручную, принудительная установка через LSPosed может вызвать проблемы</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="expand">развернуть</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="collapse">свернуть</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <!-- AppListActivity -->
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="compile_speed">Повторная оптимизация</string>
+[external][hankaviator][HankAviator@users.noreply.github.com]    <string name="compile_speed_msg">Оптимизация…</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="compile_done">Оптимизация завершена!</string>
+[external][hankaviator][HankAviator@users.noreply.github.com]    <string name="app_launch">Запустить</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="compile_failed">Ошибка оптимизации: возвращено пустое значение!</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="compile_failed_with_info">Ошибка оптимизации: </string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="sort_by_name">По названию приложения</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="sort_by_package_name">По названию пакета</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="sort_by_install_time">По времени установки</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="sort_by_update_time">По времени обновления</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_reverse">Обратная сортировка</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_system_apps">Системные</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="menu_sort">Сортировать</string>
+[external][hankaviator][HankAviator@users.noreply.github.com]    <string name="enable_module">Включить модуль</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="no_scope_selected">Вы не выбрали ни одного приложения. Продолжить?</string>
+[external][hankaviator][HankAviator@users.noreply.github.com]    <string name="menu_show_games">Игры</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_modules">Модули</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_show_denylist">DenyList</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="failed_to_save_scope_list">Не удалось сохранить список выбранных приложений для модуля</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="app_version">Версия: %1$s</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="use_recommended">Рекомендуемые</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="no_scope_selected_has_recommended">Вы не выбрали ни одного приложения. Выбрать рекомендуемые приложения?</string>
+[external][841474544][841474544@qq.com]    <string name="use_recommended_message">Выбрать рекомендуемые приложения?</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="module_is_not_activated_yet">Модуль установлен</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="requested_by_module">Рекомендуемые</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="update_available">Доступно обновление: %1$s</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="module_disabled_no_selection">Модуль %s выключен, так как ни одно приложение не выбрано</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="android_framework">Системный фреймворк</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_backup_and_restore">Резервная копия</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="menu_backup">Создать</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="menu_restore">Восстановить</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="force_stop">Остановить</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="force_stop_dlg_title">Остановить приложение?</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="force_stop_dlg_text">Принудительная остановка приложения выгружает его из запущенных</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="reboot_required">Для применения требуется перезагрузка</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="reboot">Перезагрузить</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="menu_hide">Скрывать</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="deny_list">%s находится в DenyList и может не работать</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="deny_list_info">В DenyList</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <!-- ModulesActivity and AppListActivity -->
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="modules_other_app">Магазин приложений</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="module_app_info">О приложении</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="list_empty">¯\\\\_(ツ)_\/¯\nЗдесь ничего нет</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <!-- SettingsActivity -->
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="settings_group_framework">Фреймворк</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_disable_verbose_log">Выключить подробные логи</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_disable_verbose_log_summary">Выключение подробных логов</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="pure_black_dark_theme">Черная тема</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="pure_black_dark_theme_summary">Использовать черную тему, когда включена темная тема</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="settings_group_theme">Тема</string>
+[external][hankaviator][HankAviator@users.noreply.github.com]    <string name="settings_backup_and_restore">Резервное копирование и восстановление</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup_summery">Сохранить список модулей и выбранных приложений для модулей</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_restore_summery">Восстановить список модулей и выбранных приложений для модулей</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="settings_backup">Создать</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_backup_failed2">Не удалось сделать резервную копию:\n%s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="enable_documentui">Пожалуйста, включите DocumentUI</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="settings_restore">Восстановить</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_restore_failed2">Не удалось восстановить:\n%s</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="group_network">Сеть</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="dns_over_http">DNS через HTTPS</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="dns_over_http_summary">Шифрование DNS-трафика помогающее усилить конфиденциальность пользователя в сети</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="theme_color">Акцент темы</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="theme_color_system">Системный цвет акцента</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="settings_show_hidden_icon_apps_enabled">Принудительно показывать иконку модуля</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="settings_show_hidden_icon_apps_enabled_summary">После Android 10, модули не могут скрывать иконку в лаунчер. Выключите переключатель, чтобы отключить эту системную функцию</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="settings_group_system">Система</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_language">Язык приложения</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_translation_contributors">Автор перевода</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_translation">Принять участие в переводе</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_translation_summary">Помогите нам перевести %s на ваш язык</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_create_shortcut_summary">Создать ярлык, с помощью которого можно открыть LSPosed</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_shortcut_pinned_hint">Ярлык закреплен</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_unsupported_pin_shortcut_summary">Текущий лаунчер по умолчанию не поддерживает ярлыки</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_enable_status_notification">Уведомление</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_enable_status_notification_summary">Показывать уведомление, через которое можно открыть LSPosed</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="disable_status_notification_error">Не найден ярлык, выключить уведомление нельзя</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_update_channel">Источник обновлений</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_channel_stable">Стабильные версии</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_channel_bate">Бета-версии</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="update_channel_nightly">Ночные версии</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_xposed_api_call_protection">Защита использования Xposed API</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="settings_xposed_api_call_protection_summary">Блокировать динамически загружаемый код модуля для использования Xposed API, это может нарушить работу некоторых модулей, но повысит безопасность</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <!-- Module Repo -->
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="module_readme">Описание</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="module_releases">Версии</string>
+[external][hankaviator][HankAviator@users.noreply.github.com]    <string name="module_information">Информация</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="module_information_homepage">Домашняя страница</string>
+[external][hankaviator][HankAviator@users.noreply.github.com]    <string name="module_information_source_url">Исходный код</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="module_information_collaborators">Разработчик</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="module_release_view_assets">Установить</string>
+[external][hankaviator][HankAviator@users.noreply.github.com]    <string name="menu_open_in_browser">Открыть в браузере</string>
+[external][hankaviator][HankAviator@users.noreply.github.com]    <string name="module_release_load_more">Показать старые версии</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="module_release_no_more">Больше нет других версий</string>
+[external][alexey71][agarkov.alexey.viktorovich@gmail.com]    <string name="repo_load_failed">Не удалось загрузить репозиторий модуля: %s</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="sort_upgradable_first">Сначала обновляемые</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="installed">Установлен</string>
+[bot][lsposed][lsposed@lsposed.org]    <plurals name="module_release_assets_download_count">
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="one">%d раз скачали</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="few">%d раза скачали</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="many">%d раз скачали</item>
+[bot][lsposed][lsposed@lsposed.org]        <item quantity="other">%d раз скачали</item>
+[bot][lsposed][lsposed@lsposed.org]    </plurals>
+[bot][lsposed][lsposed@lsposed.org]    <!-- Colors -->
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_sakura">Сакура</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_red">Красный</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_pink">Розовый</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_purple">Фиолетовый</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_deep_purple">Насыщенный фиолетовый</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_indigo">Индиго</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_blue">Синий</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_light_blue">Голубой</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_cyan">Бирюзово-голубой</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_teal">Сине-зеленый</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_green">Зеленый</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_light_green">Светло-зеленый</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_lime">Желто-зеленый</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_yellow">Желтый</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_amber">Янтарный</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_orange">Оранжевый</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_deep_orange">Насыщенный оранжевый</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_brown">Коричневый</string>
+[bot][lsposed][lsposed@lsposed.org]    <string name="color_blue_grey">Серо-голубой</string>
+[external][841474544][841474544@qq.com]</resources>

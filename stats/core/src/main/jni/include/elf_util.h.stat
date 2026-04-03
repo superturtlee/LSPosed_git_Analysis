@@ -1,0 +1,159 @@
+[external][shana][shana@zju.edu.cn]/*
+[external][shana][shana@zju.edu.cn] * This file is part of LSPosed.
+[external][shana][shana@zju.edu.cn] *
+[external][shana][shana@zju.edu.cn] * LSPosed is free software: you can redistribute it and/or modify
+[external][shana][shana@zju.edu.cn] * it under the terms of the GNU General Public License as published by
+[external][shana][shana@zju.edu.cn] * the Free Software Foundation, either version 3 of the License, or
+[external][shana][shana@zju.edu.cn] * (at your option) any later version.
+[external][shana][shana@zju.edu.cn] *
+[external][shana][shana@zju.edu.cn] * LSPosed is distributed in the hope that it will be useful,
+[external][shana][shana@zju.edu.cn] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][shana][shana@zju.edu.cn] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][shana][shana@zju.edu.cn] * GNU General Public License for more details.
+[external][shana][shana@zju.edu.cn] *
+[external][shana][shana@zju.edu.cn] * You should have received a copy of the GNU General Public License
+[external][shana][shana@zju.edu.cn] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][shana][shana@zju.edu.cn] *
+[external][shana][shana@zju.edu.cn] * Copyright (C) 2019 Swift Gan
+[external][shana][shana@zju.edu.cn] * Copyright (C) 2021 LSPosed Contributors
+[external][shana][shana@zju.edu.cn] */
+[external][shana][shana@zju.edu.cn]#ifndef SANDHOOK_ELF_UTIL_H
+[external][shana][shana@zju.edu.cn]#define SANDHOOK_ELF_UTIL_H
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]#include <string_view>
+[external][shana][shana@zju.edu.cn]#include <map>
+[external][shana][shana@zju.edu.cn]#include <linux/elf.h>
+[external][shana][shana@zju.edu.cn]#include <sys/types.h>
+[external][shana][shana@zju.edu.cn]#include <link.h>
+[external][shana][shana@zju.edu.cn]#include <vector>
+[external][shana][shana@zju.edu.cn]#include "config.h"
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]#define SHT_GNU_HASH 0x6ffffff6
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]namespace SandHook {
+[external][shana][shana@zju.edu.cn]    class ElfImg {
+[external][shana][shana@zju.edu.cn]    public:
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        ElfImg(std::string_view elf);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        template<typename T = void*>
+[external][shana][shana@zju.edu.cn]        requires(std::is_pointer_v<T>)
+[external][shana][shana@zju.edu.cn]        constexpr const T getSymbAddress(std::string_view name) const {
+[external][shana][shana@zju.edu.cn]            auto offset = getSymbOffset(name, GnuHash(name), ElfHash(name));
+[external][shana][shana@zju.edu.cn]            if (offset > 0 && base != nullptr) {
+[external][shana][shana@zju.edu.cn]                return reinterpret_cast<T>(static_cast<ElfW(Addr)>((uintptr_t) base + offset - bias));
+[external][shana][shana@zju.edu.cn]            } else {
+[external][shana][shana@zju.edu.cn]                return nullptr;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        template<typename T = void*>
+[external][shana][shana@zju.edu.cn]        requires(std::is_pointer_v<T>)
+[external][shana][shana@zju.edu.cn]        constexpr const T getSymbPrefixFirstAddress(std::string_view prefix) const {
+[external][shana][shana@zju.edu.cn]            auto offset = PrefixLookupFirst(prefix);
+[external][shana][shana@zju.edu.cn]            if (offset > 0 && base != nullptr) {
+[external][shana][shana@zju.edu.cn]                return reinterpret_cast<T>(static_cast<ElfW(Addr)>((uintptr_t) base + offset - bias));
+[external][shana][shana@zju.edu.cn]            } else {
+[external][shana][shana@zju.edu.cn]                return nullptr;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        template<typename T = void*>
+[external][shana][shana@zju.edu.cn]        requires(std::is_pointer_v<T>)
+[external][shana][shana@zju.edu.cn]        const std::vector<T> getAllSymbAddress(std::string_view name) const {
+[external][shana][shana@zju.edu.cn]            auto offsets = LinearRangeLookup(name);
+[external][shana][shana@zju.edu.cn]            std::vector<T> res;
+[external][shana][shana@zju.edu.cn]            res.reserve(offsets.size());
+[external][shana][shana@zju.edu.cn]            for (const auto &offset : offsets) {
+[external][shana][shana@zju.edu.cn]                res.emplace_back(reinterpret_cast<T>(static_cast<ElfW(Addr)>((uintptr_t) base + offset - bias)));
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            return res;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        bool isValid() const {
+[external][shana][shana@zju.edu.cn]            return base != nullptr;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        const std::string name() const {
+[external][shana][shana@zju.edu.cn]            return elf;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        ~ElfImg();
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private:
+[external][shana][shana@zju.edu.cn]        ElfW(Addr) getSymbOffset(std::string_view name, uint32_t gnu_hash, uint32_t elf_hash) const;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        ElfW(Addr) ElfLookup(std::string_view name, uint32_t hash) const;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        ElfW(Addr) GnuLookup(std::string_view name, uint32_t hash) const;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        ElfW(Addr) LinearLookup(std::string_view name) const;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        std::vector<ElfW(Addr)> LinearRangeLookup(std::string_view name) const;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        ElfW(Addr) PrefixLookupFirst(std::string_view prefix) const;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        constexpr static uint32_t ElfHash(std::string_view name);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        constexpr static uint32_t GnuHash(std::string_view name);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        bool findModuleBase();
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        void MayInitLinearMap() const;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        std::string elf;
+[external][shana][shana@zju.edu.cn]        void *base = nullptr;
+[external][shana][shana@zju.edu.cn]        char *buffer = nullptr;
+[external][shana][shana@zju.edu.cn]        off_t size = 0;
+[external][shana][shana@zju.edu.cn]        off_t bias = -4396;
+[external][shana][shana@zju.edu.cn]        ElfW(Ehdr) *header = nullptr;
+[external][shana][shana@zju.edu.cn]        ElfW(Shdr) *section_header = nullptr;
+[external][shana][shana@zju.edu.cn]        ElfW(Shdr) *symtab = nullptr;
+[external][shana][shana@zju.edu.cn]        ElfW(Shdr) *strtab = nullptr;
+[external][shana][shana@zju.edu.cn]        ElfW(Shdr) *dynsym = nullptr;
+[external][shana][shana@zju.edu.cn]        ElfW(Sym) *symtab_start = nullptr;
+[external][shana][shana@zju.edu.cn]        ElfW(Sym) *dynsym_start = nullptr;
+[external][shana][shana@zju.edu.cn]        ElfW(Sym) *strtab_start = nullptr;
+[external][shana][shana@zju.edu.cn]        ElfW(Off) symtab_count = 0;
+[external][shana][shana@zju.edu.cn]        ElfW(Off) symstr_offset = 0;
+[external][shana][shana@zju.edu.cn]        ElfW(Off) symstr_offset_for_symtab = 0;
+[external][shana][shana@zju.edu.cn]        ElfW(Off) symtab_offset = 0;
+[external][shana][shana@zju.edu.cn]        ElfW(Off) dynsym_offset = 0;
+[external][shana][shana@zju.edu.cn]        ElfW(Off) symtab_size = 0;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        uint32_t nbucket_{};
+[external][shana][shana@zju.edu.cn]        uint32_t *bucket_ = nullptr;
+[external][shana][shana@zju.edu.cn]        uint32_t *chain_ = nullptr;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        uint32_t gnu_nbucket_{};
+[external][shana][shana@zju.edu.cn]        uint32_t gnu_symndx_{};
+[external][shana][shana@zju.edu.cn]        uint32_t gnu_bloom_size_;
+[external][shana][shana@zju.edu.cn]        uint32_t gnu_shift2_;
+[external][shana][shana@zju.edu.cn]        uintptr_t *gnu_bloom_filter_;
+[external][shana][shana@zju.edu.cn]        uint32_t *gnu_bucket_;
+[external][shana][shana@zju.edu.cn]        uint32_t *gnu_chain_;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        mutable std::map<std::string_view, ElfW(Sym) *> symtabs_;
+[external][shana][shana@zju.edu.cn]    };
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    constexpr uint32_t ElfImg::ElfHash(std::string_view name) {
+[external][shana][shana@zju.edu.cn]        uint32_t h = 0, g;
+[external][shana][shana@zju.edu.cn]        for (unsigned char p: name) {
+[external][shana][shana@zju.edu.cn]            h = (h << 4) + p;
+[external][shana][shana@zju.edu.cn]            g = h & 0xf0000000;
+[external][shana][shana@zju.edu.cn]            h ^= g;
+[external][shana][shana@zju.edu.cn]            h ^= g >> 24;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return h;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    constexpr uint32_t ElfImg::GnuHash(std::string_view name) {
+[external][shana][shana@zju.edu.cn]        uint32_t h = 5381;
+[external][shana][shana@zju.edu.cn]        for (unsigned char p: name) {
+[external][shana][shana@zju.edu.cn]            h += (h << 5) + p;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return h;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]#endif //SANDHOOK_ELF_UTIL_H

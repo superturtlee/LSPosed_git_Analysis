@@ -1,0 +1,21 @@
+[external][hsushulong][hsushulong@gmail.com]package android.content.res;
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]import android.util.DisplayMetrics;
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]public class Resources {
+[external][hsushulong][hsushulong@gmail.com]	public Resources(AssetManager assets, DisplayMetrics metrics, Configuration config) {
+[external][hsushulong][hsushulong@gmail.com]		throw new UnsupportedOperationException("STUB");
+[external][hsushulong][hsushulong@gmail.com]	}
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]	public Resources(ClassLoader classLoader) {
+[external][hsushulong][hsushulong@gmail.com]		throw new UnsupportedOperationException("STUB");
+[external][hsushulong][hsushulong@gmail.com]	}
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]	public void setImpl(ResourcesImpl impl) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]		throw new UnsupportedOperationException("STUB");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]	}
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]	public CompatibilityInfo getCompatibilityInfo() {
+[external][shana][shana@zju.edu.cn]	    throw new UnsupportedOperationException("STUB");
+[external][shana][shana@zju.edu.cn]	}
+[external][hsushulong][hsushulong@gmail.com]}

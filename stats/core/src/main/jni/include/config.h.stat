@@ -1,0 +1,71 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com] * Copyright (C) 2021 - 2022 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]#pragma once
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]#include <jni.h>
+[external][hsushulong][hsushulong@gmail.com]#include <sys/types.h>
+[external][hsushulong][hsushulong@gmail.com]#include <string>
+[external][shana][shana@zju.edu.cn]#include "macros.h"
+[external][shana][shana@zju.edu.cn]#include "utils.h"
+[external][shana][shana@zju.edu.cn]#include "utils/hook_helper.hpp"
+[external][hsushulong][hsushulong@gmail.com]
+[external][shana][shana@zju.edu.cn]namespace lspd {
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]//#define LOG_DISABLED
+[external][hsushulong][hsushulong@gmail.com]//#define DEBUG
+[external][shana][shana@zju.edu.cn]    using lsplant::operator""_tstr;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    inline bool constexpr Is64() {
+[external][shana][shana@zju.edu.cn]#if defined(__LP64__)
+[external][shana][shana@zju.edu.cn]        return true;
+[external][shana][shana@zju.edu.cn]#else
+[external][shana][shana@zju.edu.cn]        return false;
+[external][shana][shana@zju.edu.cn]#endif
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    inline constexpr bool is64 = Is64();
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    inline bool constexpr IsDebug() {
+[external][shana][shana@zju.edu.cn]#ifdef NDEBUG
+[external][shana][shana@zju.edu.cn]        return false;
+[external][shana][shana@zju.edu.cn]#else
+[external][shana][shana@zju.edu.cn]        return true;
+[external][shana][shana@zju.edu.cn]#endif
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    inline constexpr bool isDebug = IsDebug();
+[external][shana][shana@zju.edu.cn]
+[external][hsushulong][hsushulong@gmail.com]#if defined(__LP64__)
+[external][shana][shana@zju.edu.cn]# define LP_SELECT(lp32, lp64) lp64
+[external][hsushulong][hsushulong@gmail.com]#else
+[external][shana][shana@zju.edu.cn]# define LP_SELECT(lp32, lp64) lp32
+[external][hsushulong][hsushulong@gmail.com]#endif
+[external][hsushulong][hsushulong@gmail.com]
+[external][shana][shana@zju.edu.cn]    inline static constexpr auto kLibArtName = "libart.so"_tstr;
+[external][shana][shana@zju.edu.cn]    inline static constexpr auto kLibFwName = "libandroidfw.so"_tstr;
+[external][hsushulong][hsushulong@gmail.com]
+[external][shana][shana@zju.edu.cn]    inline constexpr const char *BoolToString(bool b) {
+[external][hsushulong][hsushulong@gmail.com]        return b ? "true" : "false";
+[external][hsushulong][hsushulong@gmail.com]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    extern const int versionCode;
+[external][shana][shana@zju.edu.cn]    extern const char* const versionName;
+[external][shana][shana@zju.edu.cn]}

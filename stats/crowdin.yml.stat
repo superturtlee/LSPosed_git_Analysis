@@ -1,0 +1,15 @@
+[bot][lsposed][lsposed@lsposed.org]project_id_env: CROWDIN_PROJECT_ID
+[bot][lsposed][lsposed@lsposed.org]api_token_env: CROWDIN_API_TOKEN
+[bot][lsposed][lsposed@lsposed.org]base_path: .
+[bot][lsposed][lsposed@lsposed.org]base_url: 'https://lsposed.crowdin.com/api/v2'
+[bot][lsposed][lsposed@lsposed.org]pull_request_title: '[translation] Update translation from Crowdin'
+[bot][lsposed][lsposed@lsposed.org]preserve_hierarchy: 1
+[bot][lsposed][lsposed@lsposed.org]files:
+[bot][lsposed][lsposed@lsposed.org]  - source: /app/src/main/res/values/strings.xml
+[bot][lsposed][lsposed@lsposed.org]    translation: /app/src/main/res/values-%two_letters_code%/%original_file_name%
+[bot][lsposed][lsposed@lsposed.org]    type: android
+[bot][lsposed][lsposed@lsposed.org]    dest: /app/strings.xml
+[bot][lsposed][lsposed@lsposed.org]  - source: /daemon/src/main/res/values/strings.xml
+[bot][lsposed][lsposed@lsposed.org]    translation: /daemon/src/main/res/values-%two_letters_code%/%original_file_name%
+[bot][lsposed][lsposed@lsposed.org]    type: android
+[bot][lsposed][lsposed@lsposed.org]    dest: /daemon/strings.xml

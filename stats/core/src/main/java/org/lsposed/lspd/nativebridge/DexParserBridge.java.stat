@@ -1,0 +1,19 @@
+[external][shana][shana@zju.edu.cn]package org.lsposed.lspd.nativebridge;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import java.io.IOException;
+[external][shana][shana@zju.edu.cn]import java.lang.reflect.Method;
+[external][shana][shana@zju.edu.cn]import java.nio.ByteBuffer;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import dalvik.annotation.optimization.FastNative;
+[external][noreply][noreply@nullptr.icu]import io.github.libxposed.api.utils.DexParser;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public class DexParserBridge {
+[external][shana][shana@zju.edu.cn]    @FastNative
+[external][shana][shana@zju.edu.cn]    public static native Object openDex(ByteBuffer data, long[] args) throws IOException;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @FastNative
+[external][shana][shana@zju.edu.cn]    public static native void closeDex(long cookie);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @FastNative
+[external][shana][shana@zju.edu.cn]    public static native void visitClass(long cookie, Object visitor, Class<DexParser.FieldVisitor> fieldVisitorClass, Class<DexParser.MethodVisitor> methodVisitorClass, Method classVisitMethod, Method fieldVisitMethod, Method methodVisitMethod, Method methodBodyVisitMethod, Method stopMethod);
+[external][shana][shana@zju.edu.cn]}

@@ -1,0 +1,22 @@
+[external][shana][shana@zju.edu.cn]package org.lsposed.lspd.hooker;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import android.util.Log;
+[external][shana][shana@zju.edu.cn]
+[external][noreply][noreply@nullptr.icu]import org.lsposed.lspd.impl.LSPosedBridge;
+[external][shana][shana@zju.edu.cn]
+[external][noreply][noreply@nullptr.icu]import io.github.libxposed.api.XposedInterface;
+[external][noreply][noreply@nullptr.icu]import io.github.libxposed.api.annotations.BeforeInvocation;
+[external][noreply][noreply@nullptr.icu]import io.github.libxposed.api.annotations.XposedHooker;
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]@XposedHooker
+[external][noreply][noreply@nullptr.icu]public class CrashDumpHooker implements XposedInterface.Hooker {
+[external][noreply][noreply@nullptr.icu]
+[external][noreply][noreply@nullptr.icu]    @BeforeInvocation
+[external][noreply][noreply@nullptr.icu]    public static void beforeHookedMethod(XposedInterface.BeforeHookCallback callback) {
+[external][shana][shana@zju.edu.cn]        try {
+[external][noreply][noreply@nullptr.icu]            var e = (Throwable) callback.getArgs()[0];
+[external][noreply][noreply@nullptr.icu]            LSPosedBridge.log("Crash unexpectedly: " + Log.getStackTraceString(e));
+[external][shana][shana@zju.edu.cn]        } catch (Throwable ignored) {
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

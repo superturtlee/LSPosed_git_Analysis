@@ -1,0 +1,174 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][admin][admin@0x.mk]package android.app;
+[external][admin][admin@0x.mk]
+[external][416810799][416810799@qq.com]import static de.robv.android.xposed.XposedHelpers.findClass;
+[external][416810799][416810799@qq.com]import static de.robv.android.xposed.XposedHelpers.findFieldIfExists;
+[external][416810799][416810799@qq.com]import static de.robv.android.xposed.XposedHelpers.findMethodExactIfExists;
+[external][416810799][416810799@qq.com]import static de.robv.android.xposed.XposedHelpers.getObjectField;
+[external][416810799][416810799@qq.com]import static de.robv.android.xposed.XposedHelpers.newInstance;
+[external][416810799][416810799@qq.com]import static de.robv.android.xposed.XposedHelpers.setFloatField;
+[external][416810799][416810799@qq.com]
+[external][admin][admin@0x.mk]import android.content.SharedPreferences;
+[external][admin][admin@0x.mk]import android.content.pm.ApplicationInfo;
+[external][admin][admin@0x.mk]import android.content.res.CompatibilityInfo;
+[external][admin][admin@0x.mk]import android.content.res.Configuration;
+[external][admin][admin@0x.mk]import android.content.res.Resources;
+[external][admin][admin@0x.mk]import android.view.Display;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]import java.lang.ref.WeakReference;
+[external][admin][admin@0x.mk]import java.util.Map;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]import de.robv.android.xposed.XSharedPreferences;
+[external][admin][admin@0x.mk]import de.robv.android.xposed.XposedBridge;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]/**
+[external][admin][admin@0x.mk] * Contains various methods for information about the current app.
+[external][admin][admin@0x.mk] *
+[external][admin][admin@0x.mk] * <p>For historical reasons, this class is in the {@code android.app} package. It can't be moved
+[external][admin][admin@0x.mk] * without breaking compatibility with existing modules.
+[external][admin][admin@0x.mk] */
+[external][admin][admin@0x.mk]public final class AndroidAppHelper {
+[external][admin][admin@0x.mk]	private AndroidAppHelper() {}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	private static final Class<?> CLASS_RESOURCES_KEY;
+[external][admin][admin@0x.mk]	private static final boolean HAS_IS_THEMEABLE;
+[external][admin][admin@0x.mk]	private static final boolean HAS_THEME_CONFIG_PARAMETER;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	static {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]		CLASS_RESOURCES_KEY = findClass("android.content.res.ResourcesKey", null);
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		HAS_IS_THEMEABLE = findFieldIfExists(CLASS_RESOURCES_KEY, "mIsThemeable") != null;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]		HAS_THEME_CONFIG_PARAMETER = HAS_IS_THEMEABLE && findMethodExactIfExists("android.app.ResourcesManager", null, "getThemeConfig") != null;
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	@SuppressWarnings({ "unchecked", "rawtypes" })
+[external][admin][admin@0x.mk]	private static Map<Object, WeakReference> getResourcesMap(ActivityThread activityThread) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]		Object resourcesManager = getObjectField(activityThread, "mResourcesManager");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]		return (Map) getObjectField(resourcesManager, "mResourceImpls");
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/* For SDK 24+ */
+[external][admin][admin@0x.mk]	private static Object createResourcesKey(String resDir, String[] splitResDirs, String[] overlayDirs, String[] libDirs, int displayId, Configuration overrideConfiguration, CompatibilityInfo compatInfo) {
+[external][admin][admin@0x.mk]		try {
+[external][admin][admin@0x.mk]			return newInstance(CLASS_RESOURCES_KEY, resDir, splitResDirs, overlayDirs, libDirs, displayId, overrideConfiguration, compatInfo);
+[external][admin][admin@0x.mk]		} catch (Throwable t) {
+[external][admin][admin@0x.mk]			XposedBridge.log(t);
+[external][admin][admin@0x.mk]			return null;
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/** @hide */
+[external][admin][admin@0x.mk]	public static void addActiveResource(String resDir, float scale, boolean isThemeable, Resources resources) {
+[external][admin][admin@0x.mk]		addActiveResource(resDir, resources);
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/** @hide */
+[external][admin][admin@0x.mk]	public static void addActiveResource(String resDir, Resources resources) {
+[external][admin][admin@0x.mk]		ActivityThread thread = ActivityThread.currentActivityThread();
+[external][admin][admin@0x.mk]		if (thread == null) {
+[external][admin][admin@0x.mk]			return;
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		Object resourcesKey;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]		CompatibilityInfo compatInfo = (CompatibilityInfo) newInstance(CompatibilityInfo.class);
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]		setFloatField(compatInfo, "applicationScale", resources.hashCode());
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]		resourcesKey = createResourcesKey(resDir, null, null, null, Display.DEFAULT_DISPLAY, null, compatInfo);
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		if (resourcesKey != null) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]			Object resImpl = getObjectField(resources, "mResourcesImpl");
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]			getResourcesMap(thread).put(resourcesKey, new WeakReference<>(resImpl));
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/**
+[external][admin][admin@0x.mk]	 * Returns the name of the current process. It's usually the same as the main package name.
+[external][admin][admin@0x.mk]	 */
+[external][admin][admin@0x.mk]	public static String currentProcessName() {
+[external][admin][admin@0x.mk]		String processName = ActivityThread.currentPackageName();
+[external][admin][admin@0x.mk]		if (processName == null)
+[external][admin][admin@0x.mk]			return "android";
+[external][admin][admin@0x.mk]		return processName;
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/**
+[external][admin][admin@0x.mk]	 * Returns information about the main application in the current process.
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 * <p>In a few cases, multiple apps might run in the same process, e.g. the SystemUI and the
+[external][admin][admin@0x.mk]	 * Keyguard which both have {@code android:process="com.android.systemui"} set in their
+[external][admin][admin@0x.mk]	 * manifest. In those cases, the first application that was initialized will be returned.
+[external][admin][admin@0x.mk]	 */
+[external][admin][admin@0x.mk]	public static ApplicationInfo currentApplicationInfo() {
+[external][admin][admin@0x.mk]		ActivityThread am = ActivityThread.currentActivityThread();
+[external][admin][admin@0x.mk]		if (am == null)
+[external][admin][admin@0x.mk]			return null;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		Object boundApplication = getObjectField(am, "mBoundApplication");
+[external][admin][admin@0x.mk]		if (boundApplication == null)
+[external][admin][admin@0x.mk]			return null;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]		return (ApplicationInfo) getObjectField(boundApplication, "appInfo");
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/**
+[external][admin][admin@0x.mk]	 * Returns the Android package name of the main application in the current process.
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 * <p>In a few cases, multiple apps might run in the same process, e.g. the SystemUI and the
+[external][admin][admin@0x.mk]	 * Keyguard which both have {@code android:process="com.android.systemui"} set in their
+[external][admin][admin@0x.mk]	 * manifest. In those cases, the first application that was initialized will be returned.
+[external][admin][admin@0x.mk]	 */
+[external][admin][admin@0x.mk]	public static String currentPackageName() {
+[external][admin][admin@0x.mk]		ApplicationInfo ai = currentApplicationInfo();
+[external][admin][admin@0x.mk]		return (ai != null) ? ai.packageName : "android";
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/**
+[external][admin][admin@0x.mk]	 * Returns the main {@link android.app.Application} object in the current process.
+[external][admin][admin@0x.mk]	 *
+[external][admin][admin@0x.mk]	 * <p>In a few cases, multiple apps might run in the same process, e.g. the SystemUI and the
+[external][admin][admin@0x.mk]	 * Keyguard which both have {@code android:process="com.android.systemui"} set in their
+[external][admin][admin@0x.mk]	 * manifest. In those cases, the first application that was initialized will be returned.
+[external][admin][admin@0x.mk]	 */
+[external][admin][admin@0x.mk]	public static Application currentApplication() {
+[external][admin][admin@0x.mk]		return ActivityThread.currentApplication();
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/** @deprecated Use {@link XSharedPreferences} instead. */
+[external][admin][admin@0x.mk]	@SuppressWarnings("UnusedParameters")
+[external][admin][admin@0x.mk]	@Deprecated
+[external][admin][admin@0x.mk]	public static SharedPreferences getSharedPreferencesForPackage(String packageName, String prefFileName, int mode) {
+[external][admin][admin@0x.mk]		return new XSharedPreferences(packageName, prefFileName);
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/** @deprecated Use {@link XSharedPreferences} instead. */
+[external][admin][admin@0x.mk]	@Deprecated
+[external][admin][admin@0x.mk]	public static SharedPreferences getDefaultSharedPreferencesForPackage(String packageName) {
+[external][admin][admin@0x.mk]		return new XSharedPreferences(packageName);
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]	/** @deprecated Use {@link XSharedPreferences#reload} instead. */
+[external][admin][admin@0x.mk]	@Deprecated
+[external][admin][admin@0x.mk]	public static void reloadSharedPreferencesIfNeeded(SharedPreferences pref) {
+[external][admin][admin@0x.mk]		if (pref instanceof XSharedPreferences) {
+[external][admin][admin@0x.mk]			((XSharedPreferences) pref).reload();
+[external][admin][admin@0x.mk]		}
+[external][admin][admin@0x.mk]	}
+[external][admin][admin@0x.mk]}

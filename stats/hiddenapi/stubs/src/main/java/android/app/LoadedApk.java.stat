@@ -1,0 +1,23 @@
+[external][hsushulong][hsushulong@gmail.com]package android.app;
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]import android.content.pm.ApplicationInfo;
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]public final class LoadedApk {
+[external][shana][shana@zju.edu.cn]	private ClassLoader mDefaultClassLoader;
+[external][shana][shana@zju.edu.cn]
+[external][hsushulong][hsushulong@gmail.com]	public ApplicationInfo getApplicationInfo() {
+[external][hsushulong][hsushulong@gmail.com]		throw new UnsupportedOperationException("STUB");
+[external][hsushulong][hsushulong@gmail.com]	}
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]	public ClassLoader getClassLoader() {
+[external][hsushulong][hsushulong@gmail.com]		throw new UnsupportedOperationException("STUB");
+[external][hsushulong][hsushulong@gmail.com]	}
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]	public String getPackageName() {
+[external][hsushulong][hsushulong@gmail.com]		throw new UnsupportedOperationException("STUB");
+[external][hsushulong][hsushulong@gmail.com]	}
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]	public String getResDir() {
+[external][hsushulong][hsushulong@gmail.com]		throw new UnsupportedOperationException("STUB");
+[external][hsushulong][hsushulong@gmail.com]	}
+[external][hsushulong][hsushulong@gmail.com]}

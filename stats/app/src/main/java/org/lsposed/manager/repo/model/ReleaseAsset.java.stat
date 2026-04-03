@@ -1,0 +1,88 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][vvb2060][vvb2060@gmail.com]package org.lsposed.manager.repo.model;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]import androidx.annotation.Nullable;
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import com.google.gson.annotations.Expose;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]import com.google.gson.annotations.SerializedName;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][88844448+tehcneko@users.noreply.github.com]public class ReleaseAsset {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @SerializedName("name")
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Expose
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private String name;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @SerializedName("contentType")
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Expose
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private String contentType;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @SerializedName("downloadUrl")
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    @Expose
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    private String downloadUrl;
+[external][shana][shana@zju.edu.cn]    @SerializedName("downloadCount")
+[external][shana][shana@zju.edu.cn]    @Expose
+[external][shana][shana@zju.edu.cn]    private int downloadCount = 0;
+[external][shana][shana@zju.edu.cn]    @SerializedName("size")
+[external][shana][shana@zju.edu.cn]    @Expose
+[external][shana][shana@zju.edu.cn]    private int size = 0;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    @Nullable
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public String getName() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return name;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public void setName(String name) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        this.name = name;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    @Nullable
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public String getContentType() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return contentType;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public void setContentType(String contentType) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        this.contentType = contentType;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][howard20181][40033067+Howard20181@users.noreply.github.com]    @Nullable
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public String getDownloadUrl() {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        return downloadUrl;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    public void setDownloadUrl(String downloadUrl) {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        this.downloadUrl = downloadUrl;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public int getDownloadCount() {
+[external][shana][shana@zju.edu.cn]        return downloadCount;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void setDownloadCount(int downloadCount) {
+[external][shana][shana@zju.edu.cn]        this.downloadCount = downloadCount;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public int getSize() {
+[external][shana][shana@zju.edu.cn]        return size;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    public void setSize(int size) {
+[external][shana][shana@zju.edu.cn]        this.size = size;
+[external][shana][shana@zju.edu.cn]    }
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]}

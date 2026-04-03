@@ -1,0 +1,260 @@
+[external][shana][shana@zju.edu.cn]package org.lsposed.lspd.service;
+[external][shana][shana@zju.edu.cn]
+[internal][dr-tsng][tsng.nullptr@outlook.com]import static org.lsposed.lspd.service.BridgeService.TAG;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import android.annotation.SuppressLint;
+[external][shana][shana@zju.edu.cn]import android.app.ActivityThread;
+[external][shana][shana@zju.edu.cn]import android.app.IActivityController;
+[external][shana][shana@zju.edu.cn]import android.app.IActivityManager;
+[external][shana][shana@zju.edu.cn]import android.content.Context;
+[external][shana][shana@zju.edu.cn]import android.content.Intent;
+[external][shana][shana@zju.edu.cn]import android.os.Binder;
+[external][shana][shana@zju.edu.cn]import android.os.Bundle;
+[external][shana][shana@zju.edu.cn]import android.os.IBinder;
+[external][shana][shana@zju.edu.cn]import android.os.Parcel;
+[external][shana][shana@zju.edu.cn]import android.os.ResultReceiver;
+[external][shana][shana@zju.edu.cn]import android.os.ServiceManager;
+[external][shana][shana@zju.edu.cn]import android.os.ShellCallback;
+[external][shana][shana@zju.edu.cn]import android.os.ShellCommand;
+[external][shana][shana@zju.edu.cn]import android.util.Log;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import androidx.annotation.NonNull;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import org.lsposed.lspd.BuildConfig;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import java.io.FileDescriptor;
+[external][shana][shana@zju.edu.cn]import java.io.InputStream;
+[external][shana][shana@zju.edu.cn]import java.io.PrintWriter;
+[external][shana][shana@zju.edu.cn]import java.lang.reflect.Constructor;
+[external][shana][shana@zju.edu.cn]import java.lang.reflect.InvocationHandler;
+[external][shana][shana@zju.edu.cn]import java.lang.reflect.Method;
+[external][shana][shana@zju.edu.cn]import java.lang.reflect.Proxy;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public class ActivityController extends IActivityController.Stub {
+[external][shana][shana@zju.edu.cn]    private static Constructor<?> myActivityControllerConstructor = null;
+[external][shana][shana@zju.edu.cn]    private static Method myActivityControllerRunner = null;
+[external][shana][shana@zju.edu.cn]    private static boolean inited = false;
+[external][shana][shana@zju.edu.cn]    private static int fdSize = -1;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private static IActivityController controller = null;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    static private ActivityController instance;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    static {
+[external][shana][shana@zju.edu.cn]        try {
+[external][shana][shana@zju.edu.cn]            Context ctx = ActivityThread.currentActivityThread().getSystemContext();
+[external][shana][shana@zju.edu.cn]            var systemClassLoader = ctx.getClassLoader();
+[external][shana][shana@zju.edu.cn]            @SuppressLint("PrivateApi") var myActivityControllerClass = Class.forName("com.android.server.am.ActivityManagerShellCommand$MyActivityController", false, systemClassLoader);
+[external][shana][shana@zju.edu.cn]            try {
+[external][shana][shana@zju.edu.cn]                myActivityControllerConstructor = myActivityControllerClass.getDeclaredConstructor(IActivityManager.class, PrintWriter.class, InputStream.class,
+[external][shana][shana@zju.edu.cn]                        String.class, boolean.class);
+[external][shana][shana@zju.edu.cn]            } catch (NoSuchMethodException e1) {
+[external][shana][shana@zju.edu.cn]                try {
+[external][shana][shana@zju.edu.cn]                    myActivityControllerConstructor = myActivityControllerClass.getDeclaredConstructor(IActivityManager.class, PrintWriter.class, InputStream.class,
+[external][shana][shana@zju.edu.cn]                            String.class, boolean.class, boolean.class, String.class, boolean.class);
+[external][shana][shana@zju.edu.cn]                } catch (NoSuchMethodException e2) {
+[external][shana][shana@zju.edu.cn]                    myActivityControllerConstructor = myActivityControllerClass.getDeclaredConstructor(IActivityManager.class, PrintWriter.class, InputStream.class,
+[external][shana][shana@zju.edu.cn]                            String.class, boolean.class, boolean.class, String.class, boolean.class, boolean.class);
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            myActivityControllerConstructor.setAccessible(true);
+[external][shana][shana@zju.edu.cn]            myActivityControllerRunner = myActivityControllerClass.getDeclaredMethod("run");
+[external][shana][shana@zju.edu.cn]            myActivityControllerRunner.setAccessible(true);
+[external][shana][shana@zju.edu.cn]            var tmp = Parcel.obtain();
+[external][shana][shana@zju.edu.cn]            tmp.writeFileDescriptor(FileDescriptor.in);
+[external][shana][shana@zju.edu.cn]            fdSize = tmp.dataPosition();
+[external][shana][shana@zju.edu.cn]            tmp.recycle();
+[external][shana][shana@zju.edu.cn]            inited = true;
+[external][shana][shana@zju.edu.cn]        } catch (Throwable e) {
+[external][shana][shana@zju.edu.cn]            Log.e(TAG, "Failed to init ActivityController", e);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    private ActivityController() {
+[external][shana][shana@zju.edu.cn]        instance = this;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    static private @NonNull
+[external][shana][shana@zju.edu.cn]    ActivityController getInstance() {
+[external][shana][shana@zju.edu.cn]        if (instance == null) new ActivityController();
+[external][shana][shana@zju.edu.cn]        return instance;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    static boolean replaceShellCommand(IBinder am, Parcel data, Parcel reply) {
+[external][shana][shana@zju.edu.cn]        if (!inited) return false;
+[external][shana][shana@zju.edu.cn]        try {
+[external][shana][shana@zju.edu.cn]            data.setDataPosition(fdSize * 3);
+[external][shana][shana@zju.edu.cn]            String[] args = data.createStringArray();
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]            if (args.length > 0 && "monitor".equals(args[0])) {
+[external][shana][shana@zju.edu.cn]                data.setDataPosition(0);
+[external][shana][shana@zju.edu.cn]                try (var in = data.readFileDescriptor();
+[external][shana][shana@zju.edu.cn]                     var out = data.readFileDescriptor();
+[external][shana][shana@zju.edu.cn]                     var err = data.readFileDescriptor()) {
+[external][shana][shana@zju.edu.cn]                    data.createStringArray();
+[external][shana][shana@zju.edu.cn]                    ShellCallback shellCallback = ShellCallback.CREATOR.createFromParcel(data);
+[external][shana][shana@zju.edu.cn]                    ResultReceiver resultReceiver = ResultReceiver.CREATOR.createFromParcel(data);
+[external][shana][shana@zju.edu.cn]                    new ShellCommand() {
+[external][shana][shana@zju.edu.cn]                        @Override
+[external][shana][shana@zju.edu.cn]                        public int onCommand(String cmd) {
+[external][shana][shana@zju.edu.cn]                            final PrintWriter pw = getOutPrintWriter();
+[external][shana][shana@zju.edu.cn]                            String opt;
+[external][shana][shana@zju.edu.cn]                            String gdbPort = null;
+[external][shana][shana@zju.edu.cn]                            boolean monkey = false;
+[external][shana][shana@zju.edu.cn]                            boolean simpleMode = false;
+[external][shana][shana@zju.edu.cn]                            String target = null;
+[external][shana][shana@zju.edu.cn]                            boolean alwaysContinue = false;
+[external][shana][shana@zju.edu.cn]                            boolean alwaysKill = false;
+[external][shana][shana@zju.edu.cn]                            while ((opt = getNextOption()) != null) {
+[external][shana][shana@zju.edu.cn]                                if (opt.equals("--gdb")) {
+[external][shana][shana@zju.edu.cn]                                    gdbPort = getNextArgRequired();
+[external][shana][shana@zju.edu.cn]                                } else if (opt.equals("-m")) {
+[external][shana][shana@zju.edu.cn]                                    monkey = true;
+[external][shana][shana@zju.edu.cn]                                } else if (myActivityControllerConstructor.getParameterCount() == 8) {
+[external][shana][shana@zju.edu.cn]                                    switch (opt) {
+[external][shana][shana@zju.edu.cn]                                        case "-p":
+[external][shana][shana@zju.edu.cn]                                            target = getNextArgRequired();
+[external][shana][shana@zju.edu.cn]                                            break;
+[external][shana][shana@zju.edu.cn]                                        case "-s":
+[external][shana][shana@zju.edu.cn]                                            simpleMode = true;
+[external][shana][shana@zju.edu.cn]                                            break;
+[external][shana][shana@zju.edu.cn]                                        case "-c":
+[external][shana][shana@zju.edu.cn]                                            alwaysContinue = true;
+[external][shana][shana@zju.edu.cn]                                            break;
+[external][shana][shana@zju.edu.cn]                                    }
+[external][shana][shana@zju.edu.cn]                                } else if (myActivityControllerConstructor.getParameterCount() > 8) {
+[external][shana][shana@zju.edu.cn]                                    switch (opt) {
+[external][shana][shana@zju.edu.cn]                                        case "-k":
+[external][shana][shana@zju.edu.cn]                                            alwaysKill = true;
+[external][shana][shana@zju.edu.cn]                                            break;
+[external][shana][shana@zju.edu.cn]                                    }
+[external][shana][shana@zju.edu.cn]                                } else {
+[external][shana][shana@zju.edu.cn]                                    getErrPrintWriter().println("Error: Unknown option: " + opt);
+[external][shana][shana@zju.edu.cn]                                    return -1;
+[external][shana][shana@zju.edu.cn]                                }
+[external][shana][shana@zju.edu.cn]                            }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]                            return replaceMyControllerActivity(pw, getRawInputStream(), gdbPort, monkey, simpleMode, target, alwaysContinue, alwaysKill);
+[external][shana][shana@zju.edu.cn]                        }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]                        @Override
+[external][shana][shana@zju.edu.cn]                        public void onHelp() {
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]                        }
+[external][shana][shana@zju.edu.cn]                    }.exec((Binder) am, in.getFileDescriptor(), out.getFileDescriptor(), err.getFileDescriptor(), args, shellCallback, resultReceiver);
+[external][shana][shana@zju.edu.cn]                } catch (Throwable e) {
+[external][shana][shana@zju.edu.cn]                    Log.e(TAG, "replace shell command", e);
+[external][shana][shana@zju.edu.cn]                } finally {
+[external][shana][shana@zju.edu.cn]                    if (reply != null) reply.writeNoException();
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]                return true;
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        } finally {
+[external][shana][shana@zju.edu.cn]            data.setDataPosition(0);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return false;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    static boolean replaceActivityController(Parcel data) {
+[external][shana][shana@zju.edu.cn]        if (!inited) return false;
+[external][shana][shana@zju.edu.cn]        try {
+[external][shana][shana@zju.edu.cn]            var position = data.dataPosition();
+[external][shana][shana@zju.edu.cn]            var controller = replaceActivityController(IActivityController.Stub.asInterface(data.readStrongBinder()));
+[external][shana][shana@zju.edu.cn]            var b = data.readInt();
+[external][shana][shana@zju.edu.cn]            data.setDataSize(position);
+[external][shana][shana@zju.edu.cn]            data.setDataPosition(position);
+[external][shana][shana@zju.edu.cn]            data.writeStrongInterface(controller);
+[external][shana][shana@zju.edu.cn]            data.writeInt(b);
+[external][shana][shana@zju.edu.cn]        } catch (Throwable e) {
+[external][shana][shana@zju.edu.cn]            Log.e(TAG, "replace activity controller", e);
+[external][shana][shana@zju.edu.cn]        } finally {
+[external][shana][shana@zju.edu.cn]            data.setDataPosition(0);
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return false;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    static private int replaceMyControllerActivity(PrintWriter pw, InputStream stream, String gdbPort, boolean monkey, boolean simpleMode, String target, boolean alwaysContinue, boolean alwaysKill) {
+[external][shana][shana@zju.edu.cn]        try {
+[external][shana][shana@zju.edu.cn]            InvocationHandler handler = (proxy, method, args1) -> {
+[external][shana][shana@zju.edu.cn]                if (method.getName().equals("setActivityController")) {
+[external][shana][shana@zju.edu.cn]                    try {
+[external][shana][shana@zju.edu.cn]                        args1[0] = replaceActivityController((IActivityController) args1[0]);
+[external][shana][shana@zju.edu.cn]                    } catch (Throwable e) {
+[external][shana][shana@zju.edu.cn]                        Log.e(TAG, "replace activity controller", e);
+[external][shana][shana@zju.edu.cn]                    }
+[external][shana][shana@zju.edu.cn]                }
+[external][shana][shana@zju.edu.cn]                return method.invoke(ServiceManager.getService("activity"), args1);
+[external][shana][shana@zju.edu.cn]            };
+[external][shana][shana@zju.edu.cn]            var amProxy = Proxy.newProxyInstance(BridgeService.class.getClassLoader(),
+[external][shana][shana@zju.edu.cn]                    new Class[]{myActivityControllerConstructor.getParameterTypes()[0]}, handler);
+[external][shana][shana@zju.edu.cn]            Object ctrl;
+[external][shana][shana@zju.edu.cn]            if (myActivityControllerConstructor.getParameterCount() == 5) {
+[external][shana][shana@zju.edu.cn]                ctrl = myActivityControllerConstructor.newInstance(amProxy, pw, stream, gdbPort, monkey);
+[external][shana][shana@zju.edu.cn]            } else if (myActivityControllerConstructor.getParameterCount() == 8){
+[external][shana][shana@zju.edu.cn]                ctrl = myActivityControllerConstructor.newInstance(amProxy, pw, stream, gdbPort, monkey, simpleMode, target, alwaysContinue);
+[external][shana][shana@zju.edu.cn]            } else {
+[external][shana][shana@zju.edu.cn]                ctrl = myActivityControllerConstructor.newInstance(amProxy, pw, stream, gdbPort, monkey, simpleMode, target, alwaysContinue, alwaysKill);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]            myActivityControllerRunner.invoke(ctrl);
+[external][shana][shana@zju.edu.cn]            return 0;
+[external][shana][shana@zju.edu.cn]        } catch (Throwable e) {
+[external][shana][shana@zju.edu.cn]            Log.e(TAG, "run monitor", e);
+[external][shana][shana@zju.edu.cn]            return 1;
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    static private IActivityController replaceActivityController(IActivityController controller) {
+[external][shana][shana@zju.edu.cn]        Log.d(TAG, "android.app.IActivityManager.setActivityController is called");
+[external][shana][shana@zju.edu.cn]        ActivityController.controller = controller;
+[external][shana][shana@zju.edu.cn]        return getInstance();
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public boolean activityStarting(Intent intent, String pkg) {
+[external][shana][shana@zju.edu.cn]        Log.d(TAG, "activity from " + pkg + " with " + intent + " with extras " + intent.getExtras() + " is starting");
+[external][shana][shana@zju.edu.cn]        var snapshot = BridgeService.getService();
+[external][shana][shana@zju.edu.cn]        if (snapshot != null && BuildConfig.MANAGER_INJECTED_PKG_NAME.equals(pkg)) {
+[external][shana][shana@zju.edu.cn]            try {
+[external][shana][shana@zju.edu.cn]                return snapshot.preStartManager(pkg, intent);
+[external][shana][shana@zju.edu.cn]            } catch (Throwable e) {
+[external][shana][shana@zju.edu.cn]                Log.e(TAG, "request manager", e);
+[external][shana][shana@zju.edu.cn]            }
+[external][shana][shana@zju.edu.cn]        }
+[external][shana][shana@zju.edu.cn]        return controller == null || controller.activityStarting(intent, pkg);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public boolean activityResuming(String pkg) {
+[external][shana][shana@zju.edu.cn]        return controller == null || controller.activityResuming(pkg);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public boolean appCrashed(String processName, int pid, String shortMsg, String longMsg, long timeMillis, String stackTrace) {
+[external][shana][shana@zju.edu.cn]        return controller == null || controller.appCrashed(processName, pid, shortMsg, longMsg, timeMillis, stackTrace);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public int appEarlyNotResponding(String processName, int pid, String annotation) {
+[external][shana][shana@zju.edu.cn]        return controller == null ? 0 : controller.appNotResponding(processName, pid, annotation);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public int appNotResponding(String processName, int pid, String processStats) {
+[external][shana][shana@zju.edu.cn]        return controller == null ? 0 : controller.appNotResponding(processName, pid, processStats);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public int systemNotResponding(String msg) {
+[external][shana][shana@zju.edu.cn]        return controller == null ? -1 : controller.systemNotResponding(msg);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public boolean moveTaskToFront(String pkg, int task, int flags, Bundle options) {
+[external][shana][shana@zju.edu.cn]        return controller == null || controller.moveTaskToFront(pkg, task, flags, options);
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    @Override
+[external][shana][shana@zju.edu.cn]    public IBinder asBinder() {
+[external][shana][shana@zju.edu.cn]        return this;
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}

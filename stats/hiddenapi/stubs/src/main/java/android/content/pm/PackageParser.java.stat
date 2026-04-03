@@ -1,0 +1,32 @@
+[external][hsushulong][hsushulong@gmail.com]package android.content.pm;
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]import java.io.File;
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]public class PackageParser {
+[external][hsushulong][hsushulong@gmail.com]	public static class PackageLite {
+[external][hsushulong][hsushulong@gmail.com]		public final String packageName = null;
+[external][hsushulong][hsushulong@gmail.com]	}
+[external][hsushulong][hsushulong@gmail.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]	public final static class Package {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]        public ApplicationInfo applicationInfo;
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]	}
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[external][hsushulong][hsushulong@gmail.com]	/** Before SDK21 */
+[external][hsushulong][hsushulong@gmail.com]	public static PackageLite parsePackageLite(String packageFile, int flags) {
+[external][hsushulong][hsushulong@gmail.com]		throw new UnsupportedOperationException("STUB");
+[external][hsushulong][hsushulong@gmail.com]	}
+[external][hsushulong][hsushulong@gmail.com]
+[external][hsushulong][hsushulong@gmail.com]	/** Since SDK21 */
+[external][hsushulong][hsushulong@gmail.com]	public static PackageLite parsePackageLite(File packageFile, int flags) throws PackageParserException {
+[external][hsushulong][hsushulong@gmail.com]		throw new UnsupportedOperationException("STUB");
+[external][hsushulong][hsushulong@gmail.com]	}
+[external][hsushulong][hsushulong@gmail.com]
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]	public Package parsePackage(File packageFile, int flags, boolean useCaches)
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]			throws PackageParserException {
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]		throw new UnsupportedOperationException("STUB");
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]	}
+[internal][dr-tsng][52071314+Dr-TSNG@users.noreply.github.com]
+[external][hsushulong][hsushulong@gmail.com]	/** Since SDK21 */
+[external][hsushulong][hsushulong@gmail.com]	public static class PackageParserException extends Exception {
+[external][hsushulong][hsushulong@gmail.com]	}
+[external][hsushulong][hsushulong@gmail.com]}

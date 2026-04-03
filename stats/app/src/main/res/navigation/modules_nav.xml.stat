@@ -1,0 +1,59 @@
+[external][shana][shana@zju.edu.cn]<?xml version="1.0" encoding="utf-8"?><!--
+[external][shana][shana@zju.edu.cn]  ~ This file is part of LSPosed.
+[external][shana][shana@zju.edu.cn]  ~
+[external][shana][shana@zju.edu.cn]  ~ LSPosed is free software: you can redistribute it and/or modify
+[external][shana][shana@zju.edu.cn]  ~ it under the terms of the GNU General Public License as published by
+[external][shana][shana@zju.edu.cn]  ~ the Free Software Foundation, either version 3 of the License, or
+[external][shana][shana@zju.edu.cn]  ~ (at your option) any later version.
+[external][shana][shana@zju.edu.cn]  ~
+[external][shana][shana@zju.edu.cn]  ~ LSPosed is distributed in the hope that it will be useful,
+[external][shana][shana@zju.edu.cn]  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][shana][shana@zju.edu.cn]  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][shana][shana@zju.edu.cn]  ~ GNU General Public License for more details.
+[external][shana][shana@zju.edu.cn]  ~
+[external][shana][shana@zju.edu.cn]  ~ You should have received a copy of the GNU General Public License
+[external][shana][shana@zju.edu.cn]  ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][shana][shana@zju.edu.cn]  ~
+[external][shana][shana@zju.edu.cn]  ~ Copyright (C) 2021 LSPosed Contributors
+[external][shana][shana@zju.edu.cn]  -->
+[external][shana][shana@zju.edu.cn]<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+[external][shana][shana@zju.edu.cn]    xmlns:app="http://schemas.android.com/apk/res-auto"
+[external][shana][shana@zju.edu.cn]    android:id="@+id/modules_nav"
+[external][shana][shana@zju.edu.cn]    app:startDestination="@id/modules_fragment">
+[external][shana][shana@zju.edu.cn]    <fragment
+[external][shana][shana@zju.edu.cn]        android:id="@+id/modules_fragment"
+[external][shana][shana@zju.edu.cn]        android:name="org.lsposed.manager.ui.fragment.ModulesFragment"
+[external][shana][shana@zju.edu.cn]        android:label="modules">
+[external][shana][shana@zju.edu.cn]        <action
+[external][shana][shana@zju.edu.cn]            android:id="@+id/action_modules_fragment_to_app_list_fragment"
+[external][shana][shana@zju.edu.cn]            app:destination="@id/app_list_fragment"
+[external][shana][shana@zju.edu.cn]            app:enterAnim="@anim/fragment_enter"
+[external][shana][shana@zju.edu.cn]            app:exitAnim="@anim/fragment_exit"
+[external][shana][shana@zju.edu.cn]            app:popEnterAnim="@anim/fragment_enter_pop"
+[external][shana][shana@zju.edu.cn]            app:popExitAnim="@anim/fragment_exit_pop" />
+[external][shana][shana@zju.edu.cn]    </fragment>
+[external][shana][shana@zju.edu.cn]    <fragment
+[external][shana][shana@zju.edu.cn]        android:id="@+id/app_list_fragment"
+[external][shana][shana@zju.edu.cn]        android:name="org.lsposed.manager.ui.fragment.AppListFragment"
+[external][shana][shana@zju.edu.cn]        android:label="app_list">
+[external][shana][shana@zju.edu.cn]        <argument
+[external][shana][shana@zju.edu.cn]            android:name="modulePackageName"
+[external][shana][shana@zju.edu.cn]            app:argType="string" />
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]        <argument
+[external][shana][shana@zju.edu.cn]            android:name="moduleUserId"
+[external][shana][shana@zju.edu.cn]            app:argType="integer" />
+[external][shana][shana@zju.edu.cn]        <deepLink
+[external][shana][shana@zju.edu.cn]            android:id="@+id/repo_item_deeplink"
+[external][shana][shana@zju.edu.cn]            app:uri="lsposed://module?modulePackageName={modulePackageName}&amp;moduleUserId={moduleUserId}" />
+[external][shana][shana@zju.edu.cn]    </fragment>
+[external][shana][shana@zju.edu.cn]    <action
+[external][shana][shana@zju.edu.cn]        android:id="@+id/action_app_list_fragment_to_modules_fragment"
+[external][shana][shana@zju.edu.cn]        app:destination="@id/modules_fragment"
+[external][shana][shana@zju.edu.cn]        app:enterAnim="@anim/fragment_enter"
+[external][shana][shana@zju.edu.cn]        app:exitAnim="@anim/fragment_exit"
+[external][shana][shana@zju.edu.cn]        app:popEnterAnim="@anim/fragment_enter_pop"
+[external][shana][shana@zju.edu.cn]        app:popExitAnim="@anim/fragment_exit_pop"
+[external][shana][shana@zju.edu.cn]        app:popUpTo="@id/main_fragment"
+[external][shana][shana@zju.edu.cn]        app:popUpToInclusive="true" />
+[external][shana][shana@zju.edu.cn]</navigation>

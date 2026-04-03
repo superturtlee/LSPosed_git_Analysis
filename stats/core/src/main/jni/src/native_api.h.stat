@@ -1,0 +1,53 @@
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]/*
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * This file is part of LSPosed.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is free software: you can redistribute it and/or modify
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * it under the terms of the GNU General Public License as published by
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * the Free Software Foundation, either version 3 of the License, or
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * (at your option) any later version.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * LSPosed is distributed in the hope that it will be useful,
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * GNU General Public License for more details.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * You should have received a copy of the GNU General Public License
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] *
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2020 EdXposed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] * Copyright (C) 2021 LSPosed Contributors
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com] */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]//
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]// Created by kotori on 2/4/21.
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]//
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]#ifndef LSPOSED_NATIVE_API_H
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]#define LSPOSED_NATIVE_API_H
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]#include <cstdint>
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]#include <string>
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]#include "utils/hook_helper.hpp"
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]
+[external][shana][shana@zju.edu.cn]typedef int (*HookFunType)(void *func, void *replace, void **backup);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]typedef int (*UnhookFunType)(void *func);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]typedef void (*NativeOnModuleLoaded)(const char *name, void *handle);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]typedef struct {
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]    uint32_t version;
+[external][shana][shana@zju.edu.cn]    HookFunType hookFunc;
+[external][shana][shana@zju.edu.cn]    UnhookFunType unhookFunc;
+[external][shana][shana@zju.edu.cn]} NativeAPIEntries;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]typedef NativeOnModuleLoaded (*NativeInit)(const NativeAPIEntries *entries);
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]namespace lspd {
+[external][shana][shana@zju.edu.cn]    bool InstallNativeAPI(const lsplant::HookHandler& handler);
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]    void RegisterNativeLib(const std::string &library_name);
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]}
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]
+[internal][kotori2][17663689+kotori2@users.noreply.github.com]#endif //LSPOSED_NATIVE_API_H

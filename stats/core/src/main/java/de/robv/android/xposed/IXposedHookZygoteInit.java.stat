@@ -1,0 +1,35 @@
+[external][admin][admin@0x.mk]package de.robv.android.xposed;
+[external][admin][admin@0x.mk]
+[external][admin][admin@0x.mk]/**
+[external][admin][admin@0x.mk] * Hook the initialization of Zygote process(es), from which all the apps are forked.
+[external][admin][admin@0x.mk] *
+[external][admin][admin@0x.mk] * <p>Implement this interface in your module's main class in order to be notified when Android is
+[external][admin][admin@0x.mk] * starting up. In {@link IXposedHookZygoteInit}, you can modify objects and place hooks that should
+[external][admin][admin@0x.mk] * be applied for every app. Only the Android framework/system classes are available at that point
+[external][admin][admin@0x.mk] * in time. Use {@code null} as class loader for {@link XposedHelpers#findAndHookMethod(String, ClassLoader, String, Object...)}
+[external][admin][admin@0x.mk] * and its variants.
+[external][admin][admin@0x.mk] *
+[external][admin][admin@0x.mk] * <p>If you want to hook one/multiple specific apps, use {@link IXposedHookLoadPackage} instead.
+[external][admin][admin@0x.mk] */
+[external][admin][admin@0x.mk]public interface IXposedHookZygoteInit extends IXposedMod {
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * Called very early during startup of Zygote.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @param startupParam Details about the module itself and the started process.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     * @throws Throwable everything is caught, but will prevent further initialization of the module.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]     */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    void initZygote(StartupParam startupParam) throws Throwable;
+[external][admin][admin@0x.mk]
+[external][shana][shana@zju.edu.cn]    /** Data holder for {@link #initZygote}. */
+[external][shana][shana@zju.edu.cn]    final class StartupParam {
+[external][shana][shana@zju.edu.cn]        /*package*/ StartupParam() {}
+[external][admin][admin@0x.mk]
+[external][shana][shana@zju.edu.cn]        /** The path to the module's APK. */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public String modulePath;
+[external][admin][admin@0x.mk]
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        /**
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         * Always {@code true} on 32-bit ROMs. On 64-bit, it's only {@code true} for the primary
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         * process that starts the system_server.
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]         */
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]        public boolean startsSystemServer;
+[external][tehcneko][7764726+tehcneko@users.noreply.github.com]    }
+[external][admin][admin@0x.mk]}

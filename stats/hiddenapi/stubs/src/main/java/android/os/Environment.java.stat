@@ -1,0 +1,9 @@
+[external][shana][shana@zju.edu.cn]package android.os;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]import java.io.File;
+[external][shana][shana@zju.edu.cn]
+[external][shana][shana@zju.edu.cn]public class Environment {
+[external][shana][shana@zju.edu.cn]    public static File getDataProfilesDePackageDirectory(int userId, String packageName) {
+[external][shana][shana@zju.edu.cn]        throw new IllegalArgumentException("STUB");
+[external][shana][shana@zju.edu.cn]    }
+[external][shana][shana@zju.edu.cn]}
